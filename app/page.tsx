@@ -1,4 +1,13 @@
 import React from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function Home() {
   return (
@@ -11,9 +20,9 @@ export default function Home() {
         <div className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             {/* Beta badge */}
-            <div className="mb-6 inline-flex items-center rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-700 dark:bg-primary-900 dark:text-primary-300">
+            <Badge variant="default" className="mb-6">
               🚀 Developer Productivity Platform
-            </div>
+            </Badge>
 
             {/* Main headline */}
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-6xl">
@@ -34,12 +43,12 @@ export default function Home() {
 
             {/* CTA buttons */}
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <button className="rounded-md bg-primary-500 px-8 py-3 text-sm font-semibold text-white shadow-sm hover:bg-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500">
+              <Button variant="default" size="lg">
                 Start Planning & Building
-              </button>
-              <button className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100 hover:text-primary-500">
+              </Button>
+              <Button variant="link" className="leading-6">
                 View Demo →
-              </button>
+              </Button>
             </div>
 
             {/* Feature hints */}
@@ -101,23 +110,25 @@ export default function Home() {
                 highlight: "AI-Powered",
               },
             ].map((feature, index) => (
-              <div
+              <Card
                 key={index}
-                className="relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 hover:border-primary-300 transition-colors"
+                className="hover:border-primary-300 transition-colors"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl">{feature.icon}</span>
-                  <span className="rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-400">
-                    {feature.highlight}
-                  </span>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  {feature.description}
-                </p>
-              </div>
+                <CardHeader>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-2xl">{feature.icon}</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {feature.highlight}
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-600 dark:text-gray-300">
+                    {feature.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
             ))}
           </div>
 
@@ -139,23 +150,25 @@ export default function Home() {
                 highlight: "GPT-4 Powered",
               },
             ].map((feature, index) => (
-              <div
+              <Card
                 key={index}
-                className="relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 hover:border-primary-300 transition-colors"
+                className="hover:border-primary-300 transition-colors"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl">{feature.icon}</span>
-                  <span className="rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-400">
-                    {feature.highlight}
-                  </span>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  {feature.description}
-                </p>
-              </div>
+                <CardHeader>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-2xl">{feature.icon}</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {feature.highlight}
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-600 dark:text-gray-300">
+                    {feature.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
@@ -183,12 +196,10 @@ export default function Home() {
                 </p>
 
                 <div className="mt-10 flex items-center justify-center gap-x-6">
-                  <button className="rounded-md bg-primary-500 px-8 py-3 text-sm font-semibold text-white shadow-sm hover:bg-primary-600">
+                  <Button variant="default" size="lg">
                     Get Early Access
-                  </button>
-                  <button className="text-sm font-semibold text-gray-900 dark:text-gray-100 hover:text-primary-500">
-                    Star on GitHub ⭐
-                  </button>
+                  </Button>
+                  <Button variant="link">Star on GitHub ⭐</Button>
                 </div>
 
                 {/* Stats */}
