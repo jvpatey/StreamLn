@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
+  // App Router is now stable, no experimental flag needed
 };
 
 module.exports = nextConfig;
+ 
