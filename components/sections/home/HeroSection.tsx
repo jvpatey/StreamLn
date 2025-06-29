@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Zap } from "lucide-react";
 
 export default function HeroSection() {
   return (
@@ -10,8 +11,12 @@ export default function HeroSection() {
       <div className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           {/* Beta badge */}
-          <Badge variant="default" className="mb-6">
-            🚀 Developer Productivity Platform
+          <Badge
+            variant="secondary"
+            className="group mb-6 bg-card/50 backdrop-blur-sm border border-border/50 text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all duration-200 px-4 py-2 text-sm font-medium"
+          >
+            <Zap className="w-4 h-4 mr-2 text-primary group-hover:text-primary transition-colors duration-200 group-hover:rotate-12 group-hover:scale-110" />
+            Developer Productivity Platform
           </Badge>
 
           {/* Main headline */}

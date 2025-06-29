@@ -1,43 +1,44 @@
 import FeatureCard from "@/components/FeatureCard";
+import { FileText, Kanban, Search, Network, Brain } from "lucide-react";
 
 export default function FeaturesSection() {
   const mainFeatures = [
     {
-      title: "📝 Smart Notes",
+      title: "Smart Notes",
       description:
         "Rich markdown + code editor with tagging and linking. Inline summarization from PDFs and transcripts.",
-      icon: "📝",
+      icon: <FileText size={24} />,
       highlight: "Tiptap Editor",
     },
     {
-      title: "✅ Task Boards",
+      title: "Task Boards",
       description:
         "Visual Kanban boards with drag-and-drop functionality. Link tasks to notes, add metadata, and organize visually.",
-      icon: "✅",
+      icon: <Kanban size={24} />,
       highlight: "Drag & Drop",
     },
     {
-      title: "🔍 Semantic Search",
+      title: "Semantic Search",
       description:
         "Natural language search across all notes and tasks. Filter by tags, links, or content type.",
-      icon: "🔍",
+      icon: <Search size={24} />,
       highlight: "AI-Powered",
     },
   ];
 
   const additionalFeatures = [
     {
-      title: "🔗 Knowledge Graph",
+      title: "Knowledge Graph",
       description:
         "Visualize how notes, tasks, and tags connect. Interactive graph view powered by React Flow.",
-      icon: "🔗",
+      icon: <Network size={24} />,
       highlight: "React Flow",
     },
     {
-      title: "🧠 AI Copilot",
+      title: "AI Copilot",
       description:
         "Optional sidebar assistant to retrieve related notes, summarize content, and navigate contextually.",
-      icon: "🧠",
+      icon: <Brain size={24} />,
       highlight: "GPT-4 Powered",
     },
   ];
