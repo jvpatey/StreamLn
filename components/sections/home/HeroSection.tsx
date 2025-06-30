@@ -24,7 +24,7 @@ export default function HeroSection() {
             {/* Main logo text */}
             <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl">
               <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-primary-500 via-primary-600 to-accent-500 bg-clip-text text-transparent animate-in slide-in-from-bottom-4">
+                <span className="bg-gradient-to-r from-primary-500 via-primary-600 to-accent-500 bg-clip-text text-transparent">
                   StreamLn
                 </span>
                 {/* Subtle glow effect */}
@@ -34,7 +34,7 @@ export default function HeroSection() {
 
             {/* Integrated subtext */}
             <div className="mt-2 relative">
-              <p className="text-sm font-medium tracking-wide text-muted-foreground/80 animate-in fade-in-50 delay-300">
+              <p className="text-sm font-medium tracking-wide text-muted-foreground/80">
                 One workspace for tasks, notes, and flow.
               </p>
               {/* Decorative line */}
@@ -44,20 +44,15 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Main tagline */}
-          <p className="text-xl font-medium text-foreground/90 sm:text-2xl animate-in fade-in-50 slide-in-from-bottom-4 delay-700">
-            Development organization made simple
-          </p>
-
           {/* Subheading */}
-          <p className="mt-6 text-lg leading-8 text-muted-foreground animate-in fade-in-50 slide-in-from-bottom-4 delay-900">
+          <p className="mt-6 text-lg leading-8 text-muted-foreground">
             Smart technical notes, visual task boards, and lightweight AI
-            assistance combined into one interface. Built for solo devs and
+            assistance streamlined into one interface. Built for solo devs and
             small teams who need structure and clarity.
           </p>
 
           {/* CTA buttons */}
-          <div className="mt-10 flex items-center justify-center gap-x-6 animate-in fade-in-50 slide-in-from-bottom-4 delay-1100">
+          <div className="mt-10 flex items-center justify-center gap-x-6">
             <Button
               variant="default"
               size="lg"
@@ -79,7 +74,7 @@ export default function HeroSection() {
           </div>
 
           {/* Feature hints */}
-          <div className="mt-16 flex items-center justify-center gap-8 text-sm text-muted-foreground animate-in fade-in-50 delay-1300">
+          <div className="mt-16 flex items-center justify-center gap-8 text-sm text-muted-foreground">
             <span className="group flex items-center gap-2 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
               <div className="h-2 w-2 rounded-full bg-primary-500 transition-all duration-200 group-hover:scale-125 group-hover:shadow-sm group-hover:shadow-primary/50" />
               Smart Notes
