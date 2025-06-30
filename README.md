@@ -1,2 +1,2 @@
-# CodexFlow
-Your second brain for code, decisions, and developer flow.
+# StreamLn
+One workspace for tasks, notes, and flow.
