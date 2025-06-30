@@ -5,7 +5,7 @@ import HowItWorksSection from "@/components/sections/home/HowItWorksSection";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <main className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <HeroSection />
       <FeaturesSection />
       <HowItWorksSection />

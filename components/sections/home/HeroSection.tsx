@@ -5,9 +5,6 @@ import { Zap } from "lucide-react";
 export default function HeroSection() {
   return (
     <section className="relative overflow-hidden h-screen flex items-center justify-center">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-accent-500/10" />
-
       <div className="relative mx-auto max-w-7xl px-6 w-full">
         <div className="mx-auto max-w-2xl text-center">
           {/* Beta badge */}
@@ -27,8 +24,6 @@ export default function HeroSection() {
                 <span className="bg-gradient-to-r from-primary-500 via-primary-600 to-accent-500 bg-clip-text text-transparent">
                   StreamLn
                 </span>
-                {/* Subtle glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-500/20 to-accent-500/20 blur-2xl -z-10 animate-pulse" />
               </span>
             </h1>
 
@@ -56,7 +51,7 @@ export default function HeroSection() {
             <Button
               variant="default"
               size="lg"
-              className="transition-all duration-300 ease-out hover:scale-105 hover:shadow-lg hover:shadow-primary/25 active:scale-95"
+              className="transition-all duration-300 ease-out hover:scale-105 active:scale-95"
             >
               Start Planning & Building
             </Button>
@@ -76,15 +71,15 @@ export default function HeroSection() {
           {/* Feature hints */}
           <div className="mt-16 flex items-center justify-center gap-8 text-sm text-muted-foreground">
             <span className="group flex items-center gap-2 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
-              <div className="h-2 w-2 rounded-full bg-primary-500 transition-all duration-200 group-hover:scale-125 group-hover:shadow-sm group-hover:shadow-primary/50" />
+              <div className="h-2 w-2 rounded-full bg-primary-500 transition-all duration-200 group-hover:scale-125" />
               Smart Notes
             </span>
             <span className="group flex items-center gap-2 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
-              <div className="h-2 w-2 rounded-full bg-accent-500 transition-all duration-200 group-hover:scale-125 group-hover:shadow-sm group-hover:shadow-accent/50" />
+              <div className="h-2 w-2 rounded-full bg-accent-500 transition-all duration-200 group-hover:scale-125" />
               Task Boards
             </span>
             <span className="group flex items-center gap-2 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
-              <div className="h-2 w-2 rounded-full bg-primary-500 transition-all duration-200 group-hover:scale-125 group-hover:shadow-sm group-hover:shadow-primary/50" />
+              <div className="h-2 w-2 rounded-full bg-primary-500 transition-all duration-200 group-hover:scale-125" />
               AI Copilot
             </span>
           </div>

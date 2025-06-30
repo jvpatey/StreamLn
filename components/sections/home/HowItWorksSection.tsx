@@ -34,13 +34,7 @@ export default function HowItWorksSection() {
   ];
 
   return (
-    <section className="relative py-24 bg-gray-50 dark:bg-gray-800 overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-accent-500/5 via-transparent to-primary-500/5" />
-
-      {/* Decorative elements */}
-      <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-gradient-to-br from-accent-500/10 to-primary-500/10 rounded-full blur-3xl" />
-
+    <section className="relative py-24 bg-slate-50 dark:bg-slate-900 overflow-hidden">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <Badge variant="secondary" className="mb-6 px-4 py-2">
@@ -48,14 +42,14 @@ export default function HowItWorksSection() {
             Simple workflow
           </Badge>
 
-          <h2 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-5xl lg:text-6xl">
+          <h2 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl lg:text-6xl">
             How{" "}
             <span className="bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
               StreamLn works
             </span>
           </h2>
 
-          <p className="mt-8 text-xl leading-8 text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="mt-8 text-xl leading-8 text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
             From scattered thoughts to structured execution. StreamLn adapts to
             your workflow, not the other way around.
           </p>
@@ -68,7 +62,7 @@ export default function HowItWorksSection() {
               {/* Connecting arrow - only show between steps on large screens */}
               {index < steps.length - 1 && (
                 <div className="hidden lg:block absolute top-1/2 -right-4 z-10">
-                  <ArrowRight className="w-8 h-8 text-gray-300 dark:text-gray-600" />
+                  <ArrowRight className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                 </div>
               )}
 
@@ -76,14 +70,14 @@ export default function HowItWorksSection() {
                 className={`p-8 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 bg-gradient-to-br ${step.bgColor} backdrop-blur-sm relative overflow-hidden`}
               >
                 {/* Step number */}
-                <div className="absolute top-4 right-4 text-6xl font-bold text-gray-100 dark:text-gray-800 opacity-50">
+                <div className="absolute top-4 right-4 text-6xl font-bold text-slate-100 dark:text-slate-800 opacity-50">
                   {step.step}
                 </div>
 
                 <div className="relative">
                   <div className="flex items-center justify-center mb-6">
                     <div
-                      className={`${step.color} bg-white dark:bg-gray-800 p-4 rounded-full shadow-lg`}
+                      className={`${step.color} bg-white dark:bg-slate-800 p-4 rounded-full shadow-lg`}
                     >
                       {step.icon}
                     </div>
@@ -93,7 +87,7 @@ export default function HowItWorksSection() {
                     {step.title}
                   </h3>
 
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                     {step.description}
                   </p>
                 </div>
@@ -105,7 +99,7 @@ export default function HowItWorksSection() {
         {/* Additional note */}
         <div className="mt-16 text-center">
           <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-primary-500/10 to-accent-500/10 border border-primary-500/20">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
               💡 More features and workflow details coming soon
             </span>
           </div>

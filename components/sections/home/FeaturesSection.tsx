@@ -44,16 +44,16 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="py-24 bg-white dark:bg-gray-950">
+    <section className="py-24 bg-white dark:bg-slate-900">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
             Everything you need to{" "}
             <span className="bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
               plan, document, and execute
             </span>
           </h2>
-          <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
+          <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-300">
             StreamLn combines smart note-taking, visual task management, and AI
             assistance in a single developer-focused workspace.
           </p>
