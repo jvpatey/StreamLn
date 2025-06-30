@@ -4,9 +4,9 @@ import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "CodexFlow - Your Second Brain for Code & Developer Flow",
+  title: "StreamLn - Development Organization Made Simple",
   description:
-    "Capture ideas, link concepts automatically, and navigate your knowledge with AI. Turn scattered developer thoughts into connected insights.",
+    "Smart technical notes, visual task boards, and lightweight AI assistance combined into one interface. Built for solo devs and small teams who need structure and clarity.",
 };
 
 export default function RootLayout({ children }) {

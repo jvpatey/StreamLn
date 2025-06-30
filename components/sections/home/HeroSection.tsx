@@ -25,10 +25,7 @@ export default function HeroSection() {
             <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl">
               <span className="relative inline-block">
                 <span className="bg-gradient-to-r from-primary-500 via-primary-600 to-accent-500 bg-clip-text text-transparent animate-in slide-in-from-bottom-4">
-                  Codex
-                </span>
-                <span className="bg-gradient-to-r from-accent-500 via-accent-400 to-primary-500 bg-clip-text text-transparent animate-in slide-in-from-bottom-4 delay-100">
-                  Flow
+                  StreamLn
                 </span>
                 {/* Subtle glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-primary-500/20 to-accent-500/20 blur-2xl -z-10 animate-pulse" />
