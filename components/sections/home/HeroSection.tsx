@@ -61,26 +61,38 @@ export default function HeroSection() {
 
           {/* CTA buttons */}
           <div className="mt-10 flex items-center justify-center gap-x-6 animate-in fade-in-50 slide-in-from-bottom-4 delay-1100">
-            <Button variant="default" size="lg">
+            <Button
+              variant="default"
+              size="lg"
+              className="transition-all duration-300 ease-out hover:scale-105 hover:shadow-lg hover:shadow-primary/25 active:scale-95"
+            >
               Start Planning & Building
             </Button>
-            <Button variant="link" className="leading-6">
-              View Demo →
+            <Button
+              variant="link"
+              className="group leading-6 transition-all duration-200 hover:text-primary/80 hover:no-underline"
+            >
+              <span className="transition-transform duration-200 group-hover:translate-x-1">
+                View Demo
+              </span>
+              <span className="ml-1 transition-transform duration-200 group-hover:translate-x-1 group-hover:scale-110">
+                →
+              </span>
             </Button>
           </div>
 
           {/* Feature hints */}
           <div className="mt-16 flex items-center justify-center gap-8 text-sm text-muted-foreground animate-in fade-in-50 delay-1300">
-            <span className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-primary-500" />
+            <span className="group flex items-center gap-2 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
+              <div className="h-2 w-2 rounded-full bg-primary-500 transition-all duration-200 group-hover:scale-125 group-hover:shadow-sm group-hover:shadow-primary/50" />
               Smart Notes
             </span>
-            <span className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-accent-500" />
+            <span className="group flex items-center gap-2 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
+              <div className="h-2 w-2 rounded-full bg-accent-500 transition-all duration-200 group-hover:scale-125 group-hover:shadow-sm group-hover:shadow-accent/50" />
               Task Boards
             </span>
-            <span className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-primary-500" />
+            <span className="group flex items-center gap-2 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
+              <div className="h-2 w-2 rounded-full bg-primary-500 transition-all duration-200 group-hover:scale-125 group-hover:shadow-sm group-hover:shadow-primary/50" />
               AI Copilot
             </span>
           </div>
