@@ -44,7 +44,7 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="py-24 bg-white dark:bg-gray-800">
+    <section className="py-24 bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl">
@@ -54,7 +54,7 @@ export default function FeaturesSection() {
             </span>
           </h2>
           <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
-            CodexFlow combines smart note-taking, visual task management, and AI
+            StreamLn combines smart note-taking, visual task management, and AI
             assistance in a single developer-focused workspace.
           </p>
         </div>
