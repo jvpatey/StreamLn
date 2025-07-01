@@ -21,7 +21,11 @@ export default function HeroSection() {
             {/* Main logo text */}
             <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl">
               <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-primary-500 via-primary-600 to-accent-500 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-primary-500 via-primary-600 to-accent-500 bg-clip-text text-transparent transition-all duration-300 group-hover:brightness-110">
+                  StreamLn
+                </span>
+                {/* Glow effect */}
+                <span className="pointer-events-none absolute -inset-6 bg-gradient-to-r from-primary-500 via-primary-600 to-accent-500 bg-clip-text text-transparent opacity-0 group-hover:opacity-60 blur-2xl transition-opacity duration-300 select-none">
                   StreamLn
                 </span>
               </span>
@@ -60,15 +64,21 @@ export default function HeroSection() {
           {/* Feature hints */}
           <div className="mt-16 flex items-center justify-center gap-12 text-base text-muted-foreground">
             <span className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
-              <div className="h-3 w-3 rounded-full bg-primary-500 transition-all duration-200 group-hover:scale-125" />
+              <div className="relative h-3 w-3 rounded-full bg-primary-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:shadow-primary-500/50">
+                <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
               Smart Notes
             </span>
             <span className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
-              <div className="h-3 w-3 rounded-full bg-accent-500 transition-all duration-200 group-hover:scale-125" />
+              <div className="relative h-3 w-3 rounded-full bg-accent-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(168,85,247,0.6)] group-hover:shadow-accent-500/50">
+                <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
               Task Boards
             </span>
             <span className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
-              <div className="h-3 w-3 rounded-full bg-primary-500 transition-all duration-200 group-hover:scale-125" />
+              <div className="relative h-3 w-3 rounded-full bg-primary-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:shadow-primary-500/50">
+                <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
               AI Copilot
             </span>
           </div>
