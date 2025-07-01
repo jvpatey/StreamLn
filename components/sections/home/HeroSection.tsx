@@ -10,7 +10,7 @@ export default function HeroSection() {
           {/* Beta badge */}
           <Badge
             variant="secondary"
-            className="group mb-6 bg-card/50 backdrop-blur-sm border border-border/50 text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all duration-200 px-4 py-2 text-sm font-medium"
+            className="group mb-6 bg-primary/10 border border-primary/40 text-primary shadow-sm hover:bg-primary/20 hover:text-primary hover:border-primary transition-all duration-200 px-4 py-2 text-sm font-semibold"
           >
             <Rocket className="w-4 h-4 mr-2 text-primary group-hover:text-primary transition-all duration-200 group-hover:rotate-12 group-hover:scale-110" />
             Developer Productivity Platform
@@ -37,8 +37,8 @@ export default function HeroSection() {
                 One workspace for tasks, notes, and flow.
               </p>
               {/* Decorative line */}
-              <div className="mx-auto mt-3 w-64 h-0.5 flex justify-center items-center">
-                <div className="w-24 h-px bg-gradient-to-r from-transparent via-border to-transparent transition-all duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:w-64 group-hover:h-0.5 group-hover:via-primary/50" />
+              <div className="mx-auto mt-3 w-72 h-1 flex justify-center items-center">
+                <div className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)] w-36 group-hover:w-72 group-hover:via-primary-500" />
               </div>
             </div>
           </div>
@@ -55,9 +55,9 @@ export default function HeroSection() {
             <Button
               variant="default"
               size="lg"
-              className="transition-all duration-300 ease-out hover:scale-105 active:scale-95"
+              className="transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 will-change-transform transform-gpu"
             >
-              Start Planning & Building
+              Start Your Workspace
             </Button>
           </div>
 
