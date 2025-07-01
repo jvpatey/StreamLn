@@ -13,7 +13,7 @@ export default function HeroSection() {
             className="group mb-4 px-3 py-1 text-xs sm:mb-6 sm:px-4 sm:py-2 sm:text-sm font-medium"
           >
             <Rocket className="w-3 h-3 sm:w-4 sm:h-4 mr-2 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-yellow-500" />
-            Developer Productivity Platform
+            Canvas Dev Platform
           </Badge>
 
           {/* Main logo with hover effects and glow */}
@@ -34,7 +34,7 @@ export default function HeroSection() {
             {/* Tagline with animated decorative line */}
             <div className="mt-2 relative">
               <p className="text-xs sm:text-sm font-medium tracking-wide text-muted-foreground/80">
-                One workspace for tasks, notes, and flow.
+                Your infinite canvas for dev notes, planning, and execution.
               </p>
               {/* Animated decorative line that expands on hover */}
               <div className="mx-auto mt-2 sm:mt-3 w-40 sm:w-72 h-1 flex justify-center items-center">
@@ -45,9 +45,9 @@ export default function HeroSection() {
 
           {/* Main description text */}
           <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-muted-foreground">
-            Smart technical notes, visual task boards, and lightweight AI
-            assistance streamlined into one interface. Built for solo devs and
-            small teams who need structure and clarity.
+            Think, plan, and execute on a flexible 2D canvas. StreamLn combines
+            visual organization with powerful dev tools in one unified workspace
+            that adapts to your natural workflow.
           </p>
 
           {/* Call-to-action button with glow effect */}
@@ -57,7 +57,7 @@ export default function HeroSection() {
               size="lg"
               className="group relative overflow-hidden text-base sm:text-lg px-6 sm:px-8 py-2 sm:py-3"
             >
-              <span className="relative z-10">Start Your Workspace</span>
+              <span className="relative z-10">Start Your Canvas</span>
               {/* Subtle glow effect on hover */}
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl" />
             </Button>
@@ -69,19 +69,19 @@ export default function HeroSection() {
               <div className="relative h-3 w-3 rounded-full bg-primary-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:shadow-primary-500/50">
                 <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
-              Smart Notes
+              Infinite Canvas
             </span>
             <span className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
               <div className="relative h-3 w-3 rounded-full bg-accent-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(168,85,247,0.6)] group-hover:shadow-accent-500/50">
                 <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
-              Task Boards
+              Drag & Drop
             </span>
             <span className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
               <div className="relative h-3 w-3 rounded-full bg-primary-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:shadow-primary-500/50">
                 <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
-              AI Copilot
+              Visual Organization
             </span>
           </div>
         </div>

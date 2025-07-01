@@ -5,7 +5,7 @@ import {
   FileText,
   Kanban,
   Search,
-  GitBranch,
+  Zap,
   Code,
   Sparkles,
   Network,
@@ -74,8 +74,8 @@ export default function HowItWorksSection() {
         {/* Section header with badge and title */}
         <div className="mx-auto max-w-4xl text-center">
           <Badge variant="gradient" className="mb-6 px-4 py-2 text-sm group">
-            <GitBranch className="w-4 h-4 mr-2 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-yellow-500" />
-            Canvas workspace
+            <Zap className="w-4 h-4 mr-2 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-yellow-500" />
+            Simple workflow
           </Badge>
 
           <h2 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl lg:text-6xl">
@@ -170,12 +170,12 @@ export default function HowItWorksSection() {
 
         {/* Bottom CTA section */}
         <div className="mt-16 text-center">
-          <div className="inline-flex items-center space-x-2 text-slate-600 dark:text-slate-400">
-            <Move className="w-4 h-4" />
-            <span className="text-sm font-medium">
+          <div className="inline-flex items-center justify-center space-x-3 px-6 py-3 bg-gradient-to-r from-slate-100/50 to-slate-200/50 dark:from-slate-800/50 dark:to-slate-700/50 rounded-full border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm">
+            <Move className="w-4 h-4 text-primary-500" />
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Drag, drop, and organize your way
             </span>
-            <ZoomIn className="w-4 h-4" />
+            <ZoomIn className="w-4 h-4 text-accent-500" />
           </div>
         </div>
       </div>
