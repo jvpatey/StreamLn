@@ -1,31 +1,35 @@
+/* Tailwind CSS Base Imports */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Custom Properties (CSS Variables) for Theme Configuration */
 @layer base {
+  /* Light theme color variables */
   :root {
-    --background: 225 39% 7%;
-    --foreground: 0 0% 100%;
-    --card: 225 45% 10%;
-    --card-foreground: 0 0% 100%;
-    --popover: 225 45% 10%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 213 93% 60%;
-    --primary-foreground: 225 39% 7%;
-    --secondary: 220 66% 33%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 225 30% 15%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 45 96% 56%;
-    --accent-foreground: 225 39% 7%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 225 30% 15%;
-    --input: 225 30% 15%;
-    --ring: 213 93% 60%;
-    --radius: 0.5rem;
+    --background: 225 39% 7%; /* Dark blue-gray background */
+    --foreground: 0 0% 100%; /* White text */
+    --card: 225 45% 10%; /* Slightly lighter card background */
+    --card-foreground: 0 0% 100%; /* White card text */
+    --popover: 225 45% 10%; /* Popover background matching cards */
+    --popover-foreground: 0 0% 100%; /* White popover text */
+    --primary: 213 93% 60%; /* Bright blue primary color */
+    --primary-foreground: 225 39% 7%; /* Dark text on primary */
+    --secondary: 220 66% 33%; /* Darker blue secondary */
+    --secondary-foreground: 0 0% 100%; /* White text on secondary */
+    --muted: 225 30% 15%; /* Muted background for subtle elements */
+    --muted-foreground: 0 0% 65%; /* Gray text for muted content */
+    --accent: 45 96% 56%; /* Golden yellow accent */
+    --accent-foreground: 225 39% 7%; /* Dark text on accent */
+    --destructive: 0 84% 60%; /* Red for destructive actions */
+    --destructive-foreground: 0 0% 100%; /* White text on destructive */
+    --border: 225 30% 15%; /* Border color */
+    --input: 225 30% 15%; /* Input field background */
+    --ring: 213 93% 60%; /* Focus ring color */
+    --radius: 0.5rem; /* Border radius for rounded corners */
   }
 
+  /* Dark theme color variables (currently same as light for consistency) */
   .dark {
     --background: 225 39% 7%;
     --foreground: 0 0% 100%;
@@ -41,43 +45,63 @@
     --muted-foreground: 0 0% 65%;
     --accent: 45 96% 56%;
     --accent-foreground: 225 39% 7%;
-    --destructive: 0 63% 31%;
+    --destructive: 0 63% 31%; /* Darker red for dark theme */
     --destructive-foreground: 0 0% 100%;
     --border: 225 30% 15%;
     --input: 225 30% 15%;
     --ring: 213 93% 60%;
   }
 
+  /* Global body styles */
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings: "rlig" 1, "calt" 1; /* Enable ligatures and contextual alternates */
   }
 }
 
+/* Global border styling */
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border; /* Apply consistent border color to all elements */
   }
 }
 
-/* Gradient Cosmos Custom Gradients */
+/* Custom Gradient Utility Classes for Cosmic/Space Theme */
 @layer utilities {
+  /* Background gradients */
   .bg-cosmic-gradient {
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    background: linear-gradient(
+      135deg,
+      #1e3a8a 0%,
+      #3b82f6 100%
+    ); /* Deep blue to bright blue */
   }
 
   .bg-star-gradient {
-    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    background: linear-gradient(
+      135deg,
+      #f59e0b 0%,
+      #fbbf24 100%
+    ); /* Golden star colors */
   }
 
   .bg-space-gradient {
-    background: linear-gradient(135deg, #0b0d17 0%, #1e3a8a 100%);
+    background: linear-gradient(
+      135deg,
+      #0b0d17 0%,
+      #1e3a8a 100%
+    ); /* Deep space to blue */
   }
 
   .bg-nebula-gradient {
-    background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+    background: linear-gradient(
+      135deg,
+      #6366f1 0%,
+      #3b82f6 100%
+    ); /* Purple to blue nebula */
   }
 
+  /* Text gradients */
   .text-cosmic-gradient {
     background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
     -webkit-background-clip: text;
