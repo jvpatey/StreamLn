@@ -1,7 +1,9 @@
 import FeatureCard from "@/components/FeatureCard";
 import { FileText, Kanban, Search, Network, Brain } from "lucide-react";
 
+// Features section component showcasing main product capabilities
 export default function FeaturesSection() {
+  // Primary features displayed in 3-column grid
   const mainFeatures = [
     {
       title: "Smart Notes",
@@ -26,6 +28,7 @@ export default function FeaturesSection() {
     },
   ];
 
+  // Secondary features displayed in 2-column grid
   const additionalFeatures = [
     {
       title: "Knowledge Graph",
@@ -46,6 +49,7 @@ export default function FeaturesSection() {
   return (
     <section className="py-24 bg-white dark:bg-slate-800">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        {/* Section header with gradient text */}
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
             Everything you need to{" "}
@@ -59,6 +63,7 @@ export default function FeaturesSection() {
           </p>
         </div>
 
+        {/* Main features grid - 3 columns on large screens */}
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-8">
           {mainFeatures.map((feature, index) => (
             <FeatureCard
@@ -71,7 +76,7 @@ export default function FeaturesSection() {
           ))}
         </div>
 
-        {/* Additional Features Row */}
+        {/* Additional features grid - 2 columns on large screens */}
         <div className="mx-auto mt-8 grid max-w-2xl grid-cols-1 gap-6 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:gap-8">
           {additionalFeatures.map((feature, index) => (
             <FeatureCard
