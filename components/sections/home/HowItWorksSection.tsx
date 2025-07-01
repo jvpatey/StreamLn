@@ -1,6 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, FileText, Zap, Target } from "lucide-react";
+import {
+  ArrowRight,
+  FileText,
+  ArrowDownUp,
+  Target,
+  GitBranch,
+} from "lucide-react";
 
 export default function HowItWorksSection() {
   const steps = [
@@ -18,7 +24,7 @@ export default function HowItWorksSection() {
       title: "Organize & Structure",
       description:
         "Transform your notes into actionable tasks using visual boards and knowledge graphs.",
-      icon: <Zap className="w-6 h-6" />,
+      icon: <ArrowDownUp className="w-6 h-6" />,
       color: "text-purple-500",
       bgColor: "from-purple-500/10 to-purple-600/5",
     },
@@ -38,7 +44,7 @@ export default function HowItWorksSection() {
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <Badge variant="secondary" className="mb-6 px-4 py-2">
-            <Zap className="w-4 h-4 mr-2" />
+            <GitBranch className="w-4 h-4 mr-2" />
             Simple workflow
           </Badge>
 
@@ -94,15 +100,6 @@ export default function HowItWorksSection() {
               </Card>
             </div>
           ))}
-        </div>
-
-        {/* Additional note */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-primary-500/10 to-accent-500/10 border border-primary-500/20">
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              💡 More features and workflow details coming soon
-            </span>
-          </div>
         </div>
       </div>
     </section>
