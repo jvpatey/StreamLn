@@ -40,7 +40,7 @@ export default function HowItWorksSection() {
   ];
 
   return (
-    <section className="relative py-24 bg-slate-50 dark:bg-slate-900 overflow-hidden">
+    <section className="relative py-24 bg-slate-50 dark:bg-slate-950 overflow-hidden">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <Badge variant="secondary" className="mb-6 px-4 py-2">
