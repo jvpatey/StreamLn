@@ -20,7 +20,6 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent/50 hover:text-accent-foreground backdrop-blur-sm hover:shadow-sm hover:scale-105 active:scale-95",
         link: "text-primary underline-offset-4 hover:underline hover:scale-105 active:scale-95",
-        // New modern variants
         gradient:
           "bg-gradient-to-r from-primary via-primary/90 to-accent text-primary-foreground shadow-lg hover:shadow-xl hover:from-primary/90 hover:via-primary/80 hover:to-accent/90 hover:scale-105 active:scale-95",
         glass:

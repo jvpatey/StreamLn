@@ -17,23 +17,35 @@ export function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="relative">
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+        <Button variant="glass" size="icon" className="relative group">
+          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0 text-gray-700 dark:text-gray-300 group-hover:text-yellow-500" />
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100 group-hover:text-blue-400" />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun className="mr-2 h-4 w-4" />
+      <DropdownMenuContent
+        align="end"
+        className="backdrop-blur-md border-white/10 bg-white/5"
+      >
+        <DropdownMenuItem
+          onClick={() => setTheme("light")}
+          className="hover:bg-white/10"
+        >
+          <Sun className="mr-2 h-4 w-4 text-yellow-500" />
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon className="mr-2 h-4 w-4" />
+        <DropdownMenuItem
+          onClick={() => setTheme("dark")}
+          className="hover:bg-white/10"
+        >
+          <Moon className="mr-2 h-4 w-4 text-blue-400" />
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          <Monitor className="mr-2 h-4 w-4" />
+        <DropdownMenuItem
+          onClick={() => setTheme("system")}
+          className="hover:bg-white/10"
+        >
+          <Monitor className="mr-2 h-4 w-4 text-gray-400" />
           System
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -52,7 +64,7 @@ export function SimpleThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant="outline" size="icon" className="relative">
+      <Button variant="glass" size="icon" className="relative">
         <div className="h-[1.2rem] w-[1.2rem]" />
         <span className="sr-only">Toggle theme</span>
       </Button>
@@ -61,13 +73,13 @@ export function SimpleThemeToggle() {
 
   return (
     <Button
-      variant="outline"
+      variant="glass"
       size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="relative group hover:scale-105 transition-all duration-200"
+      className="relative group"
     >
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0 text-gray-700 dark:text-gray-300 group-hover:text-yellow-500" />
+      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100 text-gray-700 dark:text-gray-300 group-hover:text-blue-400" />
       <span className="sr-only">Toggle theme</span>
     </Button>
   );

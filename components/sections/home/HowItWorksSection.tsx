@@ -16,8 +16,12 @@ export default function HowItWorksSection() {
       description:
         "Quickly capture ideas, tasks, and project requirements in rich markdown notes with smart tagging.",
       icon: <FileText className="w-6 h-6" />,
-      color: "text-blue-500",
-      bgColor: "from-blue-500/10 to-blue-600/5",
+      color: "text-cosmos-cosmic-light",
+      bgColor:
+        "from-cosmos-cosmic-light/10 via-cosmos-cosmic-dark/5 to-cosmos-cosmic-light/5",
+      iconBg: "from-cosmos-cosmic-light/20 to-cosmos-cosmic-dark/20",
+      borderColor: "border-cosmos-cosmic-light/30",
+      hoverBorderColor: "group-hover:border-cosmos-cosmic-light/50",
     },
     {
       step: "02",
@@ -25,8 +29,11 @@ export default function HowItWorksSection() {
       description:
         "Transform your notes into actionable tasks using visual boards and knowledge graphs.",
       icon: <ArrowDownUp className="w-6 h-6" />,
-      color: "text-purple-500",
-      bgColor: "from-purple-500/10 to-purple-600/5",
+      color: "text-nebula-500",
+      bgColor: "from-nebula-500/10 via-nebula-600/5 to-nebula-500/5",
+      iconBg: "from-nebula-500/20 to-nebula-600/20",
+      borderColor: "border-nebula-500/30",
+      hoverBorderColor: "group-hover:border-nebula-500/50",
     },
     {
       step: "03",
@@ -34,8 +41,12 @@ export default function HowItWorksSection() {
       description:
         "Stay focused with AI-powered context and seamless navigation between related work.",
       icon: <Target className="w-6 h-6" />,
-      color: "text-green-500",
-      bgColor: "from-green-500/10 to-green-600/5",
+      color: "text-cosmos-star-light",
+      bgColor:
+        "from-cosmos-star-light/10 via-cosmos-star-dark/5 to-cosmos-star-light/5",
+      iconBg: "from-cosmos-star-light/20 to-cosmos-star-dark/20",
+      borderColor: "border-cosmos-star-light/30",
+      hoverBorderColor: "group-hover:border-cosmos-star-light/50",
     },
   ];
 
@@ -73,30 +84,40 @@ export default function HowItWorksSection() {
               )}
 
               <Card
-                className={`p-8 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 bg-gradient-to-br ${step.bgColor} backdrop-blur-sm relative overflow-hidden`}
+                className={`group relative overflow-hidden backdrop-blur-xl p-8 text-center transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-2xl hover:shadow-cosmos-cosmic-light/10 dark:bg-cosmos-surface/30 bg-white/40 dark:border-cosmos-cosmic-light/20 border-cosmos-cosmic-light/30 dark:hover:border-cosmos-cosmic-light/40 hover:border-cosmos-cosmic-light/50 dark:hover:bg-cosmos-surface/50 hover:bg-white/70 ${step.borderColor} ${step.hoverBorderColor}`}
               >
-                {/* Step number */}
-                <div className="absolute top-4 right-4 text-6xl font-bold text-slate-100 dark:text-slate-800 opacity-50">
+                {/* Cosmic glow effect on hover */}
+                <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-br from-cosmos-cosmic-light/5 via-transparent to-cosmos-star-light/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                {/* Step number - now much more visible */}
+                <div className="absolute top-4 right-4 text-6xl font-bold text-cosmos-cosmic-light/30 dark:text-cosmos-cosmic-light/25 group-hover:text-cosmos-cosmic-light/40 dark:group-hover:text-cosmos-cosmic-light/35 transition-all duration-500">
                   {step.step}
                 </div>
 
-                <div className="relative">
+                <div className="relative z-10">
                   <div className="flex items-center justify-center mb-6">
                     <div
-                      className={`${step.color} bg-white dark:bg-slate-800 p-4 rounded-full shadow-lg`}
+                      className={`${step.color} bg-gradient-to-br ${step.iconBg} border border-cosmos-cosmic-light/30 group-hover:border-cosmos-cosmic-light/50 p-4 rounded-full shadow-lg group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-cosmos-cosmic-light/20 transition-all duration-300`}
                     >
-                      {step.icon}
+                      <div className="group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:scale-110 transition-all duration-300">
+                        {step.icon}
+                      </div>
                     </div>
                   </div>
 
-                  <h3 className={`text-2xl font-bold ${step.color} mb-4`}>
+                  <h3
+                    className={`text-2xl font-bold ${step.color} mb-4 group-hover:drop-shadow-[0_0_4px_rgba(0,0,0,0.08)] dark:group-hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.3)] transition-all duration-300`}
+                  >
                     {step.title}
                   </h3>
 
-                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors duration-300">
                     {step.description}
                   </p>
                 </div>
+
+                {/* Subtle bottom glow */}
+                <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cosmos-cosmic-light/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </Card>
             </div>
           ))}
