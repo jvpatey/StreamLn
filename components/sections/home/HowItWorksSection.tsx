@@ -43,8 +43,8 @@ export default function HowItWorksSection() {
     <section className="relative py-24 bg-slate-50 dark:bg-slate-950 overflow-hidden">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <Badge variant="secondary" className="mb-6 px-4 py-2">
-            <GitBranch className="w-4 h-4 mr-2" />
+          <Badge variant="gradient" className="mb-6 px-4 py-2 text-sm group">
+            <GitBranch className="w-4 h-4 mr-2 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-yellow-500" />
             Simple workflow
           </Badge>
 

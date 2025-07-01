@@ -28,8 +28,8 @@ export default function FeatureCard({
             </div>
           </div>
           <Badge
-            variant="secondary"
-            className="bg-cosmos-nebula/10 border-cosmos-nebula/30 text-cosmos-nebula group-hover:bg-cosmos-star-light/20 group-hover:text-cosmos-star-dark group-hover:border-cosmos-star-light/50 group-hover:shadow-md group-hover:shadow-cosmos-star-light/20 transition-all duration-300 font-medium px-3 py-1 text-xs backdrop-blur-sm"
+            variant="gradient"
+            className="group-hover:scale-105 transition-all duration-300 font-medium px-4 py-2 text-sm"
           >
             {highlight}
           </Badge>

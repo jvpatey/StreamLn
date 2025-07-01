@@ -9,10 +9,10 @@ export default function HeroSection() {
         <div className="mx-auto max-w-2xl text-center">
           {/* Beta badge */}
           <Badge
-            variant="secondary"
-            className="group mb-6 bg-primary/10 border border-primary/40 text-primary shadow-sm hover:bg-primary/20 hover:text-primary hover:border-primary transition-all duration-200 px-4 py-2 text-sm font-semibold"
+            variant="gradient"
+            className="group mb-6 px-4 py-2 text-sm font-medium"
           >
-            <Rocket className="w-4 h-4 mr-2 text-primary group-hover:text-primary transition-all duration-200 group-hover:rotate-12 group-hover:scale-110" />
+            <Rocket className="w-4 h-4 mr-2 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-yellow-500" />
             Developer Productivity Platform
           </Badge>
 
@@ -53,11 +53,13 @@ export default function HeroSection() {
           {/* CTA button */}
           <div className="mt-10 flex items-center justify-center">
             <Button
-              variant="default"
+              variant="gradient"
               size="lg"
-              className="transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 will-change-transform transform-gpu"
+              className="group relative overflow-hidden"
             >
-              Start Your Workspace
+              <span className="relative z-10">Start Your Workspace</span>
+              {/* Subtle glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl" />
             </Button>
           </div>
 
