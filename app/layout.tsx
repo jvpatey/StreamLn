@@ -3,6 +3,8 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
+import { ClerkThemeWrapper } from "@/components/ui/clerk-theme-wrapper";
 
 // Configure Inter font with Latin subset
 const inter = Inter({ subsets: ["latin"] });
@@ -22,20 +24,18 @@ export const metadata = {
 // Root layout component that wraps all pages
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider>
-      <html lang="en" className={inter.className} suppressHydrationWarning>
-        <body className="antialiased">
-          {/* Theme provider for dark/light mode switching */}
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" className={inter.className} suppressHydrationWarning>
+      <body className="antialiased">
+        {/* Theme provider for dark/light mode switching */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ClerkThemeWrapper>{children}</ClerkThemeWrapper>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }
