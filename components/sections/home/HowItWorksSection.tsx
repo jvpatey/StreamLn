@@ -78,10 +78,16 @@ export default function HowItWorksSection() {
             Simple workflow
           </Badge>
 
-          <h2 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl lg:text-6xl">
+          <h2 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl lg:text-6xl group cursor-pointer">
             How{" "}
-            <span className="bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
-              StreamLn flows
+            <span className="relative inline-block">
+              <span className="bg-gradient-to-r from-primary-500 via-primary-400 to-accent-500 bg-clip-text text-transparent transition-all duration-700 ease-out group-hover:animate-gradient-flow group-hover:scale-105">
+                StreamLn flows
+              </span>
+              {/* Animated glow effect on hover */}
+              <span className="pointer-events-none absolute -inset-2 bg-gradient-to-r from-primary-400 via-accent-500 to-primary-500 bg-clip-text text-transparent opacity-0 group-hover:opacity-30 blur-xl transition-all duration-700 ease-out select-none group-hover:scale-105 group-hover:animate-gradient-flow">
+                StreamLn flows
+              </span>
             </span>
           </h2>
 

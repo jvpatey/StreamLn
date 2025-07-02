@@ -21,11 +21,11 @@ export default function HeroSection() {
             {/* Logo text with gradient and glow effect */}
             <h1 className="text-6xl leading-tight sm:text-7xl lg:text-8xl font-extrabold tracking-tight">
               <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-primary-500 via-primary-600 to-accent-500 bg-clip-text text-transparent transition-all duration-300 group-hover:brightness-110">
+                <span className="bg-gradient-to-r from-primary-500 via-primary-600 to-accent-500 bg-clip-text text-transparent transition-all duration-300 group-hover:animate-gradient-flow">
                   StreamLn
                 </span>
                 {/* Glow effect on hover */}
-                <span className="pointer-events-none absolute -inset-4 sm:-inset-6 bg-gradient-to-r from-primary-500 via-primary-600 to-accent-500 bg-clip-text text-transparent opacity-0 group-hover:opacity-60 blur-2xl transition-opacity duration-300 select-none">
+                <span className="pointer-events-none absolute -inset-4 sm:-inset-6 bg-gradient-to-r from-primary-500 via-primary-600 to-accent-500 bg-clip-text text-transparent opacity-0 group-hover:opacity-60 blur-2xl transition-opacity duration-300 select-none group-hover:animate-gradient-flow">
                   StreamLn
                 </span>
               </span>
@@ -33,7 +33,7 @@ export default function HeroSection() {
 
             {/* Tagline with animated decorative line */}
             <div className="mt-2 relative">
-              <p className="text-xs sm:text-sm font-medium tracking-wide text-muted-foreground/80">
+              <p className="text-xs sm:text-sm font-medium tracking-wide text-slate-600/80 dark:text-slate-300/80">
                 Your infinite canvas for dev notes, planning, and execution.
               </p>
               {/* Animated decorative line that expands on hover */}
@@ -44,7 +44,7 @@ export default function HeroSection() {
           </div>
 
           {/* Main description text */}
-          <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-muted-foreground">
+          <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-slate-600 dark:text-slate-300">
             Map out your projects, notes, and task boards on a limitless 2D
             canvas. StreamLn gives developers a visual playground to capture
             ideas, plan work, and connect everything—your workflow, your way.
@@ -64,20 +64,20 @@ export default function HeroSection() {
           </div>
 
           {/* Feature preview dots with hover animations */}
-          <div className="mt-10 sm:mt-16 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-12 text-base text-muted-foreground">
-            <span className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
+          <div className="mt-10 sm:mt-16 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-12 text-base text-slate-600 dark:text-slate-300">
+            <span className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-slate-900 dark:hover:text-slate-100 hover:scale-105">
               <div className="relative h-3 w-3 rounded-full bg-primary-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:shadow-primary-500/50">
                 <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               Infinite Canvas
             </span>
-            <span className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
+            <span className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-slate-900 dark:hover:text-slate-100 hover:scale-105">
               <div className="relative h-3 w-3 rounded-full bg-accent-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(168,85,247,0.6)] group-hover:shadow-accent-500/50">
                 <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               Drag & Drop
             </span>
-            <span className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-foreground hover:scale-105">
+            <span className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-slate-900 dark:hover:text-slate-100 hover:scale-105">
               <div className="relative h-3 w-3 rounded-full bg-primary-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:shadow-primary-500/50">
                 <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
