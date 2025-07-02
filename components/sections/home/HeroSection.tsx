@@ -3,19 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Rocket } from "lucide-react";
-import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
-import { useEffect } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { SignInButton, SignedOut } from "@clerk/nextjs";
 
 export default function HeroSection() {
-  const { isSignedIn } = useAuth();
-
-  useEffect(() => {
-    if (isSignedIn) {
-      window.location.href = "/dashboard";
-    }
-  }, [isSignedIn]);
-
   return (
     <section className="relative overflow-hidden min-h-screen flex items-center justify-center py-8 sm:py-0">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 w-full">
@@ -78,18 +68,6 @@ export default function HeroSection() {
                 </Button>
               </SignInButton>
             </SignedOut>
-            <SignedIn>
-              <Button
-                variant="gradient"
-                size="lg"
-                className="group relative overflow-hidden text-base sm:text-lg px-6 sm:px-8 py-2 sm:py-3"
-                onClick={() => (window.location.href = "/dashboard")}
-              >
-                <span className="relative z-10">Go to Dashboard</span>
-                {/* Subtle glow effect on hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl" />
-              </Button>
-            </SignedIn>
           </div>
 
           {/* Feature preview dots with hover animations */}
