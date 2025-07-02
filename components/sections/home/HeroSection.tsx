@@ -45,9 +45,9 @@ export default function HeroSection() {
 
           {/* Main description text */}
           <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-muted-foreground">
-            Think, plan, and execute on a flexible 2D canvas. StreamLn combines
-            visual organization with powerful dev tools in one unified workspace
-            that adapts to your natural workflow.
+            Map out your projects, notes, and task boards on a limitless 2D
+            canvas. StreamLn gives developers a visual playground to capture
+            ideas, plan work, and connect everything—your workflow, your way.
           </p>
 
           {/* Call-to-action button with glow effect */}
