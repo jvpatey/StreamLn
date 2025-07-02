@@ -3,21 +3,29 @@ import { Badge } from "@/components/ui/badge";
 import {
   ArrowRight,
   FileText,
-  ArrowDownUp,
-  Target,
-  GitBranch,
+  Kanban,
+  Search,
+  Zap,
+  Code,
+  Sparkles,
+  Network,
+  Move,
+  ZoomIn,
+  Layers,
 } from "lucide-react";
 
-// How it works section component - explains the 3-step workflow
+// How it works section component - explains the canvas-based developer workspace
 export default function HowItWorksSection() {
   // Step data with styling and color configurations
   const steps = [
     {
       step: "01",
-      title: "Capture & Plan",
+      title: "Visual Canvas",
+      subtitle: "Infinite 2D Workspace",
       description:
-        "Quickly capture ideas, tasks, and project requirements in rich markdown notes with smart tagging.",
-      icon: <FileText className="w-6 h-6" />,
+        "Start with a blank infinite canvas where you can place notes, tasks, and code blocks anywhere. Drag, drop, and organize content spatially for natural thinking flow.",
+      icon: <Layers className="w-6 h-6" />,
+      features: ["Infinite 2D canvas", "Drag & drop blocks", "Visual grouping"],
       color: "text-cosmos-cosmic-light",
       bgColor:
         "from-cosmos-cosmic-light/10 via-cosmos-cosmic-dark/5 to-cosmos-cosmic-light/5",
@@ -27,10 +35,16 @@ export default function HowItWorksSection() {
     },
     {
       step: "02",
-      title: "Organize & Structure",
+      title: "Rich Content Blocks",
+      subtitle: "Tiptap-Powered Notes",
       description:
-        "Transform your notes into actionable tasks using visual boards and knowledge graphs.",
-      icon: <ArrowDownUp className="w-6 h-6" />,
+        "Create rich notes with markdown, code blocks, and images directly on the canvas. Each block is collapsible, movable, and supports bidirectional linking between content.",
+      icon: <FileText className="w-6 h-6" />,
+      features: [
+        "Tiptap rich editor",
+        "Markdown + code",
+        "Bidirectional links",
+      ],
       color: "text-nebula-500",
       bgColor: "from-nebula-500/10 via-nebula-600/5 to-nebula-500/5",
       iconBg: "from-nebula-500/20 to-nebula-600/20",
@@ -39,10 +53,12 @@ export default function HowItWorksSection() {
     },
     {
       step: "03",
-      title: "Execute & Deliver",
+      title: "Task Boards & Search",
+      subtitle: "Visual Task Management",
       description:
-        "Stay focused with AI-powered context and seamless navigation between related work.",
-      icon: <Target className="w-6 h-6" />,
+        "Create and organize tasks directly on your canvas with drag-and-drop columns. Find related work instantly with semantic search across all your visual content.",
+      icon: <Kanban className="w-6 h-6" />,
+      features: ["Visual task boards", "Semantic search", "Knowledge graphs"],
       color: "text-cosmos-star-light",
       bgColor:
         "from-cosmos-star-light/10 via-cosmos-star-dark/5 to-cosmos-star-light/5",
@@ -58,20 +74,21 @@ export default function HowItWorksSection() {
         {/* Section header with badge and title */}
         <div className="mx-auto max-w-4xl text-center">
           <Badge variant="gradient" className="mb-6 px-4 py-2 text-sm group">
-            <GitBranch className="w-4 h-4 mr-2 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-yellow-500" />
+            <Zap className="w-4 h-4 mr-2 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-yellow-500" />
             Simple workflow
           </Badge>
 
           <h2 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl lg:text-6xl">
             How{" "}
             <span className="bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
-              StreamLn works
+              StreamLn flows
             </span>
           </h2>
 
           <p className="mt-8 text-xl leading-8 text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
-            From scattered thoughts to structured execution. StreamLn adapts to
-            your workflow, not the other way around.
+            Think, plan, and execute on a flexible 2D canvas. StreamLn combines
+            visual organization with powerful dev tools in one unified workspace
+            that adapts to your natural workflow.
           </p>
         </div>
 
@@ -113,15 +130,35 @@ export default function HowItWorksSection() {
 
                   {/* Step title with hover shadow effect */}
                   <h3
-                    className={`text-2xl font-bold ${step.color} mb-4 group-hover:drop-shadow-[0_0_4px_rgba(0,0,0,0.08)] dark:group-hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.3)] transition-all duration-300`}
+                    className={`text-2xl font-bold ${step.color} mb-2 group-hover:drop-shadow-[0_0_4px_rgba(0,0,0,0.08)] dark:group-hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.3)] transition-all duration-300`}
                   >
                     {step.title}
                   </h3>
 
+                  {/* Step subtitle */}
+                  <p
+                    className={`text-sm font-medium ${step.color} mb-4 opacity-80`}
+                  >
+                    {step.subtitle}
+                  </p>
+
                   {/* Step description with color transition on hover */}
-                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors duration-300">
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors duration-300 mb-6">
                     {step.description}
                   </p>
+
+                  {/* Feature highlights */}
+                  <div className="space-y-2">
+                    {step.features.map((feature, featureIndex) => (
+                      <div
+                        key={featureIndex}
+                        className="flex items-center justify-center text-sm text-slate-500 dark:text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors duration-300"
+                      >
+                        <Sparkles className="w-3 h-3 mr-2 text-cosmos-cosmic-light/60" />
+                        {feature}
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Subtle bottom glow line that appears on hover */}
@@ -129,6 +166,17 @@ export default function HowItWorksSection() {
               </Card>
             </div>
           ))}
+        </div>
+
+        {/* Bottom CTA section */}
+        <div className="mt-16 text-center">
+          <div className="inline-flex items-center justify-center space-x-3 px-6 py-3 bg-gradient-to-r from-slate-100/50 to-slate-200/50 dark:from-slate-800/50 dark:to-slate-700/50 rounded-full border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm">
+            <Move className="w-4 h-4 text-primary-500" />
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Drag, drop, and organize your way
+            </span>
+            <ZoomIn className="w-4 h-4 text-accent-500" />
+          </div>
         </div>
       </div>
     </section>
