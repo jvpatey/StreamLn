@@ -1,6 +1,9 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Rocket } from "lucide-react";
+import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
 
 export default function HeroSection() {
   return (
@@ -52,15 +55,31 @@ export default function HeroSection() {
 
           {/* Call-to-action button with glow effect */}
           <div className="mt-8 sm:mt-10 flex items-center justify-center">
-            <Button
-              variant="gradient"
-              size="lg"
-              className="group relative overflow-hidden text-base sm:text-lg px-6 sm:px-8 py-2 sm:py-3"
-            >
-              <span className="relative z-10">Start Your Canvas</span>
-              {/* Subtle glow effect on hover */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl" />
-            </Button>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button
+                  variant="gradient"
+                  size="lg"
+                  className="group relative overflow-hidden text-base sm:text-lg px-6 sm:px-8 py-2 sm:py-3"
+                >
+                  <span className="relative z-10">Start Your Canvas</span>
+                  {/* Subtle glow effect on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl" />
+                </Button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <Button
+                variant="gradient"
+                size="lg"
+                className="group relative overflow-hidden text-base sm:text-lg px-6 sm:px-8 py-2 sm:py-3"
+                onClick={() => (window.location.href = "/dashboard")}
+              >
+                <span className="relative z-10">Go to Dashboard</span>
+                {/* Subtle glow effect on hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl" />
+              </Button>
+            </SignedIn>
           </div>
 
           {/* Feature preview dots with hover animations */}
