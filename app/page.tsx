@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+import { useAuth } from "@clerk/nextjs";
+import { useEffect } from "react";
 import { SimpleThemeToggle } from "@/components/ui/theme-toggle";
 import HeroSection from "@/components/sections/home/HeroSection";
 import FeaturesSection from "@/components/sections/home/FeaturesSection";
@@ -6,6 +8,24 @@ import HowItWorksSection from "@/components/sections/home/HowItWorksSection";
 
 // Main Home page component
 export default function Home() {
+  const { isSignedIn, isLoaded } = useAuth();
+
+  useEffect(() => {
+    if (isSignedIn) {
+      window.location.href = "/dashboard";
+    }
+  }, [isSignedIn]);
+
+  if (!isLoaded) {
+    // Optionally show a loading spinner while Clerk loads
+    return null;
+  }
+
+  if (isSignedIn) {
+    // Optionally show nothing or a spinner while redirecting
+    return null;
+  }
+
   return (
     <>
       {/* Floating theme toggle button - positioned in top-right corner */}

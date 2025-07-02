@@ -4,8 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Rocket } from "lucide-react";
 import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { useEffect } from "react";
+import { useAuth } from "@clerk/nextjs";
 
 export default function HeroSection() {
+  const { isSignedIn } = useAuth();
+
+  useEffect(() => {
+    if (isSignedIn) {
+      window.location.href = "/dashboard";
+    }
+  }, [isSignedIn]);
+
   return (
     <section className="relative overflow-hidden min-h-screen flex items-center justify-center py-8 sm:py-0">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 w-full">
