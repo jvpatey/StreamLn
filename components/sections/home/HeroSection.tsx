@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Rocket } from "lucide-react";
+import { Rocket, Layers } from "lucide-react";
 import { SignInButton, SignedOut } from "@clerk/nextjs";
 
 export default function HeroSection() {
@@ -62,6 +62,7 @@ export default function HeroSection() {
                   size="lg"
                   className="group relative overflow-hidden text-base sm:text-lg px-6 sm:px-8 py-2 sm:py-3"
                 >
+                  <Layers className="w-5 h-5 mr-3 transition-transform group-hover:rotate-12" />
                   <span className="relative z-10">Start Your Canvas</span>
                   {/* Subtle glow effect on hover */}
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl" />
