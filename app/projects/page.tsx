@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import { SimpleThemeToggle } from "@/components/ui/shared/theme-toggle";
 import { Card } from "@/components/ui/shared/card";
-import CommandPalette from "@/components/ui/projects/command-palette";
+import ProjectCommandPalette from "@/components/ui/projects/project-command-palette";
 import { CanvasPreview } from "@/components/ui/projects/canvas-preview";
 import {
   Plus,
@@ -19,6 +19,7 @@ import {
   Menu,
   X,
   Filter,
+  Rocket,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -41,71 +42,6 @@ export default function DashboardPage() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [sidebarOpen]);
-
-  // Mock data for demonstration
-  const recentProjects = [
-    {
-      id: "1",
-      title: "E-commerce Platform Redesign",
-      description:
-        "Complete overhaul of the checkout experience and mobile interface",
-      type: "development" as const,
-      lastModified: "2 hours ago",
-      tasksTotal: 24,
-      tasksCompleted: 16,
-      collaborators: 3,
-      progress: 68,
-      status: "active" as const,
-      starred: true,
-      shared: true,
-      dueDate: "Dec 15, 2024",
-    },
-    {
-      id: "2",
-      title: "Market Research Analysis",
-      description: "Competitive analysis and user research for Q1 planning",
-      type: "research" as const,
-      lastModified: "1 day ago",
-      tasksTotal: 12,
-      tasksCompleted: 5,
-      collaborators: 1,
-      progress: 45,
-      status: "planning" as const,
-      starred: false,
-      shared: false,
-      dueDate: "Jan 10, 2025",
-    },
-    {
-      id: "3",
-      title: "Bug Fix Sprint",
-      description: "Critical bug fixes for the next release",
-      type: "development" as const,
-      lastModified: "3 days ago",
-      tasksTotal: 8,
-      tasksCompleted: 7,
-      collaborators: 5,
-      progress: 87,
-      status: "review" as const,
-      starred: false,
-      shared: true,
-      dueDate: "Dec 1, 2024",
-    },
-    {
-      id: "4",
-      title: "Documentation Overhaul",
-      description: "Update all API docs and create developer guides",
-      type: "documentation" as const,
-      lastModified: "1 week ago",
-      tasksTotal: 16,
-      tasksCompleted: 15,
-      collaborators: 2,
-      progress: 95,
-      status: "completed" as const,
-      starred: true,
-      shared: false,
-      dueDate: "Nov 30, 2024",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
@@ -130,13 +66,6 @@ export default function DashboardPage() {
                 <h1 className="text-lg font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-slate-100 dark:via-slate-200 dark:to-slate-100 bg-clip-text text-transparent">
                   StreamLn
                 </h1>
-                <Badge
-                  variant="outline"
-                  className="hidden sm:inline-flex text-xs"
-                >
-                  <Sparkles size={10} className="mr-1" />
-                  Project Hub
-                </Badge>
               </div>
             </div>
 
@@ -206,11 +135,11 @@ export default function DashboardPage() {
             {/* Welcome Section */}
             <div className="mb-6">
               <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-                Welcome back! 👋
+                Project Hub
               </h2>
               <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                Your project command center. Create, organize, and navigate with
-                speed.
+                Your central hub for creating, organizing, and managing all your
+                projects with speed and efficiency.
               </p>
             </div>
 
@@ -291,7 +220,7 @@ export default function DashboardPage() {
                   All Projects
                 </h3>
                 <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
-                  {recentProjects.length} active projects
+                  0 active projects
                 </p>
               </div>
               <div className="flex items-center space-x-3">
@@ -308,39 +237,6 @@ export default function DashboardPage() {
 
             {/* Spatial Projects Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-              {recentProjects.map((project, index) => (
-                <div
-                  key={project.id}
-                  className="group relative"
-                  style={{
-                    animationDelay: `${index * 100}ms`,
-                  }}
-                >
-                  <CanvasPreview
-                    id={project.id}
-                    title={project.title}
-                    type={
-                      project.type === "development"
-                        ? "project"
-                        : project.type === "research"
-                        ? "notes"
-                        : project.type === "documentation"
-                        ? "notes"
-                        : "project"
-                    }
-                    lastModified={project.lastModified}
-                    blocks={project.tasksTotal}
-                    collaborators={project.collaborators}
-                    progress={project.progress}
-                    starred={project.starred}
-                    shared={project.shared}
-                    onClick={() => {
-                      console.log(`Opening project: ${project.title}`);
-                    }}
-                  />
-                </div>
-              ))}
-
               {/* Create New Project Card */}
               <div className="group relative">
                 <Card className="h-full border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-primary-400 dark:hover:border-primary-600 transition-all duration-200 cursor-pointer bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-100/50 dark:hover:bg-slate-700/50">
@@ -370,7 +266,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Command Palette */}
-      <CommandPalette
+      <ProjectCommandPalette
         open={commandPaletteOpen}
         onOpenChange={setCommandPaletteOpen}
       />
