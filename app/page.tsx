@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@clerk/nextjs";
 import { useEffect } from "react";
-import { SimpleThemeToggle } from "@/components/ui/theme-toggle";
+import { SimpleThemeToggle } from "@/components/ui/shared/theme-toggle";
 import HeroSection from "@/components/sections/home/HeroSection";
 import FeaturesSection from "@/components/sections/home/FeaturesSection";
 import HowItWorksSection from "@/components/sections/home/HowItWorksSection";
@@ -12,7 +12,7 @@ export default function Home() {
 
   useEffect(() => {
     if (isSignedIn) {
-      window.location.href = "/dashboard";
+      window.location.href = "/projects";
     }
   }, [isSignedIn]);
 

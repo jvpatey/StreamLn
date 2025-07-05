@@ -1,7 +1,6 @@
-import FeatureCard from "@/components/FeatureCard";
+import FeatureCard from "@/components/ui/home/FeatureCard";
 import {
   Move,
-  ZoomIn,
   Layers,
   FileText,
   Search,
@@ -9,7 +8,6 @@ import {
   Brain,
   Maximize2,
   Link,
-  Sparkles,
 } from "lucide-react";
 
 // Features section component showcasing specific canvas capabilities

@@ -1,5 +1,5 @@
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/shared/card";
+import { Badge } from "@/components/ui/shared/badge";
 import { ReactNode } from "react";
 
 // Props interface for the feature card component

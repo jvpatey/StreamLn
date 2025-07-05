@@ -1,10 +1,8 @@
 // Import global styles and fonts
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { ThemeProvider } from "@/components/ui/theme-provider";
-import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
-import { ClerkThemeWrapper } from "@/components/ui/clerk-theme-wrapper";
+import { ThemeProvider } from "@/components/ui/shared/theme-provider";
+import { ClerkThemeWrapper } from "@/components/ui/shared/clerk-theme-wrapper";
 
 // Configure Inter font with Latin subset
 const inter = Inter({ subsets: ["latin"] });
@@ -15,9 +13,9 @@ export const metadata = {
   description:
     "Smart technical notes, visual task boards, and lightweight AI assistance combined into one interface. Built for solo devs and small teams who need structure and clarity.",
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
   },
 };
 
