@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { UserButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { SimpleThemeToggle } from "@/components/ui/theme-toggle";
-import { Card } from "@/components/ui/card";
-import CommandPalette from "@/components/ui/command-palette";
-import { CanvasPreview } from "@/components/ui/canvas-preview";
+import { Button } from "@/components/ui/shared/button";
+import { Badge } from "@/components/ui/shared/badge";
+import { SimpleThemeToggle } from "@/components/ui/shared/theme-toggle";
+import { Card } from "@/components/ui/shared/card";
+import CommandPalette from "@/components/ui/projects/command-palette";
+import { CanvasPreview } from "@/components/ui/projects/canvas-preview";
 import {
   Plus,
   Search,

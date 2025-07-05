@@ -1,4 +1,4 @@
-import FeatureCard from "@/components/FeatureCard";
+import FeatureCard from "@/components/ui/home/FeatureCard";
 import {
   Move,
   ZoomIn,

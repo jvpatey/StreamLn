@@ -1,10 +1,10 @@
 // Import global styles and fonts
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { ThemeProvider } from "@/components/ui/theme-provider";
+import { ThemeProvider } from "@/components/ui/shared/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
-import { ClerkThemeWrapper } from "@/components/ui/clerk-theme-wrapper";
+import { ClerkThemeWrapper } from "@/components/ui/shared/clerk-theme-wrapper";
 
 // Configure Inter font with Latin subset
 const inter = Inter({ subsets: ["latin"] });

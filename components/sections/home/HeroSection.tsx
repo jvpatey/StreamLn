@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/shared/button";
+import { Badge } from "@/components/ui/shared/badge";
 import { Rocket, Layers } from "lucide-react";
 import { SignInButton, SignedOut } from "@clerk/nextjs";
 

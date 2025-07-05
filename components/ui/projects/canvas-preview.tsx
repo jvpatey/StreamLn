@@ -1,7 +1,6 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/shared/card";
 import {
   FileText,
   Maximize2,
@@ -236,16 +235,6 @@ export function CanvasPreview({
               className="text-slate-600 dark:text-slate-400"
             />
           </div>
-        </div>
-
-        {/* Block count indicator */}
-        <div className="absolute bottom-3 left-3">
-          <Badge
-            variant="outline"
-            className="text-xs bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm"
-          >
-            {blocks} blocks
-          </Badge>
         </div>
       </div>
 
