@@ -2,6 +2,9 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
+import { ClerkThemeWrapper } from "@/components/ui/clerk-theme-wrapper";
 
 // Configure Inter font with Latin subset
 const inter = Inter({ subsets: ["latin"] });
@@ -30,7 +33,7 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <ClerkThemeWrapper>{children}</ClerkThemeWrapper>
         </ThemeProvider>
       </body>
     </html>

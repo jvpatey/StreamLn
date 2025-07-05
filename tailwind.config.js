@@ -113,6 +113,21 @@ module.exports = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      animation: {
+        "gradient-flow": "gradient-flow 2s ease-in-out infinite",
+      },
+      keyframes: {
+        "gradient-flow": {
+          "0%, 100%": {
+            "background-size": "200% 200%",
+            "background-position": "left center",
+          },
+          "50%": {
+            "background-size": "200% 200%",
+            "background-position": "right center",
+          },
+        },
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
