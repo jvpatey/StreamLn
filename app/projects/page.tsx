@@ -13,23 +13,12 @@ import {
   Search,
   Layers,
   FileText,
-  Maximize2,
-  Brain,
-  Calendar,
-  Clock,
-  Rocket,
   Zap,
   Sparkles,
-  BarChart3,
   Grid3x3,
-  Command,
-  Globe,
-  Folder,
-  Star,
   Menu,
   X,
   Filter,
-  ArrowRight,
 } from "lucide-react";
 
 export default function DashboardPage() {

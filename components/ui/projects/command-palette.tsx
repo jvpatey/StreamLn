@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import {
   Command,
@@ -14,10 +13,6 @@ import {
   Brain,
   Zap,
   Settings,
-  User,
-  Calendar,
-  Clock,
-  Hash,
   ArrowRight,
   Sparkles,
 } from "lucide-react";
