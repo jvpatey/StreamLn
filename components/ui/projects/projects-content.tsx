@@ -5,6 +5,7 @@
 import { Button } from "@/components/ui/shared/button";
 import { Filter, Grid3x3 } from "lucide-react";
 import { CreateProjectCard } from "./create-project-card";
+import { CreateProjectButton } from "./create-project-button";
 
 interface ProjectsContentProps {
   onCreateProject?: () => void;
@@ -14,13 +15,24 @@ export function ProjectsContent({ onCreateProject }: ProjectsContentProps) {
   return (
     <div className="flex-1 min-h-screen">
       <div className="p-6 lg:p-8">
+        {/* Mobile Project Hub Header */}
+        <div className="lg:hidden mb-8">
+          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 mb-1">
+            Project Hub
+          </h2>
+          <p className="text-sm text-slate-400 dark:text-slate-400 mb-4">
+            Your central hub for creating, organizing, and managing all your
+            projects with speed and efficiency.
+          </p>
+        </div>
+
         {/* Content Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 space-y-4 sm:space-y-0">
           <div>
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 sm:text-2xl">
               All Projects
             </h3>
-            <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 sm:text-sm">
               0 active projects
             </p>
           </div>
@@ -36,10 +48,20 @@ export function ProjectsContent({ onCreateProject }: ProjectsContentProps) {
           </div>
         </div>
 
+        {/* Mobile Create Project Button */}
+        <div className="lg:hidden mb-6">
+          <CreateProjectButton
+            onClick={onCreateProject}
+            className="w-full group justify-center"
+          />
+        </div>
+
         {/* Spatial Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-          {/* Create New Project Card */}
-          <CreateProjectCard onClick={onCreateProject} />
+          {/* Create New Project Card - Hidden on mobile when no projects */}
+          <div className="hidden lg:block">
+            <CreateProjectCard onClick={onCreateProject} />
+          </div>
         </div>
       </div>
     </div>

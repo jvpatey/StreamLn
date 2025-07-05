@@ -4,7 +4,8 @@
 // Used in: app/projects/page.tsx
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
-import { Plus, Search, FileText, Zap, X } from "lucide-react";
+import { Search, FileText, Zap, X } from "lucide-react";
+import { CreateProjectButton } from "./create-project-button";
 
 interface ProjectsSidebarProps {
   isOpen: boolean;
@@ -19,29 +20,29 @@ export function ProjectsSidebar({
 }: ProjectsSidebarProps) {
   return (
     <>
-      {/* Sidebar Overlay (Mobile) */}
-      {isOpen && (
+      {/* Sidebar Overlay (Mobile) - No longer needed since sidebar is hidden on mobile */}
+      {/* {isOpen && (
         <div
           className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
           onClick={onClose}
         />
-      )}
+      )} */}
 
-      {/* Collapsible Sidebar */}
+      {/* Collapsible Sidebar - Hidden on mobile */}
       <div
         className={`${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed lg:relative lg:translate-x-0 z-50 w-72 h-screen bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-800/50 transition-transform duration-300 ease-in-out overflow-y-auto`}
+        } fixed lg:relative lg:translate-x-0 z-50 w-72 h-screen bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-800/50 transition-transform duration-300 ease-in-out overflow-y-auto hidden lg:block`}
       >
-        {/* Sidebar Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-200/50 dark:border-slate-800/50 lg:hidden">
+        {/* Sidebar Header - No longer needed since sidebar is hidden on mobile */}
+        {/* <div className="flex items-center justify-between p-4 border-b border-slate-200/50 dark:border-slate-800/50 lg:hidden">
           <h2 className="font-semibold text-slate-900 dark:text-slate-100">
             Menu
           </h2>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X size={16} />
           </Button>
-        </div>
+        </div> */}
 
         <div className="p-6">
           {/* Welcome Section */}
@@ -57,17 +58,7 @@ export function ProjectsSidebar({
 
           {/* Quick Actions */}
           <div className="space-y-2 mb-8">
-            <Button
-              variant="gradient"
-              size="lg"
-              className="w-full group justify-start"
-            >
-              <Plus
-                size={18}
-                className="mr-3 transition-transform group-hover:rotate-90"
-              />
-              Create Project
-            </Button>
+            <CreateProjectButton />
 
             <Button
               variant="outline"

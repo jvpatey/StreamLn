@@ -6,7 +6,7 @@ import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import { SimpleThemeToggle } from "@/components/ui/shared/theme-toggle";
-import { Search, Layers, Menu } from "lucide-react";
+import { Search, Layers } from "lucide-react";
 
 interface ProjectsHeaderProps {
   onCommandPaletteOpen: () => void;
@@ -23,14 +23,6 @@ export function ProjectsHeader({
         <div className="flex justify-between items-center h-14">
           {/* Left section */}
           <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onSidebarToggle}
-              className="lg:hidden"
-            >
-              <Menu size={18} />
-            </Button>
             <div className="flex items-center space-x-3">
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
                 <Layers size={16} className="text-white" />
