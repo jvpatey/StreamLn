@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import ProjectCommandPalette from "@/components/ui/projects/project-command-palette";
 import { ProjectsHeader } from "@/components/ui/projects/projects-header";
 import { ProjectsSidebar } from "@/components/ui/projects/projects-sidebar";
@@ -11,6 +12,7 @@ export default function DashboardPage() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const { user } = useUser();
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -33,12 +35,34 @@ export default function DashboardPage() {
     setCreateModalOpen(true);
   };
 
+  // API integration for creating a project
+  const handleCreateProjectApi = async ({
+    name,
+    description,
+  }: {
+    name: string;
+    description?: string;
+  }) => {
+    if (!user?.id)
+      throw new Error("You must be signed in to create a project.");
+    const res = await fetch("/api/projects", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: user.id, name, description }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data?.error || "Failed to create project.");
+    }
+    setCreateModalOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <CreateProjectModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
-        onCreate={() => setCreateModalOpen(false)}
+        onCreate={handleCreateProjectApi}
       />
       {/* Modern Header */}
       <ProjectsHeader
