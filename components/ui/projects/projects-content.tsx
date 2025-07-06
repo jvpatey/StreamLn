@@ -46,6 +46,11 @@ export function ProjectsContent({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [statusChangingId, setStatusChangingId] = useState<string | null>(null);
 
+  const activeCount = projects.filter(
+    (p) => (p.status || "active") === "active"
+  ).length;
+  const archivedCount = projects.filter((p) => p.status === "archived").length;
+
   const handleDelete = async (id: string) => {
     setDeletingId(id);
     try {
@@ -97,7 +102,8 @@ export function ProjectsContent({
               All Projects
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 sm:text-sm">
-              {projects.length} active project{projects.length === 1 ? "" : "s"}
+              {activeCount} active project{activeCount === 1 ? "" : "s"}
+              {archivedCount > 0 && <> &middot; {archivedCount} archived</>}
             </p>
           </div>
           <div className="flex items-center space-x-3">
