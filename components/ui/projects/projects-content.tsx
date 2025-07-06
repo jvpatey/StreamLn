@@ -44,6 +44,7 @@ export function ProjectsContent({
   setProjects,
 }: ProjectsContentProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [statusChangingId, setStatusChangingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
@@ -56,6 +57,26 @@ export function ProjectsContent({
       console.log("Failed to delete project", err);
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    setStatusChangingId(id);
+    try {
+      await fetch(`/api/projects/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (setProjects) {
+        setProjects((prev) =>
+          prev.map((p) => (p.id === id ? { ...p, status: newStatus } : p))
+        );
+      }
+    } catch (err) {
+      console.log("Failed to update project status", err);
+    } finally {
+      setStatusChangingId(null);
     }
   };
 
@@ -122,6 +143,9 @@ export function ProjectsContent({
               blocks={typeof project.blocks === "number" ? project.blocks : 0}
               status={project.status || "Active"}
               onDelete={() => handleDelete(project.id)}
+              onStatusChange={(newStatus) =>
+                handleStatusChange(project.id, newStatus)
+              }
             />
           ))}
           {/* Create New Project Card - Hidden on mobile when no projects */}
