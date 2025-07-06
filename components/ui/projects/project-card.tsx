@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/shared/card";
 import { Folder, Users, Clock, BarChart3 } from "lucide-react";
 import React from "react";
+import { ProjectCardMenu } from "./project-card-menu";
 
 interface ProjectCardProps {
   name: string;
@@ -11,6 +12,8 @@ interface ProjectCardProps {
   blocks: number;
   status: string;
   onClick?: () => void;
+  onDelete?: () => void;
+  onStatusChange?: (newStatus: string) => void;
 }
 
 export function ProjectCard({
@@ -22,6 +25,8 @@ export function ProjectCard({
   blocks,
   status,
   onClick,
+  onDelete,
+  onStatusChange,
 }: ProjectCardProps) {
   // Color for progress
   const getProgressColor = () => {
@@ -34,12 +39,26 @@ export function ProjectCard({
     if (progress >= 50) return "text-yellow-400";
     return "text-red-400";
   };
+  const isArchived = status === "archived";
+  const statusColor = isArchived ? "text-slate-400" : "text-green-500";
 
   return (
     <Card
-      className="group relative overflow-hidden border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-200 cursor-pointer rounded-2xl shadow-lg bg-gradient-to-br from-slate-900/80 to-slate-800/80"
+      className={`group relative overflow-hidden border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-200 cursor-pointer rounded-2xl shadow-lg bg-gradient-to-br from-slate-900/80 to-slate-800/80 ${
+        isArchived ? "opacity-60" : ""
+      }`}
       onClick={onClick}
     >
+      {/* Menu Button */}
+      <div className="absolute top-3 right-3 z-10">
+        <ProjectCardMenu
+          isArchived={isArchived}
+          onArchive={() => onStatusChange?.("archived")}
+          onUnarchive={() => onStatusChange?.("active")}
+          onDelete={onDelete}
+        />
+      </div>
+
       {/* Canvas Preview Area (placeholder) */}
       <div className="relative h-24 bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden flex items-center justify-center">
         {/* Placeholder grid blocks */}
@@ -133,7 +152,9 @@ export function ProjectCard({
         </div>
         <div className="flex items-center space-x-1">
           <BarChart3 size={12} />
-          <span>{status}</span>
+          <span className={`font-semibold ${statusColor}`}>
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </span>
         </div>
       </div>
     </Card>
