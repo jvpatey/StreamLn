@@ -120,6 +120,7 @@ export default function DashboardPage() {
           <ProjectsContent
             onCreateProject={handleCreateProject}
             projects={projects}
+            setProjects={setProjects}
           />
         )}
       </div>

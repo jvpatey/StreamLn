@@ -7,6 +7,7 @@ import { Filter, Grid3x3 } from "lucide-react";
 import { CreateProjectCard } from "./create-project-card";
 import { CreateProjectButton } from "./create-project-button";
 import { ProjectCard } from "./project-card";
+import React, { useState } from "react";
 
 function formatTimeAgo(dateString?: string) {
   if (!dateString) return "—";
@@ -34,12 +35,30 @@ interface Project {
 interface ProjectsContentProps {
   onCreateProject?: () => void;
   projects?: Project[];
+  setProjects?: React.Dispatch<React.SetStateAction<Project[]>>;
 }
 
 export function ProjectsContent({
   onCreateProject,
   projects = [],
+  setProjects,
 }: ProjectsContentProps) {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    try {
+      await fetch(`/api/projects/${id}`, { method: "DELETE" });
+      if (setProjects) {
+        setProjects((prev) => prev.filter((p) => p.id !== id));
+      }
+    } catch (err) {
+      console.log("Failed to delete project", err);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className="flex-1 min-h-screen">
       <div className="p-6 lg:p-8">
@@ -102,6 +121,7 @@ export function ProjectsContent({
               }
               blocks={typeof project.blocks === "number" ? project.blocks : 0}
               status={project.status || "Active"}
+              onDelete={() => handleDelete(project.id)}
             />
           ))}
           {/* Create New Project Card - Hidden on mobile when no projects */}
