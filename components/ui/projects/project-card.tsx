@@ -35,16 +35,18 @@ export function ProjectCard({
     return "bg-red-500";
   };
   const getProgressTextColor = () => {
-    if (progress >= 80) return "text-green-400";
-    if (progress >= 50) return "text-yellow-400";
-    return "text-red-400";
+    if (progress >= 80) return "text-green-500 dark:text-green-400";
+    if (progress >= 50) return "text-yellow-600 dark:text-yellow-400";
+    return "text-red-600 dark:text-red-400";
   };
   const isArchived = status === "archived";
-  const statusColor = isArchived ? "text-slate-400" : "text-green-500";
+  const statusColor = isArchived
+    ? "text-slate-500 dark:text-slate-400"
+    : "text-green-600 dark:text-green-400";
 
   return (
     <Card
-      className={`group relative overflow-hidden border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-200 cursor-pointer rounded-2xl shadow-lg bg-gradient-to-br from-slate-900/80 to-slate-800/80 ${
+      className={`group relative overflow-hidden border border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-200 cursor-pointer rounded-2xl shadow-lg bg-white dark:bg-gradient-to-br dark:from-slate-900/80 dark:to-slate-800/80 ${
         isArchived ? "opacity-60" : ""
       }`}
       onClick={onClick}
@@ -60,7 +62,7 @@ export function ProjectCard({
       </div>
 
       {/* Canvas Preview Area (placeholder) */}
-      <div className="relative h-24 bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden flex items-center justify-center">
+      <div className="relative h-24 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 overflow-hidden flex items-center justify-center">
         {/* Placeholder grid blocks */}
         <svg width="100%" height="100%" viewBox="0 0 160 48" fill="none">
           <rect
@@ -110,7 +112,7 @@ export function ProjectCard({
           />
         </svg>
         {/* Blocks count */}
-        <div className="absolute top-2 left-2 bg-slate-900/80 text-xs text-slate-200 px-2 py-0.5 rounded-full font-medium shadow">
+        <div className="absolute top-2 left-2 bg-white/80 dark:bg-slate-900/80 text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full font-medium shadow">
           {blocks} blocks
         </div>
       </div>
@@ -119,7 +121,7 @@ export function ProjectCard({
       <div className="p-4 pb-2">
         <div className="flex items-center space-x-2 mb-1">
           <Folder size={16} className="text-primary-500" />
-          <span className="font-semibold text-slate-100 text-base truncate max-w-[140px] group-hover:text-primary-400 transition-colors">
+          <span className="font-semibold text-slate-900 dark:text-slate-100 text-base truncate max-w-[140px] group-hover:text-primary-400 transition-colors">
             {name}
           </span>
           <span
@@ -128,9 +130,11 @@ export function ProjectCard({
             {progress}%
           </span>
         </div>
-        <div className="text-xs text-slate-400 mb-2 truncate">{type}</div>
+        <div className="text-xs text-slate-500 dark:text-slate-400 mb-2 truncate">
+          {type}
+        </div>
         {/* Progress bar */}
-        <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden mb-2">
+        <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mb-2">
           <div
             className={`h-1.5 rounded-full transition-all duration-300 ${getProgressColor()}`}
             style={{ width: `${progress}%` }}
@@ -139,7 +143,7 @@ export function ProjectCard({
       </div>
 
       {/* Metadata Row */}
-      <div className="flex items-center justify-between text-xs text-slate-400 px-4 pb-3">
+      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-4 pb-3">
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-1">
             <Clock size={12} />
