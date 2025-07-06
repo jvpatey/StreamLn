@@ -1,13 +1,12 @@
 "use client";
 
-// Main content area for the projects page - contains project grid and header
-// Used in: app/projects/page.tsx
 import { Button } from "@/components/ui/shared/button";
 import { Filter, Grid3x3 } from "lucide-react";
 import { CreateProjectCard } from "./create-project-card";
 import { CreateProjectButton } from "./create-project-button";
 import { ProjectCard } from "./project-card";
 import React, { useState } from "react";
+import { deleteProject, updateProjectStatus } from "@/lib/api/projects";
 
 function formatTimeAgo(dateString?: string) {
   if (!dateString) return "—";
@@ -38,6 +37,7 @@ interface ProjectsContentProps {
   setProjects?: React.Dispatch<React.SetStateAction<Project[]>>;
 }
 
+// Projects Content component, used in projects-page.tsx
 export function ProjectsContent({
   onCreateProject,
   projects = [],
@@ -49,7 +49,7 @@ export function ProjectsContent({
   const handleDelete = async (id: string) => {
     setDeletingId(id);
     try {
-      await fetch(`/api/projects/${id}`, { method: "DELETE" });
+      await deleteProject(id);
       if (setProjects) {
         setProjects((prev) => prev.filter((p) => p.id !== id));
       }
@@ -63,11 +63,7 @@ export function ProjectsContent({
   const handleStatusChange = async (id: string, newStatus: string) => {
     setStatusChangingId(id);
     try {
-      await fetch(`/api/projects/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
+      await updateProjectStatus(id, newStatus);
       if (setProjects) {
         setProjects((prev) =>
           prev.map((p) => (p.id === id ? { ...p, status: newStatus } : p))

@@ -7,6 +7,7 @@ import { ProjectsHeader } from "@/components/ui/projects/projects-header";
 import { ProjectsSidebar } from "@/components/ui/projects/projects-sidebar";
 import { ProjectsContent } from "@/components/ui/projects/projects-content";
 import { CreateProjectModal } from "@/components/ui/projects/create-project-modal";
+import { fetchProjects, createProject } from "@/lib/api/projects";
 
 export default function DashboardPage() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -20,13 +21,11 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Fetch projects from API
-  const fetchProjects = async () => {
+  const loadProjects = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/projects");
-      if (!res.ok) throw new Error("Failed to fetch projects");
-      const data = await res.json();
+      const data = await fetchProjects();
       setProjects(data);
     } catch (err: any) {
       setError(err?.message || "Failed to fetch projects");
@@ -36,7 +35,7 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    fetchProjects();
+    loadProjects();
   }, []);
 
   // Keyboard shortcuts
@@ -70,18 +69,10 @@ export default function DashboardPage() {
   }) => {
     if (!user?.id)
       throw new Error("You must be signed in to create a project.");
-    const res = await fetch("/api/projects", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: user.id, name, description }),
-    });
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data?.error || "Failed to create project.");
-    }
+    await createProject({ userId: user.id, name, description });
     setCreateModalOpen(false);
     // Refetch projects after creating
-    fetchProjects();
+    loadProjects();
   };
 
   return (
