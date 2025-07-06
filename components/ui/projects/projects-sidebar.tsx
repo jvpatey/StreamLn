@@ -11,39 +11,23 @@ interface ProjectsSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onCommandPaletteOpen: () => void;
+  onCreateProject?: () => void;
 }
 
 export function ProjectsSidebar({
   isOpen,
   onClose,
   onCommandPaletteOpen,
+  onCreateProject,
 }: ProjectsSidebarProps) {
   return (
     <>
-      {/* Sidebar Overlay (Mobile) - No longer needed since sidebar is hidden on mobile */}
-      {/* {isOpen && (
-        <div
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
-          onClick={onClose}
-        />
-      )} */}
-
       {/* Collapsible Sidebar - Hidden on mobile */}
       <div
         className={`${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } fixed lg:relative lg:translate-x-0 z-50 w-72 h-screen bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-800/50 transition-transform duration-300 ease-in-out overflow-y-auto hidden lg:block`}
       >
-        {/* Sidebar Header - No longer needed since sidebar is hidden on mobile */}
-        {/* <div className="flex items-center justify-between p-4 border-b border-slate-200/50 dark:border-slate-800/50 lg:hidden">
-          <h2 className="font-semibold text-slate-900 dark:text-slate-100">
-            Menu
-          </h2>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X size={16} />
-          </Button>
-        </div> */}
-
         <div className="p-6">
           {/* Welcome Section */}
           <div className="mb-6">
@@ -58,7 +42,7 @@ export function ProjectsSidebar({
 
           {/* Quick Actions */}
           <div className="space-y-2 mb-8">
-            <CreateProjectButton />
+            <CreateProjectButton onClick={onCreateProject} />
 
             <Button
               variant="outline"
