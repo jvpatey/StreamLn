@@ -30,12 +30,19 @@ interface Project {
   createdAt?: string;
   collaborators?: number;
   blocks?: number;
+  userId?: string;
 }
 
 interface ProjectsContentProps {
   onCreateProject?: () => void;
   projects?: Project[];
   setProjects?: React.Dispatch<React.SetStateAction<Project[]>>;
+  onProjectClick?: (project: Project) => void;
+  onProjectDelete?: (projectId: string) => Promise<void>;
+  onProjectStatusChange?: (
+    projectId: string,
+    newStatus: string
+  ) => Promise<void>;
 }
 
 // Projects Content component, used in projects-page.tsx
@@ -43,6 +50,9 @@ export function ProjectsContent({
   onCreateProject,
   projects = [],
   setProjects,
+  onProjectClick,
+  onProjectDelete,
+  onProjectStatusChange,
 }: ProjectsContentProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [statusChangingId, setStatusChangingId] = useState<string | null>(null);
@@ -150,6 +160,7 @@ export function ProjectsContent({
           {sortedProjects.map((project) => (
             <ProjectCard
               key={project.id}
+              id={project.id}
               name={project.name}
               type={project.description || "Project Workspace"}
               progress={
@@ -162,9 +173,17 @@ export function ProjectsContent({
                   : 1
               }
               blocks={typeof project.blocks === "number" ? project.blocks : 0}
-              status={project.status || "Active"}
-              onDelete={() => handleDelete(project.id)}
+              status={project.status || "active"}
+              description={project.description}
+              createdAt={project.createdAt || new Date().toISOString()}
+              updatedAt={project.updatedAt || new Date().toISOString()}
+              userId={project.userId || ""}
+              onClick={() => onProjectClick?.(project)}
+              onDelete={() =>
+                onProjectDelete?.(project.id) || handleDelete(project.id)
+              }
               onStatusChange={(newStatus) =>
+                onProjectStatusChange?.(project.id, newStatus) ||
                 handleStatusChange(project.id, newStatus)
               }
             />

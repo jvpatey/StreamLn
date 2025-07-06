@@ -7,12 +7,20 @@ import { ProjectsHeader } from "@/components/ui/projects/projects-header";
 import { ProjectsSidebar } from "@/components/ui/projects/projects-sidebar";
 import { ProjectsContent } from "@/components/ui/projects/projects-content";
 import { CreateProjectModal } from "@/components/ui/projects/create-project-modal";
-import { fetchProjects, createProject } from "@/lib/api/projects";
+import { ProjectDetailsSidepanel } from "@/components/ui/projects/project-details-sidepanel";
+import {
+  fetchProjects,
+  createProject,
+  deleteProject,
+  updateProjectStatus,
+} from "@/lib/api/projects";
 
 export default function DashboardPage() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [sidepanelOpen, setSidepanelOpen] = useState(false);
   const { user } = useUser();
 
   // Projects state
@@ -75,12 +83,55 @@ export default function DashboardPage() {
     loadProjects();
   };
 
+  // Sidepanel handlers
+  const handleProjectClick = (project: any) => {
+    setSelectedProject(project);
+    setSidepanelOpen(true);
+  };
+
+  const handleProjectDelete = async (projectId: string) => {
+    try {
+      await deleteProject(projectId);
+      loadProjects();
+      setSidepanelOpen(false);
+      setSelectedProject(null);
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+    }
+  };
+
+  const handleProjectStatusChange = async (
+    projectId: string,
+    newStatus: string
+  ) => {
+    try {
+      await updateProjectStatus(projectId, newStatus);
+      loadProjects();
+      // Update selected project if it's the one being modified
+      if (selectedProject && selectedProject.id === projectId) {
+        setSelectedProject({ ...selectedProject, status: newStatus });
+      }
+    } catch (error) {
+      console.error("Failed to update project status:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <CreateProjectModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
         onCreate={handleCreateProjectApi}
+      />
+      <ProjectDetailsSidepanel
+        project={selectedProject}
+        isOpen={sidepanelOpen}
+        onClose={() => {
+          setSidepanelOpen(false);
+          setSelectedProject(null);
+        }}
+        onDelete={handleProjectDelete}
+        onStatusChange={handleProjectStatusChange}
       />
       {/* Modern Header */}
       <ProjectsHeader
@@ -112,6 +163,9 @@ export default function DashboardPage() {
             onCreateProject={handleCreateProject}
             projects={projects}
             setProjects={setProjects}
+            onProjectClick={handleProjectClick}
+            onProjectDelete={handleProjectDelete}
+            onProjectStatusChange={handleProjectStatusChange}
           />
         )}
       </div>

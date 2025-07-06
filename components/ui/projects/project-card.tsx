@@ -4,6 +4,7 @@ import React from "react";
 import { ProjectCardMenu } from "./project-card-menu";
 
 interface ProjectCardProps {
+  id: string;
   name: string;
   type: string;
   progress: number;
@@ -11,12 +12,17 @@ interface ProjectCardProps {
   collaborators: number;
   blocks: number;
   status: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
   onClick?: () => void;
   onDelete?: () => void;
   onStatusChange?: (newStatus: string) => void;
 }
 
 export function ProjectCard({
+  id,
   name,
   type,
   progress,
@@ -24,6 +30,10 @@ export function ProjectCard({
   collaborators,
   blocks,
   status,
+  description,
+  createdAt,
+  updatedAt,
+  userId,
   onClick,
   onDelete,
   onStatusChange,
