@@ -6,12 +6,40 @@ import { Button } from "@/components/ui/shared/button";
 import { Filter, Grid3x3 } from "lucide-react";
 import { CreateProjectCard } from "./create-project-card";
 import { CreateProjectButton } from "./create-project-button";
+import { ProjectCard } from "./project-card";
+
+function formatTimeAgo(dateString?: string) {
+  if (!dateString) return "—";
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diff < 60) return "just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
+  return date.toLocaleDateString();
+}
+
+interface Project {
+  id: string;
+  name: string;
+  description?: string;
+  status?: string;
+  progress?: number;
+  updatedAt?: string;
+  collaborators?: number;
+  blocks?: number;
+}
 
 interface ProjectsContentProps {
   onCreateProject?: () => void;
+  projects?: Project[];
 }
 
-export function ProjectsContent({ onCreateProject }: ProjectsContentProps) {
+export function ProjectsContent({
+  onCreateProject,
+  projects = [],
+}: ProjectsContentProps) {
   return (
     <div className="flex-1 min-h-screen">
       <div className="p-6 lg:p-8">
@@ -33,7 +61,7 @@ export function ProjectsContent({ onCreateProject }: ProjectsContentProps) {
               All Projects
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 sm:text-sm">
-              0 active projects
+              {projects.length} active project{projects.length === 1 ? "" : "s"}
             </p>
           </div>
           <div className="flex items-center space-x-3">
@@ -56,8 +84,26 @@ export function ProjectsContent({ onCreateProject }: ProjectsContentProps) {
           />
         </div>
 
-        {/* Spatial Projects Grid */}
+        {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+          {projects.map((project) => (
+            <ProjectCard
+              key={project.id}
+              name={project.name}
+              type={project.description || "Project Workspace"}
+              progress={
+                typeof project.progress === "number" ? project.progress : 0
+              }
+              lastModified={formatTimeAgo(project.updatedAt)}
+              collaborators={
+                typeof project.collaborators === "number"
+                  ? project.collaborators
+                  : 1
+              }
+              blocks={typeof project.blocks === "number" ? project.blocks : 0}
+              status={project.status || "Active"}
+            />
+          ))}
           {/* Create New Project Card - Hidden on mobile when no projects */}
           <div className="hidden lg:block">
             <CreateProjectCard onClick={onCreateProject} />

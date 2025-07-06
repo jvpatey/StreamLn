@@ -14,6 +14,31 @@ export default function DashboardPage() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const { user } = useUser();
 
+  // Projects state
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch projects from API
+  const fetchProjects = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/projects");
+      if (!res.ok) throw new Error("Failed to fetch projects");
+      const data = await res.json();
+      setProjects(data);
+    } catch (err: any) {
+      setError(err?.message || "Failed to fetch projects");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -55,6 +80,8 @@ export default function DashboardPage() {
       throw new Error(data?.error || "Failed to create project.");
     }
     setCreateModalOpen(false);
+    // Refetch projects after creating
+    fetchProjects();
   };
 
   return (
@@ -81,7 +108,20 @@ export default function DashboardPage() {
         />
 
         {/* Main Content Area */}
-        <ProjectsContent onCreateProject={handleCreateProject} />
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center text-slate-500 dark:text-slate-400 text-lg">
+            Loading projects...
+          </div>
+        ) : error ? (
+          <div className="flex-1 flex items-center justify-center text-destructive-500 dark:text-destructive-400 text-lg">
+            {error}
+          </div>
+        ) : (
+          <ProjectsContent
+            onCreateProject={handleCreateProject}
+            projects={projects}
+          />
+        )}
       </div>
 
       {/* Command Palette */}
