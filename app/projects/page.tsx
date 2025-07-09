@@ -18,6 +18,8 @@ import {
 
 export default function DashboardPage() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [commandPaletteSearchMode, setCommandPaletteSearchMode] =
+    useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -53,14 +55,16 @@ export default function DashboardPage() {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setCommandPaletteOpen(true);
+        setCommandPaletteSearchMode(false);
       }
       if (
         (e.metaKey || e.ctrlKey) &&
         e.shiftKey &&
-        e.key.toLowerCase() === "p"
+        e.key.toLowerCase() === "f"
       ) {
         e.preventDefault();
-        handleCreateProject();
+        setCommandPaletteOpen(true);
+        setCommandPaletteSearchMode(true);
       }
       if ((e.metaKey || e.ctrlKey) && e.key === "b") {
         e.preventDefault();
@@ -145,6 +149,13 @@ export default function DashboardPage() {
     }
   };
 
+  // Handler for selecting a project from the command palette
+  const handleProjectSelectFromPalette = (project) => {
+    setSelectedProject(project);
+    setSidepanelOpen(true);
+    setCommandPaletteOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <CreateProjectModal
@@ -205,6 +216,9 @@ export default function DashboardPage() {
         open={commandPaletteOpen}
         onOpenChange={setCommandPaletteOpen}
         onCreateProject={handleCreateProject}
+        initialSearchMode={commandPaletteSearchMode}
+        projects={projects}
+        onProjectSelect={handleProjectSelectFromPalette}
       />
     </div>
   );

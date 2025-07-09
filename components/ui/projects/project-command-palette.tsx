@@ -1,21 +1,35 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/shared/badge";
 import { Button } from "@/components/ui/shared/button";
-import { Search, Plus, Filter, Folder } from "lucide-react";
+import { Search, Plus, Filter, Folder, ArrowLeft } from "lucide-react";
+
+interface Project {
+  id: string;
+  name: string;
+  description?: string;
+}
 
 interface ProjectCommandPaletteProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreateProject?: () => void;
+  initialSearchMode?: boolean;
+  projects: Project[];
+  onProjectSelect?: (project: Project) => void;
 }
 
 const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
   open,
   onOpenChange,
   onCreateProject,
+  initialSearchMode = false,
+  projects,
+  onProjectSelect,
 }) => {
   const [search, setSearch] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [searchMode, setSearchMode] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const actions = [
     {
@@ -34,10 +48,12 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
       title: "Search Projects",
       description: "Find a project by name or keyword",
       icon: <Search size={16} />,
-      shortcut: "⌘K",
+      shortcut: "⌘⇧F",
       category: "Search",
       onSelect: () => {
-        /* TODO: Implement search */
+        setSearchMode(true);
+        setSearch("");
+        setTimeout(() => searchInputRef.current?.focus(), 0);
       },
     },
     {
@@ -71,39 +87,87 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
       action.category.toLowerCase().includes(search.toLowerCase())
   );
 
+  const filteredProjects = projects.filter(
+    (project) =>
+      project.name.toLowerCase().includes(search.toLowerCase()) ||
+      (project.description &&
+        project.description.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  useEffect(() => {
+    if (!open) {
+      setSearchMode(false);
+      setSearch("");
+      setSelectedIndex(0);
+      return;
+    }
+    setSelectedIndex(0);
+    setSearchMode(initialSearchMode);
+    if (initialSearchMode) {
+      setTimeout(() => searchInputRef.current?.focus(), 0);
+    }
+  }, [open, initialSearchMode]);
+
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!open) return;
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % filteredActions.length);
+        const listLength = searchMode
+          ? filteredProjects.length
+          : filteredActions.length;
+        setSelectedIndex((prev) => (prev + 1) % listLength);
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setSelectedIndex(
-          (prev) => (prev - 1 + filteredActions.length) % filteredActions.length
-        );
+        const listLength = searchMode
+          ? filteredProjects.length
+          : filteredActions.length;
+        setSelectedIndex((prev) => (prev - 1 + listLength) % listLength);
       } else if (e.key === "Enter") {
         e.preventDefault();
-        if (filteredActions[selectedIndex]) {
+        if (searchMode) {
+          if (filteredProjects[selectedIndex] && onProjectSelect) {
+            onProjectSelect(filteredProjects[selectedIndex]);
+            setSearch("");
+            setSelectedIndex(0);
+            setSearchMode(false);
+          }
+        } else if (filteredActions[selectedIndex]) {
           filteredActions[selectedIndex].onSelect();
+          if (filteredActions[selectedIndex].id !== "search-projects") {
+            onOpenChange(false);
+            setSearch("");
+            setSelectedIndex(0);
+          }
+        }
+      } else if (e.key === "Escape") {
+        if (searchMode) {
+          setSearchMode(false);
+          setSearch("");
+          setSelectedIndex(0);
+        } else {
           onOpenChange(false);
           setSearch("");
           setSelectedIndex(0);
         }
-      } else if (e.key === "Escape") {
-        onOpenChange(false);
-        setSearch("");
-        setSelectedIndex(0);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open, selectedIndex, filteredActions, onOpenChange]);
+  }, [
+    open,
+    selectedIndex,
+    filteredActions,
+    filteredProjects,
+    searchMode,
+    onOpenChange,
+    onProjectSelect,
+  ]);
 
   useEffect(() => {
     setSelectedIndex(0);
-  }, [search]);
+  }, [search, searchMode]);
 
   if (!open) return null;
 
@@ -128,16 +192,35 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
               </div>
               <div>
                 <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-                  Project Command Palette
+                  {searchMode ? "Search Projects" : "Project Command Palette"}
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Type to search, navigate with arrows, press Enter to select
+                  {searchMode
+                    ? "Type to search your projects. Press Esc or Back to return."
+                    : "Type to search, navigate with arrows, press Enter to select"}
                 </p>
               </div>
             </div>
-            <Badge variant="outline" className="hidden sm:flex">
-              Projects
-            </Badge>
+            {searchMode ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="ml-2"
+                onClick={() => {
+                  setSearchMode(false);
+                  setSearch("");
+                  setSelectedIndex(0);
+                  setTimeout(() => searchInputRef.current?.focus(), 0);
+                }}
+                aria-label="Back to command palette"
+              >
+                <ArrowLeft size={18} />
+              </Button>
+            ) : (
+              <Badge variant="outline" className="hidden sm:flex">
+                Projects
+              </Badge>
+            )}
           </div>
 
           {/* Search */}
@@ -147,8 +230,11 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
               className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
             />
             <input
+              ref={searchInputRef}
               type="text"
-              placeholder="Search project commands..."
+              placeholder={
+                searchMode ? "Search projects..." : "Search project commands..."
+              }
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-transparent px-12 py-4 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 outline-none"
@@ -156,50 +242,91 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
             />
             <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center space-x-2">
               <Badge variant="outline" className="text-xs">
-                {filteredActions.length} results
+                {searchMode
+                  ? `${filteredProjects.length} results`
+                  : `${filteredActions.length} results`}
               </Badge>
             </div>
           </div>
 
-          {/* Actions List */}
+          {/* Actions/Projects List */}
           <ul className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
-            {filteredActions.length === 0 && (
+            {searchMode ? (
+              filteredProjects.length === 0 ? (
+                <li className="p-6 text-center text-slate-500 dark:text-slate-400 text-sm">
+                  No projects found.
+                </li>
+              ) : (
+                filteredProjects.map((project, idx) => (
+                  <li
+                    key={project.id}
+                    className={`flex items-center px-6 py-4 cursor-pointer transition-colors duration-100 group ${
+                      idx === selectedIndex
+                        ? "bg-primary-50 dark:bg-primary-900/20"
+                        : "hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                    }`}
+                    onClick={() => {
+                      if (onProjectSelect) onProjectSelect(project);
+                      setSearch("");
+                      setSelectedIndex(0);
+                      setSearchMode(false);
+                    }}
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                  >
+                    <div className="mr-4 flex-shrink-0">
+                      <Folder size={16} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-slate-900 dark:text-slate-100">
+                        {project.name}
+                      </div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">
+                        {project.description}
+                      </div>
+                    </div>
+                  </li>
+                ))
+              )
+            ) : filteredActions.length === 0 ? (
               <li className="p-6 text-center text-slate-500 dark:text-slate-400 text-sm">
                 No commands found.
               </li>
+            ) : (
+              filteredActions.map((action, idx) => (
+                <li
+                  key={action.id}
+                  className={`flex items-center px-6 py-4 cursor-pointer transition-colors duration-100 group ${
+                    idx === selectedIndex
+                      ? "bg-primary-50 dark:bg-primary-900/20"
+                      : "hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                  }`}
+                  onClick={() => {
+                    action.onSelect();
+                    if (action.id !== "search-projects") {
+                      onOpenChange(false);
+                      setSearch("");
+                      setSelectedIndex(0);
+                    }
+                  }}
+                  onMouseEnter={() => setSelectedIndex(idx)}
+                >
+                  <div className="mr-4 flex-shrink-0">{action.icon}</div>
+                  <div className="flex-1">
+                    <div className="font-medium text-slate-900 dark:text-slate-100">
+                      {action.title}
+                    </div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      {action.description}
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <Badge variant="outline" className="text-xs">
+                      {action.shortcut}
+                    </Badge>
+                  </div>
+                </li>
+              ))
             )}
-            {filteredActions.map((action, idx) => (
-              <li
-                key={action.id}
-                className={`flex items-center px-6 py-4 cursor-pointer transition-colors duration-100 group ${
-                  idx === selectedIndex
-                    ? "bg-primary-50 dark:bg-primary-900/20"
-                    : "hover:bg-slate-100 dark:hover:bg-slate-800/60"
-                }`}
-                onClick={() => {
-                  action.onSelect();
-                  onOpenChange(false);
-                  setSearch("");
-                  setSelectedIndex(0);
-                }}
-                onMouseEnter={() => setSelectedIndex(idx)}
-              >
-                <div className="mr-4 flex-shrink-0">{action.icon}</div>
-                <div className="flex-1">
-                  <div className="font-medium text-slate-900 dark:text-slate-100">
-                    {action.title}
-                  </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400">
-                    {action.description}
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <Badge variant="outline" className="text-xs">
-                    {action.shortcut}
-                  </Badge>
-                </div>
-              </li>
-            ))}
           </ul>
         </div>
       </div>
