@@ -24,6 +24,7 @@ export default function DashboardPage() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [sidepanelOpen, setSidepanelOpen] = useState(false);
+  const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
   const { user } = useUser();
 
   // Projects state
@@ -60,6 +61,11 @@ export default function DashboardPage() {
         e.preventDefault();
         setCommandPaletteOpen(true);
         setCommandPaletteSearchMode(false);
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "/") {
+        e.preventDefault();
+        setFilterPopoverOpen(true);
+        setCommandPaletteOpen(false);
       }
       if (
         (e.metaKey || e.ctrlKey) &&
@@ -234,6 +240,8 @@ export default function DashboardPage() {
             setSortBy={setSortBy}
             statusFilter={statusFilter}
             setStatusFilter={setStatusFilter}
+            filterPopoverOpen={filterPopoverOpen}
+            setFilterPopoverOpen={setFilterPopoverOpen}
           />
         )}
       </div>
@@ -246,6 +254,7 @@ export default function DashboardPage() {
         initialSearchMode={commandPaletteSearchMode}
         projects={projects}
         onProjectSelect={handleProjectSelectFromPalette}
+        openFilterPopover={() => setFilterPopoverOpen(true)}
       />
     </div>
   );

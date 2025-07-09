@@ -16,6 +16,7 @@ interface ProjectCommandPaletteProps {
   initialSearchMode?: boolean;
   projects: Project[];
   onProjectSelect?: (project: Project) => void;
+  openFilterPopover?: () => void;
 }
 
 const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
@@ -25,6 +26,7 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
   initialSearchMode = false,
   projects,
   onProjectSelect,
+  openFilterPopover,
 }) => {
   const [search, setSearch] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -61,10 +63,10 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
       title: "Filter Projects",
       description: "Filter projects by status or type",
       icon: <Filter size={16} />,
-      shortcut: "⌘F",
+      shortcut: "⌘/",
       category: "Filter",
       onSelect: () => {
-        /* TODO: Implement filter */
+        openFilterPopover?.();
       },
     },
     {

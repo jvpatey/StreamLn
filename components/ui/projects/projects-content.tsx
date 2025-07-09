@@ -54,6 +54,8 @@ interface ProjectsContentProps {
   setSortBy: (val: "updated" | "alpha") => void;
   statusFilter: "all" | "active" | "archived";
   setStatusFilter: (val: "all" | "active" | "archived") => void;
+  filterPopoverOpen: boolean;
+  setFilterPopoverOpen: (open: boolean) => void;
 }
 
 // Projects Content component, used in projects-page.tsx
@@ -68,6 +70,8 @@ export function ProjectsContent({
   setSortBy,
   statusFilter,
   setStatusFilter,
+  filterPopoverOpen,
+  setFilterPopoverOpen,
 }: ProjectsContentProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [statusChangingId, setStatusChangingId] = useState<string | null>(null);
@@ -151,7 +155,10 @@ export function ProjectsContent({
             </p>
           </div>
           <div className="flex items-center space-x-3">
-            <Popover>
+            <Popover
+              open={filterPopoverOpen}
+              onOpenChange={setFilterPopoverOpen}
+            >
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="sm">
                   <Filter size={16} className="mr-2" />
