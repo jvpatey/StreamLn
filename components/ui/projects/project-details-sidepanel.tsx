@@ -28,8 +28,11 @@ import {
   CheckCircle,
   Circle,
   AlertCircle,
+  Save,
+  X,
 } from "lucide-react";
 import { getIconComponent } from "./icon-picker";
+import { IconPicker } from "./icon-picker";
 
 interface Project {
   id: string;
@@ -60,13 +63,31 @@ export function ProjectDetailsSidepanel({
   onStatusChange,
 }: ProjectDetailsSidepanelProps) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    description: "",
+    icon: "",
+  });
 
   // Reset confirmation state when sidepanel closes
   React.useEffect(() => {
     if (!isOpen) {
       setConfirmDelete(false);
+      setIsEditMode(false);
     }
   }, [isOpen]);
+
+  // Initialize edit form when project changes or edit mode is enabled
+  React.useEffect(() => {
+    if (project && isEditMode) {
+      setEditForm({
+        name: project.name,
+        description: project.description || "",
+        icon: project.icon || "Folder",
+      });
+    }
+  }, [project, isEditMode]);
 
   if (!project) return null;
 
@@ -116,6 +137,37 @@ export function ProjectDetailsSidepanel({
     setConfirmDelete(false);
   };
 
+  const handleEditClick = () => {
+    setIsEditMode(true);
+  };
+
+  const handleSaveEdit = () => {
+    onEdit?.({
+      ...project,
+      name: editForm.name,
+      description: editForm.description,
+      icon: editForm.icon,
+    });
+    setIsEditMode(false);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    // Reset form to original values
+    setEditForm({
+      name: project.name,
+      description: project.description || "",
+      icon: project.icon || "Folder",
+    });
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setEditForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   return (
     <>
       <Sheet open={isOpen} onOpenChange={onClose}>
@@ -128,17 +180,47 @@ export function ProjectDetailsSidepanel({
               <div className="flex items-center space-x-3 group">
                 <div className="p-2 rounded-xl bg-primary/10 border border-primary/20 transition-all duration-200 hover:bg-primary/20 hover:border-primary/30 hover:scale-105 cursor-pointer">
                   {React.createElement(
-                    getIconComponent(project.icon || "Folder"),
+                    getIconComponent(editForm.icon || project.icon || "Folder"),
                     {
                       className:
                         "h-5 w-5 text-primary transition-colors duration-200 group-hover:text-primary/80",
                     }
                   )}
                 </div>
-                <div>
-                  <SheetTitle className="text-xl font-semibold text-foreground transition-colors duration-200 group-hover:text-primary/80 cursor-pointer">
-                    {project.name}
-                  </SheetTitle>
+                <div className="flex-1">
+                  {isEditMode ? (
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        value={editForm.name}
+                        onChange={(e) =>
+                          handleInputChange("name", e.target.value)
+                        }
+                        className="w-full text-xl font-semibold bg-transparent border-b border-border/50 focus:border-primary/50 focus:outline-none transition-colors duration-200"
+                        placeholder="Project name"
+                      />
+                      <textarea
+                        value={editForm.description}
+                        onChange={(e) =>
+                          handleInputChange("description", e.target.value)
+                        }
+                        className="w-full text-sm bg-transparent border border-border/50 rounded-lg p-2 focus:border-primary/50 focus:outline-none transition-colors duration-200 resize-none"
+                        placeholder="Project description (optional)"
+                        rows={3}
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <SheetTitle className="text-xl font-semibold text-foreground transition-colors duration-200 group-hover:text-primary/80 cursor-pointer">
+                        {project.name}
+                      </SheetTitle>
+                      {project.description && (
+                        <SheetDescription className="text-sm text-muted-foreground leading-relaxed transition-colors duration-200 hover:text-foreground/80">
+                          {project.description}
+                        </SheetDescription>
+                      )}
+                    </>
+                  )}
                   <div className="flex items-center space-x-2 mt-1">
                     {getStatusIcon()}
                     <span
@@ -152,10 +234,18 @@ export function ProjectDetailsSidepanel({
               </div>
             </div>
 
-            {project.description && (
-              <SheetDescription className="text-sm text-muted-foreground leading-relaxed transition-colors duration-200 hover:text-foreground/80">
-                {project.description}
-              </SheetDescription>
+            {isEditMode && (
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">
+                    Project Icon
+                  </label>
+                  <IconPicker
+                    selectedIcon={editForm.icon}
+                    onIconSelect={(icon) => handleInputChange("icon", icon)}
+                  />
+                </div>
+              </div>
             )}
           </SheetHeader>
 
@@ -313,57 +403,76 @@ export function ProjectDetailsSidepanel({
 
           {/* Action Buttons */}
           <div className="flex flex-col space-y-3 pt-6 border-t border-border/50">
-            <Button
-              className="w-full"
-              onClick={() => {
-                // TODO: Navigate to project canvas
-                console.log("Navigate to project:", project.id);
-              }}
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Open Project
-            </Button>
+            {isEditMode ? (
+              <div className="flex space-x-2">
+                <Button className="flex-1" onClick={handleSaveEdit}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={handleCancelEdit}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button
+                  className="w-full"
+                  onClick={() => {
+                    // TODO: Navigate to project canvas
+                    console.log("Navigate to project:", project.id);
+                  }}
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open Project
+                </Button>
 
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => onEdit?.(project)}
-              >
-                <Edit3 className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={handleEditClick}
+                  >
+                    <Edit3 className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
 
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => {
-                  const newStatus = isArchived ? "active" : "archived";
-                  onStatusChange?.(project.id, newStatus);
-                }}
-              >
-                {isArchived ? (
-                  <>
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Unarchive
-                  </>
-                ) : (
-                  <>
-                    <Archive className="h-4 w-4 mr-2" />
-                    Archive
-                  </>
-                )}
-              </Button>
-            </div>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      const newStatus = isArchived ? "active" : "archived";
+                      onStatusChange?.(project.id, newStatus);
+                    }}
+                  >
+                    {isArchived ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Unarchive
+                      </>
+                    ) : (
+                      <>
+                        <Archive className="h-4 w-4 mr-2" />
+                        Archive
+                      </>
+                    )}
+                  </Button>
+                </div>
 
-            <Button
-              variant="destructive"
-              className="w-full"
-              onClick={handleDelete}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete Project
-            </Button>
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={handleDelete}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Project
+                </Button>
+              </>
+            )}
           </div>
         </SheetContent>
       </Sheet>

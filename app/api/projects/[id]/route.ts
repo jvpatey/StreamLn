@@ -7,8 +7,10 @@ export async function DELETE(
 ) {
   const { id } = params;
   try {
-    await prisma.project.delete({ where: { id } });
-    return NextResponse.json({ success: true });
+    await prisma.project.delete({
+      where: { id },
+    });
+    return NextResponse.json({ message: "Project deleted successfully" });
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to delete project." },
@@ -34,6 +36,31 @@ export async function PATCH(
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to update project status." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params;
+  const body = await req.json();
+  try {
+    const updated = await prisma.project.update({
+      where: { id },
+      data: {
+        name: body.name,
+        description: body.description,
+        icon: body.icon,
+        updatedAt: new Date(),
+      },
+    });
+    return NextResponse.json(updated);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to update project." },
       { status: 500 }
     );
   }

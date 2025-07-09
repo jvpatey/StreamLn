@@ -17,6 +17,24 @@ export async function updateProjectStatus(id: string, status: string) {
   return res.json();
 }
 
+// Update a project (name, description, icon)
+export async function updateProject(
+  id: string,
+  data: {
+    name?: string;
+    description?: string;
+    icon?: string;
+  }
+) {
+  const res = await fetch(`/api/projects/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update project");
+  return res.json();
+}
+
 // Create a project
 export async function createProject(data: {
   userId: string;

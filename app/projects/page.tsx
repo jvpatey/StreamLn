@@ -13,6 +13,7 @@ import {
   createProject,
   deleteProject,
   updateProjectStatus,
+  updateProject,
 } from "@/lib/api/projects";
 
 export default function DashboardPage() {
@@ -118,6 +119,23 @@ export default function DashboardPage() {
     }
   };
 
+  const handleProjectEdit = async (updatedProject: any) => {
+    try {
+      await updateProject(updatedProject.id, {
+        name: updatedProject.name,
+        description: updatedProject.description,
+        icon: updatedProject.icon,
+      });
+      loadProjects();
+      // Update selected project if it's the one being modified
+      if (selectedProject && selectedProject.id === updatedProject.id) {
+        setSelectedProject(updatedProject);
+      }
+    } catch (error) {
+      console.error("Failed to update project:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <CreateProjectModal
@@ -132,6 +150,7 @@ export default function DashboardPage() {
           setSidepanelOpen(false);
           setSelectedProject(null);
         }}
+        onEdit={handleProjectEdit}
         onDelete={handleProjectDelete}
         onStatusChange={handleProjectStatusChange}
       />
