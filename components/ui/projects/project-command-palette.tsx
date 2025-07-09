@@ -6,61 +6,63 @@ import { Search, Plus, Filter, Folder } from "lucide-react";
 interface ProjectCommandPaletteProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCreateProject?: () => void;
 }
-
-const actions = [
-  {
-    id: "create-project",
-    title: "Create Project",
-    description: "Start a new project workspace",
-    icon: <Plus size={16} />,
-    shortcut: "⌘N",
-    category: "Create",
-    onSelect: () => {
-      /* TODO: Implement create project */
-    },
-  },
-  {
-    id: "search-projects",
-    title: "Search Projects",
-    description: "Find a project by name or keyword",
-    icon: <Search size={16} />,
-    shortcut: "⌘K",
-    category: "Search",
-    onSelect: () => {
-      /* TODO: Implement search */
-    },
-  },
-  {
-    id: "filter-projects",
-    title: "Filter Projects",
-    description: "Filter projects by status or type",
-    icon: <Filter size={16} />,
-    shortcut: "⌘F",
-    category: "Filter",
-    onSelect: () => {
-      /* TODO: Implement filter */
-    },
-  },
-  {
-    id: "browse-all",
-    title: "Browse All Projects",
-    description: "View all your projects",
-    icon: <Folder size={16} />,
-    shortcut: "⌘B",
-    category: "Browse",
-    onSelect: () => {
-      /* TODO: Implement browse */
-    },
-  },
-];
 
 const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
   open,
   onOpenChange,
+  onCreateProject,
 }) => {
   const [search, setSearch] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const actions = [
+    {
+      id: "create-project",
+      title: "Create Project",
+      description: "Start a new project workspace",
+      icon: <Plus size={16} />,
+      shortcut: "⌘N",
+      category: "Create",
+      onSelect: () => {
+        onCreateProject?.();
+      },
+    },
+    {
+      id: "search-projects",
+      title: "Search Projects",
+      description: "Find a project by name or keyword",
+      icon: <Search size={16} />,
+      shortcut: "⌘K",
+      category: "Search",
+      onSelect: () => {
+        /* TODO: Implement search */
+      },
+    },
+    {
+      id: "filter-projects",
+      title: "Filter Projects",
+      description: "Filter projects by status or type",
+      icon: <Filter size={16} />,
+      shortcut: "⌘F",
+      category: "Filter",
+      onSelect: () => {
+        /* TODO: Implement filter */
+      },
+    },
+    {
+      id: "browse-all",
+      title: "Browse All Projects",
+      description: "View all your projects",
+      icon: <Folder size={16} />,
+      shortcut: "⌘B",
+      category: "Browse",
+      onSelect: () => {
+        /* TODO: Implement browse */
+      },
+    },
+  ];
 
   const filteredActions = actions.filter(
     (action) =>

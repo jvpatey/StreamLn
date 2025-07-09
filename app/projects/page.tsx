@@ -58,6 +58,10 @@ export default function DashboardPage() {
         e.preventDefault();
         setSidebarOpen(!sidebarOpen);
       }
+      if ((e.metaKey || e.ctrlKey) && e.key === "n") {
+        e.preventDefault();
+        handleCreateProject();
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -195,6 +199,7 @@ export default function DashboardPage() {
       <ProjectCommandPalette
         open={commandPaletteOpen}
         onOpenChange={setCommandPaletteOpen}
+        onCreateProject={handleCreateProject}
       />
     </div>
   );
