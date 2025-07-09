@@ -125,6 +125,7 @@ exports.Prisma.ProjectScalarFieldEnum = {
   userId: 'userId',
   name: 'name',
   description: 'description',
+  icon: 'icon',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

@@ -31,6 +31,7 @@ interface Project {
   collaborators?: number;
   blocks?: number;
   userId?: string;
+  icon?: string;
 }
 
 interface ProjectsContentProps {
@@ -175,6 +176,7 @@ export function ProjectsContent({
               blocks={typeof project.blocks === "number" ? project.blocks : 0}
               status={project.status || "active"}
               description={project.description}
+              icon={project.icon}
               createdAt={project.createdAt || new Date().toISOString()}
               updatedAt={project.updatedAt || new Date().toISOString()}
               userId={project.userId || ""}

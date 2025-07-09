@@ -22,6 +22,7 @@ export async function createProject(data: {
   userId: string;
   name: string;
   description?: string;
+  icon?: string;
 }) {
   const res = await fetch("/api/projects", {
     method: "POST",

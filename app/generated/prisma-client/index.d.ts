@@ -884,6 +884,7 @@ export namespace Prisma {
     userId: string | null
     name: string | null
     description: string | null
+    icon: string | null
     status: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -894,6 +895,7 @@ export namespace Prisma {
     userId: string | null
     name: string | null
     description: string | null
+    icon: string | null
     status: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -904,6 +906,7 @@ export namespace Prisma {
     userId: number
     name: number
     description: number
+    icon: number
     status: number
     createdAt: number
     updatedAt: number
@@ -916,6 +919,7 @@ export namespace Prisma {
     userId?: true
     name?: true
     description?: true
+    icon?: true
     status?: true
     createdAt?: true
     updatedAt?: true
@@ -926,6 +930,7 @@ export namespace Prisma {
     userId?: true
     name?: true
     description?: true
+    icon?: true
     status?: true
     createdAt?: true
     updatedAt?: true
@@ -936,6 +941,7 @@ export namespace Prisma {
     userId?: true
     name?: true
     description?: true
+    icon?: true
     status?: true
     createdAt?: true
     updatedAt?: true
@@ -1019,6 +1025,7 @@ export namespace Prisma {
     userId: string
     name: string
     description: string | null
+    icon: string | null
     status: string
     createdAt: Date
     updatedAt: Date
@@ -1046,6 +1053,7 @@ export namespace Prisma {
     userId?: boolean
     name?: boolean
     description?: boolean
+    icon?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -1056,6 +1064,7 @@ export namespace Prisma {
     userId?: boolean
     name?: boolean
     description?: boolean
+    icon?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -1066,6 +1075,7 @@ export namespace Prisma {
     userId?: boolean
     name?: boolean
     description?: boolean
+    icon?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -1076,12 +1086,13 @@ export namespace Prisma {
     userId?: boolean
     name?: boolean
     description?: boolean
+    icon?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "description" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "description" | "icon" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 
   export type $ProjectPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Project"
@@ -1091,6 +1102,7 @@ export namespace Prisma {
       userId: string
       name: string
       description: string | null
+      icon: string | null
       status: string
       createdAt: Date
       updatedAt: Date
@@ -1521,6 +1533,7 @@ export namespace Prisma {
     readonly userId: FieldRef<"Project", 'String'>
     readonly name: FieldRef<"Project", 'String'>
     readonly description: FieldRef<"Project", 'String'>
+    readonly icon: FieldRef<"Project", 'String'>
     readonly status: FieldRef<"Project", 'String'>
     readonly createdAt: FieldRef<"Project", 'DateTime'>
     readonly updatedAt: FieldRef<"Project", 'DateTime'>
@@ -1909,6 +1922,7 @@ export namespace Prisma {
     userId: 'userId',
     name: 'name',
     description: 'description',
+    icon: 'icon',
     status: 'status',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -1999,6 +2013,7 @@ export namespace Prisma {
     userId?: StringFilter<"Project"> | string
     name?: StringFilter<"Project"> | string
     description?: StringNullableFilter<"Project"> | string | null
+    icon?: StringNullableFilter<"Project"> | string | null
     status?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
@@ -2009,6 +2024,7 @@ export namespace Prisma {
     userId?: SortOrder
     name?: SortOrder
     description?: SortOrderInput | SortOrder
+    icon?: SortOrderInput | SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -2022,6 +2038,7 @@ export namespace Prisma {
     userId?: StringFilter<"Project"> | string
     name?: StringFilter<"Project"> | string
     description?: StringNullableFilter<"Project"> | string | null
+    icon?: StringNullableFilter<"Project"> | string | null
     status?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
@@ -2032,6 +2049,7 @@ export namespace Prisma {
     userId?: SortOrder
     name?: SortOrder
     description?: SortOrderInput | SortOrder
+    icon?: SortOrderInput | SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -2048,6 +2066,7 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"Project"> | string
     name?: StringWithAggregatesFilter<"Project"> | string
     description?: StringNullableWithAggregatesFilter<"Project"> | string | null
+    icon?: StringNullableWithAggregatesFilter<"Project"> | string | null
     status?: StringWithAggregatesFilter<"Project"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
@@ -2058,6 +2077,7 @@ export namespace Prisma {
     userId: string
     name: string
     description?: string | null
+    icon?: string | null
     status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -2068,6 +2088,7 @@ export namespace Prisma {
     userId: string
     name: string
     description?: string | null
+    icon?: string | null
     status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -2078,6 +2099,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -2088,6 +2110,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -2098,6 +2121,7 @@ export namespace Prisma {
     userId: string
     name: string
     description?: string | null
+    icon?: string | null
     status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -2108,6 +2132,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -2118,6 +2143,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -2174,6 +2200,7 @@ export namespace Prisma {
     userId?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    icon?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -2184,6 +2211,7 @@ export namespace Prisma {
     userId?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    icon?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -2194,6 +2222,7 @@ export namespace Prisma {
     userId?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    icon?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder

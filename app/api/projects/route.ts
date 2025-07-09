@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/projects - Create a new project
 export async function POST(req: NextRequest) {
-  const { userId, name, description } = await req.json();
+  const { userId, name, description, icon } = await req.json();
 
   // TODO: Add validation and authorization
   const project = await prisma.project.create({
@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
       userId,
       name,
       description,
+      icon,
     },
   });
 

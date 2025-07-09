@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/shared/card";
 import { Folder, Users, Clock, BarChart3 } from "lucide-react";
 import React from "react";
 import { ProjectCardMenu } from "./project-card-menu";
+import { getIconComponent } from "./icon-picker";
 
 interface ProjectCardProps {
   id: string;
@@ -13,6 +14,7 @@ interface ProjectCardProps {
   blocks: number;
   status: string;
   description?: string;
+  icon?: string;
   createdAt: string;
   updatedAt: string;
   userId: string;
@@ -31,6 +33,7 @@ export function ProjectCard({
   blocks,
   status,
   description,
+  icon,
   createdAt,
   updatedAt,
   userId,
@@ -130,7 +133,10 @@ export function ProjectCard({
       {/* Main Info */}
       <div className="p-4 pb-2">
         <div className="flex items-center space-x-2 mb-1">
-          <Folder size={16} className="text-primary-500" />
+          {React.createElement(getIconComponent(icon || "Folder"), {
+            size: 16,
+            className: "text-primary-500",
+          })}
           <span className="font-semibold text-slate-900 dark:text-slate-100 text-base truncate max-w-[140px] group-hover:text-primary-400 transition-colors">
             {name}
           </span>

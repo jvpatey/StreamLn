@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/shared/badge";
 import { Button } from "@/components/ui/shared/button";
 import { Card } from "@/components/ui/shared/card";
 import { Plus } from "lucide-react";
+import { IconPicker } from "./icon-picker";
 
 interface CreateProjectModalProps {
   open: boolean;
@@ -10,6 +11,7 @@ interface CreateProjectModalProps {
   onCreate?: (data: {
     name: string;
     description?: string;
+    icon?: string;
   }) => Promise<void> | void;
 }
 
@@ -21,6 +23,7 @@ export function CreateProjectModal({
 }: CreateProjectModalProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [selectedIcon, setSelectedIcon] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -32,6 +35,7 @@ export function CreateProjectModal({
     } else {
       setName("");
       setDescription("");
+      setSelectedIcon("");
       setError(null);
       setLoading(false);
     }
@@ -67,6 +71,7 @@ export function CreateProjectModal({
       await onCreate?.({
         name: name.trim(),
         description: description.trim() || undefined,
+        icon: selectedIcon || undefined,
       });
       onOpenChange(false);
     } catch (err: any) {
@@ -160,6 +165,11 @@ export function CreateProjectModal({
                 disabled={loading}
               />
             </div>
+
+            <IconPicker
+              selectedIcon={selectedIcon}
+              onIconSelect={setSelectedIcon}
+            />
             {error && (
               <div className="text-sm text-destructive-600 dark:text-destructive-400 font-medium">
                 {error}

@@ -71,13 +71,15 @@ export default function DashboardPage() {
   const handleCreateProjectApi = async ({
     name,
     description,
+    icon,
   }: {
     name: string;
     description?: string;
+    icon?: string;
   }) => {
     if (!user?.id)
       throw new Error("You must be signed in to create a project.");
-    await createProject({ userId: user.id, name, description });
+    await createProject({ userId: user.id, name, description, icon });
     setCreateModalOpen(false);
     // Refetch projects after creating
     loadProjects();

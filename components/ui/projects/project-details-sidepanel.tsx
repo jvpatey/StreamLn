@@ -29,11 +29,13 @@ import {
   Circle,
   AlertCircle,
 } from "lucide-react";
+import { getIconComponent } from "./icon-picker";
 
 interface Project {
   id: string;
   name: string;
   description?: string;
+  icon?: string;
   status: string;
   createdAt: string;
   updatedAt: string;
@@ -102,7 +104,12 @@ export function ProjectDetailsSidepanel({
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-3">
               <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
-                <Folder className="h-5 w-5 text-primary" />
+                {React.createElement(
+                  getIconComponent(project.icon || "Folder"),
+                  {
+                    className: "h-5 w-5 text-primary",
+                  }
+                )}
               </div>
               <div>
                 <SheetTitle className="text-xl font-semibold text-foreground">
