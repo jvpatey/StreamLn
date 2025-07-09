@@ -3,9 +3,9 @@ import prisma from "@/lib/db";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await context.params;
   try {
     await prisma.project.delete({
       where: { id },
@@ -21,9 +21,9 @@ export async function DELETE(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await context.params;
   const body = await req.json();
   try {
     const updated = await prisma.project.update({
@@ -43,9 +43,9 @@ export async function PATCH(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await context.params;
   const body = await req.json();
   try {
     const updated = await prisma.project.update({
