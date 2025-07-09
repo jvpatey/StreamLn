@@ -111,24 +111,6 @@ export function ProjectsContent({
     }
   };
 
-  const activeProjects = projects
-    .filter((p) => (p.status || "active") === "active")
-    .sort(
-      (a, b) =>
-        new Date(b.updatedAt || b.createdAt || 0).getTime() -
-        new Date(a.updatedAt || a.createdAt || 0).getTime()
-    );
-
-  const archivedProjects = projects
-    .filter((p) => p.status === "archived")
-    .sort(
-      (a, b) =>
-        new Date(b.updatedAt || b.createdAt || 0).getTime() -
-        new Date(a.updatedAt || a.createdAt || 0).getTime()
-    );
-
-  const sortedProjects = [...activeProjects, ...archivedProjects];
-
   return (
     <div className="flex-1 min-h-screen">
       <div className="p-6 lg:p-8">
@@ -191,7 +173,7 @@ export function ProjectsContent({
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-          {sortedProjects.map((project) => (
+          {projects.map((project) => (
             <ProjectCard
               key={project.id}
               id={project.id}
