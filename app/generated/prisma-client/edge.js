@@ -144,6 +144,10 @@ const config = {
         "fromEnvVar": null,
         "value": "darwin-arm64",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "rhel-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -151,7 +155,7 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
@@ -161,7 +165,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
+  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -170,8 +174,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../app/generated/prisma-client\"\n}\n\nmodel Project {\n  id          String   @id @default(cuid())\n  userId      String\n  name        String\n  description String?\n  icon        String?\n  status      String   @default(\"active\")\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n\n  @@index([userId])\n}\n",
-  "inlineSchemaHash": "705e195e48f4ea4c8ee6cbc4b29eaa487011eb89aaec7b784da48f3d170694d4",
+  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../app/generated/prisma-client\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n}\n\nmodel Project {\n  id          String   @id @default(cuid())\n  userId      String\n  name        String\n  description String?\n  icon        String?\n  status      String   @default(\"active\")\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n\n  @@index([userId])\n}\n",
+  "inlineSchemaHash": "aa21f8b240a0d0105a427b70a4521bd2c441b1cac616612bb1fce98ae636feee",
   "copyEngine": true
 }
 config.dirname = '/'
