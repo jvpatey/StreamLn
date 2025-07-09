@@ -30,6 +30,10 @@ export default function DashboardPage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<"updated" | "alpha">("updated");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "active" | "archived"
+  >("all");
 
   // Fetch projects from API
   const loadProjects = async () => {
@@ -156,6 +160,25 @@ export default function DashboardPage() {
     setCommandPaletteOpen(false);
   };
 
+  // Filter and sort projects before rendering
+  const filteredAndSortedProjects = projects
+    .filter((project) => {
+      if (statusFilter === "all") return true;
+      if (statusFilter === "active") return project.status === "active";
+      if (statusFilter === "archived") return project.status === "archived";
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === "updated") {
+        return (
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+      } else if (sortBy === "alpha") {
+        return a.name.localeCompare(b.name);
+      }
+      return 0;
+    });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <CreateProjectModal
@@ -202,11 +225,15 @@ export default function DashboardPage() {
         ) : (
           <ProjectsContent
             onCreateProject={handleCreateProject}
-            projects={projects}
+            projects={filteredAndSortedProjects}
             setProjects={setProjects}
             onProjectClick={handleProjectClick}
             onProjectDelete={handleProjectDelete}
             onProjectStatusChange={handleProjectStatusChange}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
           />
         )}
       </div>

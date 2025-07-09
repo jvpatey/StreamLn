@@ -7,6 +7,12 @@ import { CreateProjectButton } from "./create-project-button";
 import { ProjectCard } from "./project-card";
 import React, { useState } from "react";
 import { deleteProject, updateProjectStatus } from "@/lib/api/projects";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import FilterBar from "@/components/ui/projects/filter-bar";
 
 function formatTimeAgo(dateString?: string) {
   if (!dateString) return "—";
@@ -44,6 +50,10 @@ interface ProjectsContentProps {
     projectId: string,
     newStatus: string
   ) => Promise<void>;
+  sortBy: "updated" | "alpha";
+  setSortBy: (val: "updated" | "alpha") => void;
+  statusFilter: "all" | "active" | "archived";
+  setStatusFilter: (val: "all" | "active" | "archived") => void;
 }
 
 // Projects Content component, used in projects-page.tsx
@@ -54,6 +64,10 @@ export function ProjectsContent({
   onProjectClick,
   onProjectDelete,
   onProjectStatusChange,
+  sortBy,
+  setSortBy,
+  statusFilter,
+  setStatusFilter,
 }: ProjectsContentProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [statusChangingId, setStatusChangingId] = useState<string | null>(null);
@@ -137,10 +151,22 @@ export function ProjectsContent({
             </p>
           </div>
           <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="sm">
-              <Filter size={16} className="mr-2" />
-              Filter
-            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Filter size={16} className="mr-2" />
+                  Filter
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-4">
+                <FilterBar
+                  sortBy={sortBy}
+                  setSortBy={setSortBy}
+                  statusFilter={statusFilter}
+                  setStatusFilter={setStatusFilter}
+                />
+              </PopoverContent>
+            </Popover>
             <Button variant="ghost" size="sm">
               <Grid3x3 size={16} className="mr-2" />
               View
