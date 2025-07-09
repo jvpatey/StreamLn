@@ -54,13 +54,17 @@ export default function DashboardPage() {
         e.preventDefault();
         setCommandPaletteOpen(true);
       }
+      if (
+        (e.metaKey || e.ctrlKey) &&
+        e.shiftKey &&
+        e.key.toLowerCase() === "p"
+      ) {
+        e.preventDefault();
+        handleCreateProject();
+      }
       if ((e.metaKey || e.ctrlKey) && e.key === "b") {
         e.preventDefault();
         setSidebarOpen(!sidebarOpen);
-      }
-      if ((e.metaKey || e.ctrlKey) && e.key === "n") {
-        e.preventDefault();
-        handleCreateProject();
       }
     };
 
@@ -69,6 +73,7 @@ export default function DashboardPage() {
   }, [sidebarOpen]);
 
   const handleCreateProject = () => {
+    setCommandPaletteOpen(false); // Close the command palette if open
     setCreateModalOpen(true);
   };
 

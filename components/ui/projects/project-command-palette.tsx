@@ -23,7 +23,7 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
       title: "Create Project",
       description: "Start a new project workspace",
       icon: <Plus size={16} />,
-      shortcut: "⌘N",
+      shortcut: "⌘⇧P",
       category: "Create",
       onSelect: () => {
         onCreateProject?.();
