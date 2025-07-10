@@ -2,11 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/shared/badge";
 import { Button } from "@/components/ui/shared/button";
 import { Search, Plus, Filter, Folder, ArrowLeft } from "lucide-react";
+import { getIconComponent } from "./icon-picker";
 
 interface Project {
   id: string;
   name: string;
   description?: string;
+  status?: string;
+  icon?: string;
 }
 
 interface ProjectCommandPaletteProps {
@@ -31,6 +34,7 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
   const [search, setSearch] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [searchMode, setSearchMode] = useState(false);
+  const [browseMode, setBrowseMode] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const actions = [
@@ -50,7 +54,7 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
       title: "Search Projects",
       description: "Find a project by name or keyword",
       icon: <Search size={16} />,
-      shortcut: "⌘⇧F",
+      shortcut: "⌘/",
       category: "Search",
       onSelect: () => {
         setSearchMode(true);
@@ -77,7 +81,9 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
       shortcut: "⌘B",
       category: "Browse",
       onSelect: () => {
-        /* TODO: Implement browse */
+        setBrowseMode(true);
+        setSearch("");
+        setTimeout(() => searchInputRef.current?.focus(), 0);
       },
     },
   ];
@@ -96,9 +102,15 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
         project.description.toLowerCase().includes(search.toLowerCase()))
   );
 
+  // For browse mode, show all projects, filtered by search
+  const browseProjects = projects.filter((project) =>
+    project.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   useEffect(() => {
     if (!open) {
       setSearchMode(false);
+      setBrowseMode(false);
       setSearch("");
       setSelectedIndex(0);
       return;
@@ -111,24 +123,39 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
   }, [open, initialSearchMode]);
 
   useEffect(() => {
+    setSelectedIndex(0);
+  }, [search, searchMode, browseMode]);
+
+  useEffect(() => {
     if (!open) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!open) return;
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        const listLength = searchMode
+        const listLength = browseMode
+          ? browseProjects.length
+          : searchMode
           ? filteredProjects.length
           : filteredActions.length;
         setSelectedIndex((prev) => (prev + 1) % listLength);
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        const listLength = searchMode
+        const listLength = browseMode
+          ? browseProjects.length
+          : searchMode
           ? filteredProjects.length
           : filteredActions.length;
         setSelectedIndex((prev) => (prev - 1 + listLength) % listLength);
       } else if (e.key === "Enter") {
         e.preventDefault();
-        if (searchMode) {
+        if (browseMode) {
+          if (browseProjects[selectedIndex] && onProjectSelect) {
+            onProjectSelect(browseProjects[selectedIndex]);
+            setSearch("");
+            setSelectedIndex(0);
+            setBrowseMode(false);
+          }
+        } else if (searchMode) {
           if (filteredProjects[selectedIndex] && onProjectSelect) {
             onProjectSelect(filteredProjects[selectedIndex]);
             setSearch("");
@@ -137,14 +164,21 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
           }
         } else if (filteredActions[selectedIndex]) {
           filteredActions[selectedIndex].onSelect();
-          if (filteredActions[selectedIndex].id !== "search-projects") {
+          if (
+            filteredActions[selectedIndex].id !== "search-projects" &&
+            filteredActions[selectedIndex].id !== "browse-all"
+          ) {
             onOpenChange(false);
             setSearch("");
             setSelectedIndex(0);
           }
         }
       } else if (e.key === "Escape") {
-        if (searchMode) {
+        if (browseMode) {
+          setBrowseMode(false);
+          setSearch("");
+          setSelectedIndex(0);
+        } else if (searchMode) {
           setSearchMode(false);
           setSearch("");
           setSelectedIndex(0);
@@ -162,14 +196,12 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
     selectedIndex,
     filteredActions,
     filteredProjects,
+    browseProjects,
     searchMode,
+    browseMode,
     onOpenChange,
     onProjectSelect,
   ]);
-
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [search, searchMode]);
 
   if (!open) return null;
 
@@ -194,22 +226,29 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
               </div>
               <div>
                 <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-                  {searchMode ? "Search Projects" : "Project Command Palette"}
+                  {browseMode
+                    ? "Browse All Projects"
+                    : searchMode
+                    ? "Search Projects"
+                    : "Project Command Palette"}
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  {searchMode
+                  {browseMode
+                    ? "Type to filter, navigate with arrows, press Enter to select"
+                    : searchMode
                     ? "Type to search your projects. Press Esc or Back to return."
                     : "Type to search, navigate with arrows, press Enter to select"}
                 </p>
               </div>
             </div>
-            {searchMode ? (
+            {searchMode || browseMode ? (
               <Button
                 variant="ghost"
                 size="icon"
                 className="ml-2"
                 onClick={() => {
-                  setSearchMode(false);
+                  if (browseMode) setBrowseMode(false);
+                  if (searchMode) setSearchMode(false);
                   setSearch("");
                   setSelectedIndex(0);
                   setTimeout(() => searchInputRef.current?.focus(), 0);
@@ -235,7 +274,11 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
               ref={searchInputRef}
               type="text"
               placeholder={
-                searchMode ? "Search projects..." : "Search project commands..."
+                browseMode
+                  ? "Filter projects..."
+                  : searchMode
+                  ? "Search projects..."
+                  : "Search project commands..."
               }
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -244,7 +287,9 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
             />
             <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center space-x-2">
               <Badge variant="outline" className="text-xs">
-                {searchMode
+                {browseMode
+                  ? `${browseProjects.length} results`
+                  : searchMode
                   ? `${filteredProjects.length} results`
                   : `${filteredActions.length} results`}
               </Badge>
@@ -253,7 +298,58 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
 
           {/* Actions/Projects List */}
           <ul className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
-            {searchMode ? (
+            {browseMode ? (
+              browseProjects.length === 0 ? (
+                <li className="p-6 text-center text-slate-500 dark:text-slate-400 text-sm">
+                  No projects found.
+                </li>
+              ) : (
+                browseProjects.map((project, idx) => (
+                  <li
+                    key={project.id}
+                    className={`flex items-center px-6 py-4 cursor-pointer transition-colors duration-100 group ${
+                      idx === selectedIndex
+                        ? "bg-primary-50 dark:bg-primary-900/20"
+                        : "hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                    }`}
+                    onClick={() => {
+                      if (onProjectSelect) onProjectSelect(project);
+                      setSearch("");
+                      setSelectedIndex(0);
+                      setBrowseMode(false);
+                    }}
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                  >
+                    <div className="mr-4 flex-shrink-0">
+                      {React.createElement(
+                        getIconComponent(project.icon || "Folder"),
+                        {
+                          size: 18,
+                          className: "text-primary-500",
+                        }
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-slate-900 dark:text-slate-100">
+                        {project.name}
+                      </div>
+                      <div
+                        className={`text-xs font-semibold ${
+                          project.status === "archived"
+                            ? "text-slate-500 dark:text-slate-400"
+                            : "text-green-600 dark:text-green-400"
+                        }`}
+                      >
+                        {project.status
+                          ? project.status.charAt(0).toUpperCase() +
+                            project.status.slice(1)
+                          : "Active"}
+                      </div>
+                    </div>
+                  </li>
+                ))
+              )
+            ) : searchMode ? (
               filteredProjects.length === 0 ? (
                 <li className="p-6 text-center text-slate-500 dark:text-slate-400 text-sm">
                   No projects found.
@@ -304,7 +400,10 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
                   }`}
                   onClick={() => {
                     action.onSelect();
-                    if (action.id !== "search-projects") {
+                    if (
+                      action.id !== "search-projects" &&
+                      action.id !== "browse-all"
+                    ) {
                       onOpenChange(false);
                       setSearch("");
                       setSelectedIndex(0);
