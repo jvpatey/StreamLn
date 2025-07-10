@@ -16,6 +16,7 @@ const statusOptions = [
 const sortOptions = [
   { label: "Last Updated", value: "updated" },
   { label: "Alphabetically", value: "alpha" },
+  { label: "Status", value: "status" },
 ];
 
 const FilterBar: React.FC<FilterBarProps> = ({

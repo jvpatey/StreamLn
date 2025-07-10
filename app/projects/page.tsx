@@ -181,6 +181,14 @@ export default function DashboardPage() {
         );
       } else if (sortBy === "alpha") {
         return a.name.localeCompare(b.name);
+      } else if (sortBy === "status") {
+        // Active first, then archived, then others
+        const statusOrder = (status: string | undefined) => {
+          if (status === "active") return 0;
+          if (status === "archived") return 1;
+          return 2;
+        };
+        return statusOrder(a.status) - statusOrder(b.status);
       }
       return 0;
     });
