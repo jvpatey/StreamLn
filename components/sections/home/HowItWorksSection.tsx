@@ -9,6 +9,7 @@ import {
   Move,
   ZoomIn,
   Layers,
+  Brain,
 } from "lucide-react";
 
 // How it works section component - explains the canvas-based developer workspace
@@ -173,13 +174,10 @@ export default function HowItWorksSection() {
 
         {/* Bottom CTA section */}
         <div className="mt-16 text-center">
-          <div className="inline-flex items-center justify-center space-x-3 px-6 py-3 bg-gradient-to-r from-slate-100/50 to-slate-200/50 dark:from-slate-800/50 dark:to-slate-700/50 rounded-full border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm">
-            <Move className="w-4 h-4 text-primary-500" />
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Drag, drop, and organize your way
-            </span>
-            <ZoomIn className="w-4 h-4 text-accent-500" />
-          </div>
+          <Badge variant="gradient" className="group px-4 py-2 text-sm">
+            <Brain className="w-4 h-4 mr-2 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-yellow-500" />
+            Your canvas, your workflow - think, visualize, create
+          </Badge>
         </div>
       </div>
     </section>

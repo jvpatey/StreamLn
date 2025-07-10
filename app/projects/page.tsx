@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import ProjectCommandPalette from "@/components/ui/projects/project-command-palette";
-import { ProjectsHeader } from "@/components/ui/projects/projects-header";
-import { ProjectsSidebar } from "@/components/ui/projects/projects-sidebar";
-import { ProjectsContent } from "@/components/ui/projects/projects-content";
-import { CreateProjectModal } from "@/components/ui/projects/create-project-modal";
-import { ProjectDetailsSidepanel } from "@/components/ui/projects/project-details-sidepanel";
+import { ProjectCommandPalette } from "@/components/ui/projects/command-palette";
+import { ProjectsHeader } from "@/components/ui/projects/navbar";
+import { ProjectsSidebar } from "@/components/ui/projects/sidebar";
+import { ProjectsContent } from "@/components/ui/projects/project-content";
+import { CreateProjectModal } from "@/components/ui/projects/project-content";
+import { ProjectDetailsSidepanel } from "@/components/ui/projects/details-sidepanel";
 import {
   fetchProjects,
   createProject,
@@ -18,16 +18,23 @@ import {
 
 export default function DashboardPage() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [commandPaletteSearchMode, setCommandPaletteSearchMode] =
+    useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [sidepanelOpen, setSidepanelOpen] = useState(false);
+  const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
   const { user } = useUser();
 
   // Projects state
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<"updated" | "alpha">("updated");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "active" | "archived"
+  >("all");
 
   // Fetch projects from API
   const loadProjects = async () => {
@@ -53,6 +60,21 @@ export default function DashboardPage() {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setCommandPaletteOpen(true);
+        setCommandPaletteSearchMode(false);
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "/") {
+        e.preventDefault();
+        setFilterPopoverOpen(true);
+        setCommandPaletteOpen(false);
+      }
+      if (
+        (e.metaKey || e.ctrlKey) &&
+        e.shiftKey &&
+        e.key.toLowerCase() === "f"
+      ) {
+        e.preventDefault();
+        setCommandPaletteOpen(true);
+        setCommandPaletteSearchMode(true);
       }
       if ((e.metaKey || e.ctrlKey) && e.key === "b") {
         e.preventDefault();
@@ -65,6 +87,7 @@ export default function DashboardPage() {
   }, [sidebarOpen]);
 
   const handleCreateProject = () => {
+    setCommandPaletteOpen(false); // Close the command palette if open
     setCreateModalOpen(true);
   };
 
@@ -136,6 +159,40 @@ export default function DashboardPage() {
     }
   };
 
+  // Handler for selecting a project from the command palette
+  const handleProjectSelectFromPalette = (project) => {
+    setSelectedProject(project);
+    setSidepanelOpen(true);
+    setCommandPaletteOpen(false);
+  };
+
+  // Filter and sort projects before rendering
+  const filteredAndSortedProjects = projects
+    .filter((project) => {
+      if (statusFilter === "all") return true;
+      if (statusFilter === "active") return project.status === "active";
+      if (statusFilter === "archived") return project.status === "archived";
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === "updated") {
+        return (
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+      } else if (sortBy === "alpha") {
+        return a.name.localeCompare(b.name);
+      } else if (sortBy === "status") {
+        // Active first, then archived, then others
+        const statusOrder = (status: string | undefined) => {
+          if (status === "active") return 0;
+          if (status === "archived") return 1;
+          return 2;
+        };
+        return statusOrder(a.status) - statusOrder(b.status);
+      }
+      return 0;
+    });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <CreateProjectModal
@@ -182,11 +239,17 @@ export default function DashboardPage() {
         ) : (
           <ProjectsContent
             onCreateProject={handleCreateProject}
-            projects={projects}
+            projects={filteredAndSortedProjects}
             setProjects={setProjects}
             onProjectClick={handleProjectClick}
             onProjectDelete={handleProjectDelete}
             onProjectStatusChange={handleProjectStatusChange}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            filterPopoverOpen={filterPopoverOpen}
+            setFilterPopoverOpen={setFilterPopoverOpen}
           />
         )}
       </div>
@@ -195,6 +258,11 @@ export default function DashboardPage() {
       <ProjectCommandPalette
         open={commandPaletteOpen}
         onOpenChange={setCommandPaletteOpen}
+        onCreateProject={handleCreateProject}
+        initialSearchMode={commandPaletteSearchMode}
+        projects={projects}
+        onProjectSelect={handleProjectSelectFromPalette}
+        openFilterPopover={() => setFilterPopoverOpen(true)}
       />
     </div>
   );
