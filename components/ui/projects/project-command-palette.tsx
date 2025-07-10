@@ -230,7 +230,7 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
                     ? "Browse All Projects"
                     : searchMode
                     ? "Search Projects"
-                    : "Project Command Palette"}
+                    : "Quick Actions"}
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
                   {browseMode

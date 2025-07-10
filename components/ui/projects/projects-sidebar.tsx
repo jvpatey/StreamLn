@@ -4,7 +4,7 @@
 // Used in: app/projects/page.tsx
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
-import { Search, FileText, Zap, X } from "lucide-react";
+import { Search, FileText, Zap, X, Sparkles } from "lucide-react";
 import { CreateProjectButton } from "./create-project-button";
 
 interface ProjectsSidebarProps {
@@ -42,55 +42,49 @@ export function ProjectsSidebar({
 
           {/* Quick Actions */}
           <div className="space-y-2 mb-8">
-            <CreateProjectButton onClick={onCreateProject} />
+            <CreateProjectButton
+              onClick={onCreateProject}
+              className="mb-4 w-full"
+            />
 
-            <Button
-              variant="outline"
-              className="w-full group justify-start h-10"
-              onClick={onCommandPaletteOpen}
-            >
-              <Search
-                size={16}
-                className="mr-3 transition-transform group-hover:scale-110"
-              />
-              Search & Command
-              <Badge variant="outline" className="ml-auto text-xs">
-                ⌘K
-              </Badge>
-            </Button>
+            <div className="bg-slate-50/60 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 rounded-lg p-4 space-y-3">
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-between h-10 px-3 font-medium"
+                onClick={onCommandPaletteOpen}
+              >
+                <span className="flex items-center">
+                  <Sparkles size={16} className="mr-2 text-primary-500" />
+                  Quick Actions
+                </span>
+                <Badge variant="outline" className="text-xs flex-shrink-0">
+                  ⌘K
+                </Badge>
+              </Button>
 
-            <Button
-              variant="outline"
-              className="w-full group justify-start h-10"
-            >
-              <FileText
-                size={16}
-                className="mr-3 transition-transform group-hover:scale-110"
-              />
-              Quick Note
-              <Badge variant="outline" className="ml-auto text-xs">
-                ⌘N
-              </Badge>
-            </Button>
-          </div>
-
-          {/* Pro tip */}
-          <div className="p-4 rounded-lg bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50">
-            <div className="flex items-start space-x-3">
-              <div className="p-2 rounded-md bg-blue-50 dark:bg-blue-900/30">
-                <Zap size={14} className="text-blue-600 dark:text-blue-400" />
-              </div>
-              <div className="flex-1">
-                <h4 className="font-medium text-slate-900 dark:text-slate-100 text-sm mb-1">
-                  Pro Tip
-                </h4>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Use{" "}
-                  <kbd className="px-1.5 py-0.5 text-xs font-mono bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded text-slate-700 dark:text-slate-300">
-                    ⌘K
-                  </kbd>{" "}
-                  to instantly access any project or create new content
-                </p>
+              {/* Pro tip */}
+              <div className="p-3 rounded-lg bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50">
+                <div className="flex items-start space-x-3">
+                  <div className="p-2 rounded-md bg-blue-50 dark:bg-blue-900/30">
+                    <Zap
+                      size={14}
+                      className="text-blue-600 dark:text-blue-400"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-slate-900 dark:text-slate-100 text-sm mb-1">
+                      Pro Tip
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                      Use
+                      <kbd className="px-1.5 py-0.5 text-xs font-mono bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded text-slate-700 dark:text-slate-300 ml-1">
+                        ⌘K
+                      </kbd>
+                      {"\u00A0"}
+                      to instantly access any project or create new content
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
