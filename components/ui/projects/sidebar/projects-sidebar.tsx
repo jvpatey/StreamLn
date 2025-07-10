@@ -5,7 +5,7 @@
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import { Search, FileText, Zap, X, Sparkles } from "lucide-react";
-import { CreateProjectButton } from "./create-project-button";
+import { CreateProjectButton } from "../project-content/create-project/create-project-button";
 
 interface ProjectsSidebarProps {
   isOpen: boolean;

@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import ProjectCommandPalette from "@/components/ui/projects/project-command-palette";
-import { ProjectsHeader } from "@/components/ui/projects/projects-header";
-import { ProjectsSidebar } from "@/components/ui/projects/projects-sidebar";
-import { ProjectsContent } from "@/components/ui/projects/projects-content";
-import { CreateProjectModal } from "@/components/ui/projects/create-project-modal";
-import { ProjectDetailsSidepanel } from "@/components/ui/projects/project-details-sidepanel";
+import { ProjectCommandPalette } from "@/components/ui/projects/command-palette";
+import { ProjectsHeader } from "@/components/ui/projects/navbar";
+import { ProjectsSidebar } from "@/components/ui/projects/sidebar";
+import { ProjectsContent } from "@/components/ui/projects/project-content";
+import { CreateProjectModal } from "@/components/ui/projects/project-content";
+import { ProjectDetailsSidepanel } from "@/components/ui/projects/details-sidepanel";
 import {
   fetchProjects,
   createProject,

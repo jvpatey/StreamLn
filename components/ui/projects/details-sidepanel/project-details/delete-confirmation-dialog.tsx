@@ -1,7 +1,7 @@
 import React from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/shared/button";
-import { getIconComponent } from "../icon-picker";
+import { getIconComponent } from "../../project-content/icon-picker";
 import { Project } from "./types";
 
 interface DeleteConfirmationDialogProps {

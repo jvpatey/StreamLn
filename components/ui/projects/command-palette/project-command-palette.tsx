@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/shared/badge";
 import { Button } from "@/components/ui/shared/button";
 import { Search, Plus, Filter, Folder, ArrowLeft } from "lucide-react";
-import { getIconComponent } from "./icon-picker";
+import { getIconComponent } from "../project-content/icon-picker";
 
 interface Project {
   id: string;

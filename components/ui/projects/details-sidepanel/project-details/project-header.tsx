@@ -1,7 +1,7 @@
 import React from "react";
 import { Archive, CheckCircle, Circle } from "lucide-react";
 import { SheetTitle, SheetDescription } from "@/components/ui/shared/sheet";
-import { getIconComponent } from "../icon-picker";
+import { getIconComponent } from "../../project-content/icon-picker";
 import { Project } from "./types";
 
 interface ProjectHeaderProps {

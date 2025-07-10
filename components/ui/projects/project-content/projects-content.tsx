@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/shared/button";
 import { Filter, Grid3x3, List as ListIcon } from "lucide-react";
-import { CreateProjectCard } from "./create-project-card";
-import { CreateProjectButton } from "./create-project-button";
+import { CreateProjectCard } from "./create-project/create-project-card";
+import { CreateProjectButton } from "./create-project/create-project-button";
 import { ProjectCard } from "./project-card";
 import React, { useState } from "react";
 import { deleteProject, updateProjectStatus } from "@/lib/api/projects";
@@ -12,7 +12,7 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/shared/popover";
-import FilterBar from "@/components/ui/projects/filter-bar";
+import { FilterBar } from "@/components/ui/projects/navbar";
 import { getIconComponent } from "./icon-picker";
 
 function formatTimeAgo(dateString?: string) {

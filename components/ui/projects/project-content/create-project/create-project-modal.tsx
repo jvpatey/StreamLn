@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/shared/badge";
 import { Button } from "@/components/ui/shared/button";
 import { Card } from "@/components/ui/shared/card";
 import { Plus } from "lucide-react";
-import { IconPicker } from "./icon-picker";
+import { IconPicker } from "../icon-picker";
 
 interface CreateProjectModalProps {
   open: boolean;

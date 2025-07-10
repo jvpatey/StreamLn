@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/shared/sheet";
-import { IconPicker } from "./icon-picker";
+import { IconPicker } from "../project-content/icon-picker";
 import {
   ProjectHeader,
   ProjectStats,
