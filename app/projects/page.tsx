@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { ProjectCommandPalette } from "@/components/ui/projects/command-palette";
 import { ProjectsHeader } from "@/components/ui/projects/navbar";
 import { ProjectsSidebar } from "@/components/ui/projects/sidebar";
@@ -26,6 +27,7 @@ export default function DashboardPage() {
   const [sidepanelOpen, setSidepanelOpen] = useState(false);
   const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
   const { user } = useUser();
+  const router = useRouter();
 
   // Projects state
   const [projects, setProjects] = useState([]);
@@ -111,8 +113,19 @@ export default function DashboardPage() {
 
   // Sidepanel handlers
   const handleProjectClick = (project: any) => {
+    // Open project details sidebar
     setSelectedProject(project);
     setSidepanelOpen(true);
+  };
+
+  const handleProjectDetails = (project: any) => {
+    setSelectedProject(project);
+    setSidepanelOpen(true);
+  };
+
+  const handleOpenCanvas = (project: any) => {
+    // Navigate to canvas view
+    router.push(`/projects/${project.id}`);
   };
 
   const handleProjectDelete = async (projectId: string) => {
@@ -210,6 +223,7 @@ export default function DashboardPage() {
         onEdit={handleProjectEdit}
         onDelete={handleProjectDelete}
         onStatusChange={handleProjectStatusChange}
+        onOpenCanvas={handleOpenCanvas}
       />
       {/* Modern Header */}
       <ProjectsHeader

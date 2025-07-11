@@ -18,6 +18,7 @@ interface ProjectDetailsSidepanelProps {
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
   onStatusChange?: (projectId: string, newStatus: string) => void;
+  onOpenCanvas?: (project: Project) => void;
 }
 
 export function ProjectDetailsSidepanel({
@@ -27,6 +28,7 @@ export function ProjectDetailsSidepanel({
   onEdit,
   onDelete,
   onStatusChange,
+  onOpenCanvas,
 }: ProjectDetailsSidepanelProps) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -150,6 +152,7 @@ export function ProjectDetailsSidepanel({
               onEditClick={handleEditClick}
               onStatusChange={onStatusChange}
               onDelete={handleDelete}
+              onOpenCanvas={onOpenCanvas}
             />
           </div>
         </SheetContent>
