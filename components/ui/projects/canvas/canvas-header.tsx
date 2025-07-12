@@ -118,23 +118,59 @@ export function CanvasHeader({
           </div>
 
           {/* Center section - View Mode Toggle */}
-          <div className="hidden md:flex items-center space-x-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+          <div className="hidden md:flex items-center space-x-2 p-1 rounded-lg">
             <Button
               variant={viewMode === "edit" ? "default" : "ghost"}
               size="sm"
               onClick={() => onViewModeChange("edit")}
-              className="text-xs"
+              className={`text-xs rounded-xl p-0 h-9 w-24 flex items-center justify-center shadow-md border-0 transition-colors duration-150
+                ${
+                  viewMode === "edit"
+                    ? "bg-pink-100/60 dark:bg-pink-900/40 focus:ring-2 focus:ring-pink-400/40 hover:bg-pink-200/80 dark:hover:bg-pink-800/60 text-slate-900 dark:text-slate-100"
+                    : "bg-transparent hover:bg-pink-100/60 dark:hover:bg-pink-900/40 focus:ring-2 focus:ring-pink-400/40"
+                }
+              `}
+              style={
+                viewMode === "edit"
+                  ? { boxShadow: "0 0 0 2px #ec489930, 0 0 8px #ec489920" }
+                  : {}
+              }
             >
-              <Edit3 size={14} className="mr-1.5" />
+              <Edit3
+                size={16}
+                className={`mr-2 ${
+                  viewMode === "edit"
+                    ? "text-pink-600 dark:text-pink-300"
+                    : "text-pink-600 dark:text-pink-300"
+                }`}
+              />
               Edit
             </Button>
             <Button
               variant={viewMode === "present" ? "default" : "ghost"}
               size="sm"
               onClick={() => onViewModeChange("present")}
-              className="text-xs"
+              className={`text-xs rounded-xl p-0 h-9 w-24 flex items-center justify-center shadow-md border-0 transition-colors duration-150
+                ${
+                  viewMode === "present"
+                    ? "bg-cyan-100/60 dark:bg-cyan-900/40 focus:ring-2 focus:ring-cyan-400/40 hover:bg-cyan-200/80 dark:hover:bg-cyan-800/60 text-slate-900 dark:text-slate-100"
+                    : "bg-transparent hover:bg-cyan-100/60 dark:hover:bg-cyan-900/40 focus:ring-2 focus:ring-cyan-400/40"
+                }
+              `}
+              style={
+                viewMode === "present"
+                  ? { boxShadow: "0 0 0 2px #06b6d430, 0 0 8px #06b6d420" }
+                  : {}
+              }
             >
-              <Eye size={14} className="mr-1.5" />
+              <Eye
+                size={16}
+                className={`mr-2 ${
+                  viewMode === "present"
+                    ? "text-cyan-600 dark:text-cyan-300"
+                    : "text-cyan-600 dark:text-cyan-300"
+                }`}
+              />
               Present
             </Button>
           </div>
@@ -143,28 +179,51 @@ export function CanvasHeader({
           <div className="flex items-center space-x-2">
             {/* Quick Actions */}
             <div className="hidden sm:flex items-center space-x-2">
-              <Button variant="outline" size="sm">
-                <Users size={14} className="mr-2" />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-xl p-0 h-9 px-4 flex items-center justify-center shadow-md border-0 bg-indigo-100/60 dark:bg-indigo-900/40 hover:bg-indigo-200/80 dark:hover:bg-indigo-800/60 focus:ring-2 focus:ring-indigo-400/40"
+                style={{ boxShadow: "0 0 0 2px #6366f130, 0 0 8px #6366f120" }}
+              >
+                <Users
+                  size={16}
+                  className="mr-2 text-indigo-600 dark:text-indigo-300"
+                />
                 Share
               </Button>
-
-              <Button variant="outline" size="sm">
-                <Download size={14} className="mr-2" />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-xl p-0 h-9 px-4 flex items-center justify-center shadow-md border-0 bg-emerald-100/60 dark:bg-emerald-900/40 hover:bg-emerald-200/80 dark:hover:bg-emerald-800/60 focus:ring-2 focus:ring-emerald-400/40"
+                style={{ boxShadow: "0 0 0 2px #10b98130, 0 0 8px #10b98120" }}
+              >
+                <Download
+                  size={16}
+                  className="mr-2 text-emerald-600 dark:text-emerald-300"
+                />
                 Export
               </Button>
             </div>
-
             {/* Sidebar Toggle */}
             <Button
               variant="ghost"
               size="sm"
               onClick={onSidebarToggle}
-              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+              className="rounded-xl p-0 h-9 w-9 flex items-center justify-center shadow-md border-0 bg-blue-100/60 dark:bg-blue-900/40 hover:bg-blue-200/80 dark:hover:bg-blue-800/60 focus:ring-2 focus:ring-blue-400/40"
+              style={{
+                boxShadow: "0 0 0 2px #3b82f630, 0 0 8px #3b82f620",
+              }}
             >
               {sidebarOpen ? (
-                <PanelLeftClose size={16} />
+                <PanelLeftClose
+                  size={20}
+                  className="text-blue-600 dark:text-blue-300"
+                />
               ) : (
-                <PanelLeftOpen size={16} />
+                <PanelLeftOpen
+                  size={20}
+                  className="text-blue-600 dark:text-blue-300"
+                />
               )}
             </Button>
 
@@ -173,10 +232,28 @@ export function CanvasHeader({
               variant="ghost"
               size="sm"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 relative"
+              className="rounded-xl p-0 h-9 w-9 flex items-center justify-center shadow-md border-0 bg-yellow-100/60 dark:bg-blue-900/40 hover:bg-yellow-200/80 dark:hover:bg-blue-800/60 focus:ring-2 focus:ring-yellow-400/40 relative"
+              style={{
+                boxShadow:
+                  theme === "dark"
+                    ? "0 0 0 2px #3b82f630, 0 0 8px #3b82f620"
+                    : "0 0 0 2px #f59e0b30, 0 0 8px #f59e0b20",
+              }}
             >
-              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100" />
+              <Sun
+                className={`h-5 w-5 rotate-0 scale-100 transition-all duration-300 ${
+                  theme === "dark"
+                    ? "dark:-rotate-90 dark:scale-0 text-yellow-400/60"
+                    : "text-yellow-500"
+                }`}
+              />
+              <Moon
+                className={`absolute h-5 w-5 rotate-90 scale-0 transition-all duration-300 ${
+                  theme === "dark"
+                    ? "dark:rotate-0 dark:scale-100 text-blue-400"
+                    : "text-blue-400/60"
+                }`}
+              />
             </Button>
 
             {/* More Menu */}
@@ -185,9 +262,15 @@ export function CanvasHeader({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+                  className="rounded-xl p-0 h-9 w-9 flex items-center justify-center shadow-md border-0 bg-purple-100/60 dark:bg-purple-900/40 hover:bg-purple-200/80 dark:hover:bg-purple-800/60 focus:ring-2 focus:ring-purple-400/40"
+                  style={{
+                    boxShadow: "0 0 0 2px #a78bfa30, 0 0 8px #a78bfa20",
+                  }}
                 >
-                  <MoreVertical size={16} />
+                  <MoreVertical
+                    size={20}
+                    className="text-purple-600 dark:text-purple-300"
+                  />
                 </Button>
               </PopoverTrigger>
               <PopoverContent
