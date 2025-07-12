@@ -28,6 +28,31 @@ import {
   PopoverTrigger,
 } from "@/components/ui/shared/popover";
 import React from "react";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+
+function Tooltip({
+  children,
+  content,
+}: {
+  children: React.ReactNode;
+  content: string;
+}) {
+  return (
+    <TooltipPrimitive.Root delayDuration={200}>
+      <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
+      <TooltipPrimitive.Portal>
+        <TooltipPrimitive.Content
+          side="bottom"
+          align="center"
+          className="z-50 rounded-md bg-slate-900/90 text-white px-3 py-1.5 text-xs shadow-lg animate-in fade-in-0"
+        >
+          {content}
+          <TooltipPrimitive.Arrow className="fill-slate-900/90" />
+        </TooltipPrimitive.Content>
+      </TooltipPrimitive.Portal>
+    </TooltipPrimitive.Root>
+  );
+}
 
 interface Project {
   id: string;
@@ -193,27 +218,29 @@ export function CanvasHeader({
               </Button>
             </div>
             {/* Sidebar Toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onSidebarToggle}
-              className="rounded-xl p-0 h-9 w-9 flex items-center justify-center shadow-md border-0 bg-blue-100/60 dark:bg-blue-900/40 hover:bg-blue-200/80 dark:hover:bg-blue-800/60 focus:ring-2 focus:ring-blue-400/40"
-              style={{
-                boxShadow: "0 0 0 2px #3b82f630, 0 0 8px #3b82f620",
-              }}
-            >
-              {sidebarOpen ? (
-                <PanelLeftClose
-                  size={20}
-                  className="text-blue-600 dark:text-blue-300"
-                />
-              ) : (
-                <PanelLeftOpen
-                  size={20}
-                  className="text-blue-600 dark:text-blue-300"
-                />
-              )}
-            </Button>
+            <Tooltip content={sidebarOpen ? "Hide sidebar" : "Show sidebar"}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onSidebarToggle}
+                className="rounded-xl p-0 h-9 w-9 flex items-center justify-center shadow-md border-0 bg-blue-100/60 dark:bg-blue-900/40 hover:bg-blue-200/80 dark:hover:bg-blue-800/60 focus:ring-2 focus:ring-blue-400/40"
+                style={{
+                  boxShadow: "0 0 0 2px #3b82f630, 0 0 8px #3b82f620",
+                }}
+              >
+                {sidebarOpen ? (
+                  <PanelLeftClose
+                    size={20}
+                    className="text-blue-600 dark:text-blue-300"
+                  />
+                ) : (
+                  <PanelLeftOpen
+                    size={20}
+                    className="text-blue-600 dark:text-blue-300"
+                  />
+                )}
+              </Button>
+            </Tooltip>
 
             {/* Theme Toggle */}
             <Button
@@ -247,19 +274,21 @@ export function CanvasHeader({
             {/* More Menu */}
             <Popover open={menuOpen} onOpenChange={setMenuOpen}>
               <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="rounded-xl p-0 h-9 w-9 flex items-center justify-center shadow-md border-0 bg-purple-100/60 dark:bg-purple-900/40 hover:bg-purple-200/80 dark:hover:bg-purple-800/60 focus:ring-2 focus:ring-purple-400/40"
-                  style={{
-                    boxShadow: "0 0 0 2px #a78bfa30, 0 0 8px #a78bfa20",
-                  }}
-                >
-                  <MoreVertical
-                    size={20}
-                    className="text-purple-600 dark:text-purple-300"
-                  />
-                </Button>
+                <Tooltip content="Canvas settings">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="rounded-xl p-0 h-9 w-9 flex items-center justify-center shadow-md border-0 bg-purple-100/60 dark:bg-purple-900/40 hover:bg-purple-200/80 dark:hover:bg-purple-800/60 focus:ring-2 focus:ring-purple-400/40"
+                    style={{
+                      boxShadow: "0 0 0 2px #a78bfa30, 0 0 8px #a78bfa20",
+                    }}
+                  >
+                    <MoreVertical
+                      size={20}
+                      className="text-purple-600 dark:text-purple-300"
+                    />
+                  </Button>
+                </Tooltip>
               </PopoverTrigger>
               <PopoverContent
                 align="end"

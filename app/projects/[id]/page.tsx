@@ -267,7 +267,6 @@ export default function ProjectCanvasPage() {
         onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
         sidebarOpen={sidebarOpen}
       />
-
       {/* Main Canvas Layout */}
       <div className="flex h-[calc(100vh-64px)] relative">
         {/* Canvas Sidebar */}
@@ -287,7 +286,6 @@ export default function ProjectCanvasPage() {
           canvasBlocks={canvasBlocks}
           onBlockUpdate={updateBlock}
         />
-
         {/* Canvas Workspace Container */}
         <div className="flex-1 relative overflow-hidden">
           {/* Canvas Toolbar */}
@@ -305,7 +303,6 @@ export default function ProjectCanvasPage() {
             onDeleteSelected={deleteSelectedBlocks}
             onDuplicateSelected={duplicateBlocks}
           />
-
           {/* Canvas Workspace */}
           <CanvasWorkspace
             ref={canvasRef}
@@ -331,7 +328,6 @@ export default function ProjectCanvasPage() {
           />
         </div>
       </div>
-
       {/* Floating Toolbar */}
       {showFloatingToolbar && selectedBlocks.length > 0 && (
         <CanvasFloatingToolbar

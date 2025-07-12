@@ -3,6 +3,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/shared/theme-provider";
 import { ClerkThemeWrapper } from "@/components/ui/shared/clerk-theme-wrapper";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 // Configure Inter font with Latin subset
 const inter = Inter({ subsets: ["latin"] });
@@ -31,7 +32,9 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          <ClerkThemeWrapper>{children}</ClerkThemeWrapper>
+          <TooltipProvider>
+            <ClerkThemeWrapper>{children}</ClerkThemeWrapper>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
