@@ -100,16 +100,23 @@ export function CanvasHeader({
           {/* Left section */}
           <div className="flex items-center space-x-4">
             {/* Back to Projects */}
-            <Link href="/projects">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
-              >
-                <ArrowLeft size={16} className="mr-2" />
-                Projects
-              </Button>
-            </Link>
+            <Tooltip content="Back to Projects">
+              <Link href="/projects">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-xl p-0 h-9 w-9 flex items-center justify-center shadow-md border-0 bg-slate-100/60 dark:bg-slate-800/40 hover:bg-slate-200/80 dark:hover:bg-slate-700/60 focus:ring-2 focus:ring-slate-400/40"
+                  style={{
+                    boxShadow: "0 0 0 2px #64748b30, 0 0 8px #64748b20",
+                  }}
+                >
+                  <ArrowLeft
+                    size={20}
+                    className="text-slate-600 dark:text-slate-300"
+                  />
+                </Button>
+              </Link>
+            </Tooltip>
 
             {/* Divider */}
             <div className="h-6 w-px bg-slate-200 dark:bg-slate-700" />
