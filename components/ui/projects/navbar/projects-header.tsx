@@ -5,6 +5,7 @@
 import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
+import { getKeyboardShortcut } from "@/lib/utils";
 import { SimpleThemeToggle } from "@/components/ui/shared/theme-toggle";
 import { Search, Layers } from "lucide-react";
 import Link from "next/link";
@@ -46,7 +47,7 @@ export function ProjectsHeader({
               <Search size={16} className="mr-3" />
               Search projects, create new...
               <Badge variant="outline" className="ml-auto text-xs">
-                ⌘K
+                {getKeyboardShortcut("⌘K")}
               </Badge>
             </Button>
           </div>

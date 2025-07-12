@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/shared/button";
+import { getKeyboardShortcut } from "@/lib/utils";
 import {
   Copy,
   Trash2,
@@ -182,7 +183,7 @@ export function CanvasFloatingToolbar({
         size="sm"
         onClick={handleDuplicate}
         className="h-8 w-8 p-0 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
-        title="Duplicate (⌘D)"
+        title={`Duplicate (${getKeyboardShortcut("⌘D")})`}
       >
         <Copy size={14} />
       </Button>

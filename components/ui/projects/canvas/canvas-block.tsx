@@ -51,6 +51,8 @@ interface CanvasBlockProps {
   onResizeStart: () => void;
   onResizeEnd: () => void;
   onContextMenu: (position: { x: number; y: number }) => void;
+  zoomLevel: number;
+  panOffset: { x: number; y: number };
 }
 
 export function CanvasBlock({
@@ -64,6 +66,8 @@ export function CanvasBlock({
   onResizeStart,
   onResizeEnd,
   onContextMenu,
+  zoomLevel,
+  panOffset,
 }: CanvasBlockProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -106,26 +110,41 @@ export function CanvasBlock({
 
       if (!isEditable || block.locked) return;
 
-      const rect = blockRef.current?.getBoundingClientRect();
-      if (!rect) return;
+      // Convert screen coordinates to world coordinates
+      const worldX = (e.clientX - panOffset.x) / zoomLevel;
+      const worldY = (e.clientY - panOffset.y) / zoomLevel;
+
+      // Calculate offset from block's world position
+      const offsetX = worldX - block.x;
+      const offsetY = worldY - block.y;
 
       setIsDragging(true);
-      setDragStart({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
+      setDragStart({ x: offsetX, y: offsetY });
       onDragStart();
     },
-    [onSelect, isEditable, block.locked, onDragStart]
+    [
+      onSelect,
+      isEditable,
+      block.locked,
+      onDragStart,
+      panOffset,
+      zoomLevel,
+      block.x,
+      block.y,
+    ]
   );
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       if (isDragging) {
-        const newX = e.clientX - dragStart.x;
-        const newY = e.clientY - dragStart.y;
+        // Convert screen coordinates to world coordinates
+        const worldX = (e.clientX - panOffset.x) / zoomLevel;
+        const worldY = (e.clientY - panOffset.y) / zoomLevel;
 
-        // Convert to canvas coordinates (accounting for any transforms)
+        // Calculate new block position
+        const newX = worldX - dragStart.x;
+        const newY = worldY - dragStart.y;
+
         onUpdate({
           x: newX,
           y: newY,
@@ -146,7 +165,15 @@ export function CanvasBlock({
         });
       }
     },
-    [isDragging, isResizing, dragStart, resizeStart, onUpdate]
+    [
+      isDragging,
+      isResizing,
+      dragStart,
+      resizeStart,
+      onUpdate,
+      panOffset,
+      zoomLevel,
+    ]
   );
 
   const handleMouseUp = useCallback(() => {

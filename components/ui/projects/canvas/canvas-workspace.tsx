@@ -2,6 +2,7 @@
 
 import { forwardRef, useState, useRef, useEffect, useCallback } from "react";
 import { CanvasBlock } from "./canvas-block";
+import { getKeyboardShortcut } from "@/lib/utils";
 
 interface CanvasBlock {
   id: string;
@@ -288,6 +289,8 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
                 onBlockSelect([block.id]);
                 onFloatingToolbarShow(position);
               }}
+              zoomLevel={zoomLevel}
+              panOffset={panOffset}
             />
           ))}
 
@@ -337,7 +340,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
                   <p>• Double-click to add a note</p>
                   <p>• Use the sidebar to add different block types</p>
                   <p>• Drag blocks to rearrange them</p>
-                  <p>• Hold ⌘ to pan around</p>
+                  <p>• Hold {getKeyboardShortcut("⌘")} to pan around</p>
                 </div>
               </div>
             </div>

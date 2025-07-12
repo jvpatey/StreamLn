@@ -1,5 +1,6 @@
 import React from "react";
 import { Search, Plus, Filter, Folder } from "lucide-react";
+import { getKeyboardShortcut } from "@/lib/utils";
 import { CommandAction } from "./types";
 
 export const createCommandActions = (
@@ -15,7 +16,7 @@ export const createCommandActions = (
     title: "Create Project",
     description: "Start a new project workspace",
     icon: <Plus size={16} />,
-    shortcut: "⌘⇧P",
+    shortcut: getKeyboardShortcut("⌘⇧P"),
     category: "Create",
     onSelect: () => {
       onCreateProject?.();
@@ -26,7 +27,7 @@ export const createCommandActions = (
     title: "Search Projects",
     description: "Find a project by name or keyword",
     icon: <Search size={16} />,
-    shortcut: "⌘/",
+    shortcut: getKeyboardShortcut("⌘/"),
     category: "Search",
     onSelect: () => {
       setSearchMode(true);
@@ -39,7 +40,7 @@ export const createCommandActions = (
     title: "Filter Projects",
     description: "Filter projects by status or type",
     icon: <Filter size={16} />,
-    shortcut: "⌘/",
+    shortcut: getKeyboardShortcut("⌘/"),
     category: "Filter",
     onSelect: () => {
       openFilterPopover?.();
@@ -50,7 +51,7 @@ export const createCommandActions = (
     title: "Browse All Projects",
     description: "View all your projects",
     icon: <Folder size={16} />,
-    shortcut: "⌘B",
+    shortcut: getKeyboardShortcut("⌘B"),
     category: "Browse",
     onSelect: () => {
       setBrowseMode(true);

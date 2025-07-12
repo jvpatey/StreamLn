@@ -4,6 +4,7 @@
 // Used in: app/projects/page.tsx
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
+import { getKeyboardShortcut } from "@/lib/utils";
 import { Search, FileText, Zap, X, Sparkles } from "lucide-react";
 import { CreateProjectButton } from "../project-content/create-project/create-project-button";
 
@@ -58,7 +59,7 @@ export function ProjectsSidebar({
                   Quick Actions
                 </span>
                 <Badge variant="outline" className="text-xs flex-shrink-0">
-                  ⌘K
+                  {getKeyboardShortcut("⌘K")}
                 </Badge>
               </Button>
 
@@ -78,7 +79,7 @@ export function ProjectsSidebar({
                     <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                       Use
                       <kbd className="px-1.5 py-0.5 text-xs font-mono bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded text-slate-700 dark:text-slate-300 ml-1">
-                        ⌘K
+                        {getKeyboardShortcut("⌘K")}
                       </kbd>
                       {"\u00A0"}
                       to instantly access any project or create new content

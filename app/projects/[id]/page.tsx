@@ -83,48 +83,8 @@ export default function ProjectCanvasPage() {
         const projectData = await response.json();
         setProject(projectData);
 
-        // Load canvas blocks (mock data for now)
-        setCanvasBlocks([
-          {
-            id: "note-1",
-            type: "note",
-            x: 100,
-            y: 100,
-            width: 300,
-            height: 200,
-            title: "Project Goals",
-            content: {},
-            color: "#3b82f6",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          {
-            id: "task-board-1",
-            type: "task-board",
-            x: 500,
-            y: 150,
-            width: 400,
-            height: 300,
-            title: "Sprint Board",
-            content: {},
-            color: "#10b981",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          {
-            id: "code-1",
-            type: "code",
-            x: 200,
-            y: 400,
-            width: 350,
-            height: 250,
-            title: "API Endpoint",
-            content: {},
-            color: "#8b5cf6",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ]);
+        // Start with empty canvas
+        setCanvasBlocks([]);
       } catch (err: any) {
         setError(err.message || "Failed to load project");
       } finally {

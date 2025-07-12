@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
+import { getKeyboardShortcut } from "@/lib/utils";
 import {
   ZoomIn,
   ZoomOut,
@@ -304,7 +305,7 @@ export function CanvasToolbar({
         {/* Keyboard Shortcuts Hint */}
         {!hasSelection && (
           <div className="hidden lg:flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
-            <span>⌘+/</span>
+            <span>{getKeyboardShortcut("⌘+/")}</span>
             <span>for shortcuts</span>
           </div>
         )}
