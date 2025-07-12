@@ -482,31 +482,37 @@ export function CanvasSidebar({
   if (!isOpen) return null;
 
   return (
-    <div className="w-80 h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-800/50 flex flex-col">
+    <div
+      className="w-80 h-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-800/50 flex flex-col shadow-xl"
+      style={{ boxShadow: "0 0 24px 0 #3b82f610, 0 0 0 2px #3b82f630" }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
-        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+      <div className="flex items-center justify-between p-4 border-b border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">
           Canvas Tools
         </h2>
         <Button
           variant="ghost"
           size="sm"
           onClick={onClose}
-          className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 lg:hidden"
+          className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-white/60 dark:bg-slate-800/60 rounded-full shadow-md hover:shadow-lg lg:hidden"
         >
           <X size={16} />
         </Button>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-700">
+      <div className="flex border-b border-slate-200/60 dark:border-slate-700/60 bg-transparent">
         <button
           onClick={() => setActiveTab("blocks")}
-          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-t-xl ${
             activeTab === "blocks"
-              ? "text-primary border-b-2 border-primary bg-primary/5"
+              ? "text-primary bg-primary/10 shadow-md"
               : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
           }`}
+          style={
+            activeTab === "blocks" ? { boxShadow: "0 2px 8px #3b82f620" } : {}
+          }
         >
           <div className="flex items-center justify-center space-x-2">
             <Plus size={14} />
@@ -515,11 +521,14 @@ export function CanvasSidebar({
         </button>
         <button
           onClick={() => setActiveTab("layers")}
-          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-t-xl ${
             activeTab === "layers"
-              ? "text-primary border-b-2 border-primary bg-primary/5"
+              ? "text-primary bg-primary/10 shadow-md"
               : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
           }`}
+          style={
+            activeTab === "layers" ? { boxShadow: "0 2px 8px #3b82f620" } : {}
+          }
         >
           <div className="flex items-center justify-center space-x-2">
             <Layers size={14} />
@@ -528,11 +537,16 @@ export function CanvasSidebar({
         </button>
         <button
           onClick={() => setActiveTab("properties")}
-          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-t-xl ${
             activeTab === "properties"
-              ? "text-primary border-b-2 border-primary bg-primary/5"
+              ? "text-primary bg-primary/10 shadow-md"
               : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
           }`}
+          style={
+            activeTab === "properties"
+              ? { boxShadow: "0 2px 8px #3b82f620" }
+              : {}
+          }
         >
           <div className="flex items-center justify-center space-x-2">
             <Settings size={14} />
@@ -543,7 +557,94 @@ export function CanvasSidebar({
 
       {/* Content */}
       <div className="flex-1 p-4 overflow-y-auto">
-        {activeTab === "blocks" && renderBlocksTab()}
+        {activeTab === "blocks" && (
+          <div className="space-y-4">
+            {/* Search */}
+            <div className="relative">
+              <Search
+                size={16}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
+              />
+              <input
+                type="text"
+                placeholder="Search blocks..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 text-sm border-0 rounded-xl bg-white/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary shadow-sm"
+                style={{ backdropFilter: "blur(6px)" }}
+              />
+            </div>
+
+            {/* Block Types */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                Add Blocks
+              </h3>
+              <div className="grid grid-cols-1 gap-3">
+                {filteredBlockTypes.map((blockType) => {
+                  const IconComponent = blockType.icon;
+                  return (
+                    <Card
+                      key={blockType.type}
+                      className="p-3 cursor-pointer transition-all duration-200 border-0 rounded-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-md shadow-md hover:shadow-xl hover:scale-105"
+                      style={{
+                        boxShadow: `0 0 0 2px ${blockType.color}30, 0 0 16px ${blockType.color}18`,
+                        border: `1.5px solid ${blockType.color}30`,
+                      }}
+                      onClick={() => onAddBlock(blockType.type)}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div
+                          className="p-2 rounded-xl shadow"
+                          style={{
+                            backgroundColor: `${blockType.color}22`,
+                            boxShadow: `0 2px 8px ${blockType.color}22`,
+                          }}
+                        >
+                          <IconComponent
+                            size={18}
+                            style={{ color: blockType.color }}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                            {blockType.label}
+                          </h4>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                            {blockType.description}
+                          </p>
+                        </div>
+                        <Plus size={16} className="text-slate-400" />
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="pt-4 border-t border-slate-200/60 dark:border-slate-700/60">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                    {canvasBlocks.length}
+                  </div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    Total Blocks
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                    {selectedBlocks.length}
+                  </div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    Selected
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {activeTab === "layers" && renderLayersTab()}
         {activeTab === "properties" && renderPropertiesTab()}
       </div>
