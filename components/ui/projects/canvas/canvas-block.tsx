@@ -269,49 +269,64 @@ export function CanvasBlock({
       onContextMenu={handleContextMenu}
     >
       <Card
-        className={`relative w-full h-full overflow-hidden transition-all duration-200 ${
+        className={`relative w-full h-full overflow-hidden transition-all duration-200 border ${
           isSelected
-            ? "ring-2 ring-primary ring-offset-2 shadow-lg"
-            : "hover:shadow-md"
+            ? "ring-2 ring-primary ring-offset-2 shadow-xl"
+            : "hover:shadow-lg"
         } ${isDragging ? "opacity-80 scale-105" : ""} ${
           !isEditable ? "cursor-default" : ""
         }`}
         style={{
-          borderLeftColor: getBlockColor(),
-          borderLeftWidth: "4px",
+          background: `linear-gradient(135deg, ${getBlockColor()}05 0%, transparent 100%)`,
+          backdropFilter: "blur(10px)",
+          borderColor: `${getBlockColor()}30`,
+          boxShadow: `0 0 0 1px ${getBlockColor()}25, 0 0 24px ${getBlockColor()}15, 0 4px 12px rgba(0, 0, 0, 0.1)`,
         }}
       >
         {/* Block Header */}
-        <div className="flex items-center justify-between p-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
-          <div className="flex items-center space-x-2 min-w-0 flex-1">
+        <div
+          className="flex items-center justify-between p-3 border-b border-slate-200/50 dark:border-slate-700/50"
+          style={{
+            background: `linear-gradient(90deg, ${getBlockColor()}08 0%, transparent 100%)`,
+          }}
+        >
+          <div className="flex items-center space-x-3 min-w-0 flex-1">
             <div
-              className="p-1 rounded"
-              style={{ backgroundColor: `${getBlockColor()}20` }}
+              className="p-2 rounded-xl shadow-sm ring-1 ring-white/20"
+              style={{
+                backgroundColor: `${getBlockColor()}15`,
+                boxShadow: `0 2px 8px ${getBlockColor()}20`,
+              }}
             >
               <div style={{ color: getBlockColor() }}>{getBlockIcon()}</div>
             </div>
-            <span className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">
-              {block.title ||
-                `${block.type.charAt(0).toUpperCase() + block.type.slice(1)}`}
-            </span>
-            <Badge variant="subtle" className="text-xs px-1.5 py-0.5">
-              {block.type}
-            </Badge>
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
+                {block.title ||
+                  `${block.type.charAt(0).toUpperCase() + block.type.slice(1)}`}
+              </span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 capitalize">
+                {block.type} block
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
             {block.locked && (
-              <div className="p-1">
-                <Lock size={10} className="text-slate-400" />
+              <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                <Lock
+                  size={12}
+                  className="text-amber-600 dark:text-amber-400"
+                />
               </div>
             )}
             {isEditable && (
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 text-slate-400 hover:text-slate-600"
+                className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"
               >
-                <MoreVertical size={10} />
+                <MoreVertical size={14} />
               </Button>
             )}
           </div>
