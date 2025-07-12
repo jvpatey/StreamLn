@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import { getIconComponent } from "@/components/ui/projects/project-content/icon-picker";
+import { useTheme } from "next-themes";
 import {
   ArrowLeft,
   Layers,
@@ -18,6 +19,8 @@ import {
   PanelLeftClose,
   Download,
   BookOpen,
+  Sun,
+  Moon,
 } from "lucide-react";
 import {
   Popover,
@@ -54,6 +57,7 @@ export function CanvasHeader({
   sidebarOpen,
 }: CanvasHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -137,6 +141,19 @@ export function CanvasHeader({
 
           {/* Right section */}
           <div className="flex items-center space-x-2">
+            {/* Quick Actions */}
+            <div className="hidden sm:flex items-center space-x-2">
+              <Button variant="outline" size="sm">
+                <Users size={14} className="mr-2" />
+                Share
+              </Button>
+
+              <Button variant="outline" size="sm">
+                <Download size={14} className="mr-2" />
+                Export
+              </Button>
+            </div>
+
             {/* Sidebar Toggle */}
             <Button
               variant="ghost"
@@ -151,18 +168,16 @@ export function CanvasHeader({
               )}
             </Button>
 
-            {/* Quick Actions */}
-            <div className="hidden sm:flex items-center space-x-2">
-              <Button variant="outline" size="sm">
-                <Users size={14} className="mr-2" />
-                Share
-              </Button>
-
-              <Button variant="outline" size="sm">
-                <Download size={14} className="mr-2" />
-                Export
-              </Button>
-            </div>
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 relative"
+            >
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100" />
+            </Button>
 
             {/* More Menu */}
             <Popover open={menuOpen} onOpenChange={setMenuOpen}>
