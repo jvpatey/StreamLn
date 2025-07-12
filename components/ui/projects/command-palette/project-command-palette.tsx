@@ -12,6 +12,7 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
   onOpenChange,
   onCreateProject,
   initialSearchMode = false,
+  initialBrowseMode = false,
   projects,
   onProjectSelect,
   openFilterPopover,
@@ -54,6 +55,7 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
   const { searchInputRef } = useCommandPalette({
     open,
     initialSearchMode,
+    initialBrowseMode,
     projects,
     filteredActions,
     filteredProjects,

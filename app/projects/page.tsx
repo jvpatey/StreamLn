@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { ProjectCommandPalette } from "@/components/ui/projects/command-palette";
@@ -20,6 +20,8 @@ import {
 export default function DashboardPage() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [commandPaletteSearchMode, setCommandPaletteSearchMode] =
+    useState(false);
+  const [commandPaletteBrowseMode, setCommandPaletteBrowseMode] =
     useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -56,6 +58,12 @@ export default function DashboardPage() {
     loadProjects();
   }, []);
 
+  // Handler functions (defined before useEffect to avoid initialization errors)
+  const handleCreateProject = useCallback(() => {
+    setCommandPaletteOpen(false); // Close the command palette if open
+    setCreateModalOpen(true);
+  }, []);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -72,26 +80,62 @@ export default function DashboardPage() {
       if (
         (e.metaKey || e.ctrlKey) &&
         e.shiftKey &&
-        e.key.toLowerCase() === "f"
+        e.key.toLowerCase() === "s"
       ) {
         e.preventDefault();
-        setCommandPaletteOpen(true);
-        setCommandPaletteSearchMode(true);
+        // Always reset states first
+        setCommandPaletteSearchMode(false);
+        setCommandPaletteBrowseMode(false);
+
+        // If command palette is already open, just switch to search mode
+        if (commandPaletteOpen) {
+          setTimeout(() => {
+            setCommandPaletteSearchMode(true);
+          }, 0);
+        } else {
+          // Open command palette and set search mode
+          setCommandPaletteOpen(true);
+          setTimeout(() => {
+            setCommandPaletteSearchMode(true);
+          }, 0);
+        }
       }
-      if ((e.metaKey || e.ctrlKey) && e.key === "b") {
+      if (
+        (e.metaKey || e.ctrlKey) &&
+        e.shiftKey &&
+        e.key.toLowerCase() === "p"
+      ) {
         e.preventDefault();
-        setSidebarOpen(!sidebarOpen);
+        handleCreateProject();
+      }
+      if (
+        (e.metaKey || e.ctrlKey) &&
+        e.shiftKey &&
+        e.key.toLowerCase() === "b"
+      ) {
+        e.preventDefault();
+        // Always reset states first
+        setCommandPaletteSearchMode(false);
+        setCommandPaletteBrowseMode(false);
+
+        // If command palette is already open, just switch to browse mode
+        if (commandPaletteOpen) {
+          setTimeout(() => {
+            setCommandPaletteBrowseMode(true);
+          }, 0);
+        } else {
+          // Open command palette and set browse mode
+          setCommandPaletteOpen(true);
+          setTimeout(() => {
+            setCommandPaletteBrowseMode(true);
+          }, 0);
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [sidebarOpen]);
-
-  const handleCreateProject = () => {
-    setCommandPaletteOpen(false); // Close the command palette if open
-    setCreateModalOpen(true);
-  };
+  }, [sidebarOpen, commandPaletteOpen, handleCreateProject]);
 
   // API integration for creating a project
   const handleCreateProjectApi = async ({
@@ -271,9 +315,16 @@ export default function DashboardPage() {
       {/* Command Palette */}
       <ProjectCommandPalette
         open={commandPaletteOpen}
-        onOpenChange={setCommandPaletteOpen}
+        onOpenChange={(open) => {
+          setCommandPaletteOpen(open);
+          if (!open) {
+            setCommandPaletteSearchMode(false);
+            setCommandPaletteBrowseMode(false);
+          }
+        }}
         onCreateProject={handleCreateProject}
         initialSearchMode={commandPaletteSearchMode}
+        initialBrowseMode={commandPaletteBrowseMode}
         projects={projects}
         onProjectSelect={handleProjectSelectFromPalette}
         openFilterPopover={() => setFilterPopoverOpen(true)}

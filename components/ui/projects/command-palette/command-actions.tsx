@@ -27,7 +27,7 @@ export const createCommandActions = (
     title: "Search Projects",
     description: "Find a project by name or keyword",
     icon: <Search size={16} />,
-    shortcut: getKeyboardShortcut("⌘/"),
+    shortcut: getKeyboardShortcut("⌘⇧S"),
     category: "Search",
     onSelect: () => {
       setSearchMode(true);
@@ -51,7 +51,7 @@ export const createCommandActions = (
     title: "Browse All Projects",
     description: "View all your projects",
     icon: <Folder size={16} />,
-    shortcut: getKeyboardShortcut("⌘B"),
+    shortcut: getKeyboardShortcut("⌘⇧B"),
     category: "Browse",
     onSelect: () => {
       setBrowseMode(true);

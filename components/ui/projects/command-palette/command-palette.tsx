@@ -37,7 +37,7 @@ export default function CommandPalette({
       description: "Start with a blank infinite canvas",
       icon: <Plus size={16} />,
       badge: "Canvas",
-      shortcut: getKeyboardShortcut("⌘N"),
+      shortcut: getKeyboardShortcut("⌘⇧C"),
       category: "Create",
     },
     {
@@ -46,7 +46,7 @@ export default function CommandPalette({
       description: "Add a note block to your canvas",
       icon: <FileText size={16} />,
       badge: "Note",
-      shortcut: getKeyboardShortcut("⌘⇧N"),
+      shortcut: getKeyboardShortcut("⌘⇧Q"),
       category: "Create",
     },
     {
@@ -55,7 +55,7 @@ export default function CommandPalette({
       description: "Create a Kanban-style task board",
       icon: <Maximize2 size={16} />,
       badge: "Board",
-      shortcut: getKeyboardShortcut("⌘B"),
+      shortcut: getKeyboardShortcut("⌘⇧T"),
       category: "Create",
     },
     {
@@ -73,7 +73,7 @@ export default function CommandPalette({
       description: "Visualize connections between content",
       icon: <Network size={16} />,
       badge: "Graph",
-      shortcut: getKeyboardShortcut("⌘G"),
+      shortcut: getKeyboardShortcut("⌘⇧G"),
       category: "Navigate",
     },
     {
@@ -91,7 +91,7 @@ export default function CommandPalette({
       description: "Start from pre-built canvas templates",
       icon: <Layers size={16} />,
       badge: "Templates",
-      shortcut: getKeyboardShortcut("⌘T"),
+      shortcut: getKeyboardShortcut("⌘⇧L"),
       category: "Browse",
     },
     {
