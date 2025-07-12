@@ -123,25 +123,20 @@ export function CanvasHeader({
               variant={viewMode === "edit" ? "default" : "ghost"}
               size="sm"
               onClick={() => onViewModeChange("edit")}
-              className={`text-xs rounded-xl p-0 h-9 w-24 flex items-center justify-center shadow-md border-0 transition-colors duration-150
+              className={`text-xs rounded-xl p-0 h-9 w-24 flex items-center justify-center shadow-md transition-colors duration-150
                 ${
                   viewMode === "edit"
-                    ? "bg-pink-100/60 dark:bg-pink-900/40 focus:ring-2 focus:ring-pink-400/40 hover:bg-pink-200/80 dark:hover:bg-pink-800/60 text-slate-900 dark:text-slate-100"
-                    : "bg-transparent hover:bg-pink-100/60 dark:hover:bg-pink-900/40 focus:ring-2 focus:ring-pink-400/40"
+                    ? "bg-primary-600 hover:bg-primary-700 text-white"
+                    : "bg-transparent hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-600 dark:text-primary-300 hover:text-primary-600 dark:hover:text-primary-300"
                 }
               `}
-              style={
-                viewMode === "edit"
-                  ? { boxShadow: "0 0 0 2px #ec489930, 0 0 8px #ec489920" }
-                  : {}
-              }
             >
               <Edit3
                 size={16}
                 className={`mr-2 ${
                   viewMode === "edit"
-                    ? "text-pink-600 dark:text-pink-300"
-                    : "text-pink-600 dark:text-pink-300"
+                    ? "text-white"
+                    : "text-primary-700 dark:text-primary-300"
                 }`}
               />
               Edit
@@ -150,28 +145,23 @@ export function CanvasHeader({
               variant={viewMode === "present" ? "default" : "ghost"}
               size="sm"
               onClick={() => onViewModeChange("present")}
-              className={`text-xs rounded-xl p-0 h-9 w-24 flex items-center justify-center shadow-md border-0 transition-colors duration-150
+              className={`text-xs rounded-xl p-0 h-9 w-24 flex items-center justify-center shadow-md transition-colors duration-150
                 ${
                   viewMode === "present"
-                    ? "bg-cyan-100/60 dark:bg-cyan-900/40 focus:ring-2 focus:ring-cyan-400/40 hover:bg-cyan-200/80 dark:hover:bg-cyan-800/60 text-slate-900 dark:text-slate-100"
-                    : "bg-transparent hover:bg-cyan-100/60 dark:hover:bg-cyan-900/40 focus:ring-2 focus:ring-cyan-400/40"
+                    ? "bg-primary-600 hover:bg-primary-700 text-white"
+                    : "bg-transparent hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-600 dark:text-primary-300 hover:text-primary-600 dark:hover:text-primary-300"
                 }
               `}
-              style={
-                viewMode === "present"
-                  ? { boxShadow: "0 0 0 2px #06b6d430, 0 0 8px #06b6d420" }
-                  : {}
-              }
             >
               <Eye
                 size={16}
                 className={`mr-2 ${
                   viewMode === "present"
-                    ? "text-cyan-600 dark:text-cyan-300"
-                    : "text-cyan-600 dark:text-cyan-300"
+                    ? "text-white"
+                    : "text-primary-700 dark:text-primary-300"
                 }`}
               />
-              Present
+              View
             </Button>
           </div>
 
@@ -182,24 +172,22 @@ export function CanvasHeader({
               <Button
                 variant="ghost"
                 size="sm"
-                className="rounded-xl p-0 h-9 px-4 flex items-center justify-center shadow-md border-0 bg-indigo-100/60 dark:bg-indigo-900/40 hover:bg-indigo-200/80 dark:hover:bg-indigo-800/60 focus:ring-2 focus:ring-indigo-400/40"
-                style={{ boxShadow: "0 0 0 2px #6366f130, 0 0 8px #6366f120" }}
+                className="rounded-xl p-0 h-9 px-4 flex items-center justify-center shadow-md bg-blue-100/60 dark:bg-blue-900/40 hover:bg-blue-200/80 dark:hover:bg-blue-800/60 text-blue-600 dark:text-blue-300 focus:ring-2 focus:ring-blue-400/40"
               >
                 <Users
                   size={16}
-                  className="mr-2 text-indigo-600 dark:text-indigo-300"
+                  className="mr-2 text-blue-600 dark:text-blue-300"
                 />
                 Share
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="rounded-xl p-0 h-9 px-4 flex items-center justify-center shadow-md border-0 bg-emerald-100/60 dark:bg-emerald-900/40 hover:bg-emerald-200/80 dark:hover:bg-emerald-800/60 focus:ring-2 focus:ring-emerald-400/40"
-                style={{ boxShadow: "0 0 0 2px #10b98130, 0 0 8px #10b98120" }}
+                className="rounded-xl p-0 h-9 px-4 flex items-center justify-center shadow-md bg-blue-100/60 dark:bg-blue-900/40 hover:bg-blue-200/80 dark:hover:bg-blue-800/60 text-blue-600 dark:text-blue-300 focus:ring-2 focus:ring-blue-400/40"
               >
                 <Download
                   size={16}
-                  className="mr-2 text-emerald-600 dark:text-emerald-300"
+                  className="mr-2 text-blue-600 dark:text-blue-300"
                 />
                 Export
               </Button>
@@ -306,7 +294,7 @@ export function CanvasHeader({
                       }`}
                     >
                       <Eye size={14} className="mr-2" />
-                      Present Mode
+                      View Mode
                     </button>
                   </div>
 

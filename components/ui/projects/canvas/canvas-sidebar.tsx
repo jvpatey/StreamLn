@@ -505,14 +505,13 @@ export function CanvasSidebar({
       <div className="flex border-b border-slate-200/60 dark:border-slate-700/60 bg-transparent">
         <button
           onClick={() => setActiveTab("blocks")}
-          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-t-xl ${
-            activeTab === "blocks"
-              ? "text-primary bg-primary/10 shadow-md"
-              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
-          }`}
-          style={
-            activeTab === "blocks" ? { boxShadow: "0 2px 8px #3b82f620" } : {}
-          }
+          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-t-xl
+            ${
+              activeTab === "blocks"
+                ? "text-primary bg-primary/10 border-b-2 border-primary shadow-none"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 border-b-2 border-transparent"
+            }
+          `}
         >
           <div className="flex items-center justify-center space-x-2">
             <Plus size={14} />
@@ -521,14 +520,13 @@ export function CanvasSidebar({
         </button>
         <button
           onClick={() => setActiveTab("layers")}
-          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-t-xl ${
-            activeTab === "layers"
-              ? "text-primary bg-primary/10 shadow-md"
-              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
-          }`}
-          style={
-            activeTab === "layers" ? { boxShadow: "0 2px 8px #3b82f620" } : {}
-          }
+          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-t-xl
+            ${
+              activeTab === "layers"
+                ? "text-primary bg-primary/10 border-b-2 border-primary shadow-none"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 border-b-2 border-transparent"
+            }
+          `}
         >
           <div className="flex items-center justify-center space-x-2">
             <Layers size={14} />
@@ -537,16 +535,13 @@ export function CanvasSidebar({
         </button>
         <button
           onClick={() => setActiveTab("properties")}
-          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-t-xl ${
-            activeTab === "properties"
-              ? "text-primary bg-primary/10 shadow-md"
-              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
-          }`}
-          style={
-            activeTab === "properties"
-              ? { boxShadow: "0 2px 8px #3b82f620" }
-              : {}
-          }
+          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-t-xl
+            ${
+              activeTab === "properties"
+                ? "text-primary bg-primary/10 border-b-2 border-primary shadow-none"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 border-b-2 border-transparent"
+            }
+          `}
         >
           <div className="flex items-center justify-center space-x-2">
             <Settings size={14} />

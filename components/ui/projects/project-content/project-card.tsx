@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/shared/card";
 import { Folder, Users, Clock, BarChart3 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { ProjectCardMenu } from "./project-card-menu";
 import { getIconComponent } from "./icon-picker";
 
@@ -57,13 +57,38 @@ export function ProjectCard({
     ? "text-slate-500 dark:text-slate-400"
     : "text-green-600 dark:text-green-400";
 
+  const [isHovered, setIsHovered] = useState(false);
+  // Accent color (use icon color or default blue)
+  const accentColor = icon === "Folder" || !icon ? "#3b82f6" : undefined;
+  const baseBoxShadow = `0 0 0 2px ${accentColor || "#3b82f6"}30, 0 0 16px ${
+    accentColor || "#3b82f6"
+  }18`;
+  const hoverBoxShadow = `0 0 0 2px ${accentColor || "#3b82f6"}80, 0 0 24px ${
+    accentColor || "#3b82f6"
+  }40, 0 8px 32px rgba(0,0,0,0.10)`;
+  const baseBorder = `1.5px solid ${accentColor || "#3b82f6"}30`;
+  const hoverBorder = `1.5px solid ${accentColor || "#3b82f6"}80`;
   return (
     <Card
-      className={`group relative overflow-hidden border border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-200 cursor-pointer rounded-2xl shadow-lg bg-white dark:bg-gradient-to-br dark:from-slate-900/80 dark:to-slate-800/80 ${
+      className={`group relative overflow-hidden border-0 transition-all duration-200 cursor-pointer rounded-2xl shadow-md bg-white/70 dark:bg-slate-900/70 backdrop-blur-md ${
         isArchived ? "opacity-60" : ""
       }`}
+      style={{
+        boxShadow: isHovered ? hoverBoxShadow : baseBoxShadow,
+        border: isHovered ? hoverBorder : baseBorder,
+      }}
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
+      <style jsx>{`
+        .group:hover {
+          box-shadow: 0 0 0 2px ${accentColor || "#3b82f6"}80,
+            0 0 24px ${accentColor || "#3b82f6"}40,
+            0 8px 32px rgba(0, 0, 0, 0.1);
+          border: 1.5px solid ${accentColor || "#3b82f6"}80;
+        }
+      `}</style>
       {/* Menu Button */}
       <div className="absolute top-3 right-3 z-10">
         <ProjectCardMenu
@@ -75,7 +100,7 @@ export function ProjectCard({
       </div>
 
       {/* Canvas Preview Area (placeholder) */}
-      <div className="relative h-24 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 overflow-hidden flex items-center justify-center">
+      <div className="relative h-24 bg-gradient-to-br from-slate-100/60 to-slate-200/60 dark:from-slate-800/60 dark:to-slate-900/60 overflow-hidden flex items-center justify-center">
         {/* Placeholder grid blocks */}
         <svg width="100%" height="100%" viewBox="0 0 160 48" fill="none">
           <rect
@@ -133,10 +158,18 @@ export function ProjectCard({
       {/* Main Info */}
       <div className="p-4 pb-2">
         <div className="flex items-center space-x-2 mb-1">
-          {React.createElement(getIconComponent(icon || "Folder"), {
-            size: 16,
-            className: "text-primary-500",
-          })}
+          <div
+            className="p-2 rounded-xl shadow"
+            style={{
+              backgroundColor: `${accentColor || "#3b82f6"}22`,
+              boxShadow: `0 2px 8px ${accentColor || "#3b82f6"}22`,
+            }}
+          >
+            {React.createElement(getIconComponent(icon || "Folder"), {
+              size: 18,
+              style: { color: accentColor || "#3b82f6" },
+            })}
+          </div>
           <span className="font-semibold text-slate-900 dark:text-slate-100 text-base truncate max-w-[140px] group-hover:text-primary-400 transition-colors">
             {name}
           </span>

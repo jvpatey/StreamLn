@@ -129,33 +129,61 @@ export function CanvasToolbar({
             variant={tool === "select" ? "default" : "ghost"}
             size="sm"
             onClick={() => setTool("select")}
-            className="h-8 w-8 p-0"
+            className={`h-8 w-8 p-0 ${
+              tool === "select"
+                ? "bg-primary-600 hover:bg-primary-700 text-white"
+                : ""
+            }`}
           >
-            <MousePointer size={14} />
+            <MousePointer
+              size={14}
+              className={tool === "select" ? "text-white" : undefined}
+            />
           </Button>
           <Button
             variant={tool === "pan" ? "default" : "ghost"}
             size="sm"
             onClick={() => setTool("pan")}
-            className="h-8 w-8 p-0"
+            className={`h-8 w-8 p-0 ${
+              tool === "pan"
+                ? "bg-primary-600 hover:bg-primary-700 text-white"
+                : ""
+            }`}
           >
-            <Hand size={14} />
+            <Hand
+              size={14}
+              className={tool === "pan" ? "text-white" : undefined}
+            />
           </Button>
           <Button
             variant={tool === "text" ? "default" : "ghost"}
             size="sm"
             onClick={() => setTool("text")}
-            className="h-8 w-8 p-0"
+            className={`h-8 w-8 p-0 ${
+              tool === "text"
+                ? "bg-primary-600 hover:bg-primary-700 text-white"
+                : ""
+            }`}
           >
-            <Type size={14} />
+            <Type
+              size={14}
+              className={tool === "text" ? "text-white" : undefined}
+            />
           </Button>
           <Button
             variant={tool === "shape" ? "default" : "ghost"}
             size="sm"
             onClick={() => setTool("shape")}
-            className="h-8 w-8 p-0"
+            className={`h-8 w-8 p-0 ${
+              tool === "shape"
+                ? "bg-primary-600 hover:bg-primary-700 text-white"
+                : ""
+            }`}
           >
-            <Square size={14} />
+            <Square
+              size={14}
+              className={tool === "shape" ? "text-white" : undefined}
+            />
           </Button>
         </div>
 
@@ -206,9 +234,14 @@ export function CanvasToolbar({
             variant={showGrid ? "default" : "ghost"}
             size="sm"
             onClick={onGridToggle}
-            className="h-8 w-8 p-0"
+            className={`h-8 w-8 p-0 ${
+              showGrid ? "bg-primary-600 hover:bg-primary-700 text-white" : ""
+            }`}
           >
-            <Grid3x3 size={14} />
+            <Grid3x3
+              size={14}
+              className={showGrid ? "text-white" : undefined}
+            />
           </Button>
         </div>
 
