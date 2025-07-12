@@ -74,30 +74,28 @@ export function ActionButtons({
 
       <div className="flex gap-3">
         <Button
-          // Edit button: glassy purple
-          className="flex-1 rounded-xl font-semibold shadow-md border-0 bg-purple-100/60 dark:bg-purple-900/40 hover:bg-purple-200/80 dark:hover:bg-purple-800/60 focus:ring-2 focus:ring-purple-400/40 text-purple-700 dark:text-purple-200 flex items-center justify-center transition-all duration-200"
+          className="flex-1 rounded-xl font-semibold shadow-md border-0 bg-amber-100/60 dark:bg-amber-900/40 hover:bg-amber-200/80 dark:hover:bg-amber-800/60 focus:ring-2 focus:ring-amber-400/40 text-amber-700 dark:text-amber-200 flex items-center justify-center transition-all duration-200"
           style={{
-            boxShadow: "0 0 0 2px #a78bfa30, 0 0 16px #a78bfa18",
-            border: "1.5px solid #a78bfa30",
+            boxShadow: "0 0 0 2px #f59e0b30, 0 0 16px #f59e0b18",
+            border: "1.5px solid #f59e0b30",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.boxShadow =
-              "0 0 0 2px #a78bfa80, 0 0 24px #a78bfa40, 0 8px 32px rgba(0,0,0,0.10)";
-            e.currentTarget.style.border = "1.5px solid #a78bfa80";
+              "0 0 0 2px #f59e0b80, 0 0 24px #f59e0b40, 0 8px 32px rgba(0,0,0,0.10)";
+            e.currentTarget.style.border = "1.5px solid #f59e0b80";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.boxShadow =
-              "0 0 0 2px #a78bfa30, 0 0 16px #a78bfa18";
-            e.currentTarget.style.border = "1.5px solid #a78bfa30";
+              "0 0 0 2px #f59e0b30, 0 0 16px #f59e0b18";
+            e.currentTarget.style.border = "1.5px solid #f59e0b30";
           }}
           onClick={onEditClick}
         >
-          <Edit3 className="h-4 w-4 mr-2 text-purple-600 dark:text-purple-300" />
+          <Edit3 className="h-4 w-4 mr-2 text-amber-600 dark:text-amber-300" />
           Edit
         </Button>
 
         <Button
-          // Archive/Unarchive button: glassy amber
           className="flex-1 rounded-xl font-semibold shadow-md border-0 bg-amber-100/60 dark:bg-amber-900/40 hover:bg-amber-200/80 dark:hover:bg-amber-800/60 focus:ring-2 focus:ring-amber-400/40 text-amber-700 dark:text-amber-200 flex items-center justify-center transition-all duration-200"
           style={{
             boxShadow: "0 0 0 2px #f59e0b30, 0 0 16px #f59e0b18",
@@ -132,8 +130,25 @@ export function ActionButtons({
         </Button>
       </div>
 
-      <Button variant="destructive" className="w-full" onClick={onDelete}>
-        <Trash2 className="h-4 w-4 mr-2" />
+      <Button
+        className="w-full rounded-xl font-semibold shadow-md border-0 bg-red-100/60 dark:bg-red-900/40 hover:bg-red-200/80 dark:hover:bg-red-800/60 focus:ring-2 focus:ring-red-400/40 text-red-700 dark:text-red-200 flex items-center justify-center transition-all duration-200"
+        style={{
+          boxShadow: "0 0 0 2px #ef444430, 0 0 16px #ef444418",
+          border: "1.5px solid #ef444430",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow =
+            "0 0 0 2px #ef444480, 0 0 24px #ef444440, 0 8px 32px rgba(0,0,0,0.10)";
+          e.currentTarget.style.border = "1.5px solid #ef444480";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow =
+            "0 0 0 2px #ef444430, 0 0 16px #ef444418";
+          e.currentTarget.style.border = "1.5px solid #ef444430";
+        }}
+        onClick={onDelete}
+      >
+        <Trash2 className="h-4 w-4 mr-2 text-red-600 dark:text-red-300" />
         Delete Project
       </Button>
     </>

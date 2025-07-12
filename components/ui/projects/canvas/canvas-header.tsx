@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import { getIconComponent } from "@/components/ui/projects/project-content/icon-picker";
+import { ProjectStatusBadge } from "@/components/ui/projects/shared";
 import { useTheme } from "next-themes";
 import {
   ArrowLeft,
@@ -134,12 +135,9 @@ export function CanvasHeader({
             </div>
 
             {/* Status Badge */}
-            <Badge
-              variant={project.status === "active" ? "success" : "subtle"}
-              className="hidden sm:flex"
-            >
-              {project.status === "active" ? "Active" : "Archived"}
-            </Badge>
+            <div className="hidden sm:flex">
+              <ProjectStatusBadge status={project.status} />
+            </div>
           </div>
 
           {/* Center section - View Mode Toggle */}

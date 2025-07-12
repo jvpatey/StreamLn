@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/shared/popover";
 import { FilterBar } from "@/components/ui/projects/navbar";
 import { getIconComponent } from "./icon-picker";
+import { ProjectStatusText } from "@/components/ui/projects/shared";
 
 function formatTimeAgo(dateString?: string) {
   if (!dateString) return "—";
@@ -262,18 +263,10 @@ export function ProjectsContent({
                 </div>
                 {/* Status */}
                 <div className="w-24 text-center">
-                  <div
-                    className={`text-xs font-semibold ${
-                      project.status === "archived"
-                        ? "text-slate-500 dark:text-slate-400"
-                        : "text-green-600 dark:text-green-400"
-                    }`}
-                  >
-                    {project.status
-                      ? project.status.charAt(0).toUpperCase() +
-                        project.status.slice(1)
-                      : "Active"}
-                  </div>
+                  <ProjectStatusText
+                    status={project.status || "active"}
+                    size="sm"
+                  />
                 </div>
                 {/* Actions */}
                 <div className="w-20 text-center">
