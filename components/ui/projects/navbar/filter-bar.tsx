@@ -35,7 +35,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           {statusOptions.map((opt) => (
             <button
               key={opt.value}
-              className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+              className={`px-3 py-1 rounded-xl text-sm font-medium border transition-colors ${
                 statusFilter === opt.value
                   ? "bg-primary-500 text-white border-primary-500"
                   : "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-primary-100 dark:hover:bg-primary-900/20"
@@ -62,7 +62,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           {sortOptions.map((opt) => (
             <button
               key={opt.value}
-              className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+              className={`px-3 py-1 rounded-xl text-sm font-medium border transition-colors ${
                 sortBy === opt.value
                   ? "bg-primary-500 text-white border-primary-500"
                   : "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-primary-100 dark:hover:bg-primary-900/20"
