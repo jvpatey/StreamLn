@@ -4,6 +4,7 @@ import { Project, CommandAction } from "./types";
 interface UseCommandPaletteProps {
   open: boolean;
   initialSearchMode: boolean;
+  initialBrowseMode: boolean;
   projects: Project[];
   filteredActions: CommandAction[];
   filteredProjects: Project[];
@@ -22,6 +23,7 @@ interface UseCommandPaletteProps {
 export function useCommandPalette({
   open,
   initialSearchMode,
+  initialBrowseMode,
   projects,
   filteredActions,
   filteredProjects,
@@ -49,12 +51,14 @@ export function useCommandPalette({
     }
     setSelectedIndex(0);
     setSearchMode(initialSearchMode);
-    if (initialSearchMode) {
+    setBrowseMode(initialBrowseMode);
+    if (initialSearchMode || initialBrowseMode) {
       setTimeout(() => searchInputRef.current?.focus(), 0);
     }
   }, [
     open,
     initialSearchMode,
+    initialBrowseMode,
     setSearchMode,
     setBrowseMode,
     setSearch,

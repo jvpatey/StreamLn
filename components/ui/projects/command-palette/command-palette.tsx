@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/shared/badge";
+import { getKeyboardShortcut } from "@/lib/utils";
 import {
   Command,
   Search,
@@ -36,7 +37,7 @@ export default function CommandPalette({
       description: "Start with a blank infinite canvas",
       icon: <Plus size={16} />,
       badge: "Canvas",
-      shortcut: "⌘N",
+      shortcut: getKeyboardShortcut("⌘⇧C"),
       category: "Create",
     },
     {
@@ -45,7 +46,7 @@ export default function CommandPalette({
       description: "Add a note block to your canvas",
       icon: <FileText size={16} />,
       badge: "Note",
-      shortcut: "⌘⇧N",
+      shortcut: getKeyboardShortcut("⌘⇧Q"),
       category: "Create",
     },
     {
@@ -54,7 +55,7 @@ export default function CommandPalette({
       description: "Create a Kanban-style task board",
       icon: <Maximize2 size={16} />,
       badge: "Board",
-      shortcut: "⌘B",
+      shortcut: getKeyboardShortcut("⌘⇧T"),
       category: "Create",
     },
     {
@@ -63,7 +64,7 @@ export default function CommandPalette({
       description: "Semantic search across all content",
       icon: <Search size={16} />,
       badge: "Search",
-      shortcut: "⌘K",
+      shortcut: getKeyboardShortcut("⌘K"),
       category: "Navigate",
     },
     {
@@ -72,7 +73,7 @@ export default function CommandPalette({
       description: "Visualize connections between content",
       icon: <Network size={16} />,
       badge: "Graph",
-      shortcut: "⌘G",
+      shortcut: getKeyboardShortcut("⌘⇧G"),
       category: "Navigate",
     },
     {
@@ -81,7 +82,7 @@ export default function CommandPalette({
       description: "Get help with your canvas",
       icon: <Brain size={16} />,
       badge: "AI",
-      shortcut: "⌘⇧A",
+      shortcut: getKeyboardShortcut("⌘⇧A"),
       category: "AI",
     },
     {
@@ -90,7 +91,7 @@ export default function CommandPalette({
       description: "Start from pre-built canvas templates",
       icon: <Layers size={16} />,
       badge: "Templates",
-      shortcut: "⌘T",
+      shortcut: getKeyboardShortcut("⌘⇧L"),
       category: "Browse",
     },
     {
@@ -99,7 +100,7 @@ export default function CommandPalette({
       description: "Configure your workspace",
       icon: <Settings size={16} />,
       badge: "Settings",
-      shortcut: "⌘,",
+      shortcut: getKeyboardShortcut("⌘,"),
       category: "System",
     },
   ];

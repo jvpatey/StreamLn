@@ -18,6 +18,7 @@ interface ProjectDetailsSidepanelProps {
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
   onStatusChange?: (projectId: string, newStatus: string) => void;
+  onOpenCanvas?: (project: Project) => void;
 }
 
 export function ProjectDetailsSidepanel({
@@ -27,6 +28,7 @@ export function ProjectDetailsSidepanel({
   onEdit,
   onDelete,
   onStatusChange,
+  onOpenCanvas,
 }: ProjectDetailsSidepanelProps) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -110,7 +112,7 @@ export function ProjectDetailsSidepanel({
           side="right"
           className="w-full sm:max-w-lg overflow-y-auto bg-gradient-to-b from-background to-background/95 backdrop-blur-sm border-l border-border/50"
         >
-          <SheetHeader className="space-y-4 pb-6 border-b border-border/50">
+          <SheetHeader className="space-y-2 pb-3 border-b border-border/50">
             <ProjectHeader
               project={project}
               isEditMode={isEditMode}
@@ -119,8 +121,8 @@ export function ProjectDetailsSidepanel({
             />
 
             {isEditMode && (
-              <div className="space-y-3">
-                <div className="space-y-2">
+              <div className="space-y-2">
+                <div className="space-y-1">
                   <label className="text-sm font-medium text-foreground">
                     Project Icon
                   </label>
@@ -133,14 +135,14 @@ export function ProjectDetailsSidepanel({
             )}
           </SheetHeader>
 
-          <div className="space-y-6 py-6">
+          <div className="space-y-3 py-3">
             <ProjectStats project={project} />
             <CanvasPreview />
             <ProjectDetails project={project} />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col space-y-3 pt-6 border-t border-border/50">
+          <div className="flex flex-col space-y-2 pt-3 border-t border-border/50">
             <ActionButtons
               isEditMode={isEditMode}
               project={project}
@@ -150,6 +152,7 @@ export function ProjectDetailsSidepanel({
               onEditClick={handleEditClick}
               onStatusChange={onStatusChange}
               onDelete={handleDelete}
+              onOpenCanvas={onOpenCanvas}
             />
           </div>
         </SheetContent>

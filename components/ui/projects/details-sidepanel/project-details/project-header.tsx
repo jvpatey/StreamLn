@@ -1,7 +1,7 @@
 import React from "react";
-import { Archive, CheckCircle, Circle } from "lucide-react";
 import { SheetTitle, SheetDescription } from "@/components/ui/shared/sheet";
 import { getIconComponent } from "../../project-content/icon-picker";
+import { ProjectStatusIconText } from "@/components/ui/projects/shared";
 import { Project } from "./types";
 
 interface ProjectHeaderProps {
@@ -21,27 +21,6 @@ export function ProjectHeader({
   editForm,
   onInputChange,
 }: ProjectHeaderProps) {
-  const getStatusIcon = () => {
-    switch (project.status) {
-      case "active":
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "archived":
-        return <Archive className="h-4 w-4 text-slate-500" />;
-      default:
-        return <Circle className="h-4 w-4 text-slate-400" />;
-    }
-  };
-
-  const getStatusColor = () => {
-    switch (project.status) {
-      case "active":
-        return "text-green-600 dark:text-green-400";
-      case "archived":
-        return "text-slate-500 dark:text-slate-400";
-      default:
-        return "text-slate-400";
-    }
-  };
 
   return (
     <div className="flex items-start justify-between">
@@ -85,13 +64,11 @@ export function ProjectHeader({
               )}
             </>
           )}
-          <div className="flex items-center space-x-2 mt-1">
-            {getStatusIcon()}
-            <span
-              className={`text-sm font-medium ${getStatusColor()} transition-colors duration-200 group-hover:opacity-80`}
-            >
-              {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
-            </span>
+          <div className="mt-1">
+            <ProjectStatusIconText 
+              status={project.status} 
+              className="transition-colors duration-200 group-hover:opacity-80"
+            />
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@ export interface ProjectCommandPaletteProps {
   onOpenChange: (open: boolean) => void;
   onCreateProject?: () => void;
   initialSearchMode?: boolean;
+  initialBrowseMode?: boolean;
   projects: Project[];
   onProjectSelect?: (project: Project) => void;
   openFilterPopover?: () => void;

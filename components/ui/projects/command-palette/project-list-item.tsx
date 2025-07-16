@@ -1,6 +1,7 @@
 import React from "react";
 import { Folder } from "lucide-react";
 import { getIconComponent } from "../project-content/icon-picker";
+import { ProjectStatusText } from "@/components/ui/projects/shared";
 import { Project } from "./types";
 
 interface ProjectListItemProps {
@@ -49,17 +50,10 @@ export function ProjectListItem({
           {project.name}
         </div>
         {showStatus ? (
-          <div
-            className={`text-xs font-semibold ${
-              project.status === "archived"
-                ? "text-slate-500 dark:text-slate-400"
-                : "text-green-600 dark:text-green-400"
-            }`}
-          >
-            {project.status
-              ? project.status.charAt(0).toUpperCase() + project.status.slice(1)
-              : "Active"}
-          </div>
+          <ProjectStatusText 
+            status={project.status || "active"} 
+            size="sm"
+          />
         ) : (
           <div className="text-xs text-slate-500 dark:text-slate-400">
             {project.description}
