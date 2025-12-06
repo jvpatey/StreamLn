@@ -79,7 +79,7 @@ export default function HeroSection() {
             ideas, plan work, and connect everything—your workflow, your way.
           </motion.p>
 
-          {/* Call-to-action button with glow effect */}
+          {/* Call-to-action button with liquid glass effect */}
           <motion.div
             className="mt-8 sm:mt-10 flex items-center justify-center"
             initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15 }}
@@ -95,11 +95,22 @@ export default function HeroSection() {
                 <Button
                   variant="gradient"
                   size="lg"
-                  className="group relative overflow-hidden text-base sm:text-lg px-6 sm:px-8 py-2 sm:py-3"
+                  className="group relative overflow-hidden rounded-full text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4
+                    backdrop-blur-2xl
+                    bg-gradient-to-r from-primary/20 via-primary/30 to-accent/20
+                    dark:from-primary/15 dark:via-primary/25 dark:to-accent/15
+                    border border-white/20 dark:border-white/10
+                    shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.3)]
+                    dark:shadow-[0_8px_32px_rgba(0,0,0,0.3),0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]
+                    hover:from-primary/30 hover:via-primary/40 hover:to-accent/30
+                    dark:hover:from-primary/20 dark:hover:via-primary/30 dark:hover:to-accent/20
+                    hover:border-white/30 dark:hover:border-white/20
+                    hover:shadow-[0_12px_40px_rgba(0,0,0,0.15),0_4px_12px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.4)]
+                    dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.4),0_4px_12px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.15)]
+                    hover:scale-[1.02] active:scale-[0.98]
+                    transition-all duration-200 ease-out"
                 >
-                  <span className="relative z-10">Launch Your Workspace</span>
-                  {/* Subtle glow effect on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl" />
+                  <span className="relative z-10 font-semibold">Launch Your Workspace</span>
                 </Button>
               </SignInButton>
             </SignedOut>
