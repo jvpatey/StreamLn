@@ -32,11 +32,13 @@ export function SearchInput({
         className="w-full bg-transparent px-12 py-4 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 outline-none"
         autoFocus
       />
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center space-x-2">
-        <Badge variant="outline" className="text-xs backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/20">
-          {resultCount} results
-        </Badge>
-      </div>
+      {search && (
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center space-x-2">
+          <Badge variant="outline" className="text-xs backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/20">
+            {resultCount} results
+          </Badge>
+        </div>
+      )}
     </div>
   );
 }

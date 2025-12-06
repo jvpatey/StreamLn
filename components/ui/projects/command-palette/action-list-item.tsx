@@ -21,10 +21,10 @@ export function ActionListItem({
 
   return (
     <li
-      className={`flex items-center px-6 py-4 cursor-pointer transition-colors duration-100 group ${
+      className={`flex items-center px-6 py-4 cursor-pointer transition-all duration-200 group ${
         isSelected
-          ? "bg-primary-50 dark:bg-primary-900/20"
-          : "hover:bg-slate-100 dark:hover:bg-slate-800/60"
+          ? "bg-gradient-to-br from-primary-500/10 via-primary-400/15 to-accent-500/10 dark:from-primary-500/5 dark:via-primary-400/10 dark:to-accent-500/5 backdrop-blur-sm"
+          : "hover:bg-slate-100/50 dark:hover:bg-slate-800/40"
       }`}
       onClick={() => onSelect(action)}
       onMouseEnter={() => onMouseEnter(index)}

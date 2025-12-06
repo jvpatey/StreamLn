@@ -57,10 +57,19 @@ export function ProjectsSidebar({
               <Button
                 variant="outline"
                 className="w-full flex items-center justify-between h-10 px-3 font-medium
-                  backdrop-blur-xl bg-white/30 dark:bg-slate-800/20 
-                  border-white/40 dark:border-slate-700/30
-                  hover:bg-white/50 dark:hover:bg-slate-800/40
-                  hover:border-white/50 dark:hover:border-slate-600/40
+                  backdrop-blur-2xl 
+                  bg-gradient-to-br from-primary-500/10 via-primary-400/15 to-accent-500/10 
+                  dark:from-primary-500/5 dark:via-primary-400/10 dark:to-accent-500/5
+                  border-white/30 dark:border-white/20
+                  hover:from-primary-500/15 hover:via-primary-400/20 hover:to-accent-500/15
+                  dark:hover:from-primary-500/8 dark:hover:via-primary-400/12 dark:hover:to-accent-500/8
+                  focus:from-primary-500/15 focus:via-primary-400/20 focus:to-accent-500/15
+                  dark:focus:from-primary-500/8 dark:focus:via-primary-400/12 dark:focus:to-accent-500/8
+                  active:from-primary-500/15 active:via-primary-400/20 active:to-accent-500/15
+                  dark:active:from-primary-500/8 dark:active:via-primary-400/12 dark:active:to-accent-500/8
+                  hover:border-white/40 dark:hover:border-white/30
+                  focus:border-white/40 dark:focus:border-white/30
+                  shadow-lg hover:shadow-xl focus:shadow-xl
                   transition-all duration-200 rounded-full"
                 onClick={onCommandPaletteOpen}
               >

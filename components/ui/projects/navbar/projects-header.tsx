@@ -42,16 +42,24 @@ export function ProjectsHeader({
             <Button
               variant="outline"
               className="w-full justify-start text-slate-500 dark:text-slate-400 
-                backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 
-                border border-white/40 dark:border-slate-700/40
-                hover:bg-white/70 dark:hover:bg-slate-800/70 
-                hover:border-white/50 dark:hover:border-slate-700/50
-                shadow-md hover:shadow-lg transition-all duration-200"
+                backdrop-blur-2xl 
+                bg-gradient-to-br from-primary-500/10 via-primary-400/15 to-accent-500/10 
+                dark:from-primary-500/5 dark:via-primary-400/10 dark:to-accent-500/5
+                border border-white/30 dark:border-white/20
+                hover:from-primary-500/15 hover:via-primary-400/20 hover:to-accent-500/15
+                dark:hover:from-primary-500/8 dark:hover:via-primary-400/12 dark:hover:to-accent-500/8
+                focus:from-primary-500/15 focus:via-primary-400/20 focus:to-accent-500/15
+                dark:focus:from-primary-500/8 dark:focus:via-primary-400/12 dark:focus:to-accent-500/8
+                active:from-primary-500/15 active:via-primary-400/20 active:to-accent-500/15
+                dark:active:from-primary-500/8 dark:active:via-primary-400/12 dark:active:to-accent-500/8
+                hover:border-white/40 dark:hover:border-white/30
+                focus:border-white/40 dark:focus:border-white/30
+                shadow-lg hover:shadow-xl focus:shadow-xl transition-all duration-200 rounded-full"
               onClick={onCommandPaletteOpen}
             >
               <Search size={16} className="mr-3" />
               Search projects, create new...
-              <Badge variant="outline" className="ml-auto text-xs backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/20">
+              <Badge variant="outline" className="ml-auto text-xs backdrop-blur-sm bg-white/40 dark:bg-slate-800/40 border-white/30 dark:border-slate-700/30">
                 {getKeyboardShortcut("⌘K")}
               </Badge>
             </Button>
@@ -62,7 +70,7 @@ export function ProjectsHeader({
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden backdrop-blur-xl bg-white/40 dark:bg-slate-800/40 border border-white/30 dark:border-slate-700/30 hover:bg-white/60 dark:hover:bg-slate-800/60"
+              className="md:hidden backdrop-blur-2xl bg-white/40 dark:bg-slate-800/40 border border-white/30 dark:border-slate-700/30 hover:bg-white/50 dark:hover:bg-slate-800/50 rounded-full"
               onClick={onCommandPaletteOpen}
             >
               <Search size={16} />
