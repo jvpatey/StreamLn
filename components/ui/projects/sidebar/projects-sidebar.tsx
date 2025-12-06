@@ -27,7 +27,12 @@ export function ProjectsSidebar({
       <div
         className={`${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed lg:relative lg:translate-x-0 z-50 w-72 h-screen bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-800/50 transition-transform duration-300 ease-in-out overflow-y-auto hidden lg:block`}
+        } fixed lg:relative lg:translate-x-0 z-50 w-72 
+        backdrop-blur-2xl bg-white/40 dark:bg-slate-900/30 
+        border border-slate-300/60 dark:border-slate-600/50
+        lg:rounded-[24px] lg:mt-2 lg:mb-2 lg:ml-2 lg:h-[calc(100%-1rem)] lg:max-h-[calc(100%-1rem)]
+        transition-transform duration-300 ease-in-out overflow-y-auto hidden lg:block
+        shadow-lg`}
       >
         <div className="p-6">
           {/* Welcome Section */}
@@ -48,23 +53,28 @@ export function ProjectsSidebar({
               className="mb-4 w-full"
             />
 
-            <div className="bg-slate-50/60 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 rounded-lg p-4 space-y-3">
+            <div className="backdrop-blur-2xl bg-gradient-to-br from-primary-500/10 via-primary-400/15 to-accent-500/10 dark:from-primary-500/5 dark:via-primary-400/10 dark:to-accent-500/5 border border-white/30 dark:border-white/20 rounded-2xl p-4 space-y-3 shadow-lg">
               <Button
                 variant="outline"
-                className="w-full flex items-center justify-between h-10 px-3 font-medium"
+                className="w-full flex items-center justify-between h-10 px-3 font-medium
+                  backdrop-blur-xl bg-white/30 dark:bg-slate-800/20 
+                  border-white/40 dark:border-slate-700/30
+                  hover:bg-white/50 dark:hover:bg-slate-800/40
+                  hover:border-white/50 dark:hover:border-slate-600/40
+                  transition-all duration-200 rounded-full"
                 onClick={onCommandPaletteOpen}
               >
                 <span className="flex items-center">
                   <Sparkles size={16} className="mr-2 text-primary-500" />
                   Quick Actions
                 </span>
-                <Badge variant="outline" className="text-xs flex-shrink-0">
+                <Badge variant="outline" className="text-xs flex-shrink-0 backdrop-blur-sm bg-white/40 dark:bg-slate-800/40 border-white/30 dark:border-slate-700/30">
                   {getKeyboardShortcut("⌘K")}
                 </Badge>
               </Button>
 
               {/* Pro tip */}
-              <div className="p-3 rounded-lg bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50">
+              <div className="p-3 rounded-2xl backdrop-blur-xl bg-white/20 dark:bg-slate-800/15 border border-white/25 dark:border-slate-700/25">
                 <div className="flex items-start space-x-3">
                   <div className="p-2 rounded-md bg-blue-50 dark:bg-blue-900/30">
                     <Zap

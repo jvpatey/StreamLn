@@ -35,10 +35,10 @@ const FilterBar: React.FC<FilterBarProps> = ({
           {statusOptions.map((opt) => (
             <button
               key={opt.value}
-              className={`px-3 py-1 rounded-xl text-sm font-medium border transition-colors ${
+              className={`px-3 py-1 rounded-xl text-sm font-medium border transition-all duration-200 ${
                 statusFilter === opt.value
-                  ? "bg-primary-500 text-white border-primary-500"
-                  : "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-primary-100 dark:hover:bg-primary-900/20"
+                  ? "bg-primary-500 text-white border-primary-500 shadow-md"
+                  : "backdrop-blur-md bg-white/50 dark:bg-slate-800/50 border-white/30 dark:border-slate-700/30 text-slate-700 dark:text-slate-200 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-white/40 dark:hover:border-slate-700/40 shadow-sm"
               }`}
               onClick={() => {
                 if (statusFilter === opt.value) {
@@ -62,10 +62,10 @@ const FilterBar: React.FC<FilterBarProps> = ({
           {sortOptions.map((opt) => (
             <button
               key={opt.value}
-              className={`px-3 py-1 rounded-xl text-sm font-medium border transition-colors ${
+              className={`px-3 py-1 rounded-xl text-sm font-medium border transition-all duration-200 ${
                 sortBy === opt.value
-                  ? "bg-primary-500 text-white border-primary-500"
-                  : "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-primary-100 dark:hover:bg-primary-900/20"
+                  ? "bg-primary-500 text-white border-primary-500 shadow-md"
+                  : "backdrop-blur-md bg-white/50 dark:bg-slate-800/50 border-white/30 dark:border-slate-700/30 text-slate-700 dark:text-slate-200 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-white/40 dark:hover:border-slate-700/40 shadow-sm"
               }`}
               onClick={() => {
                 if (sortBy === opt.value) {

@@ -18,10 +18,10 @@ export function SearchInput({
   searchInputRef,
 }: SearchInputProps) {
   return (
-    <div className="relative border-b border-slate-200 dark:border-slate-700">
+    <div className="relative border-b border-white/20 dark:border-slate-700/30 backdrop-blur-xl bg-white/30 dark:bg-slate-900/30">
       <Search
         size={20}
-        className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+        className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
       />
       <input
         ref={searchInputRef}
@@ -33,7 +33,7 @@ export function SearchInput({
         autoFocus
       />
       <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center space-x-2">
-        <Badge variant="outline" className="text-xs">
+        <Badge variant="outline" className="text-xs backdrop-blur-sm bg-white/50 dark:bg-slate-800/50 border-white/20 dark:border-slate-700/20">
           {resultCount} results
         </Badge>
       </div>

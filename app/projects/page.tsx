@@ -8,6 +8,7 @@ import { ProjectsHeader } from "@/components/ui/projects/navbar";
 import { ProjectsSidebar } from "@/components/ui/projects/sidebar";
 import { ProjectsContent } from "@/components/ui/projects/project-content";
 import { CreateProjectModal } from "@/components/ui/projects/project-content";
+import { ProjectSkeletonGrid } from "@/components/ui/projects/project-content/project-skeleton";
 import { ProjectDetailsSidepanel } from "@/components/ui/projects/details-sidepanel";
 import {
   fetchProjects,
@@ -251,7 +252,7 @@ export default function DashboardPage() {
     });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <CreateProjectModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
@@ -276,7 +277,7 @@ export default function DashboardPage() {
       />
 
       {/* Main Layout */}
-      <div className="flex relative">
+      <div className="flex relative lg:h-[calc(100vh-3.5rem)]">
         {/* Sidebar */}
         <ProjectsSidebar
           isOpen={sidebarOpen}
@@ -287,8 +288,14 @@ export default function DashboardPage() {
 
         {/* Main Content Area */}
         {loading ? (
-          <div className="flex-1 flex items-center justify-center text-slate-500 dark:text-slate-400 text-lg">
-            Loading projects...
+          <div className="flex-1 min-h-screen">
+            <div className="p-6 lg:p-8">
+              <div className="mb-8">
+                <div className="h-8 w-48 rounded-lg bg-slate-200/60 dark:bg-slate-700/60 mb-2 animate-pulse" />
+                <div className="h-4 w-64 rounded bg-slate-200/60 dark:bg-slate-700/60 animate-pulse" />
+              </div>
+              <ProjectSkeletonGrid count={8} />
+            </div>
           </div>
         ) : error ? (
           <div className="flex-1 flex items-center justify-center text-destructive-500 dark:text-destructive-400 text-lg">
