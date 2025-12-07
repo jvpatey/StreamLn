@@ -25,7 +25,7 @@ export function CreateProjectButton({
     >
       <Plus
         size={18}
-        className="mr-3 text-white transition-transform group-hover:rotate-90"
+        className="mr-3 text-slate-900 dark:text-white transition-transform group-hover:rotate-90"
       />
       Create Project
     </LiquidGlassButton>
