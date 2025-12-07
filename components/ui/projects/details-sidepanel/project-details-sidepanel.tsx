@@ -4,7 +4,6 @@ import { IconPicker } from "../project-content/icon-picker";
 import {
   ProjectHeader,
   ProjectStats,
-  CanvasPreview,
   ProjectDetails,
   ActionButtons,
   DeleteConfirmationDialog,
@@ -110,9 +109,12 @@ export function ProjectDetailsSidepanel({
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent
           side="right"
-          className="w-full sm:max-w-lg overflow-y-auto bg-gradient-to-b from-background to-background/95 backdrop-blur-sm border-l border-border/50"
+          className="w-full sm:max-w-lg overflow-y-auto 
+            backdrop-blur-2xl bg-white/40 dark:bg-slate-900/30 
+            border border-white/30 dark:border-white/20
+            rounded-[24px] !top-2 !bottom-2 !right-2 !h-[calc(100vh-1rem)] max-h-[calc(100vh-1rem)]"
         >
-          <SheetHeader className="space-y-2 pb-3 border-b border-border/50">
+          <SheetHeader className="space-y-2 pb-4 border-b border-white/20 dark:border-slate-700/20">
             <ProjectHeader
               project={project}
               isEditMode={isEditMode}
@@ -137,12 +139,11 @@ export function ProjectDetailsSidepanel({
 
           <div className="space-y-3 py-3">
             <ProjectStats project={project} />
-            <CanvasPreview />
             <ProjectDetails project={project} />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col space-y-2 pt-3 border-t border-border/50">
+          <div className="flex flex-col space-y-2 pt-4 border-t border-white/20 dark:border-slate-700/20">
             <ActionButtons
               isEditMode={isEditMode}
               project={project}
