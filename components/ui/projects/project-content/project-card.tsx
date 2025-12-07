@@ -57,157 +57,94 @@ export function ProjectCard({
     ? "text-slate-500 dark:text-slate-400"
     : "text-green-600 dark:text-green-400";
 
-  const [isHovered, setIsHovered] = useState(false);
   // Accent color (use icon color or default blue)
   const accentColor = icon === "Folder" || !icon ? "#3b82f6" : undefined;
-  const baseBoxShadow = `0 0 0 2px ${accentColor || "#3b82f6"}30, 0 0 16px ${
-    accentColor || "#3b82f6"
-  }18`;
-  const hoverBoxShadow = `0 0 0 2px ${accentColor || "#3b82f6"}80, 0 0 24px ${
-    accentColor || "#3b82f6"
-  }40, 0 8px 32px rgba(0,0,0,0.10)`;
-  const baseBorder = `1.5px solid ${accentColor || "#3b82f6"}30`;
-  const hoverBorder = `1.5px solid ${accentColor || "#3b82f6"}80`;
   return (
     <Card
-      className={`group relative overflow-hidden border-0 transition-all duration-200 cursor-pointer rounded-2xl shadow-md bg-white/70 dark:bg-slate-900/70 backdrop-blur-md ${
-        isArchived ? "opacity-60" : ""
-      }`}
-      style={{
-        boxShadow: isHovered ? hoverBoxShadow : baseBoxShadow,
-        border: isHovered ? hoverBorder : baseBorder,
-      }}
+      className={`group relative overflow-hidden transition-all duration-200 cursor-pointer rounded-2xl 
+        backdrop-blur-2xl 
+        bg-gradient-to-br from-primary-500/10 via-primary-400/15 to-accent-500/10 
+        dark:from-primary-500/5 dark:via-primary-400/10 dark:to-accent-500/5
+        border border-white/30 dark:border-white/20
+        hover:border-white/40 dark:hover:border-white/30
+        shadow-lg hover:shadow-xl
+        flex flex-col h-full
+        ${isArchived ? "opacity-60" : ""}`}
       onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
-      <style jsx>{`
-        .group:hover {
-          box-shadow: 0 0 0 2px ${accentColor || "#3b82f6"}80,
-            0 0 24px ${accentColor || "#3b82f6"}40,
-            0 8px 32px rgba(0, 0, 0, 0.1);
-          border: 1.5px solid ${accentColor || "#3b82f6"}80;
-        }
-      `}</style>
-      {/* Menu Button */}
-      <div className="absolute top-3 right-3 z-10">
-        <ProjectCardMenu
-          isArchived={isArchived}
-          onArchive={() => onStatusChange?.("archived")}
-          onUnarchive={() => onStatusChange?.("active")}
-          onDelete={onDelete}
-        />
-      </div>
-
-      {/* Canvas Preview Area (placeholder) */}
-      <div className="relative h-24 bg-gradient-to-br from-slate-100/60 to-slate-200/60 dark:from-slate-800/60 dark:to-slate-900/60 overflow-hidden flex items-center justify-center">
-        {/* Placeholder grid blocks */}
-        <svg width="100%" height="100%" viewBox="0 0 160 48" fill="none">
-          <rect
-            x="8"
-            y="8"
-            width="40"
-            height="16"
-            rx="3"
-            fill="#3b82f6"
-            fillOpacity="0.18"
-          />
-          <rect
-            x="56"
-            y="8"
-            width="32"
-            height="12"
-            rx="3"
-            fill="#f59e42"
-            fillOpacity="0.18"
-          />
-          <rect
-            x="96"
-            y="8"
-            width="24"
-            height="20"
-            rx="3"
-            fill="#3b82f6"
-            fillOpacity="0.18"
-          />
-          <rect
-            x="24"
-            y="28"
-            width="32"
-            height="12"
-            rx="3"
-            fill="#f59e42"
-            fillOpacity="0.18"
-          />
-          <rect
-            x="64"
-            y="28"
-            width="40"
-            height="10"
-            rx="3"
-            fill="#3b82f6"
-            fillOpacity="0.18"
-          />
-        </svg>
-        {/* Blocks count */}
-        <div className="absolute top-2 left-2 bg-white/80 dark:bg-slate-900/80 text-xs text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-full font-medium shadow">
-          {blocks} blocks
-        </div>
-      </div>
-
       {/* Main Info */}
-      <div className="p-4 pb-2">
-        <div className="flex items-center space-x-2 mb-1">
+      <div className="p-5 pb-4 flex flex-col flex-1">
+        {/* First line: Icon, Title, Menu */}
+        <div className="flex items-center space-x-3 mb-3 pr-8">
           <div
-            className="p-2 rounded-xl shadow"
+            className="p-2.5 rounded-lg backdrop-blur-sm bg-white/30 dark:bg-slate-800/30 border border-white/20 dark:border-slate-700/20 flex-shrink-0"
             style={{
-              backgroundColor: `${accentColor || "#3b82f6"}22`,
-              boxShadow: `0 2px 8px ${accentColor || "#3b82f6"}22`,
+              color: accentColor || "#3b82f6",
             }}
           >
             {React.createElement(getIconComponent(icon || "Folder"), {
-              size: 18,
+              size: 20,
               style: { color: accentColor || "#3b82f6" },
             })}
           </div>
-          <span className="font-semibold text-slate-900 dark:text-slate-100 text-base truncate max-w-[140px] group-hover:text-primary-400 transition-colors">
-            {name}
-          </span>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-lg truncate group-hover:text-primary-400 transition-colors">
+              {name}
+            </h3>
+          </div>
+          {/* Menu Button */}
+          <div className="absolute top-4 right-4 z-10">
+            <ProjectCardMenu
+              isArchived={isArchived}
+              onArchive={() => onStatusChange?.("archived")}
+              onUnarchive={() => onStatusChange?.("active")}
+              onDelete={onDelete}
+            />
+          </div>
+        </div>
+        
+        {/* Second line: Description and Progress % */}
+        <div className="flex items-center justify-between mb-3">
+          {description ? (
+            <p className="text-sm text-slate-500 dark:text-slate-400 truncate flex-1 pr-2">
+              {description}
+            </p>
+          ) : (
+            <div className="flex-1" />
+          )}
           <span
-            className={`ml-auto font-bold text-sm ${getProgressTextColor()}`}
+            className={`font-bold text-base flex-shrink-0 ${getProgressTextColor()}`}
           >
             {progress}%
           </span>
         </div>
-        <div className="text-xs text-slate-500 dark:text-slate-400 mb-2 truncate">
-          {type}
-        </div>
-        {/* Progress bar */}
-        <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mb-2">
+        
+        {/* Third line: Progress bar */}
+        <div className="w-full h-2 bg-slate-200/50 dark:bg-slate-700/50 rounded-full overflow-hidden mb-3">
           <div
-            className={`h-1.5 rounded-full transition-all duration-300 ${getProgressColor()}`}
+            className={`h-2 rounded-full transition-all duration-300 ${getProgressColor()}`}
             style={{ width: `${progress}%` }}
           />
         </div>
-      </div>
 
-      {/* Metadata Row */}
-      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-4 pb-3">
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-1">
-            <Clock size={12} />
-            <span>{lastModified}</span>
+        {/* Metadata Row - pushed to bottom */}
+        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2.5 border-t border-white/20 dark:border-slate-700/20 mt-auto">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1">
+              <Clock size={12} />
+              <span>{lastModified}</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <Users size={12} />
+              <span>{collaborators}</span>
+            </div>
           </div>
           <div className="flex items-center space-x-1">
-            <Users size={12} />
-            <span>{collaborators}</span>
+            <BarChart3 size={12} />
+            <span className={`font-semibold ${statusColor}`}>
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </span>
           </div>
-        </div>
-        <div className="flex items-center space-x-1">
-          <BarChart3 size={12} />
-          <span className={`font-semibold ${statusColor}`}>
-            {status.charAt(0).toUpperCase() + status.slice(1)}
-          </span>
         </div>
       </div>
     </Card>
