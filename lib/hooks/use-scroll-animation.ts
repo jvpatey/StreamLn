@@ -11,8 +11,8 @@ interface UseScrollAnimationOptions {
  * Custom hook for scroll-based animation logic
  * Returns whether an element is visible in the viewport
  */
-export function useScrollAnimation(
-  ref: RefObject<HTMLElement>,
+export function useScrollAnimation<T extends HTMLElement>(
+  ref: RefObject<T | null>,
   options: UseScrollAnimationOptions = {}
 ) {
   const { threshold = 0.2, rootMargin = "0px" } = options;
