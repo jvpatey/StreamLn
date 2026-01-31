@@ -645,8 +645,8 @@ export function CanvasBlock({
             block.type === "tag" || block.type === "code"
               ? "flex-1 overflow-visible min-h-0"
               : block.type === "task-board"
-                ? "flex-1 overflow-auto min-h-0"
-                : "flex-1 overflow-hidden"
+              ? "flex-1 overflow-auto min-h-0"
+              : "flex-1 overflow-hidden"
           }
         >
           {renderBlockContent()}

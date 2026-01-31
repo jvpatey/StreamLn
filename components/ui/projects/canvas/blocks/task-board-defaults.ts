@@ -34,7 +34,8 @@ function createDefaultContent(): TaskBoardContent {
 }
 
 /** Default content for new task board blocks: one board with blank title. */
-export const DEFAULT_TASK_BOARD_CONTENT: TaskBoardContent = createDefaultContent();
+export const DEFAULT_TASK_BOARD_CONTENT: TaskBoardContent =
+  createDefaultContent();
 
 /**
  * Returns valid task board content from unknown value.
@@ -50,7 +51,13 @@ export function getTaskBoardContent(value: unknown): TaskBoardContent {
   const columns: TaskBoardColumn[] = [];
   if (Array.isArray(v.columns) && v.columns.length > 0) {
     for (const c of v.columns) {
-      if (c && typeof c === "object" && "id" in c && "title" in c && "cardIds" in c) {
+      if (
+        c &&
+        typeof c === "object" &&
+        "id" in c &&
+        "title" in c &&
+        "cardIds" in c
+      ) {
         const col = c as { id: unknown; title: unknown; cardIds: unknown };
         columns.push({
           id: typeof col.id === "string" ? col.id : generateId(),

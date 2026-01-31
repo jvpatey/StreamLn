@@ -162,22 +162,22 @@ export default function ProjectCanvasPage() {
         type === "note"
           ? 300
           : type === "task-board"
-            ? 480
-            : type === "link"
-              ? 320
-              : type === "tag"
-                ? 160
-                : 350,
+          ? 480
+          : type === "link"
+          ? 320
+          : type === "tag"
+          ? 160
+          : 350,
       height:
         type === "note"
           ? 200
           : type === "task-board"
-            ? 320
-            : type === "link"
-              ? 180
-              : type === "tag"
-                ? 56
-                : 250,
+          ? 320
+          : type === "link"
+          ? 180
+          : type === "tag"
+          ? 56
+          : 250,
       content: getDefaultContent(type),
       title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
       color: getDefaultColor(type),

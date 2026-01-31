@@ -307,7 +307,9 @@ function Column({
             onPointerDown={(e) => e.stopPropagation()}
           >
             {column.title || (
-              <span className="text-slate-400 dark:text-slate-500">Add title…</span>
+              <span className="text-slate-400 dark:text-slate-500">
+                Add title…
+              </span>
             )}
           </button>
         )}
@@ -395,7 +397,9 @@ export function TaskBoardBlock({
   const collisionDetection: CollisionDetection = useCallback((args) => {
     const pointerIntersections = pointerWithin(args);
     const intersections =
-      pointerIntersections.length > 0 ? pointerIntersections : rectIntersection(args);
+      pointerIntersections.length > 0
+        ? pointerIntersections
+        : rectIntersection(args);
     let overId = getFirstCollision(intersections, "id") ?? null;
 
     if (overId != null) {
