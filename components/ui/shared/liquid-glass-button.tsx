@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/shared/button";
-import { ButtonProps } from "@/components/ui/shared/button";
+import { Button, ButtonProps } from "@/components/ui/shared/button";
 import { cn } from "@/lib/utils";
 
 interface LiquidGlassButtonProps extends ButtonProps {
