@@ -343,6 +343,7 @@ export default function ProjectCanvasPage() {
           selectedBlocks={selectedBlocks}
           canvasBlocks={canvasBlocks}
           onBlockUpdate={updateBlock}
+          onBlockSelect={setSelectedBlocks}
         />
         {/* Canvas Workspace Container */}
         <div className="flex-1 relative overflow-hidden">

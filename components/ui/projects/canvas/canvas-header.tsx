@@ -132,7 +132,7 @@ export function CanvasHeader({
                     getIconComponent(project.icon || "Folder"),
                     {
                       className: "h-5 w-5 text-primary",
-                    },
+                    }
                   )}
                 </div>
                 <div>
