@@ -11,6 +11,7 @@ import { CanvasHeader } from "@/components/ui/projects/canvas/canvas-header";
 import { DEFAULT_NOTE_CONTENT } from "@/components/ui/projects/canvas/blocks/note-defaults";
 import { DEFAULT_LINK_CONTENT } from "@/components/ui/projects/canvas/blocks/link-defaults";
 import { DEFAULT_TAG_CONTENT } from "@/components/ui/projects/canvas/blocks/tag-defaults";
+import { DEFAULT_TASK_BOARD_CONTENT } from "@/components/ui/projects/canvas/blocks/task-board-defaults";
 import { PanelLeftOpen } from "lucide-react";
 
 interface CanvasBlock {
@@ -161,7 +162,7 @@ export default function ProjectCanvasPage() {
         type === "note"
           ? 300
           : type === "task-board"
-            ? 400
+            ? 480
             : type === "link"
               ? 320
               : type === "tag"
@@ -171,7 +172,7 @@ export default function ProjectCanvasPage() {
         type === "note"
           ? 200
           : type === "task-board"
-            ? 300
+            ? 320
             : type === "link"
               ? 180
               : type === "tag"
@@ -248,6 +249,7 @@ export default function ProjectCanvasPage() {
     if (type === "note") return DEFAULT_NOTE_CONTENT;
     if (type === "link") return DEFAULT_LINK_CONTENT;
     if (type === "tag") return DEFAULT_TAG_CONTENT;
+    if (type === "task-board") return DEFAULT_TASK_BOARD_CONTENT;
     return {};
   };
 

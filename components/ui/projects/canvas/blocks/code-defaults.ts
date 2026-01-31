@@ -22,7 +22,9 @@ export function getCodeContent(value: unknown): CodeBlockContent {
     return {
       code: typeof v.code === "string" ? v.code : "",
       language:
-        v.language !== undefined && v.language !== null && typeof v.language === "string"
+        v.language !== undefined &&
+        v.language !== null &&
+        typeof v.language === "string"
           ? v.language
           : DEFAULT_CODE_CONTENT.language,
     };

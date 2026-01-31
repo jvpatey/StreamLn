@@ -172,6 +172,9 @@ export function CanvasBlock({
 
       if (!isEditable || block.locked) return;
 
+      // Don't start block drag when interacting with task board (cards, columns, etc.)
+      if ((e.target as HTMLElement).closest("[data-no-block-drag]")) return;
+
       // Convert screen coordinates to world coordinates
       const worldX = (e.clientX - panOffset.x) / zoomLevel;
       const worldY = (e.clientY - panOffset.y) / zoomLevel;
@@ -186,15 +189,7 @@ export function CanvasBlock({
         offsetY,
       });
     },
-    [
-      onSelect,
-      isEditable,
-      block.locked,
-      panOffset,
-      zoomLevel,
-      block.x,
-      block.y,
-    ]
+    [onSelect, isEditable, block.locked, panOffset, zoomLevel, block.x, block.y]
   );
 
   const handleMouseMove = useCallback(
@@ -208,7 +203,8 @@ export function CanvasBlock({
           setIsDragging(true);
           onDragStart();
           setPendingDrag(null);
-          const el = typeof document !== "undefined" ? document.activeElement : null;
+          const el =
+            typeof document !== "undefined" ? document.activeElement : null;
           if (el && "blur" in el && typeof el.blur === "function") el.blur();
 
           const worldX = (e.clientX - panOffset.x) / zoomLevel;
@@ -344,7 +340,9 @@ export function CanvasBlock({
     >
       <Card
         className={`relative w-full h-full transition-all duration-200 border ${
-          block.type === "tag" ? "rounded-full overflow-visible" : "overflow-hidden"
+          block.type === "tag"
+            ? "rounded-full overflow-visible"
+            : "overflow-hidden"
         } ${
           isSelected
             ? block.type === "tag"
@@ -360,7 +358,8 @@ export function CanvasBlock({
               ? "transparent"
               : `linear-gradient(135deg, ${getBlockColor()}05 0%, transparent 100%)`,
           backdropFilter: block.type === "tag" ? "none" : "blur(10px)",
-          borderColor: block.type === "tag" ? "transparent" : `${getBlockColor()}30`,
+          borderColor:
+            block.type === "tag" ? "transparent" : `${getBlockColor()}30`,
           boxShadow:
             block.type === "tag"
               ? "none"
@@ -369,163 +368,164 @@ export function CanvasBlock({
       >
         {/* Block Header (hidden for tag – tag is just the pill) */}
         {block.type !== "tag" && (
-        <div
-          className="flex items-center justify-between p-3 border-b border-slate-200/50 dark:border-slate-700/50"
-          style={{
-            background: `linear-gradient(90deg, ${getBlockColor()}08 0%, transparent 100%)`,
-          }}
-        >
-          <div className="flex items-center space-x-3 min-w-0 flex-1">
-            <div
-              className="p-2 rounded-xl shadow-sm ring-1 ring-white/20"
-              style={{
-                backgroundColor: `${getBlockColor()}15`,
-                boxShadow: `0 2px 8px ${getBlockColor()}20`,
-              }}
-            >
-              <div style={{ color: getBlockColor() }}>{getBlockIcon()}</div>
-            </div>
-            <div
-              className="flex flex-col min-w-0 flex-1"
-              onDoubleClick={handleTitleDoubleClick}
-              onMouseDown={handleTitleMouseDown}
-              onPointerDown={handleTitleMouseDown}
-            >
-              {isEditingTitle ? (
-                <input
-                  ref={titleInputRef}
-                  type="text"
-                  value={titleEditValue}
-                  onChange={(e) => setTitleEditValue(e.target.value)}
-                  onBlur={saveTitleAndClose}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      saveTitleAndClose();
-                    } else if (e.key === "Escape") {
-                      e.preventDefault();
-                      discardTitleEdit();
-                    }
-                  }}
-                  className="w-full text-sm font-semibold text-slate-800 dark:text-slate-200 bg-transparent border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-primary dark:focus:ring-primary"
-                  onClick={(e) => e.stopPropagation()}
-                />
-              ) : (
-                <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
-                  {getDisplayTitle()}
-                </span>
-              )}
-              <span className="text-xs text-slate-500 dark:text-slate-400 capitalize">
-                {block.type} block
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
-            {block.locked && (
-              <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20">
-                <Lock
-                  size={12}
-                  className="text-amber-600 dark:text-amber-400"
-                />
+          <div
+            className="flex items-center justify-between p-3 border-b border-slate-200/50 dark:border-slate-700/50"
+            style={{
+              background: `linear-gradient(90deg, ${getBlockColor()}08 0%, transparent 100%)`,
+            }}
+          >
+            <div className="flex items-center space-x-3 min-w-0 flex-1">
+              <div
+                className="p-2 rounded-xl shadow-sm ring-1 ring-white/20"
+                style={{
+                  backgroundColor: `${getBlockColor()}15`,
+                  boxShadow: `0 2px 8px ${getBlockColor()}20`,
+                }}
+              >
+                <div style={{ color: getBlockColor() }}>{getBlockIcon()}</div>
               </div>
-            )}
-            {isEditable && (
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"
-                    onMouseDown={(e) => e.stopPropagation()}
-                  >
-                    <MoreVertical size={14} />
-                  </Button>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Portal>
-                  <DropdownMenu.Content
-                    className="min-w-[10rem] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg p-1 z-[100]"
-                    sideOffset={4}
-                    align="end"
-                  >
-                    {onDuplicate && (
+              <div
+                className="flex flex-col min-w-0 flex-1"
+                onDoubleClick={handleTitleDoubleClick}
+                onMouseDown={handleTitleMouseDown}
+                onPointerDown={handleTitleMouseDown}
+              >
+                {isEditingTitle ? (
+                  <input
+                    ref={titleInputRef}
+                    type="text"
+                    value={titleEditValue}
+                    onChange={(e) => setTitleEditValue(e.target.value)}
+                    onBlur={saveTitleAndClose}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        saveTitleAndClose();
+                      } else if (e.key === "Escape") {
+                        e.preventDefault();
+                        discardTitleEdit();
+                      }
+                    }}
+                    className="w-full text-sm font-semibold text-slate-800 dark:text-slate-200 bg-transparent border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-primary dark:focus:ring-primary"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                ) : (
+                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
+                    {getDisplayTitle()}
+                  </span>
+                )}
+                <span className="text-xs text-slate-500 dark:text-slate-400 capitalize">
+                  {block.type} block
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
+              {block.locked && (
+                <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                  <Lock
+                    size={12}
+                    className="text-amber-600 dark:text-amber-400"
+                  />
+                </div>
+              )}
+              {isEditable && (
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"
+                      onMouseDown={(e) => e.stopPropagation()}
+                    >
+                      <MoreVertical size={14} />
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content
+                      className="min-w-[10rem] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg p-1 z-[100]"
+                      sideOffset={4}
+                      align="end"
+                    >
+                      {onDuplicate && (
+                        <DropdownMenu.Item
+                          className={dropdownItemClass}
+                          onSelect={() => onDuplicate(block.id)}
+                        >
+                          <Copy size={14} />
+                          Duplicate
+                        </DropdownMenu.Item>
+                      )}
+                      {onDelete && (
+                        <DropdownMenu.Item
+                          className={`${dropdownItemClass} text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300`}
+                          onSelect={() => onDelete(block.id)}
+                        >
+                          <Trash2 size={14} />
+                          Delete
+                        </DropdownMenu.Item>
+                      )}
+                      {(onDuplicate || onDelete) && (
+                        <DropdownMenu.Separator className="h-px bg-slate-200 dark:bg-slate-700 my-1" />
+                      )}
                       <DropdownMenu.Item
                         className={dropdownItemClass}
-                        onSelect={() => onDuplicate(block.id)}
+                        onSelect={() => onUpdate({ locked: !block.locked })}
                       >
-                        <Copy size={14} />
-                        Duplicate
+                        {block.locked ? (
+                          <>
+                            <Unlock size={14} />
+                            Unlock
+                          </>
+                        ) : (
+                          <>
+                            <Lock size={14} />
+                            Lock
+                          </>
+                        )}
                       </DropdownMenu.Item>
-                    )}
-                    {onDelete && (
                       <DropdownMenu.Item
-                        className={`${dropdownItemClass} text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300`}
-                        onSelect={() => onDelete(block.id)}
+                        className={dropdownItemClass}
+                        onSelect={() => onUpdate({ hidden: !block.hidden })}
                       >
-                        <Trash2 size={14} />
-                        Delete
+                        {block.hidden ? (
+                          <>
+                            <Eye size={14} />
+                            Show
+                          </>
+                        ) : (
+                          <>
+                            <EyeOff size={14} />
+                            Hide
+                          </>
+                        )}
                       </DropdownMenu.Item>
-                    )}
-                    {(onDuplicate || onDelete) && (
                       <DropdownMenu.Separator className="h-px bg-slate-200 dark:bg-slate-700 my-1" />
-                    )}
-                    <DropdownMenu.Item
-                      className={dropdownItemClass}
-                      onSelect={() => onUpdate({ locked: !block.locked })}
-                    >
-                      {block.locked ? (
-                        <>
-                          <Unlock size={14} />
-                          Unlock
-                        </>
-                      ) : (
-                        <>
-                          <Lock size={14} />
-                          Lock
-                        </>
-                      )}
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item
-                      className={dropdownItemClass}
-                      onSelect={() => onUpdate({ hidden: !block.hidden })}
-                    >
-                      {block.hidden ? (
-                        <>
-                          <Eye size={14} />
-                          Show
-                        </>
-                      ) : (
-                        <>
-                          <EyeOff size={14} />
-                          Hide
-                        </>
-                      )}
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Separator className="h-px bg-slate-200 dark:bg-slate-700 my-1" />
-                    <DropdownMenu.Item
-                      className={dropdownItemClass}
-                      onSelect={() => {
-                        const url = `${
-                          typeof window !== "undefined"
-                            ? window.location.origin + window.location.pathname
-                            : ""
-                        }?block=${block.id}`;
-                        if (
-                          typeof navigator !== "undefined" &&
-                          navigator.clipboard?.writeText
-                        )
-                          navigator.clipboard.writeText(url);
-                      }}
-                    >
-                      <Link2 size={14} />
-                      Copy link
-                    </DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        className={dropdownItemClass}
+                        onSelect={() => {
+                          const url = `${
+                            typeof window !== "undefined"
+                              ? window.location.origin +
+                                window.location.pathname
+                              : ""
+                          }?block=${block.id}`;
+                          if (
+                            typeof navigator !== "undefined" &&
+                            navigator.clipboard?.writeText
+                          )
+                            navigator.clipboard.writeText(url);
+                        }}
+                      >
+                        <Link2 size={14} />
+                        Copy link
+                      </DropdownMenu.Item>
                     </DropdownMenu.Content>
-                </DropdownMenu.Portal>
-              </DropdownMenu.Root>
-            )}
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
+              )}
+            </div>
           </div>
-        </div>
         )}
 
         {/* Tag block: floating menu (no header, so menu overlays pill) */}
@@ -644,7 +644,9 @@ export function CanvasBlock({
           className={
             block.type === "tag" || block.type === "code"
               ? "flex-1 overflow-visible min-h-0"
-              : "flex-1 overflow-hidden"
+              : block.type === "task-board"
+                ? "flex-1 overflow-auto min-h-0"
+                : "flex-1 overflow-hidden"
           }
         >
           {renderBlockContent()}
