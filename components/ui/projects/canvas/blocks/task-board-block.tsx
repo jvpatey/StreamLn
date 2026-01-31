@@ -522,7 +522,6 @@ export function TaskBoardBlock({
           };
           contentRef.current = next;
           setLocalContent(next);
-          persist(next);
         }
       }
 

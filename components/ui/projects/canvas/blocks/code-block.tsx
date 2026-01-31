@@ -5,6 +5,10 @@ import { useTheme } from "next-themes";
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
+import { html } from "@codemirror/lang-html";
+import { css } from "@codemirror/lang-css";
+import { markdown } from "@codemirror/lang-markdown";
+import { python } from "@codemirror/lang-python";
 import { githubLight } from "@uiw/codemirror-theme-github";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import type { Extension } from "@codemirror/state";
@@ -42,6 +46,14 @@ function getLanguageExtension(language: string): Extension | null {
       return javascript({ jsx: true, typescript: true });
     case "json":
       return json();
+    case "html":
+      return html();
+    case "css":
+      return css();
+    case "markdown":
+      return markdown();
+    case "python":
+      return python();
     default:
       return null;
   }
