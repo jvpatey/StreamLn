@@ -263,7 +263,8 @@ export function NoteBlock({ block, onUpdate, isEditable }: NoteBlockProps) {
     };
   }, [editor]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  const handleMenuMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
   }, []);
 
@@ -276,17 +277,13 @@ export function NoteBlock({ block, onUpdate, isEditable }: NoteBlockProps) {
   }
 
   return (
-    <div
-      className="h-full min-h-0 overflow-auto"
-      onMouseDown={handleMouseDown}
-      onPointerDown={handleMouseDown}
-    >
+    <div className="h-full min-h-0 overflow-auto">
       <BubbleMenu
         editor={editor}
         options={{ placement: "top", offset: 8 }}
         className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg px-1 py-0.5"
-        onMouseDown={handleMouseDown}
-        onPointerDown={handleMouseDown}
+        onMouseDown={handleMenuMouseDown}
+        onPointerDown={handleMenuMouseDown}
       >
         <NoteBubbleToolbar editor={editor} />
       </BubbleMenu>
@@ -294,8 +291,8 @@ export function NoteBlock({ block, onUpdate, isEditable }: NoteBlockProps) {
         editor={editor}
         options={{ placement: "top", offset: 8 }}
         className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg px-1 py-0.5"
-        onMouseDown={handleMouseDown}
-        onPointerDown={handleMouseDown}
+        onMouseDown={handleMenuMouseDown}
+        onPointerDown={handleMenuMouseDown}
       >
         <NoteFloatingToolbar editor={editor} />
       </FloatingMenu>

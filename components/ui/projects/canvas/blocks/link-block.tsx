@@ -50,10 +50,6 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
     setLabel(c.label ?? "");
   }, [block.content]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-  }, []);
-
   const persistContent = useCallback((nextUrl: string, nextLabel: string) => {
     const normalizedUrl = normalizeUrl(nextUrl);
     const updates: Partial<CanvasBlock> = {
@@ -131,11 +127,7 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
       : null;
 
   return (
-    <div
-      className="h-full min-h-0 flex flex-col overflow-auto px-4 py-3"
-      onMouseDown={handleMouseDown}
-      onPointerDown={handleMouseDown}
-    >
+    <div className="h-full min-h-0 flex flex-col overflow-auto px-4 py-3">
       {/* Display row: icon + text + Open (when URL is set; when not editable show "No link" if empty) */}
       {content.url.trim() || !isEditable ? (
         <div className="flex items-center gap-2 min-w-0 flex-1">

@@ -42,10 +42,6 @@ export function TagBlock({ block, onUpdate, isEditable }: TagBlockProps) {
     setLabel(c.label);
   }, [block.content]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-  }, []);
-
   const persistContent = useCallback((nextLabel: string) => {
     const trimmed = nextLabel.trim();
     const updates: Partial<CanvasBlock> = {
@@ -74,11 +70,7 @@ export function TagBlock({ block, onUpdate, isEditable }: TagBlockProps) {
   const style = chipStyle(tagColor);
 
   return (
-    <div
-      className="h-full min-h-0 flex items-center overflow-auto px-4 py-3"
-      onMouseDown={handleMouseDown}
-      onPointerDown={handleMouseDown}
-    >
+    <div className="h-full min-h-0 flex items-center overflow-auto px-4 py-3">
       {!isEditable ? (
         /* Display: single chip only, no icon */
         <div

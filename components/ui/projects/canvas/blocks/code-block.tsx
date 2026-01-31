@@ -112,24 +112,16 @@ export function CodeBlock({ block, onUpdate, isEditable }: CodeBlockProps) {
     setLanguage(id);
   }, []);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-  }, []);
-
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    e.stopPropagation();
-  }, []);
-
   const currentLanguageLabel =
     CODE_BLOCK_LANGUAGES.find((l) => l.id === language)?.label ?? "JavaScript";
 
   return (
-    <div
-      className="flex h-full min-h-0 flex-col overflow-hidden"
-      onMouseDown={handleMouseDown}
-      onPointerDown={handlePointerDown}
-    >
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-slate-200 px-2 py-1.5 dark:border-slate-700">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden">
+      <div
+        className="flex shrink-0 items-center justify-between gap-2 border-b border-slate-200 px-2 py-1.5 dark:border-slate-700"
+        onMouseDown={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+      >
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <Button

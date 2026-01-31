@@ -81,8 +81,15 @@ export function CanvasBlock({
   zoomLevel,
   panOffset,
 }: CanvasBlockProps) {
+  const DRAG_THRESHOLD_PX = 8;
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [pendingDrag, setPendingDrag] = useState<{
+    startClientX: number;
+    startClientY: number;
+    offsetX: number;
+    offsetY: number;
+  } | null>(null);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleEditValue, setTitleEditValue] = useState("");
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -113,8 +120,8 @@ export function CanvasBlock({
     [isEditable, block.locked, block.title, block.type]
   );
 
-  const handleTitleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleTitleMouseDown = useCallback(() => {
+    // No stopPropagation so mousedown bubbles to block for drag-from-anywhere
   }, []);
 
   const saveTitleAndClose = useCallback(() => {
@@ -169,19 +176,20 @@ export function CanvasBlock({
       const worldX = (e.clientX - panOffset.x) / zoomLevel;
       const worldY = (e.clientY - panOffset.y) / zoomLevel;
 
-      // Calculate offset from block's world position
+      // Record pending drag; start real drag only after pointer moves past threshold
       const offsetX = worldX - block.x;
       const offsetY = worldY - block.y;
-
-      setIsDragging(true);
-      setDragStart({ x: offsetX, y: offsetY });
-      onDragStart();
+      setPendingDrag({
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+        offsetX,
+        offsetY,
+      });
     },
     [
       onSelect,
       isEditable,
       block.locked,
-      onDragStart,
       panOffset,
       zoomLevel,
       block.x,
@@ -191,19 +199,31 @@ export function CanvasBlock({
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (isDragging) {
-        // Convert screen coordinates to world coordinates
+      if (pendingDrag) {
+        const dx = e.clientX - pendingDrag.startClientX;
+        const dy = e.clientY - pendingDrag.startClientY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance > DRAG_THRESHOLD_PX) {
+          setDragStart({ x: pendingDrag.offsetX, y: pendingDrag.offsetY });
+          setIsDragging(true);
+          onDragStart();
+          setPendingDrag(null);
+          const el = typeof document !== "undefined" ? document.activeElement : null;
+          if (el && "blur" in el && typeof el.blur === "function") el.blur();
+
+          const worldX = (e.clientX - panOffset.x) / zoomLevel;
+          const worldY = (e.clientY - panOffset.y) / zoomLevel;
+          onUpdate({
+            x: worldX - pendingDrag.offsetX,
+            y: worldY - pendingDrag.offsetY,
+          });
+        }
+      } else if (isDragging) {
         const worldX = (e.clientX - panOffset.x) / zoomLevel;
         const worldY = (e.clientY - panOffset.y) / zoomLevel;
-
-        // Calculate new block position
         const newX = worldX - dragStart.x;
         const newY = worldY - dragStart.y;
-
-        onUpdate({
-          x: newX,
-          y: newY,
-        });
+        onUpdate({ x: newX, y: newY });
       } else if (isResizing) {
         const newWidth = Math.max(
           150,
@@ -213,25 +233,24 @@ export function CanvasBlock({
           100,
           e.clientY - resizeStart.y + resizeStart.height
         );
-
-        onUpdate({
-          width: newWidth,
-          height: newHeight,
-        });
+        onUpdate({ width: newWidth, height: newHeight });
       }
     },
     [
+      pendingDrag,
       isDragging,
       isResizing,
       dragStart,
       resizeStart,
       onUpdate,
+      onDragStart,
       panOffset,
       zoomLevel,
     ]
   );
 
   const handleMouseUp = useCallback(() => {
+    if (pendingDrag) setPendingDrag(null);
     if (isDragging) {
       setIsDragging(false);
       onDragEnd();
@@ -240,7 +259,7 @@ export function CanvasBlock({
       setIsResizing(false);
       onResizeEnd();
     }
-  }, [isDragging, isResizing, onDragEnd, onResizeEnd]);
+  }, [pendingDrag, isDragging, isResizing, onDragEnd, onResizeEnd]);
 
   const handleResizeStart = useCallback(
     (e: React.MouseEvent) => {
@@ -267,9 +286,9 @@ export function CanvasBlock({
     [onContextMenu]
   );
 
-  // Add global mouse event listeners when dragging or resizing
+  // Add global mouse event listeners when dragging, resizing, or pending drag
   useEffect(() => {
-    if (isDragging || isResizing) {
+    if (isDragging || isResizing || pendingDrag !== null) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
       return () => {
@@ -277,7 +296,7 @@ export function CanvasBlock({
         document.removeEventListener("mouseup", handleMouseUp);
       };
     }
-  }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
+  }, [isDragging, isResizing, pendingDrag, handleMouseMove, handleMouseUp]);
 
   const renderBlockContent = () => {
     const commonProps = {
