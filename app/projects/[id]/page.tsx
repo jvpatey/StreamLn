@@ -166,7 +166,7 @@ export default function ProjectCanvasPage() {
           : type === "link"
           ? 320
           : type === "tag"
-          ? 160
+          ? 240
           : 350,
       height:
         type === "note"
