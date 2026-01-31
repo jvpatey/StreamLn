@@ -471,8 +471,15 @@ export function CanvasBlock({
                     <DropdownMenu.Item
                       className={dropdownItemClass}
                       onSelect={() => {
-                        const url = `${typeof window !== "undefined" ? window.location.origin + window.location.pathname : ""}?block=${block.id}`;
-                        if (typeof navigator !== "undefined" && navigator.clipboard?.writeText)
+                        const url = `${
+                          typeof window !== "undefined"
+                            ? window.location.origin + window.location.pathname
+                            : ""
+                        }?block=${block.id}`;
+                        if (
+                          typeof navigator !== "undefined" &&
+                          navigator.clipboard?.writeText
+                        )
                           navigator.clipboard.writeText(url);
                       }}
                     >

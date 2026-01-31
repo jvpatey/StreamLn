@@ -244,8 +244,7 @@ export function NoteBlock({ block, onUpdate, isEditable }: NoteBlockProps) {
         const json = editor.getJSON() as NoteBlockContent;
         const firstLine = getFirstLineText(json);
         const currentTitle = blockRef.current?.title;
-        const titleUnset =
-          !currentTitle || currentTitle === "New Note";
+        const titleUnset = !currentTitle || currentTitle === "New Note";
         onUpdateRef.current(
           firstLine && titleUnset
             ? { content: json, title: firstLine }

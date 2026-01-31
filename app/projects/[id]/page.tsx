@@ -9,6 +9,7 @@ import { CanvasSidebar } from "@/components/ui/projects/canvas/canvas-sidebar";
 import { CanvasFloatingToolbar } from "@/components/ui/projects/canvas/canvas-floating-toolbar";
 import { CanvasHeader } from "@/components/ui/projects/canvas/canvas-header";
 import { DEFAULT_NOTE_CONTENT } from "@/components/ui/projects/canvas/blocks/note-defaults";
+import { DEFAULT_LINK_CONTENT } from "@/components/ui/projects/canvas/blocks/link-defaults";
 
 interface CanvasBlock {
   id: string;
@@ -154,8 +155,22 @@ export default function ProjectCanvasPage() {
       type: type as any,
       x: position.x,
       y: position.y,
-      width: type === "note" ? 300 : type === "task-board" ? 400 : 350,
-      height: type === "note" ? 200 : type === "task-board" ? 300 : 250,
+      width:
+        type === "note"
+          ? 300
+          : type === "task-board"
+            ? 400
+            : type === "link"
+              ? 320
+              : 350,
+      height:
+        type === "note"
+          ? 200
+          : type === "task-board"
+            ? 300
+            : type === "link"
+              ? 180
+              : 250,
       content: getDefaultContent(type),
       title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
       color: getDefaultColor(type),
@@ -225,6 +240,7 @@ export default function ProjectCanvasPage() {
 
   const getDefaultContent = (type: string) => {
     if (type === "note") return DEFAULT_NOTE_CONTENT;
+    if (type === "link") return DEFAULT_LINK_CONTENT;
     return {};
   };
 

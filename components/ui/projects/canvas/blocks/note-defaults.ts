@@ -40,17 +40,30 @@ export function getFirstLineText(doc: NoteBlockContent): string {
   if (!Array.isArray(content) || content.length === 0) return "";
 
   const first = content[0];
-  if (!first || typeof first !== "object" || (first as { type?: string }).type !== "paragraph")
+  if (
+    !first ||
+    typeof first !== "object" ||
+    (first as { type?: string }).type !== "paragraph"
+  )
     return "";
 
-  const paraContent = (first as { content?: Array<{ type?: string; text?: string }> }).content;
+  const paraContent = (
+    first as { content?: Array<{ type?: string; text?: string }> }
+  ).content;
   if (!Array.isArray(paraContent)) return "";
 
   const parts: string[] = [];
   for (const node of paraContent) {
-    if (node && typeof node === "object" && (node as { type?: string }).type === "text" && "text" in node)
+    if (
+      node &&
+      typeof node === "object" &&
+      (node as { type?: string }).type === "text" &&
+      "text" in node
+    )
       parts.push(String((node as { text: string }).text));
   }
   const line = parts.join("").trim();
-  return line.length > MAX_TITLE_LENGTH ? line.slice(0, MAX_TITLE_LENGTH) : line;
+  return line.length > MAX_TITLE_LENGTH
+    ? line.slice(0, MAX_TITLE_LENGTH)
+    : line;
 }
