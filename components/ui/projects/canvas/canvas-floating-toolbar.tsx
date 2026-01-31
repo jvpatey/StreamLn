@@ -4,6 +4,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/shared/button";
 import { getKeyboardShortcut } from "@/lib/utils";
 import {
+  LiquidGlassSurface,
+  getLiquidGlassSurfaceClassName,
+} from "@/components/ui/shared/liquid-glass-surface";
+import {
   Copy,
   Trash2,
   Palette,
@@ -56,7 +60,7 @@ export function CanvasFloatingToolbar({
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
 
   const selectedBlocksData = canvasBlocks.filter((block) =>
-    selectedBlocks.includes(block.id)
+    selectedBlocks.includes(block.id),
   );
 
   const hasMultipleBlocks = selectedBlocks.length > 1;
@@ -117,7 +121,7 @@ export function CanvasFloatingToolbar({
     if (!hasMultipleBlocks) return;
     const leftmost = Math.min(...selectedBlocksData.map((block) => block.x));
     const rightmost = Math.max(
-      ...selectedBlocksData.map((block) => block.x + block.width)
+      ...selectedBlocksData.map((block) => block.x + block.width),
     );
     const center = leftmost + (rightmost - leftmost) / 2;
 
@@ -132,7 +136,7 @@ export function CanvasFloatingToolbar({
   const handleAlignRight = () => {
     if (!hasMultipleBlocks) return;
     const rightmost = Math.max(
-      ...selectedBlocksData.map((block) => block.x + block.width)
+      ...selectedBlocksData.map((block) => block.x + block.width),
     );
     selectedBlocks.forEach((blockId) => {
       const block = selectedBlocksData.find((b) => b.id === blockId);
@@ -170,8 +174,11 @@ export function CanvasFloatingToolbar({
   };
 
   return (
-    <div
-      className="fixed z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg p-2 flex items-center space-x-1"
+    <LiquidGlassSurface
+      variant="toolbar"
+      intensity="xl"
+      rounded="xl"
+      className="fixed z-50 p-2 flex items-center space-x-1"
       style={{
         left: Math.min(adjustedPosition.x, window.innerWidth - 400),
         top: Math.max(64, adjustedPosition.y - 60),
@@ -214,7 +221,14 @@ export function CanvasFloatingToolbar({
         </Button>
 
         {colorPickerOpen && (
-          <div className="absolute bottom-full mb-2 left-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2 shadow-lg">
+          <div
+            className={getLiquidGlassSurfaceClassName({
+              variant: "popover",
+              intensity: "xl",
+              rounded: "lg",
+              className: "absolute bottom-full mb-2 left-0 p-2",
+            })}
+          >
             <div className="grid grid-cols-4 gap-1">
               {QUICK_COLORS.map((color) => (
                 <button
@@ -363,6 +377,6 @@ export function CanvasFloatingToolbar({
       <div className="text-xs text-slate-500 dark:text-slate-400 px-2">
         {selectedBlocks.length} selected
       </div>
-    </div>
+    </LiquidGlassSurface>
   );
 }

@@ -145,12 +145,16 @@ export function ProjectsContent({
               onOpenChange={setFilterPopoverOpen}
             >
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="backdrop-blur-md bg-white/50 dark:bg-slate-800/50 border border-white/30 dark:border-slate-700/30 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-white/40 dark:hover:border-slate-700/40 shadow-sm"
+                >
                   <Filter size={16} className="mr-2" />
                   Filter
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-4">
+              <PopoverContent className="w-auto p-4 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-white/30 dark:border-slate-700/30">
                 <FilterBar
                   sortBy={sortBy}
                   setSortBy={setSortBy}
@@ -165,6 +169,7 @@ export function ProjectsContent({
                 size="sm"
                 aria-label="Grid view"
                 onClick={() => setViewMode("grid")}
+                className={viewMode === "grid" ? "" : "backdrop-blur-md bg-white/50 dark:bg-slate-800/50 border border-white/30 dark:border-slate-700/30 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-white/40 dark:hover:border-slate-700/40 shadow-sm"}
               >
                 <Grid3x3 size={16} />
               </Button>
@@ -173,6 +178,7 @@ export function ProjectsContent({
                 size="sm"
                 aria-label="List view"
                 onClick={() => setViewMode("list")}
+                className={viewMode === "list" ? "" : "backdrop-blur-md bg-white/50 dark:bg-slate-800/50 border border-white/30 dark:border-slate-700/30 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-white/40 dark:hover:border-slate-700/40 shadow-sm"}
               >
                 <ListIcon size={16} />
               </Button>

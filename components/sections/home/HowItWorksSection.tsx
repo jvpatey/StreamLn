@@ -1,5 +1,10 @@
+"use client";
+
 import { Card } from "@/components/ui/shared/card";
 import { Badge } from "@/components/ui/shared/badge";
+import AnimatedSection from "@/components/ui/shared/animated-section";
+import AnimatedGridItem from "@/components/ui/shared/animated-grid-item";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
   FileText,
@@ -14,6 +19,8 @@ import {
 
 // How it works section component - explains the canvas-based developer workspace
 export default function HowItWorksSection() {
+  const shouldReduceMotion = useReducedMotion();
+  
   // Step data with styling and color configurations
   const steps = [
     {
@@ -70,42 +77,55 @@ export default function HowItWorksSection() {
     <section className="relative py-24 bg-slate-50 dark:bg-slate-950 overflow-hidden">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section header with badge and title */}
-        <div className="mx-auto max-w-4xl text-center">
-          <Badge variant="gradient" className="mb-6 px-4 py-2 text-sm group">
-            <Zap className="w-4 h-4 mr-2 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-yellow-500" />
-            Simple workflow
-          </Badge>
+        <AnimatedSection>
+          <div className="mx-auto max-w-4xl text-center">
+            <Badge variant="gradient" className="mb-6 px-4 py-2 text-sm group">
+              <Zap className="w-4 h-4 mr-2 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-yellow-500" />
+              Simple workflow
+            </Badge>
 
-          <h2 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl lg:text-6xl group cursor-pointer">
-            How{" "}
-            <span className="relative inline-block">
-              <span className="bg-gradient-to-r from-primary-500 via-primary-400 to-accent-500 bg-clip-text text-transparent transition-all duration-700 ease-out group-hover:animate-gradient-flow group-hover:scale-105">
-                StreamLn flows
+            <h2 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl lg:text-6xl group cursor-pointer">
+              How{" "}
+              <span className="relative inline-block">
+                <span className="bg-gradient-to-r from-primary-500 via-primary-400 to-accent-500 bg-clip-text text-transparent transition-all duration-300 ease-out group-hover:from-primary-400 group-hover:via-primary-300 group-hover:to-accent-400 group-hover:scale-[1.02] group-hover:tracking-wide">
+                  StreamLn flows
+                </span>
               </span>
-              {/* Animated glow effect on hover */}
-              <span className="pointer-events-none absolute -inset-2 bg-gradient-to-r from-primary-400 via-accent-500 to-primary-500 bg-clip-text text-transparent opacity-0 group-hover:opacity-30 blur-xl transition-all duration-700 ease-out select-none group-hover:scale-105 group-hover:animate-gradient-flow">
-                StreamLn flows
-              </span>
-            </span>
-          </h2>
+            </h2>
 
-          <p className="mt-8 text-xl leading-8 text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
-            Think, plan, and execute on a flexible 2D canvas. StreamLn combines
-            visual organization with powerful dev tools in one unified workspace
-            that adapts to your natural workflow.
-          </p>
-        </div>
+            <p className="mt-8 text-xl leading-8 text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+              Think, plan, and execute on a flexible 2D canvas. StreamLn combines
+              visual organization with powerful dev tools in one unified workspace
+              that adapts to your natural workflow.
+            </p>
+          </div>
+        </AnimatedSection>
 
         {/* Workflow steps grid - 3 columns on large screens */}
         <div className="mx-auto mt-20 grid max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3">
           {steps.map((step, index) => (
-            <div key={index} className="relative">
-              {/* Connecting arrow between steps - only visible on large screens */}
-              {index < steps.length - 1 && (
-                <div className="hidden lg:block absolute top-1/2 -right-4 z-10">
-                  <ArrowRight className="w-8 h-8 text-slate-300 dark:text-slate-600" />
-                </div>
-              )}
+            <AnimatedGridItem key={index} index={index} staggerDelay={0.15}>
+              <div className="relative">
+                {/* Connecting arrow between steps - only visible on large screens */}
+                {index < steps.length - 1 && (
+                  <motion.div
+                    className="hidden lg:block absolute top-1/2 -right-4 z-10"
+                    initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={
+                      shouldReduceMotion
+                        ? { duration: 0.01 }
+                        : {
+                            duration: 0.5,
+                            ease: "easeOut",
+                            delay: (index + 1) * 0.15 + 0.2,
+                          }
+                    }
+                  >
+                    <ArrowRight className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                  </motion.div>
+                )}
 
               {/* Step card with hover animations and cosmic effects */}
               <Card
@@ -168,17 +188,20 @@ export default function HowItWorksSection() {
                 {/* Subtle bottom glow line that appears on hover */}
                 <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cosmos-cosmic-light/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </Card>
-            </div>
+              </div>
+            </AnimatedGridItem>
           ))}
         </div>
 
         {/* Bottom CTA section */}
-        <div className="mt-16 text-center">
-          <Badge variant="gradient" className="group px-4 py-2 text-sm">
-            <Brain className="w-4 h-4 mr-2 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-yellow-500" />
-            Your canvas, your workflow - think, visualize, create
-          </Badge>
-        </div>
+        <AnimatedSection delay={0.3}>
+          <div className="mt-16 text-center">
+            <Badge variant="gradient" className="group px-4 py-2 text-sm">
+              <Brain className="w-4 h-4 mr-2 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:text-yellow-500" />
+              Your canvas, your workflow - think, visualize, create
+            </Badge>
+          </div>
+        </AnimatedSection>
       </div>
     </section>
   );

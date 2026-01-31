@@ -46,7 +46,7 @@ export function CommandPaletteHeader({
           </p>
         </div>
       </div>
-      {searchMode || browseMode ? (
+      {(searchMode || browseMode) && (
         <Button
           variant="ghost"
           size="icon"
@@ -56,10 +56,6 @@ export function CommandPaletteHeader({
         >
           <ArrowLeft size={18} />
         </Button>
-      ) : (
-        <Badge variant="outline" className="hidden sm:flex">
-          Projects
-        </Badge>
       )}
     </div>
   );

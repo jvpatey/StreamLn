@@ -4,6 +4,8 @@
 // Used in: app/projects/page.tsx
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
+import { LiquidGlassSurface } from "@/components/ui/shared/liquid-glass-surface";
+import { LiquidGlassButton } from "@/components/ui/shared/liquid-glass-button";
 import { getKeyboardShortcut } from "@/lib/utils";
 import { Search, FileText, Zap, X, Sparkles } from "lucide-react";
 import { CreateProjectButton } from "../project-content/create-project/create-project-button";
@@ -24,10 +26,14 @@ export function ProjectsSidebar({
   return (
     <>
       {/* Collapsible Sidebar - Hidden on mobile */}
-      <div
+      <LiquidGlassSurface
+        variant="panel"
+        intensity="2xl"
         className={`${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed lg:relative lg:translate-x-0 z-50 w-72 h-screen bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-800/50 transition-transform duration-300 ease-in-out overflow-y-auto hidden lg:block`}
+        } fixed lg:relative lg:translate-x-0 z-50 w-72 
+        lg:rounded-[24px] lg:mt-2 lg:mb-2 lg:ml-2 lg:h-[calc(100%-1rem)] lg:max-h-[calc(100%-1rem)]
+        transition-transform duration-300 ease-in-out overflow-y-auto hidden lg:block`}
       >
         <div className="p-6">
           {/* Welcome Section */}
@@ -48,23 +54,36 @@ export function ProjectsSidebar({
               className="mb-4 w-full"
             />
 
-            <div className="bg-slate-50/60 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 rounded-lg p-4 space-y-3">
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-between h-10 px-3 font-medium"
+            <LiquidGlassSurface
+              variant="panel"
+              intensity="xl"
+              rounded="2xl"
+              className="p-4 space-y-3 bg-gradient-to-br from-primary-500/10 via-primary-400/15 to-accent-500/10 dark:from-primary-500/6 dark:via-primary-400/10 dark:to-accent-500/6"
+            >
+              <LiquidGlassButton
+                gradient="primary"
+                className="w-full flex items-center justify-between h-10 px-3 font-medium rounded-full"
                 onClick={onCommandPaletteOpen}
               >
                 <span className="flex items-center">
                   <Sparkles size={16} className="mr-2 text-primary-500" />
                   Quick Actions
                 </span>
-                <Badge variant="outline" className="text-xs flex-shrink-0">
+                <Badge
+                  variant="glass"
+                  className="text-xs flex-shrink-0 px-2 py-1"
+                >
                   {getKeyboardShortcut("⌘K")}
                 </Badge>
-              </Button>
+              </LiquidGlassButton>
 
               {/* Pro tip */}
-              <div className="p-3 rounded-lg bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50">
+              <LiquidGlassSurface
+                variant="panel"
+                intensity="md"
+                rounded="2xl"
+                className="p-3 bg-white/20 dark:bg-slate-800/15"
+              >
                 <div className="flex items-start space-x-3">
                   <div className="p-2 rounded-md bg-blue-50 dark:bg-blue-900/30">
                     <Zap
@@ -86,11 +105,11 @@ export function ProjectsSidebar({
                     </p>
                   </div>
                 </div>
-              </div>
-            </div>
+              </LiquidGlassSurface>
+            </LiquidGlassSurface>
           </div>
         </div>
-      </div>
+      </LiquidGlassSurface>
     </>
   );
 }

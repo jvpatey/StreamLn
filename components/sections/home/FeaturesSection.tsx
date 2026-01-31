@@ -1,4 +1,8 @@
+"use client";
+
 import FeatureCard from "@/components/ui/home/FeatureCard";
+import AnimatedSection from "@/components/ui/shared/animated-section";
+import AnimatedGridItem from "@/components/ui/shared/animated-grid-item";
 import {
   Move,
   Layers,
@@ -84,61 +88,62 @@ export default function FeaturesSection() {
     <section className="py-24 bg-white dark:bg-slate-800">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section header with gradient text */}
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl lg:text-6xl group cursor-pointer">
-            Canvas{" "}
-            <span className="relative inline-block">
-              <span className="bg-gradient-to-r from-primary-500 via-primary-400 to-accent-500 bg-clip-text text-transparent transition-all duration-700 ease-out group-hover:animate-gradient-flow group-hover:scale-105">
-                superpowers
+        <AnimatedSection>
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl lg:text-6xl group cursor-pointer">
+              Canvas{" "}
+              <span className="relative inline-block">
+                <span className="bg-gradient-to-r from-primary-500 via-primary-400 to-accent-500 bg-clip-text text-transparent transition-all duration-300 ease-out group-hover:from-primary-400 group-hover:via-primary-300 group-hover:to-accent-400 group-hover:scale-[1.02] group-hover:tracking-wide">
+                  superpowers
+                </span>
               </span>
-              {/* Animated glow effect on hover */}
-              <span className="pointer-events-none absolute -inset-2 bg-gradient-to-r from-primary-400 via-accent-500 to-primary-500 bg-clip-text text-transparent opacity-0 group-hover:opacity-30 blur-xl transition-all duration-700 ease-out select-none group-hover:scale-105 group-hover:animate-gradient-flow">
-                superpowers
-              </span>
-            </span>
-          </h2>
-          <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-300">
-            Everything you need to think, plan, and execute on a flexible visual
-            workspace designed specifically for developers.
-          </p>
-        </div>
+            </h2>
+            <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-300">
+              Everything you need to think, plan, and execute on a flexible visual
+              workspace designed specifically for developers.
+            </p>
+          </div>
+        </AnimatedSection>
 
         {/* Main features grid - 3 columns on large screens */}
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-8">
           {mainFeatures.map((feature, index) => (
-            <FeatureCard
-              key={index}
-              title={feature.title}
-              description={feature.description}
-              icon={feature.icon}
-              highlight={feature.highlight}
-            />
+            <AnimatedGridItem key={index} index={index} staggerDelay={0.1}>
+              <FeatureCard
+                title={feature.title}
+                description={feature.description}
+                icon={feature.icon}
+                highlight={feature.highlight}
+              />
+            </AnimatedGridItem>
           ))}
         </div>
 
         {/* Additional features grid - 2 columns on large screens */}
         <div className="mx-auto mt-8 grid max-w-2xl grid-cols-1 gap-6 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:gap-8">
           {additionalFeatures.map((feature, index) => (
-            <FeatureCard
-              key={index}
-              title={feature.title}
-              description={feature.description}
-              icon={feature.icon}
-              highlight={feature.highlight}
-            />
+            <AnimatedGridItem key={index} index={index} staggerDelay={0.1}>
+              <FeatureCard
+                title={feature.title}
+                description={feature.description}
+                icon={feature.icon}
+                highlight={feature.highlight}
+              />
+            </AnimatedGridItem>
           ))}
         </div>
 
         {/* Power features grid - 3 columns on large screens */}
         <div className="mx-auto mt-8 grid max-w-2xl grid-cols-1 gap-6 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-8">
           {powerFeatures.map((feature, index) => (
-            <FeatureCard
-              key={index}
-              title={feature.title}
-              description={feature.description}
-              icon={feature.icon}
-              highlight={feature.highlight}
-            />
+            <AnimatedGridItem key={index} index={index} staggerDelay={0.1}>
+              <FeatureCard
+                title={feature.title}
+                description={feature.description}
+                icon={feature.icon}
+                highlight={feature.highlight}
+              />
+            </AnimatedGridItem>
           ))}
         </div>
       </div>
