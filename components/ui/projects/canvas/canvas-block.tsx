@@ -71,6 +71,8 @@ export function CanvasBlock({
 }: CanvasBlockProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [titleEditValue, setTitleEditValue] = useState("");
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [resizeStart, setResizeStart] = useState({
     x: 0,
@@ -79,6 +81,43 @@ export function CanvasBlock({
     height: 0,
   });
   const blockRef = useRef<HTMLDivElement>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+
+  const getDisplayTitle = () =>
+    block.title ||
+    `${block.type.charAt(0).toUpperCase() + block.type.slice(1)}`;
+
+  const handleTitleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!isEditable || block.locked) return;
+      setTitleEditValue(getDisplayTitle());
+      setIsEditingTitle(true);
+    },
+    [isEditable, block.locked, block.title, block.type]
+  );
+
+  const handleTitleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
+
+  const saveTitleAndClose = useCallback(() => {
+    const trimmed = titleEditValue.trim();
+    onUpdate({ title: trimmed || undefined });
+    setIsEditingTitle(false);
+  }, [titleEditValue, onUpdate]);
+
+  const discardTitleEdit = useCallback(() => {
+    setTitleEditValue(getDisplayTitle());
+    setIsEditingTitle(false);
+  }, [block.title, block.type]);
+
+  useEffect(() => {
+    if (isEditingTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
+  }, [isEditingTitle]);
 
   const getBlockIcon = () => {
     switch (block.type) {
@@ -300,11 +339,36 @@ export function CanvasBlock({
             >
               <div style={{ color: getBlockColor() }}>{getBlockIcon()}</div>
             </div>
-            <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
-                {block.title ||
-                  `${block.type.charAt(0).toUpperCase() + block.type.slice(1)}`}
-              </span>
+            <div
+              className="flex flex-col min-w-0 flex-1"
+              onDoubleClick={handleTitleDoubleClick}
+              onMouseDown={handleTitleMouseDown}
+              onPointerDown={handleTitleMouseDown}
+            >
+              {isEditingTitle ? (
+                <input
+                  ref={titleInputRef}
+                  type="text"
+                  value={titleEditValue}
+                  onChange={(e) => setTitleEditValue(e.target.value)}
+                  onBlur={saveTitleAndClose}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      saveTitleAndClose();
+                    } else if (e.key === "Escape") {
+                      e.preventDefault();
+                      discardTitleEdit();
+                    }
+                  }}
+                  className="w-full text-sm font-semibold text-slate-800 dark:text-slate-200 bg-transparent border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-primary dark:focus:ring-primary"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              ) : (
+                <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
+                  {getDisplayTitle()}
+                </span>
+              )}
               <span className="text-xs text-slate-500 dark:text-slate-400 capitalize">
                 {block.type} block
               </span>

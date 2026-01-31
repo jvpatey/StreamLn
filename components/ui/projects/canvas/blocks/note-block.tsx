@@ -7,6 +7,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
   getNoteContent,
+  getFirstLineText,
   type NoteBlockContent,
 } from "./note-defaults";
 import type { Editor } from "@tiptap/core";
@@ -89,6 +90,8 @@ interface NoteBlockProps {
 
 export function NoteBlock({ block, onUpdate, isEditable }: NoteBlockProps) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const blockRef = useRef(block);
+  blockRef.current = block;
   const initialContent = useMemo(
     () => getNoteContent(block.content),
     [block.content]
@@ -123,7 +126,15 @@ export function NoteBlock({ block, onUpdate, isEditable }: NoteBlockProps) {
       debounceRef.current = setTimeout(() => {
         debounceRef.current = null;
         const json = editor.getJSON() as NoteBlockContent;
-        onUpdateRef.current({ content: json });
+        const firstLine = getFirstLineText(json);
+        const currentTitle = blockRef.current?.title;
+        const titleUnset =
+          !currentTitle || currentTitle === "New Note";
+        onUpdateRef.current(
+          firstLine && titleUnset
+            ? { content: json, title: firstLine }
+            : { content: json }
+        );
       }, DEBOUNCE_MS);
     };
 
