@@ -160,3 +160,21 @@
     animation: shimmer 2s infinite;
   }
 }
+
+/* Note block Tiptap editor (canvas) */
+.note-block-editor.ProseMirror {
+  outline: none;
+}
+.note-block-editor.ProseMirror p {
+  margin: 0.25em 0;
+}
+.note-block-editor.ProseMirror p:first-child {
+  margin-top: 0;
+}
+.note-block-editor.ProseMirror p.is-editor-empty:first-child::before {
+  color: hsl(var(--muted-foreground));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

@@ -8,6 +8,7 @@ import { CanvasWorkspace } from "@/components/ui/projects/canvas/canvas-workspac
 import { CanvasSidebar } from "@/components/ui/projects/canvas/canvas-sidebar";
 import { CanvasFloatingToolbar } from "@/components/ui/projects/canvas/canvas-floating-toolbar";
 import { CanvasHeader } from "@/components/ui/projects/canvas/canvas-header";
+import { DEFAULT_NOTE_CONTENT } from "@/components/ui/projects/canvas/blocks/note-defaults";
 
 interface CanvasBlock {
   id: string;
@@ -203,7 +204,7 @@ export default function ProjectCanvasPage() {
   };
 
   const getDefaultContent = (type: string) => {
-    // All blocks are placeholders for now
+    if (type === "note") return DEFAULT_NOTE_CONTENT;
     return {};
   };
 
