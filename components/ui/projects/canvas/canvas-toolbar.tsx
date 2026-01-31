@@ -9,6 +9,8 @@ import {
   ZoomOut,
   Maximize2,
   Grid3x3,
+  PanelLeftClose,
+  PanelLeftOpen,
   MousePointer,
   Hand,
   Square,
@@ -53,6 +55,8 @@ interface CanvasToolbarProps {
   showGrid: boolean;
   onGridToggle: () => void;
   onResetView: () => void;
+  sidebarOpen?: boolean;
+  onSidebarToggle?: () => void;
   canvasBlocks: CanvasBlock[];
   selectedBlocks: string[];
   onDeleteSelected: () => void;
@@ -65,6 +69,8 @@ export function CanvasToolbar({
   showGrid,
   onGridToggle,
   onResetView,
+  sidebarOpen = true,
+  onSidebarToggle,
   canvasBlocks,
   selectedBlocks,
   onDeleteSelected,
@@ -238,6 +244,22 @@ export function CanvasToolbar({
 
         {/* View Options */}
         <div className="flex items-center space-x-1 pr-3 border-r border-slate-200 dark:border-slate-700">
+          {onSidebarToggle && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onSidebarToggle}
+              title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+              aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+              className="h-8 w-8 p-0"
+            >
+              {sidebarOpen ? (
+                <PanelLeftClose size={14} />
+              ) : (
+                <PanelLeftOpen size={14} />
+              )}
+            </Button>
+          )}
           <Button
             variant={showGrid ? "default" : "ghost"}
             size="sm"

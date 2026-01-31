@@ -18,7 +18,7 @@ import {
   Settings,
   Search,
   Plus,
-  X,
+  PanelLeftClose,
   Eye,
   EyeOff,
   Lock,
@@ -419,14 +419,18 @@ export function CanvasSidebar({
     </div>
   );
 
-  if (!isOpen) return null;
-
   return (
-    <LiquidGlassSurface
-      variant="panel"
-      intensity="xl"
-      className="w-80 h-full flex flex-col border-r border-white/30 dark:border-white/15"
+    <div
+      className={`flex-shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out ${
+        isOpen ? "w-80" : "w-0"
+      }`}
     >
+      <div className="w-80 h-full min-w-80">
+        <LiquidGlassSurface
+          variant="panel"
+          intensity="xl"
+          className="w-80 h-full flex flex-col border-r border-white/30 dark:border-white/15"
+        >
       {/* Header */}
       <LiquidGlassSurface
         variant="panel"
@@ -442,9 +446,11 @@ export function CanvasSidebar({
           variant="ghost"
           size="sm"
           onClick={onClose}
-          className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full lg:hidden"
+          title="Hide sidebar"
+          aria-label="Hide sidebar"
+          className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full"
         >
-          <X size={16} />
+          <PanelLeftClose size={16} />
         </Button>
       </LiquidGlassSurface>
 
@@ -599,6 +605,8 @@ export function CanvasSidebar({
         {activeTab === "layers" && renderLayersTab()}
         {activeTab === "properties" && renderPropertiesTab()}
       </div>
-    </LiquidGlassSurface>
+        </LiquidGlassSurface>
+      </div>
+    </div>
   );
 }
