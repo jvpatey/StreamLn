@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/shared/liquid-glass-surface";
 import {
   FileText,
-  Maximize2,
+  Kanban,
   Code2,
   Image,
   Link,
@@ -65,7 +65,7 @@ const BLOCK_TYPES = [
     type: "task-board",
     label: "Task Board",
     description: "Kanban-style task management",
-    icon: Maximize2,
+    icon: Kanban,
     color: "#10b981",
   },
   {

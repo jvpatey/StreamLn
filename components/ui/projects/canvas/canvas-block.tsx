@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import {
   FileText,
-  Maximize2,
+  Kanban,
   Code2,
   Image,
   Link,
@@ -147,7 +147,7 @@ export function CanvasBlock({
       case "note":
         return <FileText size={12} />;
       case "task-board":
-        return <Maximize2 size={12} />;
+        return <Kanban size={12} />;
       case "code":
         return <Code2 size={12} />;
       case "image":
@@ -657,9 +657,10 @@ export function CanvasBlock({
           <>
             {/* Resize Handle */}
             <div
-              className="absolute bottom-0 right-0 w-4 h-4 bg-primary cursor-se-resize opacity-80 hover:opacity-100"
+              className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize opacity-80 hover:opacity-100"
               style={{
                 clipPath: "polygon(100% 0%, 0% 100%, 100% 100%)",
+                backgroundColor: getBlockColor(),
               }}
               onMouseDown={handleResizeStart}
             />
