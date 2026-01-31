@@ -102,13 +102,13 @@ export function CanvasBlock({
   const blockRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
 
-  const getDisplayTitle = () => {
+  const getDisplayTitle = useCallback(() => {
     if (block.type === "tag") return "Tag";
     return (
       block.title ||
       `${block.type.charAt(0).toUpperCase() + block.type.slice(1)}`
     );
-  };
+  }, [block.title, block.type]);
 
   const handleTitleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
@@ -117,7 +117,7 @@ export function CanvasBlock({
       setTitleEditValue(getDisplayTitle());
       setIsEditingTitle(true);
     },
-    [isEditable, block.locked, block.title, block.type]
+    [isEditable, block.locked, getDisplayTitle]
   );
 
   const handleTitleMouseDown = useCallback(() => {
@@ -133,7 +133,7 @@ export function CanvasBlock({
   const discardTitleEdit = useCallback(() => {
     setTitleEditValue(getDisplayTitle());
     setIsEditingTitle(false);
-  }, [block.title, block.type]);
+  }, [getDisplayTitle]);
 
   useEffect(() => {
     if (isEditingTitle && titleInputRef.current) {

@@ -11,7 +11,7 @@ import { CanvasHeader } from "@/components/ui/projects/canvas/canvas-header";
 import { DEFAULT_NOTE_CONTENT } from "@/components/ui/projects/canvas/blocks/note-defaults";
 import { DEFAULT_LINK_CONTENT } from "@/components/ui/projects/canvas/blocks/link-defaults";
 import { DEFAULT_TAG_CONTENT } from "@/components/ui/projects/canvas/blocks/tag-defaults";
-import { DEFAULT_TASK_BOARD_CONTENT } from "@/components/ui/projects/canvas/blocks/task-board-defaults";
+import { getDefaultTaskBoardContent } from "@/components/ui/projects/canvas/blocks/task-board-defaults";
 import { PanelLeftOpen } from "lucide-react";
 
 interface CanvasBlock {
@@ -37,6 +37,13 @@ interface Project {
   userId: string;
   createdAt: string;
   updatedAt: string;
+}
+
+function generateBlockId(type: string): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return `${type}-${crypto.randomUUID()}`;
+  }
+  return `${type}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 export default function ProjectCanvasPage() {
@@ -154,7 +161,7 @@ export default function ProjectCanvasPage() {
   // Canvas block manipulation functions
   const addBlock = (type: string, position: { x: number; y: number }) => {
     const newBlock: CanvasBlock = {
-      id: `${type}-${Date.now()}`,
+      id: generateBlockId(type),
       type: type as any,
       x: position.x,
       y: position.y,
@@ -214,7 +221,7 @@ export default function ProjectCanvasPage() {
 
     const clonedBlocks = blocksToClone.map((block) => ({
       ...block,
-      id: `${block.type}-${Date.now()}-${Math.random()}`,
+      id: generateBlockId(block.type),
       x: block.x + 20,
       y: block.y + 20,
       createdAt: new Date(),
@@ -235,7 +242,7 @@ export default function ProjectCanvasPage() {
     if (!block) return;
     const cloned = {
       ...block,
-      id: `${block.type}-${Date.now()}-${Math.random()}`,
+      id: generateBlockId(block.type),
       x: block.x + 20,
       y: block.y + 20,
       createdAt: new Date(),
@@ -249,7 +256,7 @@ export default function ProjectCanvasPage() {
     if (type === "note") return DEFAULT_NOTE_CONTENT;
     if (type === "link") return DEFAULT_LINK_CONTENT;
     if (type === "tag") return DEFAULT_TAG_CONTENT;
-    if (type === "task-board") return DEFAULT_TASK_BOARD_CONTENT;
+    if (type === "task-board") return getDefaultTaskBoardContent();
     return {};
   };
 

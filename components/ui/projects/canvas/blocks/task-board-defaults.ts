@@ -34,8 +34,9 @@ function createDefaultContent(): TaskBoardContent {
 }
 
 /** Default content for new task board blocks: one board with blank title. */
-export const DEFAULT_TASK_BOARD_CONTENT: TaskBoardContent =
-  createDefaultContent();
+export function getDefaultTaskBoardContent(): TaskBoardContent {
+  return createDefaultContent();
+}
 
 /**
  * Returns valid task board content from unknown value.

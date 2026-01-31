@@ -173,7 +173,9 @@ export function CanvasSidebar({
               const handleLayerClick = (e: React.MouseEvent) => {
                 if (e.metaKey || e.ctrlKey) {
                   if (selectedBlocks.includes(block.id)) {
-                    onBlockSelect(selectedBlocks.filter((id) => id !== block.id));
+                    onBlockSelect(
+                      selectedBlocks.filter((id) => id !== block.id)
+                    );
                   } else {
                     onBlockSelect([...selectedBlocks, block.id]);
                   }
@@ -269,7 +271,7 @@ export function CanvasSidebar({
         isOpen ? "w-80" : "w-0"
       }`}
     >
-      <div className="w-80 h-full min-w-80">
+      <div className="w-80 h-full">
         <LiquidGlassSurface
           variant="panel"
           intensity="xl"

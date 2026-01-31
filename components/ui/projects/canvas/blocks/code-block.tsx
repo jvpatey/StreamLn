@@ -52,6 +52,7 @@ export function CodeBlock({ block, onUpdate, isEditable }: CodeBlockProps) {
   const [code, setCode] = useState(content.code);
   const [language, setLanguage] = useState(content.language ?? "javascript");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipNextPersistRef = useRef(false);
   const onUpdateRef = useRef(onUpdate);
   onUpdateRef.current = onUpdate;
 
@@ -66,28 +67,38 @@ export function CodeBlock({ block, onUpdate, isEditable }: CodeBlockProps) {
     [language]
   );
 
+  // Only add tooltips after mount so SSR and initial client render use the same extensions (avoids hydration mismatch)
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const extensions = useMemo<Extension[]>(() => {
     const exts: Extension[] = [themeExtension];
     if (languageExtension) exts.push(languageExtension);
-    // Render tooltips (e.g. autocomplete) in document.body so they aren't clipped by overflow
-    if (typeof document !== "undefined") {
+    if (isMounted && typeof document !== "undefined") {
       exts.push(tooltips({ parent: document.body }));
     }
     return exts;
-  }, [themeExtension, languageExtension]);
+  }, [themeExtension, languageExtension, isMounted]);
 
   // Sync from block when content changes externally
   useEffect(() => {
     const c = getCodeContent(block.content);
+    skipNextPersistRef.current = true;
     setCode(c.code);
     setLanguage(c.language ?? "javascript");
   }, [block.content]);
 
-  // Debounced persist on code or language change
+  // Debounced persist on code or language change (skip when change came from external sync)
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       debounceRef.current = null;
+      if (skipNextPersistRef.current) {
+        skipNextPersistRef.current = false;
+        return;
+      }
       const payload: CodeBlockContent = {
         code,
         language: language || "javascript",

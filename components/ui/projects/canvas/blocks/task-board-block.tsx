@@ -357,6 +357,7 @@ export function TaskBoardBlock({
   const content = getTaskBoardContent(block.content);
   const [localContent, setLocalContent] = useState(content);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const contentRef = useRef(localContent);
   const clonedContentRef = useRef<TaskBoardContent | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -367,6 +368,10 @@ export function TaskBoardBlock({
 
   contentRef.current = localContent;
   onUpdateRef.current = onUpdate;
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const next = getTaskBoardContent(block.content);
@@ -660,7 +665,8 @@ export function TaskBoardBlock({
           )}
         </div>
 
-        {typeof document !== "undefined" &&
+        {isMounted &&
+          typeof document !== "undefined" &&
           createPortal(
             <DragOverlay dropAnimation={dropAnimation}>
               {activeId && localContent.cards[activeId as string] ? (

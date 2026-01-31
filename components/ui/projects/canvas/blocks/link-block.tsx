@@ -22,6 +22,21 @@ interface LinkBlockProps {
   isEditable: boolean;
 }
 
+const DANGEROUS_URL_SCHEMES = [
+  "javascript",
+  "data",
+  "vbscript",
+  "file",
+  "blob",
+];
+
+function hasDangerousScheme(url: string): boolean {
+  const i = url.indexOf(":");
+  if (i === -1) return false;
+  const scheme = url.slice(0, i).trim().toLowerCase();
+  return DANGEROUS_URL_SCHEMES.includes(scheme);
+}
+
 function isValidHttpUrl(url: string): boolean {
   const trimmed = url.trim();
   return trimmed.startsWith("http://") || trimmed.startsWith("https://");
@@ -30,6 +45,7 @@ function isValidHttpUrl(url: string): boolean {
 function normalizeUrl(url: string): string {
   const trimmed = url.trim();
   if (!trimmed) return "";
+  if (hasDangerousScheme(trimmed)) return "";
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://"))
     return trimmed;
   return `https://${trimmed}`;
@@ -101,18 +117,13 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
     (e: React.ClipboardEvent<HTMLInputElement>) => {
       const pasted = e.clipboardData.getData("text").trim();
       if (!pasted) return;
+      if (hasDangerousScheme(pasted)) return;
       try {
         new URL(pasted.startsWith("http") ? pasted : `https://${pasted}`);
-        setUrl(pasted.startsWith("http") ? pasted : `https://${pasted}`);
+        const normalized = pasted.startsWith("http") ? pasted : `https://${pasted}`;
+        setUrl(normalized);
         e.preventDefault();
-        setTimeout(
-          () =>
-            persistContent(
-              pasted.startsWith("http") ? pasted : `https://${pasted}`,
-              label
-            ),
-          0
-        );
+        setTimeout(() => persistContent(normalized, label), 0);
       } catch {
         // not a URL, allow default paste
       }

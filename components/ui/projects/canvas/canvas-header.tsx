@@ -153,6 +153,8 @@ export function CanvasHeader({
 
             {/* Center section - View Mode Toggle */}
             <div
+              role="radiogroup"
+              aria-label="View mode"
               className={cn(
                 "hidden md:flex items-center p-1 gap-0.5 relative",
                 getLiquidGlassSurfaceClassName({
@@ -182,6 +184,8 @@ export function CanvasHeader({
               />
               <button
                 type="button"
+                role="radio"
+                aria-checked={viewMode === "edit"}
                 onClick={() => onViewModeChange("edit")}
                 className={cn(
                   "relative z-10 text-xs rounded-xl h-9 w-24 flex items-center justify-center font-medium transition-colors duration-200",
@@ -195,6 +199,8 @@ export function CanvasHeader({
               </button>
               <button
                 type="button"
+                role="radio"
+                aria-checked={viewMode === "present"}
                 onClick={() => onViewModeChange("present")}
                 className={cn(
                   "relative z-10 text-xs rounded-xl h-9 w-24 flex items-center justify-center font-medium transition-colors duration-200",
@@ -301,8 +307,15 @@ export function CanvasHeader({
                 >
                   <div className="space-y-1">
                     {/* Mobile View Mode Toggle */}
-                    <div className="md:hidden space-y-1 pb-2 border-b border-slate-200 dark:border-slate-700 mb-2">
+                    <div
+                      role="radiogroup"
+                      aria-label="View mode"
+                      className="md:hidden space-y-1 pb-2 border-b border-slate-200 dark:border-slate-700 mb-2"
+                    >
                       <button
+                        type="button"
+                        role="radio"
+                        aria-checked={viewMode === "edit"}
                         onClick={() => {
                           onViewModeChange("edit");
                           setMenuOpen(false);
@@ -317,6 +330,9 @@ export function CanvasHeader({
                         Edit Mode
                       </button>
                       <button
+                        type="button"
+                        role="radio"
+                        aria-checked={viewMode === "present"}
                         onClick={() => {
                           onViewModeChange("present");
                           setMenuOpen(false);
