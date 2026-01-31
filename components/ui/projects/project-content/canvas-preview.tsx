@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/shared/card";
 import {
   FileText,
-  Maximize2,
+  Kanban,
   Layers,
   Users,
   Clock,
@@ -122,7 +122,7 @@ export function CanvasPreview({
         );
       case "board":
         return (
-          <Maximize2
+          <Kanban
             size={16}
             className="text-primary-600 dark:text-primary-400"
           />
@@ -198,7 +198,7 @@ export function CanvasPreview({
                   />
                 )}
                 {block.type === "task-board" && (
-                  <Maximize2
+                  <Kanban
                     size={8}
                     className="text-accent-600 dark:text-accent-400"
                   />

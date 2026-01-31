@@ -8,6 +8,12 @@ import { CanvasWorkspace } from "@/components/ui/projects/canvas/canvas-workspac
 import { CanvasSidebar } from "@/components/ui/projects/canvas/canvas-sidebar";
 import { CanvasFloatingToolbar } from "@/components/ui/projects/canvas/canvas-floating-toolbar";
 import { CanvasHeader } from "@/components/ui/projects/canvas/canvas-header";
+import { DEFAULT_NOTE_CONTENT } from "@/components/ui/projects/canvas/blocks/note-defaults";
+import { DEFAULT_LINK_CONTENT } from "@/components/ui/projects/canvas/blocks/link-defaults";
+import { DEFAULT_TAG_CONTENT } from "@/components/ui/projects/canvas/blocks/tag-defaults";
+import { getDefaultTaskBoardContent } from "@/components/ui/projects/canvas/blocks/task-board-defaults";
+import { DEFAULT_CODE_CONTENT } from "@/components/ui/projects/canvas/blocks/code-defaults";
+import { PanelLeftOpen } from "lucide-react";
 
 interface CanvasBlock {
   id: string;
@@ -32,6 +38,13 @@ interface Project {
   userId: string;
   createdAt: string;
   updatedAt: string;
+}
+
+function generateBlockId(type: string): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return `${type}-${crypto.randomUUID()}`;
+  }
+  return `${type}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 export default function ProjectCanvasPage() {
@@ -149,12 +162,30 @@ export default function ProjectCanvasPage() {
   // Canvas block manipulation functions
   const addBlock = (type: string, position: { x: number; y: number }) => {
     const newBlock: CanvasBlock = {
-      id: `${type}-${Date.now()}`,
+      id: generateBlockId(type),
       type: type as any,
       x: position.x,
       y: position.y,
-      width: type === "note" ? 300 : type === "task-board" ? 400 : 350,
-      height: type === "note" ? 200 : type === "task-board" ? 300 : 250,
+      width:
+        type === "note"
+          ? 300
+          : type === "task-board"
+          ? 480
+          : type === "link"
+          ? 320
+          : type === "tag"
+          ? 240
+          : 350,
+      height:
+        type === "note"
+          ? 200
+          : type === "task-board"
+          ? 320
+          : type === "link"
+          ? 180
+          : type === "tag"
+          ? 56
+          : 250,
       content: getDefaultContent(type),
       title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
       color: getDefaultColor(type),
@@ -191,7 +222,7 @@ export default function ProjectCanvasPage() {
 
     const clonedBlocks = blocksToClone.map((block) => ({
       ...block,
-      id: `${block.type}-${Date.now()}-${Math.random()}`,
+      id: generateBlockId(block.type),
       x: block.x + 20,
       y: block.y + 20,
       createdAt: new Date(),
@@ -202,8 +233,32 @@ export default function ProjectCanvasPage() {
     setSelectedBlocks(clonedBlocks.map((block) => block.id));
   };
 
+  const deleteBlock = (id: string) => {
+    setCanvasBlocks((prev) => prev.filter((block) => block.id !== id));
+    setSelectedBlocks((prev) => prev.filter((blockId) => blockId !== id));
+  };
+
+  const duplicateBlock = (id: string) => {
+    const block = canvasBlocks.find((b) => b.id === id);
+    if (!block) return;
+    const cloned = {
+      ...block,
+      id: generateBlockId(block.type),
+      x: block.x + 20,
+      y: block.y + 20,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    setCanvasBlocks((prev) => [...prev, cloned]);
+    setSelectedBlocks([cloned.id]);
+  };
+
   const getDefaultContent = (type: string) => {
-    // All blocks are placeholders for now
+    if (type === "note") return DEFAULT_NOTE_CONTENT;
+    if (type === "link") return DEFAULT_LINK_CONTENT;
+    if (type === "tag") return DEFAULT_TAG_CONTENT;
+    if (type === "task-board") return getDefaultTaskBoardContent();
+    if (type === "code") return DEFAULT_CODE_CONTENT;
     return {};
   };
 
@@ -269,6 +324,18 @@ export default function ProjectCanvasPage() {
       />
       {/* Main Canvas Layout */}
       <div className="flex h-[calc(100vh-64px)] relative">
+        {/* Floating "Show sidebar" tab when sidebar is closed */}
+        {!sidebarOpen && (
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            title="Show sidebar"
+            aria-label="Show sidebar"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+          >
+            <PanelLeftOpen size={18} aria-hidden />
+          </button>
+        )}
         {/* Canvas Sidebar */}
         <CanvasSidebar
           isOpen={sidebarOpen}
@@ -285,6 +352,7 @@ export default function ProjectCanvasPage() {
           selectedBlocks={selectedBlocks}
           canvasBlocks={canvasBlocks}
           onBlockUpdate={updateBlock}
+          onBlockSelect={setSelectedBlocks}
         />
         {/* Canvas Workspace Container */}
         <div className="flex-1 relative overflow-hidden">
@@ -298,6 +366,8 @@ export default function ProjectCanvasPage() {
               setZoomLevel(1);
               setPanOffset({ x: 0, y: 0 });
             }}
+            sidebarOpen={sidebarOpen}
+            onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
             canvasBlocks={canvasBlocks}
             selectedBlocks={selectedBlocks}
             onDeleteSelected={deleteSelectedBlocks}
@@ -310,6 +380,8 @@ export default function ProjectCanvasPage() {
             selectedBlocks={selectedBlocks}
             onBlockSelect={setSelectedBlocks}
             onBlockUpdate={updateBlock}
+            onBlockDuplicate={duplicateBlock}
+            onBlockDelete={deleteBlock}
             zoomLevel={zoomLevel}
             panOffset={panOffset}
             onPanOffsetChange={setPanOffset}

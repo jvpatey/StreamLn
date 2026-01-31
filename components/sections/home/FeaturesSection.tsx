@@ -10,7 +10,7 @@ import {
   Search,
   Network,
   Brain,
-  Maximize2,
+  Kanban,
   Link,
 } from "lucide-react";
 
@@ -47,7 +47,7 @@ export default function FeaturesSection() {
       title: "Visual Task Management",
       description:
         "Create task boards directly on your canvas. Drag tasks between columns and link them to related notes and content.",
-      icon: <Maximize2 size={24} />,
+      icon: <Kanban size={24} />,
       highlight: "Canvas Native",
     },
     {
@@ -99,8 +99,8 @@ export default function FeaturesSection() {
               </span>
             </h2>
             <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-300">
-              Everything you need to think, plan, and execute on a flexible visual
-              workspace designed specifically for developers.
+              Everything you need to think, plan, and execute on a flexible
+              visual workspace designed specifically for developers.
             </p>
           </div>
         </AnimatedSection>
