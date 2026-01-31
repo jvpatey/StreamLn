@@ -23,6 +23,8 @@ interface CanvasWorkspaceProps {
   selectedBlocks: string[];
   onBlockSelect: (blockIds: string[]) => void;
   onBlockUpdate: (id: string, updates: Partial<CanvasBlock>) => void;
+  onBlockDuplicate?: (id: string) => void;
+  onBlockDelete?: (id: string) => void;
   zoomLevel: number;
   panOffset: { x: number; y: number };
   onPanOffsetChange: (offset: { x: number; y: number }) => void;
@@ -44,6 +46,8 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
       selectedBlocks,
       onBlockSelect,
       onBlockUpdate,
+      onBlockDuplicate,
+      onBlockDelete,
       zoomLevel,
       panOffset,
       onPanOffsetChange,
@@ -276,6 +280,8 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
               isSelected={selectedBlocks.includes(block.id)}
               isEditable={viewMode === "edit"}
               onUpdate={(updates) => onBlockUpdate(block.id, updates)}
+              onDuplicate={onBlockDuplicate}
+              onDelete={onBlockDelete}
               onSelect={() => {
                 if (!selectedBlocks.includes(block.id)) {
                   onBlockSelect([block.id]);

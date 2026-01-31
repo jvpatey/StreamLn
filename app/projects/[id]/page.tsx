@@ -203,6 +203,26 @@ export default function ProjectCanvasPage() {
     setSelectedBlocks(clonedBlocks.map((block) => block.id));
   };
 
+  const deleteBlock = (id: string) => {
+    setCanvasBlocks((prev) => prev.filter((block) => block.id !== id));
+    setSelectedBlocks((prev) => prev.filter((blockId) => blockId !== id));
+  };
+
+  const duplicateBlock = (id: string) => {
+    const block = canvasBlocks.find((b) => b.id === id);
+    if (!block) return;
+    const cloned = {
+      ...block,
+      id: `${block.type}-${Date.now()}-${Math.random()}`,
+      x: block.x + 20,
+      y: block.y + 20,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    setCanvasBlocks((prev) => [...prev, cloned]);
+    setSelectedBlocks([cloned.id]);
+  };
+
   const getDefaultContent = (type: string) => {
     if (type === "note") return DEFAULT_NOTE_CONTENT;
     return {};
@@ -311,6 +331,8 @@ export default function ProjectCanvasPage() {
             selectedBlocks={selectedBlocks}
             onBlockSelect={setSelectedBlocks}
             onBlockUpdate={updateBlock}
+            onBlockDuplicate={duplicateBlock}
+            onBlockDelete={deleteBlock}
             zoomLevel={zoomLevel}
             panOffset={panOffset}
             onPanOffsetChange={setPanOffset}
