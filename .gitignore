@@ -41,4 +41,3 @@ next-env.d.ts
 
 /generated/prisma
 /app/generated/prisma-client
-.eslintrc.json
