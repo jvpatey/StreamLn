@@ -10,6 +10,7 @@ import { CanvasFloatingToolbar } from "@/components/ui/projects/canvas/canvas-fl
 import { CanvasHeader } from "@/components/ui/projects/canvas/canvas-header";
 import { DEFAULT_NOTE_CONTENT } from "@/components/ui/projects/canvas/blocks/note-defaults";
 import { DEFAULT_LINK_CONTENT } from "@/components/ui/projects/canvas/blocks/link-defaults";
+import { DEFAULT_TAG_CONTENT } from "@/components/ui/projects/canvas/blocks/tag-defaults";
 
 interface CanvasBlock {
   id: string;
@@ -162,7 +163,9 @@ export default function ProjectCanvasPage() {
             ? 400
             : type === "link"
               ? 320
-              : 350,
+              : type === "tag"
+                ? 160
+                : 350,
       height:
         type === "note"
           ? 200
@@ -170,7 +173,9 @@ export default function ProjectCanvasPage() {
             ? 300
             : type === "link"
               ? 180
-              : 250,
+              : type === "tag"
+                ? 56
+                : 250,
       content: getDefaultContent(type),
       title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
       color: getDefaultColor(type),
@@ -241,6 +246,7 @@ export default function ProjectCanvasPage() {
   const getDefaultContent = (type: string) => {
     if (type === "note") return DEFAULT_NOTE_CONTENT;
     if (type === "link") return DEFAULT_LINK_CONTENT;
+    if (type === "tag") return DEFAULT_TAG_CONTENT;
     return {};
   };
 

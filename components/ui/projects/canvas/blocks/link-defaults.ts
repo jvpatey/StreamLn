@@ -22,9 +22,7 @@ export function getLinkContent(value: unknown): LinkBlockContent {
     return {
       url: typeof v.url === "string" ? v.url : "",
       label:
-        v.label !== undefined && v.label !== null
-          ? String(v.label)
-          : undefined,
+        v.label !== undefined && v.label !== null ? String(v.label) : undefined,
     };
   }
   return { ...DEFAULT_LINK_CONTENT };

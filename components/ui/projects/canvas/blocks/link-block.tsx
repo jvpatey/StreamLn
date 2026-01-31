@@ -24,10 +24,7 @@ interface LinkBlockProps {
 
 function isValidHttpUrl(url: string): boolean {
   const trimmed = url.trim();
-  return (
-    trimmed.startsWith("http://") ||
-    trimmed.startsWith("https://")
-  );
+  return trimmed.startsWith("http://") || trimmed.startsWith("https://");
 }
 
 function normalizeUrl(url: string): string {
@@ -57,24 +54,21 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
     e.stopPropagation();
   }, []);
 
-  const persistContent = useCallback(
-    (nextUrl: string, nextLabel: string) => {
-      const normalizedUrl = normalizeUrl(nextUrl);
-      const updates: Partial<CanvasBlock> = {
-        content: {
-          url: normalizedUrl,
-          label: nextLabel.trim() || undefined,
-        } as LinkBlockContent,
-      };
-      const displayLabel = getLinkDisplayLabel({
+  const persistContent = useCallback((nextUrl: string, nextLabel: string) => {
+    const normalizedUrl = normalizeUrl(nextUrl);
+    const updates: Partial<CanvasBlock> = {
+      content: {
         url: normalizedUrl,
         label: nextLabel.trim() || undefined,
-      });
-      if (displayLabel) updates.title = displayLabel;
-      onUpdateRef.current(updates);
-    },
-    []
-  );
+      } as LinkBlockContent,
+    };
+    const displayLabel = getLinkDisplayLabel({
+      url: normalizedUrl,
+      label: nextLabel.trim() || undefined,
+    });
+    if (displayLabel) updates.title = displayLabel;
+    onUpdateRef.current(updates);
+  }, []);
 
   const handleUrlBlur = useCallback(() => {
     const normalizedUrl = normalizeUrl(url);
@@ -115,7 +109,14 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
         new URL(pasted.startsWith("http") ? pasted : `https://${pasted}`);
         setUrl(pasted.startsWith("http") ? pasted : `https://${pasted}`);
         e.preventDefault();
-        setTimeout(() => persistContent(pasted.startsWith("http") ? pasted : `https://${pasted}`, label), 0);
+        setTimeout(
+          () =>
+            persistContent(
+              pasted.startsWith("http") ? pasted : `https://${pasted}`,
+              label
+            ),
+          0
+        );
       } catch {
         // not a URL, allow default paste
       }
@@ -124,7 +125,10 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
   );
 
   const displayLabel = getLinkDisplayLabel(content);
-  const hrefUrl = content.url.trim() && isValidHttpUrl(content.url) ? normalizeUrl(content.url) : null;
+  const hrefUrl =
+    content.url.trim() && isValidHttpUrl(content.url)
+      ? normalizeUrl(content.url)
+      : null;
 
   return (
     <div
@@ -133,7 +137,7 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
       onPointerDown={handleMouseDown}
     >
       {/* Display row: icon + text + Open (when URL is set; when not editable show "No link" if empty) */}
-      {(content.url.trim() || !isEditable) ? (
+      {content.url.trim() || !isEditable ? (
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <ExternalLink
             size={16}
