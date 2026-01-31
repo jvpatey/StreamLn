@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useEditor, EditorContent, useEditorState } from "@tiptap/react";
-import { BubbleMenu } from "@tiptap/react/menus";
+import { BubbleMenu, FloatingMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
@@ -11,21 +11,31 @@ import {
   type NoteBlockContent,
 } from "./note-defaults";
 import type { Editor } from "@tiptap/core";
-import { Bold, Italic, Strikethrough, Code } from "lucide-react";
+import {
+  Bold,
+  Italic,
+  Strikethrough,
+  Code,
+  List,
+  ListOrdered,
+} from "lucide-react";
 
 const DEBOUNCE_MS = 350;
 
 /** Toolbar buttons for the bubble menu; uses useEditorState so only re-renders when marks change. */
 function NoteBubbleToolbar({ editor }: { editor: Editor }) {
-  const { isBold, isItalic, isStrike, isCode } = useEditorState({
-    editor,
-    selector: ({ editor: ed }) => ({
-      isBold: ed.isActive("bold"),
-      isItalic: ed.isActive("italic"),
-      isStrike: ed.isActive("strike"),
-      isCode: ed.isActive("code"),
-    }),
-  });
+  const { isBold, isItalic, isStrike, isCode, isBulletList, isOrderedList } =
+    useEditorState({
+      editor,
+      selector: ({ editor: ed }) => ({
+        isBold: ed.isActive("bold"),
+        isItalic: ed.isActive("italic"),
+        isStrike: ed.isActive("strike"),
+        isCode: ed.isActive("code"),
+        isBulletList: ed.isActive("bulletList"),
+        isOrderedList: ed.isActive("orderedList"),
+      }),
+    });
 
   const buttonClass =
     "p-1.5 rounded text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100 transition-colors";
@@ -33,7 +43,10 @@ function NoteBubbleToolbar({ editor }: { editor: Editor }) {
     "bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-slate-100";
 
   return (
-    <div className="flex items-center gap-0.5">
+    <div
+      className="flex items-center gap-0.5"
+      onMouseDown={(e) => e.preventDefault()}
+    >
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleBold().run()}
@@ -69,6 +82,109 @@ function NoteBubbleToolbar({ editor }: { editor: Editor }) {
         aria-pressed={isCode}
       >
         <Code size={14} />
+      </button>
+      <div className="w-px h-4 bg-slate-200 dark:bg-slate-600 mx-0.5" />
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={`${buttonClass} ${isBulletList ? activeClass : ""}`}
+        title="Bullet list"
+        aria-pressed={isBulletList}
+      >
+        <List size={14} />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={`${buttonClass} ${isOrderedList ? activeClass : ""}`}
+        title="Numbered list"
+        aria-pressed={isOrderedList}
+      >
+        <ListOrdered size={14} />
+      </button>
+    </div>
+  );
+}
+
+/** Toolbar for the floating menu on empty line: marks and list buttons. */
+function NoteFloatingToolbar({ editor }: { editor: Editor }) {
+  const { isBold, isItalic, isStrike, isCode, isBulletList, isOrderedList } =
+    useEditorState({
+      editor,
+      selector: ({ editor: ed }) => ({
+        isBold: ed.isActive("bold"),
+        isItalic: ed.isActive("italic"),
+        isStrike: ed.isActive("strike"),
+        isCode: ed.isActive("code"),
+        isBulletList: ed.isActive("bulletList"),
+        isOrderedList: ed.isActive("orderedList"),
+      }),
+    });
+
+  const buttonClass =
+    "p-1.5 rounded text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100 transition-colors";
+  const activeClass =
+    "bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-slate-100";
+
+  return (
+    <div
+      className="flex items-center gap-0.5"
+      onMouseDown={(e) => e.preventDefault()}
+    >
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        className={`${buttonClass} ${isBold ? activeClass : ""}`}
+        title="Bold"
+        aria-pressed={isBold}
+      >
+        <Bold size={14} />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        className={`${buttonClass} ${isItalic ? activeClass : ""}`}
+        title="Italic"
+        aria-pressed={isItalic}
+      >
+        <Italic size={14} />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleStrike().run()}
+        className={`${buttonClass} ${isStrike ? activeClass : ""}`}
+        title="Strikethrough"
+        aria-pressed={isStrike}
+      >
+        <Strikethrough size={14} />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleCode().run()}
+        className={`${buttonClass} ${isCode ? activeClass : ""}`}
+        title="Code"
+        aria-pressed={isCode}
+      >
+        <Code size={14} />
+      </button>
+      <div className="w-px h-4 bg-slate-200 dark:bg-slate-600 mx-0.5" />
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={`${buttonClass} ${isBulletList ? activeClass : ""}`}
+        title="Bullet list"
+        aria-pressed={isBulletList}
+      >
+        <List size={14} />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={`${buttonClass} ${isOrderedList ? activeClass : ""}`}
+        title="Numbered list"
+        aria-pressed={isOrderedList}
+      >
+        <ListOrdered size={14} />
       </button>
     </div>
   );
@@ -175,6 +291,15 @@ export function NoteBlock({ block, onUpdate, isEditable }: NoteBlockProps) {
       >
         <NoteBubbleToolbar editor={editor} />
       </BubbleMenu>
+      <FloatingMenu
+        editor={editor}
+        options={{ placement: "top", offset: 8 }}
+        className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg px-1 py-0.5"
+        onMouseDown={handleMouseDown}
+        onPointerDown={handleMouseDown}
+      >
+        <NoteFloatingToolbar editor={editor} />
+      </FloatingMenu>
       <EditorContent editor={editor} />
     </div>
   );
