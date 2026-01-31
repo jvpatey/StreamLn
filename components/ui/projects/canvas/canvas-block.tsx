@@ -623,7 +623,7 @@ export function CanvasBlock({
         {/* Block Content */}
         <div
           className={
-            block.type === "tag"
+            block.type === "tag" || block.type === "code"
               ? "flex-1 overflow-visible min-h-0"
               : "flex-1 overflow-hidden"
           }

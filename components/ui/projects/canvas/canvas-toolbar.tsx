@@ -77,7 +77,7 @@ export function CanvasToolbar({
   onDuplicateSelected,
 }: CanvasToolbarProps) {
   const [tool, setTool] = useState<"select" | "pan" | "text" | "shape">(
-    "select",
+    "select"
   );
   const [alignMenuOpen, setAlignMenuOpen] = useState(false);
   const [layerMenuOpen, setLayerMenuOpen] = useState(false);
@@ -109,7 +109,7 @@ export function CanvasToolbar({
         right: Math.max(acc.right, block.x + block.width),
         bottom: Math.max(acc.bottom, block.y + block.height),
       }),
-      { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity },
+      { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity }
     );
 
     // Calculate zoom to fit content with padding
