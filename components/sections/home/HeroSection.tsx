@@ -14,7 +14,9 @@ export default function HeroSection() {
         <div className="mx-auto max-w-2xl text-center">
           {/* Beta badge with animated rocket icon */}
           <motion.div
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15 }}
+            initial={
+              shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15 }
+            }
             animate={{ opacity: 1, y: 0 }}
             transition={
               shouldReduceMotion
@@ -34,7 +36,9 @@ export default function HeroSection() {
           {/* Main logo with hover effects and glow */}
           <motion.div
             className="relative mb-6 sm:mb-8 group cursor-pointer"
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15 }}
+            initial={
+              shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15 }
+            }
             animate={{ opacity: 1, y: 0 }}
             transition={
               shouldReduceMotion
@@ -66,7 +70,9 @@ export default function HeroSection() {
           {/* Main description text */}
           <motion.p
             className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-slate-600 dark:text-slate-300"
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15 }}
+            initial={
+              shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15 }
+            }
             animate={{ opacity: 1, y: 0 }}
             transition={
               shouldReduceMotion
@@ -82,7 +88,9 @@ export default function HeroSection() {
           {/* Call-to-action button with liquid glass effect */}
           <motion.div
             className="mt-8 sm:mt-10 flex items-center justify-center"
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15 }}
+            initial={
+              shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15 }
+            }
             animate={{ opacity: 1, y: 0 }}
             transition={
               shouldReduceMotion
@@ -110,7 +118,9 @@ export default function HeroSection() {
                     hover:scale-[1.02] active:scale-[0.98]
                     transition-all duration-200 ease-out"
                 >
-                  <span className="relative z-10 font-semibold">Launch Your Workspace</span>
+                  <span className="relative z-10 font-semibold">
+                    Launch Your Workspace
+                  </span>
                 </Button>
               </SignInButton>
             </SignedOut>
@@ -129,7 +139,9 @@ export default function HeroSection() {
           >
             <motion.span
               className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-slate-900 dark:hover:text-slate-100 hover:scale-105"
-              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
+              initial={
+                shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }
+              }
               animate={{ opacity: 1, y: 0 }}
               transition={
                 shouldReduceMotion
@@ -144,7 +156,9 @@ export default function HeroSection() {
             </motion.span>
             <motion.span
               className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-slate-900 dark:hover:text-slate-100 hover:scale-105"
-              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
+              initial={
+                shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }
+              }
               animate={{ opacity: 1, y: 0 }}
               transition={
                 shouldReduceMotion
@@ -159,7 +173,9 @@ export default function HeroSection() {
             </motion.span>
             <motion.span
               className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-slate-900 dark:hover:text-slate-100 hover:scale-105"
-              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
+              initial={
+                shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }
+              }
               animate={{ opacity: 1, y: 0 }}
               transition={
                 shouldReduceMotion

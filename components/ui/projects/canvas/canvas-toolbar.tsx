@@ -32,6 +32,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/shared/popover";
+import { getLiquidGlassSurfaceClassName } from "@/components/ui/shared/liquid-glass-surface";
 
 interface CanvasBlock {
   id: string;
@@ -70,7 +71,7 @@ export function CanvasToolbar({
   onDuplicateSelected,
 }: CanvasToolbarProps) {
   const [tool, setTool] = useState<"select" | "pan" | "text" | "shape">(
-    "select"
+    "select",
   );
   const [alignMenuOpen, setAlignMenuOpen] = useState(false);
   const [layerMenuOpen, setLayerMenuOpen] = useState(false);
@@ -102,7 +103,7 @@ export function CanvasToolbar({
         right: Math.max(acc.right, block.x + block.width),
         bottom: Math.max(acc.bottom, block.y + block.height),
       }),
-      { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity }
+      { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity },
     );
 
     // Calculate zoom to fit content with padding
@@ -122,7 +123,14 @@ export function CanvasToolbar({
 
   return (
     <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-40">
-      <div className="flex items-center space-x-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 shadow-lg">
+      <div
+        className={getLiquidGlassSurfaceClassName({
+          variant: "toolbar",
+          intensity: "xl",
+          rounded: "xl",
+          className: "flex items-center space-x-2 px-3 py-2",
+        })}
+      >
         {/* Tools Section */}
         <div className="flex items-center space-x-1 pr-3 border-r border-slate-200 dark:border-slate-700">
           <Button
@@ -275,7 +283,12 @@ export function CanvasToolbar({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-40 p-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl"
+                  className={getLiquidGlassSurfaceClassName({
+                    variant: "popover",
+                    intensity: "xl",
+                    rounded: "xl",
+                    className: "w-40 p-2",
+                  })}
                   align="center"
                 >
                   <div className="space-y-1">
@@ -304,7 +317,12 @@ export function CanvasToolbar({
                 </Button>
               </PopoverTrigger>
               <PopoverContent
-                className="w-44 p-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl"
+                className={getLiquidGlassSurfaceClassName({
+                  variant: "popover",
+                  intensity: "xl",
+                  rounded: "xl",
+                  className: "w-44 p-2",
+                })}
                 align="center"
               >
                 <div className="space-y-1">

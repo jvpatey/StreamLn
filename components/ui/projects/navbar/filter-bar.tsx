@@ -1,4 +1,6 @@
 import React from "react";
+import { LiquidGlassButton } from "@/components/ui/shared/liquid-glass-button";
+import { cn } from "@/lib/utils";
 
 interface FilterBarProps {
   sortBy: "updated" | "alpha";
@@ -33,13 +35,16 @@ const FilterBar: React.FC<FilterBarProps> = ({
         </div>
         <div className="flex gap-2">
           {statusOptions.map((opt) => (
-            <button
+            <LiquidGlassButton
               key={opt.value}
-              className={`px-3 py-1 rounded-xl text-sm font-medium border transition-all duration-200 ${
+              type="button"
+              gradient="primary"
+              className={cn(
+                "px-3 py-1 h-auto rounded-xl text-sm font-medium",
                 statusFilter === opt.value
-                  ? "bg-primary-500 text-white border-primary-500 shadow-md"
-                  : "backdrop-blur-md bg-white/50 dark:bg-slate-800/50 border-white/30 dark:border-slate-700/30 text-slate-700 dark:text-slate-200 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-white/40 dark:hover:border-slate-700/40 shadow-sm"
-              }`}
+                  ? "text-white bg-primary-600/80 dark:bg-primary-500/35 border-primary-400/40 dark:border-primary-300/20 shadow-lg"
+                  : "text-slate-700 dark:text-slate-200",
+              )}
               onClick={() => {
                 if (statusFilter === opt.value) {
                   setStatusFilter("all");
@@ -49,7 +54,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
               }}
             >
               {opt.label}
-            </button>
+            </LiquidGlassButton>
           ))}
         </div>
       </div>
@@ -60,13 +65,16 @@ const FilterBar: React.FC<FilterBarProps> = ({
         </div>
         <div className="flex gap-2">
           {sortOptions.map((opt) => (
-            <button
+            <LiquidGlassButton
               key={opt.value}
-              className={`px-3 py-1 rounded-xl text-sm font-medium border transition-all duration-200 ${
+              type="button"
+              gradient="primary"
+              className={cn(
+                "px-3 py-1 h-auto rounded-xl text-sm font-medium",
                 sortBy === opt.value
-                  ? "bg-primary-500 text-white border-primary-500 shadow-md"
-                  : "backdrop-blur-md bg-white/50 dark:bg-slate-800/50 border-white/30 dark:border-slate-700/30 text-slate-700 dark:text-slate-200 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-white/40 dark:hover:border-slate-700/40 shadow-sm"
-              }`}
+                  ? "text-white bg-primary-600/80 dark:bg-primary-500/35 border-primary-400/40 dark:border-primary-300/20 shadow-lg"
+                  : "text-slate-700 dark:text-slate-200",
+              )}
               onClick={() => {
                 if (sortBy === opt.value) {
                   setSortBy("updated");
@@ -76,7 +84,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
               }}
             >
               {opt.label}
-            </button>
+            </LiquidGlassButton>
           ))}
         </div>
       </div>

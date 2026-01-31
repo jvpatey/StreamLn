@@ -186,7 +186,7 @@ export default function DashboardPage() {
 
   const handleProjectStatusChange = async (
     projectId: string,
-    newStatus: string
+    newStatus: string,
   ) => {
     try {
       await updateProjectStatus(projectId, newStatus);
@@ -252,7 +252,7 @@ export default function DashboardPage() {
     });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-primary-50/40 to-slate-100 dark:from-[#0b0d17] dark:via-[#151c2e] dark:to-[#1e3a8a]">
       <CreateProjectModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}

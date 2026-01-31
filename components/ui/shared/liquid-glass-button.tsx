@@ -46,7 +46,7 @@ export function LiquidGlassButton({
         "dark:hover:shadow-[0_12px_40px_rgba(59,130,246,0.18),0_4px_12px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.12)]",
         "hover:scale-[1.01] active:scale-[0.99]",
         "transition-all duration-200",
-        className
+        className,
       )}
       {...props}
     >
@@ -54,4 +54,3 @@ export function LiquidGlassButton({
     </Button>
   );
 }
-

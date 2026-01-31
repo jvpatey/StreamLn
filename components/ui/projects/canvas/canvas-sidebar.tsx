@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
-import { Card } from "@/components/ui/shared/card";
+import {
+  LiquidGlassSurface,
+  getLiquidGlassSurfaceClassName,
+} from "@/components/ui/shared/liquid-glass-surface";
 import {
   FileText,
   Maximize2,
@@ -116,7 +119,7 @@ export function CanvasSidebar({
   const filteredBlockTypes = BLOCK_TYPES.filter(
     (blockType) =>
       blockType.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      blockType.description.toLowerCase().includes(searchQuery.toLowerCase())
+      blockType.description.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const formatDate = (date: Date) => {
@@ -142,94 +145,13 @@ export function CanvasSidebar({
     }
   };
 
-  const renderBlocksTab = () => (
-    <div className="space-y-4">
-      {/* Search */}
-      <div className="relative">
-        <Search
-          size={16}
-          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
-        />
-        <input
-          type="text"
-          placeholder="Search blocks..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-        />
-      </div>
-
-      {/* Block Types */}
-      <div className="space-y-2">
-        <h3 className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-          Add Blocks
-        </h3>
-        <div className="grid grid-cols-1 gap-2">
-          {filteredBlockTypes.map((blockType) => {
-            const IconComponent = blockType.icon;
-            return (
-              <Card
-                key={blockType.type}
-                className="p-3 cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 border border-slate-200 dark:border-slate-700 hover:border-primary/30"
-                onClick={() => onAddBlock(blockType.type)}
-              >
-                <div className="flex items-center space-x-3">
-                  <div
-                    className="p-2 rounded-lg"
-                    style={{ backgroundColor: `${blockType.color}20` }}
-                  >
-                    <IconComponent
-                      size={16}
-                      style={{ color: blockType.color }}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      {blockType.label}
-                    </h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                      {blockType.description}
-                    </p>
-                  </div>
-                  <Plus size={14} className="text-slate-400" />
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="text-center">
-            <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
-              {canvasBlocks.length}
-            </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">
-              Total Blocks
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
-              {selectedBlocks.length}
-            </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">
-              Selected
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   const renderLayersTab = () => (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
           Canvas Layers
         </h3>
-        <Badge variant="outline" className="text-xs">
+        <Badge variant="glass" className="text-xs">
           {canvasBlocks.length}
         </Badge>
       </div>
@@ -240,7 +162,7 @@ export function CanvasSidebar({
             No blocks yet
           </div>
           <Button
-            variant="outline"
+            variant="glass"
             size="sm"
             onClick={() => setActiveTab("blocks")}
             className="text-xs"
@@ -260,10 +182,10 @@ export function CanvasSidebar({
               return (
                 <div
                   key={block.id}
-                  className={`p-2 rounded-lg border transition-all duration-200 cursor-pointer group ${
+                  className={`p-2 rounded-lg border transition-all duration-200 cursor-pointer group backdrop-blur-sm ${
                     isSelected
                       ? "border-primary bg-primary/5"
-                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                      : "border-white/20 dark:border-white/10 hover:border-white/30 dark:hover:border-white/20 bg-white/20 dark:bg-slate-800/20"
                   }`}
                 >
                   <div className="flex items-center space-x-2">
@@ -327,6 +249,9 @@ export function CanvasSidebar({
     </div>
   );
 
+  const inputGlass =
+    "border border-white/25 dark:border-white/15 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary";
+
   const renderPropertiesTab = () => (
     <div className="space-y-4">
       <h3 className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
@@ -336,7 +261,12 @@ export function CanvasSidebar({
       {selectedBlock ? (
         <div className="space-y-4">
           {/* Block Info */}
-          <Card className="p-3">
+          <LiquidGlassSurface
+            variant="panel"
+            intensity="md"
+            rounded="xl"
+            className="p-3"
+          >
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-medium text-slate-600 dark:text-slate-400 block mb-1">
@@ -348,7 +278,7 @@ export function CanvasSidebar({
                   onChange={(e) =>
                     onBlockUpdate(selectedBlock.id, { title: e.target.value })
                   }
-                  className="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                  className={`w-full px-2 py-1 text-sm ${inputGlass}`}
                   placeholder="Enter title..."
                 />
               </div>
@@ -364,7 +294,7 @@ export function CanvasSidebar({
                     onChange={(e) =>
                       onBlockUpdate(selectedBlock.id, { color: e.target.value })
                     }
-                    className="w-8 h-8 rounded border border-slate-200 dark:border-slate-700 cursor-pointer"
+                    className="w-8 h-8 rounded border border-white/25 dark:border-white/15 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md cursor-pointer"
                   />
                   <input
                     type="text"
@@ -372,15 +302,20 @@ export function CanvasSidebar({
                     onChange={(e) =>
                       onBlockUpdate(selectedBlock.id, { color: e.target.value })
                     }
-                    className="flex-1 px-2 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono"
+                    className={`flex-1 px-2 py-1 text-sm font-mono ${inputGlass}`}
                   />
                 </div>
               </div>
             </div>
-          </Card>
+          </LiquidGlassSurface>
 
           {/* Position & Size */}
-          <Card className="p-3">
+          <LiquidGlassSurface
+            variant="panel"
+            intensity="md"
+            rounded="xl"
+            className="p-3"
+          >
             <h4 className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-3">
               Position & Size
             </h4>
@@ -397,7 +332,7 @@ export function CanvasSidebar({
                       x: parseInt(e.target.value) || 0,
                     })
                   }
-                  className="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                  className={`w-full px-2 py-1 text-xs ${inputGlass}`}
                 />
               </div>
               <div>
@@ -412,7 +347,7 @@ export function CanvasSidebar({
                       y: parseInt(e.target.value) || 0,
                     })
                   }
-                  className="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                  className={`w-full px-2 py-1 text-xs ${inputGlass}`}
                 />
               </div>
               <div>
@@ -427,7 +362,7 @@ export function CanvasSidebar({
                       width: parseInt(e.target.value) || 100,
                     })
                   }
-                  className="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                  className={`w-full px-2 py-1 text-xs ${inputGlass}`}
                 />
               </div>
               <div>
@@ -442,30 +377,35 @@ export function CanvasSidebar({
                       height: parseInt(e.target.value) || 100,
                     })
                   }
-                  className="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                  className={`w-full px-2 py-1 text-xs ${inputGlass}`}
                 />
               </div>
             </div>
-          </Card>
+          </LiquidGlassSurface>
 
           {/* Block Type */}
-          <Card className="p-3">
+          <LiquidGlassSurface
+            variant="panel"
+            intensity="md"
+            rounded="xl"
+            className="p-3"
+          >
             <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="glass" className="text-xs">
                 {selectedBlock.type}
               </Badge>
               <span className="text-xs text-slate-500 dark:text-slate-400">
                 Created {formatDate(selectedBlock.createdAt)}
               </span>
             </div>
-          </Card>
+          </LiquidGlassSurface>
         </div>
       ) : selectedBlocks.length > 1 ? (
         <div className="text-center py-8">
           <div className="text-slate-400 dark:text-slate-500 text-sm mb-2">
             Multiple blocks selected
           </div>
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="glass" className="text-xs">
             {selectedBlocks.length} blocks
           </Badge>
         </div>
@@ -482,12 +422,19 @@ export function CanvasSidebar({
   if (!isOpen) return null;
 
   return (
-    <div
-      className="w-80 h-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-800/50 flex flex-col shadow-xl"
-      style={{ boxShadow: "0 0 24px 0 #3b82f610, 0 0 0 2px #3b82f630" }}
+    <LiquidGlassSurface
+      variant="panel"
+      intensity="xl"
+      className="w-80 h-full flex flex-col border-r border-white/30 dark:border-white/15"
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-slate-200/60 dark:border-slate-700/60 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md">
+      <LiquidGlassSurface
+        variant="panel"
+        intensity="md"
+        rounded="none"
+        shadow={false}
+        className="flex items-center justify-between p-4 border-b border-white/25 dark:border-white/10"
+      >
         <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">
           Canvas Tools
         </h2>
@@ -495,14 +442,14 @@ export function CanvasSidebar({
           variant="ghost"
           size="sm"
           onClick={onClose}
-          className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-white/60 dark:bg-slate-800/60 rounded-full shadow-md hover:shadow-lg lg:hidden"
+          className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full lg:hidden"
         >
           <X size={16} />
         </Button>
-      </div>
+      </LiquidGlassSurface>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200/60 dark:border-slate-700/60 bg-transparent">
+      <div className="flex border-b border-white/20 dark:border-white/10 bg-transparent">
         <button
           onClick={() => setActiveTab("blocks")}
           className={`flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-t-xl
@@ -565,8 +512,7 @@ export function CanvasSidebar({
                 placeholder="Search blocks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm border-0 rounded-xl bg-white/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary shadow-sm"
-                style={{ backdropFilter: "blur(6px)" }}
+                className="w-full pl-10 pr-4 py-2 text-sm border border-white/25 dark:border-white/15 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md rounded-xl text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
               />
             </div>
 
@@ -579,21 +525,31 @@ export function CanvasSidebar({
                 {filteredBlockTypes.map((blockType) => {
                   const IconComponent = blockType.icon;
                   return (
-                    <Card
+                    <div
                       key={blockType.type}
-                      className="p-3 cursor-pointer transition-all duration-200 border-0 rounded-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-md shadow-md hover:shadow-xl hover:scale-105"
-                      style={{
-                        boxShadow: `0 0 0 2px ${blockType.color}30, 0 0 16px ${blockType.color}18`,
-                        border: `1.5px solid ${blockType.color}30`,
-                      }}
+                      className={getLiquidGlassSurfaceClassName({
+                        variant: "panel",
+                        intensity: "md",
+                        rounded: "2xl",
+                        className:
+                          "p-3 cursor-pointer transition-all duration-200 hover:scale-105 border-l-4 hover:border-white/40 dark:hover:border-white/30",
+                      })}
+                      style={{ borderLeftColor: blockType.color }}
                       onClick={() => onAddBlock(blockType.type)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onAddBlock(blockType.type);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
                     >
                       <div className="flex items-center space-x-3">
                         <div
-                          className="p-2 rounded-xl shadow"
+                          className="p-2 rounded-xl"
                           style={{
                             backgroundColor: `${blockType.color}22`,
-                            boxShadow: `0 2px 8px ${blockType.color}22`,
                           }}
                         >
                           <IconComponent
@@ -611,14 +567,14 @@ export function CanvasSidebar({
                         </div>
                         <Plus size={16} className="text-slate-400" />
                       </div>
-                    </Card>
+                    </div>
                   );
                 })}
               </div>
             </div>
 
             {/* Quick Stats */}
-            <div className="pt-4 border-t border-slate-200/60 dark:border-slate-700/60">
+            <div className="pt-4 border-t border-white/20 dark:border-white/10">
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
                   <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
@@ -643,6 +599,6 @@ export function CanvasSidebar({
         {activeTab === "layers" && renderLayersTab()}
         {activeTab === "properties" && renderPropertiesTab()}
       </div>
-    </div>
+    </LiquidGlassSurface>
   );
 }
