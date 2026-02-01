@@ -49,6 +49,7 @@ interface CanvasBlockProps {
   block: CanvasBlock;
   isSelected: boolean;
   isEditable: boolean;
+  isSelectionDragging?: boolean;
   onUpdate: (updates: Partial<CanvasBlock>) => void;
   onDuplicate?: (id: string) => void;
   onDelete?: (id: string) => void;
@@ -69,6 +70,7 @@ export function CanvasBlock({
   block,
   isSelected,
   isEditable,
+  isSelectionDragging = false,
   onUpdate,
   onDuplicate,
   onDelete,
@@ -327,7 +329,11 @@ export function CanvasBlock({
     <div
       ref={blockRef}
       className={`absolute group cursor-move select-none ${
-        isDragging ? "z-50" : isSelected ? "z-40" : "z-10"
+        isDragging || (isSelected && isSelectionDragging)
+          ? "z-50"
+          : isSelected
+          ? "z-40"
+          : "z-10"
       }`}
       style={{
         left: block.x,
@@ -349,7 +355,7 @@ export function CanvasBlock({
               ? "ring-2 ring-primary ring-inset shadow-xl"
               : "ring-2 ring-primary ring-offset-2 shadow-xl"
             : "hover:shadow-lg"
-        } ${isDragging ? "opacity-80 scale-105" : ""} ${
+        } ${(isDragging || (isSelected && isSelectionDragging)) ? "opacity-80 scale-105" : ""} ${
           !isEditable ? "cursor-default" : ""
         }`}
         style={{
@@ -675,7 +681,7 @@ export function CanvasBlock({
         )}
 
         {/* Drag Preview */}
-        {isDragging && (
+        {(isDragging || (isSelected && isSelectionDragging)) && (
           <div className="absolute inset-0 bg-primary/10 border-2 border-primary border-dashed rounded pointer-events-none" />
         )}
       </Card>

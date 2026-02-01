@@ -69,6 +69,8 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
     const [selectionBox, setSelectionBox] = useState<{
       start: { x: number; y: number };
       end: { x: number; y: number };
+      additive: boolean;
+      initialSelection: string[];
     } | null>(null);
 
     // Handle mouse events for panning and selection
@@ -119,12 +121,17 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
               y: e.clientY - panOffset.y,
             });
           } else {
-            // Selection box mode
+            // Selection box mode (Shift = additive)
+            const additive = e.shiftKey;
             setSelectionBox({
               start: { x, y },
               end: { x, y },
+              additive,
+              initialSelection: additive ? selectedBlocks : [],
             });
-            onBlockSelect([]);
+            if (!additive) {
+              onBlockSelect([]);
+            }
           }
         }
       },
@@ -164,18 +171,24 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
           const minY = Math.min(selectionBox.start.y, y);
           const maxY = Math.max(selectionBox.start.y, y);
 
-          const selectedBlockIds = blocks
+          const marqueeBlockIds = blocks
             .filter((block) => {
-              const blockCenterX = block.x + block.width / 2;
-              const blockCenterY = block.y + block.height / 2;
+              const blockLeft = block.x;
+              const blockRight = block.x + block.width;
+              const blockTop = block.y;
+              const blockBottom = block.y + block.height;
               return (
-                blockCenterX >= minX &&
-                blockCenterX <= maxX &&
-                blockCenterY >= minY &&
-                blockCenterY <= maxY
+                blockLeft < maxX &&
+                blockRight > minX &&
+                blockTop < maxY &&
+                blockBottom > minY
               );
             })
             .map((block) => block.id);
+
+          const selectedBlockIds = selectionBox.additive
+            ? [...new Set([...selectionBox.initialSelection, ...marqueeBlockIds])]
+            : marqueeBlockIds;
 
           onBlockSelect(selectedBlockIds);
         }
@@ -279,6 +292,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
               block={block}
               isSelected={selectedBlocks.includes(block.id)}
               isEditable={viewMode === "edit"}
+              isSelectionDragging={isDragging}
               onUpdate={(updates) => onBlockUpdate(block.id, updates)}
               onDuplicate={onBlockDuplicate}
               onDelete={onBlockDelete}

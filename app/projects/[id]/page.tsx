@@ -199,13 +199,36 @@ export default function ProjectCanvasPage() {
   };
 
   const updateBlock = (id: string, updates: Partial<CanvasBlock>) => {
-    setCanvasBlocks((prev) =>
-      prev.map((block) =>
-        block.id === id
-          ? { ...block, ...updates, updatedAt: new Date() }
-          : block
-      )
-    );
+    setCanvasBlocks((prev) => {
+      const block = prev.find((b) => b.id === id);
+      if (!block) return prev;
+
+      const hasPositionChange = "x" in updates || "y" in updates;
+      const isMultiSelect =
+        selectedBlocks.length > 1 && selectedBlocks.includes(id);
+
+      if (hasPositionChange && isMultiSelect) {
+        const newX = (updates.x ?? block.x) as number;
+        const newY = (updates.y ?? block.y) as number;
+        const deltaX = newX - block.x;
+        const deltaY = newY - block.y;
+        return prev.map((b) => {
+          if (selectedBlocks.includes(b.id)) {
+            return {
+              ...b,
+              x: b.x + deltaX,
+              y: b.y + deltaY,
+              updatedAt: new Date(),
+            };
+          }
+          return b;
+        });
+      }
+
+      return prev.map((b) =>
+        b.id === id ? { ...b, ...updates, updatedAt: new Date() } : b
+      );
+    });
   };
 
   const deleteSelectedBlocks = () => {
