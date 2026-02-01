@@ -49,7 +49,11 @@ interface CanvasBlock {
   locked?: boolean;
 }
 
+export type CanvasTool = "select" | "pan" | "text" | "shape";
+
 interface CanvasToolbarProps {
+  tool: CanvasTool;
+  onToolChange: (tool: CanvasTool) => void;
   zoomLevel: number;
   onZoomChange: (zoom: number) => void;
   showGrid: boolean;
@@ -64,6 +68,8 @@ interface CanvasToolbarProps {
 }
 
 export function CanvasToolbar({
+  tool,
+  onToolChange,
   zoomLevel,
   onZoomChange,
   showGrid,
@@ -76,9 +82,6 @@ export function CanvasToolbar({
   onDeleteSelected,
   onDuplicateSelected,
 }: CanvasToolbarProps) {
-  const [tool, setTool] = useState<"select" | "pan" | "text" | "shape">(
-    "select"
-  );
   const [alignMenuOpen, setAlignMenuOpen] = useState(false);
   const [layerMenuOpen, setLayerMenuOpen] = useState(false);
 
@@ -142,7 +145,8 @@ export function CanvasToolbar({
           <Button
             variant={tool === "select" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setTool("select")}
+            onClick={() => onToolChange("select")}
+            title="Select (V)"
             className={`h-8 w-8 p-0 ${
               tool === "select"
                 ? "bg-primary-600 hover:bg-primary-700 text-white"
@@ -157,7 +161,8 @@ export function CanvasToolbar({
           <Button
             variant={tool === "pan" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setTool("pan")}
+            onClick={() => onToolChange("pan")}
+            title="Pan (H)"
             className={`h-8 w-8 p-0 ${
               tool === "pan"
                 ? "bg-primary-600 hover:bg-primary-700 text-white"
@@ -172,7 +177,7 @@ export function CanvasToolbar({
           <Button
             variant={tool === "text" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setTool("text")}
+            onClick={() => onToolChange("text")}
             className={`h-8 w-8 p-0 ${
               tool === "text"
                 ? "bg-primary-600 hover:bg-primary-700 text-white"
@@ -187,7 +192,7 @@ export function CanvasToolbar({
           <Button
             variant={tool === "shape" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setTool("shape")}
+            onClick={() => onToolChange("shape")}
             className={`h-8 w-8 p-0 ${
               tool === "shape"
                 ? "bg-primary-600 hover:bg-primary-700 text-white"

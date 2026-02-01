@@ -3,7 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useParams, useRouter } from "next/navigation";
-import { CanvasToolbar } from "@/components/ui/projects/canvas/canvas-toolbar";
+import {
+  CanvasToolbar,
+  type CanvasTool,
+} from "@/components/ui/projects/canvas/canvas-toolbar";
 import { CanvasWorkspace } from "@/components/ui/projects/canvas/canvas-workspace";
 import { CanvasSidebar } from "@/components/ui/projects/canvas/canvas-sidebar";
 import { CanvasFloatingToolbar } from "@/components/ui/projects/canvas/canvas-floating-toolbar";
@@ -69,6 +72,9 @@ export default function ProjectCanvasPage() {
   const [showGrid, setShowGrid] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [viewMode, setViewMode] = useState<"edit" | "present">("edit");
+
+  // Canvas tool state (select vs pan)
+  const [activeTool, setActiveTool] = useState<CanvasTool>("select");
 
   // Canvas interaction state
   const [isAddingBlock, setIsAddingBlock] = useState<string | null>(null);
@@ -152,6 +158,22 @@ export default function ProjectCanvasPage() {
         setSelectedBlocks([]);
         setIsAddingBlock(null);
         setShowFloatingToolbar(false);
+      }
+
+      // Tool shortcuts (only when not in an input)
+      const target = e.target as HTMLElement;
+      if (
+        !target.closest("input") &&
+        !target.closest("textarea") &&
+        !target.closest("[contenteditable]")
+      ) {
+        if (e.key === "v" && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          setActiveTool("select");
+        } else if (e.key === "h" && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          setActiveTool("pan");
+        }
       }
     };
 
@@ -381,6 +403,8 @@ export default function ProjectCanvasPage() {
         <div className="flex-1 relative overflow-hidden">
           {/* Canvas Toolbar */}
           <CanvasToolbar
+            tool={activeTool}
+            onToolChange={setActiveTool}
             zoomLevel={zoomLevel}
             onZoomChange={setZoomLevel}
             showGrid={showGrid}
@@ -399,6 +423,7 @@ export default function ProjectCanvasPage() {
           {/* Canvas Workspace */}
           <CanvasWorkspace
             ref={canvasRef}
+            activeTool={activeTool}
             blocks={canvasBlocks}
             selectedBlocks={selectedBlocks}
             onBlockSelect={setSelectedBlocks}

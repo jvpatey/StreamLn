@@ -1,8 +1,9 @@
 "use client";
 
-import { forwardRef, useState, useRef, useEffect, useCallback } from "react";
+import { forwardRef, useState, useRef, useCallback } from "react";
 import { CanvasBlock } from "./canvas-block";
 import { getKeyboardShortcut } from "@/lib/utils";
+import type { CanvasTool } from "./canvas-toolbar";
 
 interface CanvasBlock {
   id: string;
@@ -19,6 +20,7 @@ interface CanvasBlock {
 }
 
 interface CanvasWorkspaceProps {
+  activeTool: CanvasTool;
   blocks: CanvasBlock[];
   selectedBlocks: string[];
   onBlockSelect: (blockIds: string[]) => void;
@@ -42,6 +44,7 @@ interface CanvasWorkspaceProps {
 export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
   (
     {
+      activeTool,
       blocks,
       selectedBlocks,
       onBlockSelect,
@@ -113,8 +116,13 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
           }
         } else {
           // Start panning or selection box
-          if (e.metaKey || e.ctrlKey || e.button === 1) {
-            // Pan mode
+          // Pan: hand tool active, or modifier key, or middle mouse
+          const shouldPan =
+            activeTool === "pan" ||
+            e.metaKey ||
+            e.ctrlKey ||
+            e.button === 1;
+          if (shouldPan) {
             setIsPanning(true);
             setPanStart({
               x: e.clientX - panOffset.x,
@@ -136,6 +144,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         }
       },
       [
+        activeTool,
         blocks,
         selectedBlocks,
         onBlockSelect,
@@ -245,6 +254,14 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
       [blocks, onAddBlock, panOffset, zoomLevel, viewMode]
     );
 
+    // Cursor: grab/grabbing in pan mode, crosshair in select mode
+    const cursorClass =
+      activeTool === "pan"
+        ? isPanning
+          ? "cursor-grabbing"
+          : "cursor-grab"
+        : "cursor-crosshair";
+
     // Grid pattern
     const gridSize = 20 * zoomLevel;
     const gridOffsetX = panOffset.x % gridSize;
@@ -259,7 +276,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
             else ref.current = node;
           }
         }}
-        className="relative w-full h-full overflow-hidden cursor-crosshair select-none"
+        className={`relative w-full h-full overflow-hidden select-none ${cursorClass}`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -360,7 +377,10 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
                   <p>• Double-click to add a note</p>
                   <p>• Use the sidebar to add different block types</p>
                   <p>• Drag blocks to rearrange them</p>
-                  <p>• Hold {getKeyboardShortcut("⌘")} to pan around</p>
+                  <p>
+                    • Hand tool ({getKeyboardShortcut("H")}) or hold{" "}
+                    {getKeyboardShortcut("⌘")} to pan
+                  </p>
                 </div>
               </div>
             </div>
