@@ -345,7 +345,9 @@ export function CanvasBlock({
       onContextMenu={handleContextMenu}
     >
       <Card
-        className={`relative w-full h-full transition-all duration-200 border ${
+        className={`relative w-full h-full transition-all duration-200 ${
+          block.type === "tag" ? "border" : isSelected ? "border-2" : "border"
+        } ${
           block.type === "tag"
             ? "rounded-full overflow-visible"
             : "overflow-hidden"
@@ -365,11 +367,17 @@ export function CanvasBlock({
               : `linear-gradient(135deg, ${getBlockColor()}05 0%, transparent 100%)`,
           backdropFilter: block.type === "tag" ? "none" : "blur(10px)",
           borderColor:
-            block.type === "tag" ? "transparent" : `${getBlockColor()}30`,
+            block.type === "tag"
+              ? "transparent"
+              : isSelected
+                ? `${getBlockColor()}70`
+                : `${getBlockColor()}30`,
           boxShadow:
             block.type === "tag"
               ? "none"
-              : `0 0 0 1px ${getBlockColor()}25, 0 0 24px ${getBlockColor()}15, 0 4px 12px rgba(0, 0, 0, 0.1)`,
+              : isSelected
+                ? `0 0 0 1px ${getBlockColor()}50, 0 0 24px ${getBlockColor()}15, 0 4px 12px rgba(0, 0, 0, 0.1)`
+                : `0 0 0 1px ${getBlockColor()}25, 0 0 24px ${getBlockColor()}15, 0 4px 12px rgba(0, 0, 0, 0.1)`,
         }}
       >
         {/* Block Header (hidden for tag – tag is just the pill) */}
