@@ -14,6 +14,7 @@ import {
   Image,
   Link,
   Tag,
+  Type,
   Layers,
   Search,
   Plus,
@@ -26,7 +27,7 @@ import {
 
 interface CanvasBlock {
   id: string;
-  type: "note" | "task-board" | "code" | "image" | "link" | "tag";
+  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text";
   x: number;
   y: number;
   width: number;
@@ -92,6 +93,13 @@ const BLOCK_TYPES = [
     description: "Labels and categories",
     icon: Tag,
     color: "#ef4444",
+  },
+  {
+    type: "text",
+    label: "Text",
+    description: "Short labels and comments",
+    icon: Type,
+    color: "#64748b",
   },
 ];
 

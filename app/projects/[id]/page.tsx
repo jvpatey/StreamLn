@@ -16,11 +16,12 @@ import { DEFAULT_LINK_CONTENT } from "@/components/ui/projects/canvas/blocks/lin
 import { DEFAULT_TAG_CONTENT } from "@/components/ui/projects/canvas/blocks/tag-defaults";
 import { getDefaultTaskBoardContent } from "@/components/ui/projects/canvas/blocks/task-board-defaults";
 import { DEFAULT_CODE_CONTENT } from "@/components/ui/projects/canvas/blocks/code-defaults";
+import { DEFAULT_TEXT_CONTENT } from "@/components/ui/projects/canvas/blocks/text-defaults";
 import { PanelLeftOpen } from "lucide-react";
 
 interface CanvasBlock {
   id: string;
-  type: "note" | "task-board" | "code" | "image" | "link" | "tag";
+  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text";
   x: number;
   y: number;
   width: number;
@@ -158,6 +159,7 @@ export default function ProjectCanvasPage() {
         setSelectedBlocks([]);
         setIsAddingBlock(null);
         setShowFloatingToolbar(false);
+        setActiveTool("select");
       }
 
       // Tool shortcuts (only when not in an input)
@@ -181,11 +183,36 @@ export default function ProjectCanvasPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedBlocks, canvasBlocks]);
 
+  // When a single text block is selected, show floating toolbar above it (outside the text box)
+  useEffect(() => {
+    if (selectedBlocks.length === 0) {
+      setShowFloatingToolbar(false);
+      return;
+    }
+    if (selectedBlocks.length !== 1) return;
+
+    const block = canvasBlocks.find((b) => b.id === selectedBlocks[0]);
+    if (!block || block.type !== "text") return;
+
+    const el = canvasRef.current;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const centerX =
+      rect.left + panOffset.x + block.x * zoomLevel + (block.width * zoomLevel) / 2;
+    const topY = rect.top + panOffset.y + block.y * zoomLevel;
+    setFloatingToolbarPosition({
+      x: centerX - 120,
+      y: Math.max(64, topY - 56),
+    });
+    setShowFloatingToolbar(true);
+  }, [selectedBlocks, canvasBlocks, panOffset, zoomLevel]);
+
   // Canvas block manipulation functions
   const addBlock = (type: string, position: { x: number; y: number }) => {
     const newBlock: CanvasBlock = {
       id: generateBlockId(type),
-      type: type as any,
+      type: type as CanvasBlock["type"],
       x: position.x,
       y: position.y,
       width:
@@ -197,6 +224,8 @@ export default function ProjectCanvasPage() {
           ? 320
           : type === "tag"
           ? 240
+          : type === "text"
+          ? 220
           : 350,
       height:
         type === "note"
@@ -207,6 +236,8 @@ export default function ProjectCanvasPage() {
           ? 180
           : type === "tag"
           ? 56
+          : type === "text"
+          ? 80
           : 250,
       content: getDefaultContent(type),
       title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
@@ -218,6 +249,9 @@ export default function ProjectCanvasPage() {
     setCanvasBlocks((prev) => [...prev, newBlock]);
     setSelectedBlocks([newBlock.id]);
     setIsAddingBlock(null);
+    if (type === "text") {
+      setActiveTool("select");
+    }
   };
 
   const updateBlock = (id: string, updates: Partial<CanvasBlock>) => {
@@ -304,6 +338,7 @@ export default function ProjectCanvasPage() {
     if (type === "tag") return DEFAULT_TAG_CONTENT;
     if (type === "task-board") return getDefaultTaskBoardContent();
     if (type === "code") return DEFAULT_CODE_CONTENT;
+    if (type === "text") return DEFAULT_TEXT_CONTENT;
     return {};
   };
 
@@ -321,6 +356,8 @@ export default function ProjectCanvasPage() {
         return "#06b6d4";
       case "tag":
         return "#ef4444";
+      case "text":
+        return "#64748b";
       default:
         return "#6b7280";
     }
@@ -404,7 +441,10 @@ export default function ProjectCanvasPage() {
           {/* Canvas Toolbar */}
           <CanvasToolbar
             tool={activeTool}
-            onToolChange={setActiveTool}
+            onToolChange={(newTool) => {
+              setActiveTool(newTool);
+              if (newTool === "text") setIsAddingBlock("text");
+            }}
             zoomLevel={zoomLevel}
             onZoomChange={setZoomLevel}
             showGrid={showGrid}

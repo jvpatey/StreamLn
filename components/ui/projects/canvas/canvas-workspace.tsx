@@ -7,7 +7,7 @@ import type { CanvasTool } from "./canvas-toolbar";
 
 interface CanvasBlock {
   id: string;
-  type: "note" | "task-board" | "code" | "image" | "link" | "tag";
+  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text";
   x: number;
   y: number;
   width: number;

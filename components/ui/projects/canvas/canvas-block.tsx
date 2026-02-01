@@ -12,6 +12,7 @@ import {
   Image,
   Link,
   Tag,
+  Type,
   GripVertical,
   MoreVertical,
   Lock,
@@ -28,10 +29,11 @@ import { CodeBlock } from "./blocks/code-block";
 import { ImageBlock } from "./blocks/image-block";
 import { LinkBlock } from "./blocks/link-block";
 import { TagBlock } from "./blocks/tag-block";
+import { TextBlock } from "./blocks/text-block";
 
 interface CanvasBlock {
   id: string;
-  type: "note" | "task-board" | "code" | "image" | "link" | "tag";
+  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text";
   x: number;
   y: number;
   width: number;
@@ -158,6 +160,8 @@ export function CanvasBlock({
         return <Link size={12} />;
       case "tag":
         return <Tag size={12} />;
+      case "text":
+        return <Type size={12} />;
       default:
         return <FileText size={12} />;
     }
@@ -316,6 +320,8 @@ export function CanvasBlock({
         return <LinkBlock {...commonProps} />;
       case "tag":
         return <TagBlock {...commonProps} />;
+      case "text":
+        return <TextBlock {...commonProps} />;
       default:
         return <NoteBlock {...commonProps} />;
     }
@@ -357,9 +363,11 @@ export function CanvasBlock({
               ? "ring-2 ring-primary ring-inset shadow-xl"
               : "ring-2 ring-primary ring-offset-2 shadow-xl"
             : "hover:shadow-lg"
-        } ${(isDragging || (isSelected && isSelectionDragging)) ? "opacity-80 scale-105" : ""} ${
-          !isEditable ? "cursor-default" : ""
-        }`}
+        } ${
+          isDragging || (isSelected && isSelectionDragging)
+            ? "opacity-80 scale-105"
+            : ""
+        } ${!isEditable ? "cursor-default" : ""}`}
         style={{
           background:
             block.type === "tag"
@@ -370,18 +378,18 @@ export function CanvasBlock({
             block.type === "tag"
               ? "transparent"
               : isSelected
-                ? `${getBlockColor()}70`
-                : `${getBlockColor()}30`,
+              ? `${getBlockColor()}70`
+              : `${getBlockColor()}30`,
           boxShadow:
             block.type === "tag"
               ? "none"
               : isSelected
-                ? `0 0 0 1px ${getBlockColor()}50, 0 0 24px ${getBlockColor()}15, 0 4px 12px rgba(0, 0, 0, 0.1)`
-                : `0 0 0 1px ${getBlockColor()}25, 0 0 24px ${getBlockColor()}15, 0 4px 12px rgba(0, 0, 0, 0.1)`,
+              ? `0 0 0 1px ${getBlockColor()}50, 0 0 24px ${getBlockColor()}15, 0 4px 12px rgba(0, 0, 0, 0.1)`
+              : `0 0 0 1px ${getBlockColor()}25, 0 0 24px ${getBlockColor()}15, 0 4px 12px rgba(0, 0, 0, 0.1)`,
         }}
       >
-        {/* Block Header (hidden for tag – tag is just the pill) */}
-        {block.type !== "tag" && (
+        {/* Block Header (hidden for tag and text – both are minimal/subtle) */}
+        {block.type !== "tag" && block.type !== "text" && (
           <div
             className="flex items-center justify-between p-3 border-b border-slate-200/50 dark:border-slate-700/50"
             style={{
@@ -539,6 +547,117 @@ export function CanvasBlock({
                 </DropdownMenu.Root>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Text block: floating menu (no header, subtle comment style) */}
+        {block.type === "text" && (
+          <div
+            className="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            {block.locked && (
+              <div className="p-1 rounded bg-amber-50 dark:bg-amber-900/20">
+                <Lock
+                  size={10}
+                  className="text-amber-600 dark:text-amber-400"
+                />
+              </div>
+            )}
+            {isEditable && (
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md"
+                    onMouseDown={(e) => e.stopPropagation()}
+                  >
+                    <MoreVertical size={12} />
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content
+                    className="min-w-[10rem] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg p-1 z-[100]"
+                    sideOffset={4}
+                    align="end"
+                  >
+                    {onDuplicate && (
+                      <DropdownMenu.Item
+                        className={dropdownItemClass}
+                        onSelect={() => onDuplicate(block.id)}
+                      >
+                        <Copy size={14} />
+                        Duplicate
+                      </DropdownMenu.Item>
+                    )}
+                    {onDelete && (
+                      <DropdownMenu.Item
+                        className={`${dropdownItemClass} text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300`}
+                        onSelect={() => onDelete(block.id)}
+                      >
+                        <Trash2 size={14} />
+                        Delete
+                      </DropdownMenu.Item>
+                    )}
+                    {(onDuplicate || onDelete) && (
+                      <DropdownMenu.Separator className="h-px bg-slate-200 dark:bg-slate-700 my-1" />
+                    )}
+                    <DropdownMenu.Item
+                      className={dropdownItemClass}
+                      onSelect={() => onUpdate({ locked: !block.locked })}
+                    >
+                      {block.locked ? (
+                        <>
+                          <Unlock size={14} />
+                          Unlock
+                        </>
+                      ) : (
+                        <>
+                          <Lock size={14} />
+                          Lock
+                        </>
+                      )}
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item
+                      className={dropdownItemClass}
+                      onSelect={() => onUpdate({ hidden: !block.hidden })}
+                    >
+                      {block.hidden ? (
+                        <>
+                          <Eye size={14} />
+                          Show
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff size={14} />
+                          Hide
+                        </>
+                      )}
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Separator className="h-px bg-slate-200 dark:bg-slate-700 my-1" />
+                    <DropdownMenu.Item
+                      className={dropdownItemClass}
+                      onSelect={() => {
+                        const url = `${
+                          typeof window !== "undefined"
+                            ? window.location.origin + window.location.pathname
+                            : ""
+                        }?block=${block.id}`;
+                        if (
+                          typeof navigator !== "undefined" &&
+                          navigator.clipboard?.writeText
+                        )
+                          navigator.clipboard.writeText(url);
+                      }}
+                    >
+                      <Link2 size={14} />
+                      Copy link
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
+            )}
           </div>
         )}
 

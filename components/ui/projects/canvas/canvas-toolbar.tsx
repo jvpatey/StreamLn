@@ -178,6 +178,7 @@ export function CanvasToolbar({
             variant={tool === "text" ? "default" : "ghost"}
             size="sm"
             onClick={() => onToolChange("text")}
+            title="Add text (click canvas to place)"
             className={`h-8 w-8 p-0 ${
               tool === "text"
                 ? "bg-primary-600 hover:bg-primary-700 text-white"
