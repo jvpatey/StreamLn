@@ -59,6 +59,7 @@ interface CanvasToolbarProps {
   showGrid: boolean;
   onGridToggle: () => void;
   onResetView: () => void;
+  onFitToView?: () => void;
   sidebarOpen?: boolean;
   onSidebarToggle?: () => void;
   canvasBlocks: CanvasBlock[];
@@ -75,6 +76,7 @@ export function CanvasToolbar({
   showGrid,
   onGridToggle,
   onResetView,
+  onFitToView,
   sidebarOpen = true,
   onSidebarToggle,
   canvasBlocks,
@@ -103,31 +105,7 @@ export function CanvasToolbar({
       onResetView();
       return;
     }
-
-    // Calculate bounds of all blocks
-    const bounds = canvasBlocks.reduce(
-      (acc, block) => ({
-        left: Math.min(acc.left, block.x),
-        top: Math.min(acc.top, block.y),
-        right: Math.max(acc.right, block.x + block.width),
-        bottom: Math.max(acc.bottom, block.y + block.height),
-      }),
-      { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity }
-    );
-
-    // Calculate zoom to fit content with padding
-    const padding = 100;
-    const canvasWidth = window.innerWidth;
-    const canvasHeight = window.innerHeight - 180; // Account for header and toolbar
-
-    const contentWidth = bounds.right - bounds.left + padding * 2;
-    const contentHeight = bounds.bottom - bounds.top + padding * 2;
-
-    const scaleX = canvasWidth / contentWidth;
-    const scaleY = canvasHeight / contentHeight;
-    const newZoom = Math.min(scaleX, scaleY, 1);
-
-    onZoomChange(newZoom);
+    onFitToView?.();
   };
 
   return (

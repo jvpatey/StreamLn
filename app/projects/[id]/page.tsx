@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -86,6 +86,39 @@ export default function ProjectCanvasPage() {
   });
 
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  const handleFitToView = useCallback(() => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect || canvasBlocks.length === 0) {
+      setZoomLevel(1);
+      setPanOffset({ x: 0, y: 0 });
+      return;
+    }
+    const viewportWidth = rect.width;
+    const viewportHeight = rect.height;
+    const bounds = canvasBlocks.reduce(
+      (acc, block) => ({
+        left: Math.min(acc.left, block.x),
+        top: Math.min(acc.top, block.y),
+        right: Math.max(acc.right, block.x + block.width),
+        bottom: Math.max(acc.bottom, block.y + block.height),
+      }),
+      { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity }
+    );
+    const padding = 100;
+    const contentWidth = bounds.right - bounds.left + padding * 2;
+    const contentHeight = bounds.bottom - bounds.top + padding * 2;
+    const scaleX = viewportWidth / contentWidth;
+    const scaleY = viewportHeight / contentHeight;
+    const newZoom = Math.min(scaleX, scaleY, 1);
+    const centerX = (bounds.left + bounds.right) / 2;
+    const centerY = (bounds.top + bounds.bottom) / 2;
+    setZoomLevel(newZoom);
+    setPanOffset({
+      x: viewportWidth / 2 - centerX * newZoom,
+      y: viewportHeight / 2 - centerY * newZoom,
+    });
+  }, [canvasBlocks]);
 
   // Load project data
   useEffect(() => {
@@ -199,7 +232,10 @@ export default function ProjectCanvasPage() {
 
     const rect = el.getBoundingClientRect();
     const centerX =
-      rect.left + panOffset.x + block.x * zoomLevel + (block.width * zoomLevel) / 2;
+      rect.left +
+      panOffset.x +
+      block.x * zoomLevel +
+      (block.width * zoomLevel) / 2;
     const topY = rect.top + panOffset.y + block.y * zoomLevel;
     setFloatingToolbarPosition({
       x: centerX - 120,
@@ -453,6 +489,7 @@ export default function ProjectCanvasPage() {
               setZoomLevel(1);
               setPanOffset({ x: 0, y: 0 });
             }}
+            onFitToView={handleFitToView}
             sidebarOpen={sidebarOpen}
             onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
             canvasBlocks={canvasBlocks}
@@ -472,6 +509,7 @@ export default function ProjectCanvasPage() {
             onBlockDelete={deleteBlock}
             zoomLevel={zoomLevel}
             panOffset={panOffset}
+            onZoomChange={setZoomLevel}
             onPanOffsetChange={setPanOffset}
             showGrid={showGrid}
             isDragging={isDragging}

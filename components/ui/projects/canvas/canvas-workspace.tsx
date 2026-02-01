@@ -29,6 +29,7 @@ interface CanvasWorkspaceProps {
   onBlockDelete?: (id: string) => void;
   zoomLevel: number;
   panOffset: { x: number; y: number };
+  onZoomChange: (zoom: number) => void;
   onPanOffsetChange: (offset: { x: number; y: number }) => void;
   showGrid: boolean;
   isDragging: boolean;
@@ -53,6 +54,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
       onBlockDelete,
       zoomLevel,
       panOffset,
+      onZoomChange,
       onPanOffsetChange,
       showGrid,
       isDragging,
@@ -118,10 +120,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
           // Start panning or selection box
           // Pan: hand tool active, or modifier key, or middle mouse
           const shouldPan =
-            activeTool === "pan" ||
-            e.metaKey ||
-            e.ctrlKey ||
-            e.button === 1;
+            activeTool === "pan" || e.metaKey || e.ctrlKey || e.button === 1;
           if (shouldPan) {
             setIsPanning(true);
             setPanStart({
@@ -196,7 +195,12 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
             .map((block) => block.id);
 
           const selectedBlockIds = selectionBox.additive
-            ? [...new Set([...selectionBox.initialSelection, ...marqueeBlockIds])]
+            ? [
+                ...new Set([
+                  ...selectionBox.initialSelection,
+                  ...marqueeBlockIds,
+                ]),
+              ]
             : marqueeBlockIds;
 
           onBlockSelect(selectedBlockIds);
@@ -219,13 +223,35 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
       setSelectionBox(null);
     }, []);
 
-    // Handle wheel zoom
-    const handleWheel = useCallback((e: React.WheelEvent) => {
-      if (e.metaKey || e.ctrlKey) {
+    // Handle wheel zoom (scroll = zoom toward cursor; Cmd/Ctrl+scroll also zooms)
+    const handleWheel = useCallback(
+      (e: React.WheelEvent) => {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (!rect) return;
+
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        const canvasX = (mx - panOffset.x) / zoomLevel;
+        const canvasY = (my - panOffset.y) / zoomLevel;
+
+        const ZOOM_SENSITIVITY = 0.002;
+        const MIN_ZOOM = 0.1;
+        const MAX_ZOOM = 3;
+        const newZoom = Math.min(
+          MAX_ZOOM,
+          Math.max(MIN_ZOOM, zoomLevel * (1 - e.deltaY * ZOOM_SENSITIVITY))
+        );
+
+        // Keep the point under the cursor fixed in screen space
+        const newPanX = mx - canvasX * newZoom;
+        const newPanY = my - canvasY * newZoom;
+
         e.preventDefault();
-        // Zoom behavior would be handled by parent component
-      }
-    }, []);
+        onZoomChange(newZoom);
+        onPanOffsetChange({ x: newPanX, y: newPanY });
+      },
+      [zoomLevel, panOffset, onZoomChange, onPanOffsetChange]
+    );
 
     // Double-click to add note
     const handleDoubleClick = useCallback(
@@ -377,6 +403,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
                   <p>• Double-click to add a note</p>
                   <p>• Use the sidebar to add different block types</p>
                   <p>• Drag blocks to rearrange them</p>
+                  <p>• Scroll to zoom in and out</p>
                   <p>
                     • Hand tool ({getKeyboardShortcut("H")}) or hold{" "}
                     {getKeyboardShortcut("⌘")} to pan

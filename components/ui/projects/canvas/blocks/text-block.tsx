@@ -1,10 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  getTextContent,
-  type TextBlockContent,
-} from "./text-defaults";
+import { getTextContent, type TextBlockContent } from "./text-defaults";
 
 interface CanvasBlock {
   id: string;
@@ -32,10 +29,7 @@ export function TextBlock({ block, onUpdate, isEditable }: TextBlockProps) {
   useEffect(() => {
     const c = getTextContent(block.content);
     setLocalText(c.text);
-    if (
-      editRef.current &&
-      document.activeElement !== editRef.current
-    ) {
+    if (editRef.current && document.activeElement !== editRef.current) {
       editRef.current.textContent = c.text;
     }
   }, [block.content]);
@@ -113,7 +107,11 @@ export function TextBlock({ block, onUpdate, isEditable }: TextBlockProps) {
 
   const handleWrapperClick = useCallback(
     (e: React.MouseEvent) => {
-      if (isEditable && editRef.current && !editRef.current.contains(e.target as Node)) {
+      if (
+        isEditable &&
+        editRef.current &&
+        !editRef.current.contains(e.target as Node)
+      ) {
         editRef.current.focus();
       }
     },
@@ -124,7 +122,14 @@ export function TextBlock({ block, onUpdate, isEditable }: TextBlockProps) {
     <div
       className="h-full min-h-0 overflow-auto px-4 py-3 flex items-center cursor-text"
       data-no-block-drag
-      style={{ justifyContent: content.textAlign === "center" ? "center" : content.textAlign === "right" ? "flex-end" : "flex-start" }}
+      style={{
+        justifyContent:
+          content.textAlign === "center"
+            ? "center"
+            : content.textAlign === "right"
+            ? "flex-end"
+            : "flex-start",
+      }}
       onClick={handleWrapperClick}
     >
       {!isEditable ? (

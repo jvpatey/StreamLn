@@ -3,10 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/shared/button";
 import { getLiquidGlassSurfaceClassName } from "@/components/ui/shared/liquid-glass-surface";
-import {
-  getTextContent,
-  type TextBlockContent,
-} from "./text-defaults";
+import { getTextContent, type TextBlockContent } from "./text-defaults";
 import { AlignLeft, AlignCenter, AlignRight } from "lucide-react";
 
 interface CanvasBlock {
@@ -51,7 +48,10 @@ function updateContent(
   onUpdate({ content: { ...content, ...updates } as TextBlockContent });
 }
 
-export function TextBlockFormatBar({ block, onUpdate }: TextBlockFormatBarProps) {
+export function TextBlockFormatBar({
+  block,
+  onUpdate,
+}: TextBlockFormatBarProps) {
   const [fontOpen, setFontOpen] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
   const content = getTextContent(block.content);
@@ -74,7 +74,8 @@ export function TextBlockFormatBar({ block, onUpdate }: TextBlockFormatBarProps)
           className="h-7 px-2 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 min-w-[4rem]"
           title="Font"
         >
-          {TEXT_FONTS.find((f) => f.value === content.fontFamily)?.label ?? "Font"}
+          {TEXT_FONTS.find((f) => f.value === content.fontFamily)?.label ??
+            "Font"}
         </Button>
         {fontOpen && (
           <div
@@ -135,7 +136,9 @@ export function TextBlockFormatBar({ block, onUpdate }: TextBlockFormatBarProps)
         >
           <span
             className="block w-4 h-4 rounded border border-slate-300 dark:border-slate-600"
-            style={{ backgroundColor: content.color ?? "hsl(var(--foreground))" }}
+            style={{
+              backgroundColor: content.color ?? "hsl(var(--foreground))",
+            }}
           />
         </Button>
         {colorOpen && (
@@ -183,7 +186,9 @@ export function TextBlockFormatBar({ block, onUpdate }: TextBlockFormatBarProps)
         <Button
           variant={content.textAlign === "center" ? "default" : "ghost"}
           size="sm"
-          onClick={() => updateContent(block, onUpdate, { textAlign: "center" })}
+          onClick={() =>
+            updateContent(block, onUpdate, { textAlign: "center" })
+          }
           className={`h-7 w-7 p-0 ${
             content.textAlign === "center"
               ? "bg-primary-600 hover:bg-primary-700 text-white"

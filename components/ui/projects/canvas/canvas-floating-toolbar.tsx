@@ -64,7 +64,7 @@ export function CanvasFloatingToolbar({
   const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
 
   const selectedBlocksData = canvasBlocks.filter((block) =>
-    selectedBlocks.includes(block.id),
+    selectedBlocks.includes(block.id)
   );
 
   const hasMultipleBlocks = selectedBlocks.length > 1;
@@ -125,7 +125,7 @@ export function CanvasFloatingToolbar({
     if (!hasMultipleBlocks) return;
     const leftmost = Math.min(...selectedBlocksData.map((block) => block.x));
     const rightmost = Math.max(
-      ...selectedBlocksData.map((block) => block.x + block.width),
+      ...selectedBlocksData.map((block) => block.x + block.width)
     );
     const center = leftmost + (rightmost - leftmost) / 2;
 
@@ -140,7 +140,7 @@ export function CanvasFloatingToolbar({
   const handleAlignRight = () => {
     if (!hasMultipleBlocks) return;
     const rightmost = Math.max(
-      ...selectedBlocksData.map((block) => block.x + block.width),
+      ...selectedBlocksData.map((block) => block.x + block.width)
     );
     selectedBlocks.forEach((blockId) => {
       const block = selectedBlocksData.find((b) => b.id === blockId);
@@ -180,8 +180,7 @@ export function CanvasFloatingToolbar({
 
   const TEXT_SIZES = [12, 14, 16, 18, 24];
 
-  const isSingleTextBlock =
-    singleBlock?.type === "text";
+  const isSingleTextBlock = singleBlock?.type === "text";
 
   const updateTextBlockContent = (
     blockId: string,
@@ -222,9 +221,7 @@ export function CanvasFloatingToolbar({
     setTextColorPickerOpen(false);
   };
 
-  const handleTextAlignChange = (
-    textAlign: "left" | "center" | "right"
-  ) => {
+  const handleTextAlignChange = (textAlign: "left" | "center" | "right") => {
     if (!singleBlock || singleBlock.type !== "text") return;
     updateTextBlockContent(singleBlock.id, { textAlign });
   };
@@ -379,150 +376,169 @@ export function CanvasFloatingToolbar({
       )}
 
       {/* Text formatting (single text block) */}
-      {isSingleTextBlock && singleBlock && (() => {
-        const textContent = getTextContent(singleBlock.content);
-        return (
-          <>
-            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
-            <span className="text-xs text-slate-500 dark:text-slate-400 px-0.5">Text</span>
-            {/* Font */}
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setFontDropdownOpen(!fontDropdownOpen);
-                  setTextColorPickerOpen(false);
-                }}
-                className="h-8 px-2 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 min-w-[4rem]"
-                title="Font"
-              >
-                {TEXT_FONTS.find((f) => f.value === textContent.fontFamily)?.label ?? "Font"}
-              </Button>
-              {fontDropdownOpen && (
-                <div
-                  className={getLiquidGlassSurfaceClassName({
-                    variant: "popover",
-                    intensity: "xl",
-                    rounded: "lg",
-                    className: "absolute bottom-full mb-1 left-0 py-1 min-w-[7rem]",
-                  })}
-                >
-                  {TEXT_FONTS.map((f) => (
-                    <button
-                      key={f.value}
-                      onClick={() => handleTextFontChange(f.value)}
-                      className="w-full text-left px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                    >
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            {/* Size */}
-            <div className="flex items-center gap-0.5">
-              {TEXT_SIZES.map((size) => (
+      {isSingleTextBlock &&
+        singleBlock &&
+        (() => {
+          const textContent = getTextContent(singleBlock.content);
+          return (
+            <>
+              <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
+              <span className="text-xs text-slate-500 dark:text-slate-400 px-0.5">
+                Text
+              </span>
+              {/* Font */}
+              <div className="relative">
                 <Button
-                  key={size}
-                  variant={textContent.fontSize === size ? "default" : "ghost"}
+                  variant="ghost"
                   size="sm"
-                  onClick={() => handleTextSizeChange(size)}
-                  className={`h-8 w-8 p-0 text-xs ${
-                    textContent.fontSize === size
-                      ? "bg-primary-600 hover:bg-primary-700 text-white"
-                      : "text-slate-600 dark:text-slate-400"
-                  }`}
-                  title={`${size}px`}
+                  onClick={() => {
+                    setFontDropdownOpen(!fontDropdownOpen);
+                    setTextColorPickerOpen(false);
+                  }}
+                  className="h-8 px-2 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 min-w-[4rem]"
+                  title="Font"
                 >
-                  {size}
+                  {TEXT_FONTS.find((f) => f.value === textContent.fontFamily)
+                    ?.label ?? "Font"}
                 </Button>
-              ))}
-            </div>
-            {/* Text color */}
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setTextColorPickerOpen(!textColorPickerOpen);
-                  setFontDropdownOpen(false);
-                }}
-                className="h-8 w-8 p-0"
-                title="Text color"
-              >
-                <Type size={14} className="text-slate-600 dark:text-slate-400" />
-                <span
-                  className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full"
-                  style={{ backgroundColor: textContent.color ?? "hsl(var(--foreground))" }}
-                />
-              </Button>
-              {textColorPickerOpen && (
-                <div
-                  className={getLiquidGlassSurfaceClassName({
-                    variant: "popover",
-                    intensity: "xl",
-                    rounded: "lg",
-                    className: "absolute bottom-full left-0 z-50 mb-2 w-[7rem] p-2",
-                  })}
-                >
-                  <div className="grid grid-cols-4 grid-rows-2 gap-1">
-                    {QUICK_COLORS.map((color) => (
+                {fontDropdownOpen && (
+                  <div
+                    className={getLiquidGlassSurfaceClassName({
+                      variant: "popover",
+                      intensity: "xl",
+                      rounded: "lg",
+                      className:
+                        "absolute bottom-full mb-1 left-0 py-1 min-w-[7rem]",
+                    })}
+                  >
+                    {TEXT_FONTS.map((f) => (
                       <button
-                        key={color}
-                        onClick={() => handleTextColorChange(color)}
-                        className="h-6 w-6 shrink-0 rounded border border-slate-200 dark:border-slate-600 hover:scale-110 transition-transform"
-                        style={{ backgroundColor: color }}
-                        title={color}
-                      />
+                        key={f.value}
+                        onClick={() => handleTextFontChange(f.value)}
+                        className="w-full text-left px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      >
+                        {f.label}
+                      </button>
                     ))}
                   </div>
-                </div>
-              )}
-            </div>
-            {/* Text alignment */}
-            <Button
-              variant={textContent.textAlign === "left" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => handleTextAlignChange("left")}
-              className={`h-8 w-8 p-0 ${
-                textContent.textAlign === "left"
-                  ? "bg-primary-600 hover:bg-primary-700 text-white"
-                  : "text-slate-600 dark:text-slate-400"
-              }`}
-              title="Align text left"
-            >
-              <AlignLeft size={14} />
-            </Button>
-            <Button
-              variant={textContent.textAlign === "center" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => handleTextAlignChange("center")}
-              className={`h-8 w-8 p-0 ${
-                textContent.textAlign === "center"
-                  ? "bg-primary-600 hover:bg-primary-700 text-white"
-                  : "text-slate-600 dark:text-slate-400"
-              }`}
-              title="Align text center"
-            >
-              <AlignCenter size={14} />
-            </Button>
-            <Button
-              variant={textContent.textAlign === "right" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => handleTextAlignChange("right")}
-              className={`h-8 w-8 p-0 ${
-                textContent.textAlign === "right"
-                  ? "bg-primary-600 hover:bg-primary-700 text-white"
-                  : "text-slate-600 dark:text-slate-400"
-              }`}
-              title="Align text right"
-            >
-              <AlignRight size={14} />
-            </Button>
-          </>
-        );
-      })()}
+                )}
+              </div>
+              {/* Size */}
+              <div className="flex items-center gap-0.5">
+                {TEXT_SIZES.map((size) => (
+                  <Button
+                    key={size}
+                    variant={
+                      textContent.fontSize === size ? "default" : "ghost"
+                    }
+                    size="sm"
+                    onClick={() => handleTextSizeChange(size)}
+                    className={`h-8 w-8 p-0 text-xs ${
+                      textContent.fontSize === size
+                        ? "bg-primary-600 hover:bg-primary-700 text-white"
+                        : "text-slate-600 dark:text-slate-400"
+                    }`}
+                    title={`${size}px`}
+                  >
+                    {size}
+                  </Button>
+                ))}
+              </div>
+              {/* Text color */}
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setTextColorPickerOpen(!textColorPickerOpen);
+                    setFontDropdownOpen(false);
+                  }}
+                  className="h-8 w-8 p-0"
+                  title="Text color"
+                >
+                  <Type
+                    size={14}
+                    className="text-slate-600 dark:text-slate-400"
+                  />
+                  <span
+                    className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full"
+                    style={{
+                      backgroundColor:
+                        textContent.color ?? "hsl(var(--foreground))",
+                    }}
+                  />
+                </Button>
+                {textColorPickerOpen && (
+                  <div
+                    className={getLiquidGlassSurfaceClassName({
+                      variant: "popover",
+                      intensity: "xl",
+                      rounded: "lg",
+                      className:
+                        "absolute bottom-full left-0 z-50 mb-2 w-[7rem] p-2",
+                    })}
+                  >
+                    <div className="grid grid-cols-4 grid-rows-2 gap-1">
+                      {QUICK_COLORS.map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => handleTextColorChange(color)}
+                          className="h-6 w-6 shrink-0 rounded border border-slate-200 dark:border-slate-600 hover:scale-110 transition-transform"
+                          style={{ backgroundColor: color }}
+                          title={color}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* Text alignment */}
+              <Button
+                variant={textContent.textAlign === "left" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => handleTextAlignChange("left")}
+                className={`h-8 w-8 p-0 ${
+                  textContent.textAlign === "left"
+                    ? "bg-primary-600 hover:bg-primary-700 text-white"
+                    : "text-slate-600 dark:text-slate-400"
+                }`}
+                title="Align text left"
+              >
+                <AlignLeft size={14} />
+              </Button>
+              <Button
+                variant={
+                  textContent.textAlign === "center" ? "default" : "ghost"
+                }
+                size="sm"
+                onClick={() => handleTextAlignChange("center")}
+                className={`h-8 w-8 p-0 ${
+                  textContent.textAlign === "center"
+                    ? "bg-primary-600 hover:bg-primary-700 text-white"
+                    : "text-slate-600 dark:text-slate-400"
+                }`}
+                title="Align text center"
+              >
+                <AlignCenter size={14} />
+              </Button>
+              <Button
+                variant={
+                  textContent.textAlign === "right" ? "default" : "ghost"
+                }
+                size="sm"
+                onClick={() => handleTextAlignChange("right")}
+                className={`h-8 w-8 p-0 ${
+                  textContent.textAlign === "right"
+                    ? "bg-primary-600 hover:bg-primary-700 text-white"
+                    : "text-slate-600 dark:text-slate-400"
+                }`}
+                title="Align text right"
+              >
+                <AlignRight size={14} />
+              </Button>
+            </>
+          );
+        })()}
 
       {/* Layer Controls */}
       <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />

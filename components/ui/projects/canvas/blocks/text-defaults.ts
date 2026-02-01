@@ -42,8 +42,7 @@ export function getTextContent(value: unknown): TextBlockContent {
         : "left";
     return {
       text: typeof v.text === "string" ? v.text : "",
-      fontFamily:
-        typeof v.fontFamily === "string" ? v.fontFamily : "system-ui",
+      fontFamily: typeof v.fontFamily === "string" ? v.fontFamily : "system-ui",
       fontSize:
         typeof v.fontSize === "number" && v.fontSize > 0
           ? v.fontSize
