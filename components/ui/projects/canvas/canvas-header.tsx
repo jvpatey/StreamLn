@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import { LiquidGlassButton } from "@/components/ui/shared/liquid-glass-button";
@@ -14,19 +16,16 @@ import { ProjectStatusBadge } from "@/components/ui/projects/shared";
 import { useTheme } from "next-themes";
 import {
   ArrowLeft,
-  Layers,
   Eye,
   Edit3,
   Share2,
   Settings,
   Users,
-  MoreVertical,
-  PanelLeftOpen,
-  PanelLeftClose,
   Download,
   BookOpen,
   Sun,
   Moon,
+  LogOut,
 } from "lucide-react";
 import {
   Popover,
@@ -76,8 +75,6 @@ interface CanvasHeaderProps {
   project: Project;
   viewMode: "edit" | "present";
   onViewModeChange: (mode: "edit" | "present") => void;
-  onSidebarToggle: () => void;
-  sidebarOpen: boolean;
 }
 
 // Canvas header component used in the canvas page
@@ -85,11 +82,18 @@ export function CanvasHeader({
   project,
   viewMode,
   onViewModeChange,
-  onSidebarToggle,
-  sidebarOpen,
 }: CanvasHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { user } = useUser();
+  const { signOut } = useClerk();
+
+  const userName = user?.fullName ?? user?.firstName ?? "User";
+  const userEmail = user?.primaryEmailAddress?.emailAddress ?? "";
+  const userImage = user?.imageUrl ?? "";
+  const userInitials = user?.firstName?.[0] && user?.lastName?.[0]
+    ? `${user.firstName[0]}${user.lastName[0]}`
+    : user?.firstName?.[0] ?? user?.emailAddresses?.[0]?.emailAddress?.[0] ?? "?";
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -165,21 +169,23 @@ export function CanvasHeader({
                 })
               )}
             >
-              {/* Sliding indicator */}
-              <div
+              {/* Sliding indicator - spring animation matches sidebar */}
+              <motion.div
                 className={cn(
-                  "absolute left-1 top-1 h-9 w-24 rounded-xl pointer-events-none transition-transform duration-200 ease-out",
+                  "absolute left-1 top-1 h-9 w-32 rounded-xl pointer-events-none",
                   "bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/20 dark:via-primary-400/25 dark:to-accent-500/20",
                   "backdrop-blur-2xl",
                   "border border-white/30 dark:border-white/20",
                   "shadow-[0_8px_32px_rgba(59,130,246,0.2),0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.3)]",
                   "dark:shadow-[0_8px_32px_rgba(59,130,246,0.15),0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
                 )}
-                style={{
-                  transform:
-                    viewMode === "present"
-                      ? "translateX(calc(100% + 2px))"
-                      : "translateX(0)",
+                animate={{
+                  x: viewMode === "present" ? "calc(100% + 4px)" : 0,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 30,
                 }}
               />
               <button
@@ -188,7 +194,7 @@ export function CanvasHeader({
                 aria-checked={viewMode === "edit"}
                 onClick={() => onViewModeChange("edit")}
                 className={cn(
-                  "relative z-10 text-xs rounded-xl h-9 w-24 flex items-center justify-center font-medium transition-colors duration-200",
+                  "relative z-10 text-xs rounded-xl h-9 w-32 flex items-center justify-center font-medium transition-colors duration-200",
                   viewMode === "edit"
                     ? "text-slate-900 dark:text-white"
                     : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100"
@@ -203,7 +209,7 @@ export function CanvasHeader({
                 aria-checked={viewMode === "present"}
                 onClick={() => onViewModeChange("present")}
                 className={cn(
-                  "relative z-10 text-xs rounded-xl h-9 w-24 flex items-center justify-center font-medium transition-colors duration-200",
+                  "relative z-10 text-xs rounded-xl h-9 w-32 flex items-center justify-center font-medium transition-colors duration-200",
                   viewMode === "present"
                     ? "text-slate-900 dark:text-white"
                     : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100"
@@ -235,27 +241,6 @@ export function CanvasHeader({
                   Export
                 </LiquidGlassButton>
               </div>
-              {/* Sidebar Toggle */}
-              <Tooltip content={sidebarOpen ? "Hide sidebar" : "Show sidebar"}>
-                <Button
-                  variant="glass"
-                  size="sm"
-                  onClick={onSidebarToggle}
-                  className="rounded-xl p-0 h-9 w-9 flex items-center justify-center"
-                >
-                  {sidebarOpen ? (
-                    <PanelLeftClose
-                      size={20}
-                      className="text-blue-600 dark:text-blue-300"
-                    />
-                  ) : (
-                    <PanelLeftOpen
-                      size={20}
-                      className="text-blue-600 dark:text-blue-300"
-                    />
-                  )}
-                </Button>
-              </Tooltip>
 
               {/* Theme Toggle */}
               <Button
@@ -280,21 +265,28 @@ export function CanvasHeader({
                 />
               </Button>
 
-              {/* More Menu */}
+              {/* User Menu (avatar trigger) */}
               <Popover open={menuOpen} onOpenChange={setMenuOpen}>
                 <PopoverTrigger asChild>
-                  <Tooltip content="Canvas settings">
-                    <Button
-                      variant="glass"
-                      size="sm"
-                      className="rounded-xl p-0 h-9 w-9 flex items-center justify-center"
-                    >
-                      <MoreVertical
-                        size={20}
-                        className="text-purple-600 dark:text-purple-300"
+                  <Button
+                    variant="glass"
+                    size="sm"
+                    className="rounded-full p-0 h-9 w-9 flex items-center justify-center overflow-hidden"
+                    title="Account & canvas options"
+                    aria-label="Account & canvas options"
+                  >
+                    {userImage ? (
+                      <img
+                        src={userImage}
+                        alt={userName}
+                        className="h-9 w-9 object-cover pointer-events-none"
                       />
-                    </Button>
-                  </Tooltip>
+                    ) : (
+                      <span className="h-9 w-9 flex items-center justify-center rounded-full bg-primary/20 text-primary text-sm font-medium pointer-events-none">
+                        {userInitials}
+                      </span>
+                    )}
+                  </Button>
                 </PopoverTrigger>
                 <PopoverContent
                   align="end"
@@ -302,15 +294,42 @@ export function CanvasHeader({
                     variant: "popover",
                     intensity: "xl",
                     rounded: "xl",
-                    className: "w-48 p-2",
+                    className: "w-56 p-0 overflow-hidden",
                   })}
                 >
-                  <div className="space-y-1">
+                  {/* User info header */}
+                  <div className="p-3 border-b border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-3">
+                      {userImage ? (
+                        <img
+                          src={userImage}
+                          alt={userName}
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="h-10 w-10 flex items-center justify-center rounded-full bg-primary/20 text-primary text-sm font-medium shrink-0">
+                          {userInitials}
+                        </span>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+                          {userName}
+                        </p>
+                        {userEmail && (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                            {userEmail}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-2">
                     {/* Mobile View Mode Toggle */}
                     <div
                       role="radiogroup"
                       aria-label="View mode"
-                      className="md:hidden space-y-1 pb-2 border-b border-slate-200 dark:border-slate-700 mb-2"
+                      className="md:hidden space-y-1 pb-2 mb-2 border-b border-slate-200 dark:border-slate-700"
                     >
                       <button
                         type="button"
@@ -348,25 +367,61 @@ export function CanvasHeader({
                       </button>
                     </div>
 
-                    {/* Mobile Actions */}
-                    <div className="sm:hidden space-y-1 pb-2 border-b border-slate-200 dark:border-slate-700 mb-2">
-                      <button className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                        <Share2 size={14} className="mr-2" />
-                        Share Canvas
-                      </button>
-                      <button className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                        <Download size={14} className="mr-2" />
-                        Export Canvas
-                      </button>
-                    </div>
+                    {/* Back to Projects */}
+                    <Link
+                      href="/projects"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                    >
+                      <ArrowLeft size={14} className="mr-2 shrink-0" />
+                      Back to Projects
+                    </Link>
 
-                    <button className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                      <BookOpen size={14} className="mr-2" />
+                    <div className="h-px bg-slate-200 dark:bg-slate-700 my-2" />
+
+                    {/* Canvas actions */}
+                    <button
+                      type="button"
+                      className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                    >
+                      <Share2 size={14} className="mr-2 shrink-0" />
+                      Share Canvas
+                    </button>
+                    <button
+                      type="button"
+                      className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                    >
+                      <Download size={14} className="mr-2 shrink-0" />
+                      Export Canvas
+                    </button>
+                    <button
+                      type="button"
+                      className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                    >
+                      <BookOpen size={14} className="mr-2 shrink-0" />
                       Canvas Guide
                     </button>
-                    <button className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                      <Settings size={14} className="mr-2" />
+                    <button
+                      type="button"
+                      className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                    >
+                      <Settings size={14} className="mr-2 shrink-0" />
                       Canvas Settings
+                    </button>
+
+                    <div className="h-px bg-slate-200 dark:bg-slate-700 my-2" />
+
+                    {/* Sign out */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        signOut();
+                        setMenuOpen(false);
+                      }}
+                      className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                    >
+                      <LogOut size={14} className="mr-2 shrink-0" />
+                      Sign out
                     </button>
                   </div>
                 </PopoverContent>

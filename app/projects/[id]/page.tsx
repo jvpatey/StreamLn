@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useParams, useRouter } from "next/navigation";
-import { CanvasToolbar } from "@/components/ui/projects/canvas/canvas-toolbar";
+import {
+  CanvasToolbar,
+  type CanvasTool,
+} from "@/components/ui/projects/canvas/canvas-toolbar";
 import { CanvasWorkspace } from "@/components/ui/projects/canvas/canvas-workspace";
 import { CanvasSidebar } from "@/components/ui/projects/canvas/canvas-sidebar";
 import { CanvasFloatingToolbar } from "@/components/ui/projects/canvas/canvas-floating-toolbar";
@@ -13,11 +16,34 @@ import { DEFAULT_LINK_CONTENT } from "@/components/ui/projects/canvas/blocks/lin
 import { DEFAULT_TAG_CONTENT } from "@/components/ui/projects/canvas/blocks/tag-defaults";
 import { getDefaultTaskBoardContent } from "@/components/ui/projects/canvas/blocks/task-board-defaults";
 import { DEFAULT_CODE_CONTENT } from "@/components/ui/projects/canvas/blocks/code-defaults";
-import { PanelLeftOpen } from "lucide-react";
+import { DEFAULT_TEXT_CONTENT } from "@/components/ui/projects/canvas/blocks/text-defaults";
+import {
+  DEFAULT_SHAPE_CONTENT,
+  type ShapeKind,
+} from "@/components/ui/projects/canvas/blocks/shape-defaults";
+import { PanelLeftOpen, PanelTopOpen } from "lucide-react";
+import { motion } from "framer-motion";
+
+function CanvasToolbarShowTab({ onShow }: { onShow: () => void }) {
+  return (
+    <motion.button
+      type="button"
+      onClick={onShow}
+      title="Show toolbar"
+      aria-label="Show toolbar"
+      className="absolute top-0 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center p-2 rounded-b-xl border border-t-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-colors text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+      initial={{ opacity: 0, scale: 0.8, y: -8 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+    >
+      <PanelTopOpen size={18} aria-hidden />
+    </motion.button>
+  );
+}
 
 interface CanvasBlock {
   id: string;
-  type: "note" | "task-board" | "code" | "image" | "link" | "tag";
+  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text" | "shape";
   x: number;
   y: number;
   width: number;
@@ -68,10 +94,16 @@ export default function ProjectCanvasPage() {
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [showGrid, setShowGrid] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [toolbarOpen, setToolbarOpen] = useState(true);
+  const [isToolbarExiting, setIsToolbarExiting] = useState(false);
   const [viewMode, setViewMode] = useState<"edit" | "present">("edit");
+
+  // Canvas tool state (select vs pan)
+  const [activeTool, setActiveTool] = useState<CanvasTool>("select");
 
   // Canvas interaction state
   const [isAddingBlock, setIsAddingBlock] = useState<string | null>(null);
+  const [addingShapeKind, setAddingShapeKind] = useState<ShapeKind>("rectangle");
   const [showFloatingToolbar, setShowFloatingToolbar] = useState(false);
   const [floatingToolbarPosition, setFloatingToolbarPosition] = useState({
     x: 0,
@@ -79,6 +111,39 @@ export default function ProjectCanvasPage() {
   });
 
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  const handleFitToView = useCallback(() => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect || canvasBlocks.length === 0) {
+      setZoomLevel(1);
+      setPanOffset({ x: 0, y: 0 });
+      return;
+    }
+    const viewportWidth = rect.width;
+    const viewportHeight = rect.height;
+    const bounds = canvasBlocks.reduce(
+      (acc, block) => ({
+        left: Math.min(acc.left, block.x),
+        top: Math.min(acc.top, block.y),
+        right: Math.max(acc.right, block.x + block.width),
+        bottom: Math.max(acc.bottom, block.y + block.height),
+      }),
+      { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity },
+    );
+    const padding = 100;
+    const contentWidth = bounds.right - bounds.left + padding * 2;
+    const contentHeight = bounds.bottom - bounds.top + padding * 2;
+    const scaleX = viewportWidth / contentWidth;
+    const scaleY = viewportHeight / contentHeight;
+    const newZoom = Math.min(scaleX, scaleY, 1);
+    const centerX = (bounds.left + bounds.right) / 2;
+    const centerY = (bounds.top + bounds.bottom) / 2;
+    setZoomLevel(newZoom);
+    setPanOffset({
+      x: viewportWidth / 2 - centerX * newZoom,
+      y: viewportHeight / 2 - centerY * newZoom,
+    });
+  }, [canvasBlocks]);
 
   // Load project data
   useEffect(() => {
@@ -152,6 +217,23 @@ export default function ProjectCanvasPage() {
         setSelectedBlocks([]);
         setIsAddingBlock(null);
         setShowFloatingToolbar(false);
+        setActiveTool("select");
+      }
+
+      // Tool shortcuts (only when not in an input)
+      const target = e.target as HTMLElement;
+      if (
+        !target.closest("input") &&
+        !target.closest("textarea") &&
+        !target.closest("[contenteditable]")
+      ) {
+        if (e.key === "v" && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          setActiveTool("select");
+        } else if (e.key === "h" && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          setActiveTool("pan");
+        }
       }
     };
 
@@ -159,34 +241,82 @@ export default function ProjectCanvasPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedBlocks, canvasBlocks]);
 
+  // When a single text or shape block is selected, show floating toolbar above it
+  useEffect(() => {
+    if (selectedBlocks.length === 0) {
+      setShowFloatingToolbar(false);
+      return;
+    }
+    if (selectedBlocks.length !== 1) return;
+
+    const block = canvasBlocks.find((b) => b.id === selectedBlocks[0]);
+    if (!block || (block.type !== "text" && block.type !== "shape")) return;
+
+    const el = canvasRef.current;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const centerX =
+      rect.left +
+      panOffset.x +
+      block.x * zoomLevel +
+      (block.width * zoomLevel) / 2;
+    const topY = rect.top + panOffset.y + block.y * zoomLevel;
+    setFloatingToolbarPosition({
+      x: centerX - 120,
+      y: Math.max(64, topY - 56),
+    });
+    setShowFloatingToolbar(true);
+  }, [selectedBlocks, canvasBlocks, panOffset, zoomLevel]);
+
   // Canvas block manipulation functions
   const addBlock = (type: string, position: { x: number; y: number }) => {
+    const shapeKind = type === "shape" ? addingShapeKind : "rectangle";
+    const isLineOrArrow =
+      type === "shape" &&
+      (shapeKind === "line" || shapeKind === "arrow");
+
     const newBlock: CanvasBlock = {
       id: generateBlockId(type),
-      type: type as any,
+      type: type as CanvasBlock["type"],
       x: position.x,
       y: position.y,
       width:
         type === "note"
           ? 300
           : type === "task-board"
-          ? 480
-          : type === "link"
-          ? 320
-          : type === "tag"
-          ? 240
-          : 350,
+            ? 480
+            : type === "link"
+              ? 320
+              : type === "tag"
+                ? 240
+                : type === "text"
+                  ? 220
+                  : type === "shape"
+                    ? isLineOrArrow
+                      ? 150
+                      : 120
+                    : 350,
       height:
         type === "note"
           ? 200
           : type === "task-board"
-          ? 320
-          : type === "link"
-          ? 180
-          : type === "tag"
-          ? 56
-          : 250,
-      content: getDefaultContent(type),
+            ? 320
+            : type === "link"
+              ? 180
+              : type === "tag"
+                ? 56
+                : type === "text"
+                  ? 80
+                  : type === "shape"
+                    ? isLineOrArrow
+                      ? 24
+                      : 80
+                    : 250,
+      content:
+        type === "shape"
+          ? { ...DEFAULT_SHAPE_CONTENT, shapeKind }
+          : getDefaultContent(type),
       title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
       color: getDefaultColor(type),
       createdAt: new Date(),
@@ -196,28 +326,54 @@ export default function ProjectCanvasPage() {
     setCanvasBlocks((prev) => [...prev, newBlock]);
     setSelectedBlocks([newBlock.id]);
     setIsAddingBlock(null);
+    if (type === "text" || type === "shape") {
+      setActiveTool("select");
+    }
   };
 
   const updateBlock = (id: string, updates: Partial<CanvasBlock>) => {
-    setCanvasBlocks((prev) =>
-      prev.map((block) =>
-        block.id === id
-          ? { ...block, ...updates, updatedAt: new Date() }
-          : block
-      )
-    );
+    setCanvasBlocks((prev) => {
+      const block = prev.find((b) => b.id === id);
+      if (!block) return prev;
+
+      const hasPositionChange = "x" in updates || "y" in updates;
+      const isMultiSelect =
+        selectedBlocks.length > 1 && selectedBlocks.includes(id);
+
+      if (hasPositionChange && isMultiSelect) {
+        const newX = (updates.x ?? block.x) as number;
+        const newY = (updates.y ?? block.y) as number;
+        const deltaX = newX - block.x;
+        const deltaY = newY - block.y;
+        return prev.map((b) => {
+          if (selectedBlocks.includes(b.id)) {
+            return {
+              ...b,
+              x: b.x + deltaX,
+              y: b.y + deltaY,
+              updatedAt: new Date(),
+            };
+          }
+          return b;
+        });
+      }
+
+      return prev.map((b) =>
+        b.id === id ? { ...b, ...updates, updatedAt: new Date() } : b,
+      );
+    });
   };
 
   const deleteSelectedBlocks = () => {
     setCanvasBlocks((prev) =>
-      prev.filter((block) => !selectedBlocks.includes(block.id))
+      prev.filter((block) => !selectedBlocks.includes(block.id)),
     );
     setSelectedBlocks([]);
   };
 
   const duplicateBlocks = () => {
     const blocksToClone = canvasBlocks.filter((block) =>
-      selectedBlocks.includes(block.id)
+      selectedBlocks.includes(block.id),
     );
 
     const clonedBlocks = blocksToClone.map((block) => ({
@@ -259,6 +415,8 @@ export default function ProjectCanvasPage() {
     if (type === "tag") return DEFAULT_TAG_CONTENT;
     if (type === "task-board") return getDefaultTaskBoardContent();
     if (type === "code") return DEFAULT_CODE_CONTENT;
+    if (type === "text") return DEFAULT_TEXT_CONTENT;
+    if (type === "shape") return DEFAULT_SHAPE_CONTENT;
     return {};
   };
 
@@ -276,6 +434,10 @@ export default function ProjectCanvasPage() {
         return "#06b6d4";
       case "tag":
         return "#ef4444";
+      case "text":
+        return "#64748b";
+      case "shape":
+        return "#6b7280";
       default:
         return "#6b7280";
     }
@@ -315,13 +477,11 @@ export default function ProjectCanvasPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden">
       {/* Canvas Header */}
-      <CanvasHeader
-        project={project}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
-        sidebarOpen={sidebarOpen}
-      />
+        <CanvasHeader
+          project={project}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
       {/* Main Canvas Layout */}
       <div className="flex h-[calc(100vh-64px)] relative">
         {/* Floating "Show sidebar" tab when sidebar is closed */}
@@ -331,7 +491,7 @@ export default function ProjectCanvasPage() {
             onClick={() => setSidebarOpen(true)}
             title="Show sidebar"
             aria-label="Show sidebar"
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+            className="absolute left-0 top-4 z-30 flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
           >
             <PanelLeftOpen size={18} aria-hidden />
           </button>
@@ -356,26 +516,50 @@ export default function ProjectCanvasPage() {
         />
         {/* Canvas Workspace Container */}
         <div className="flex-1 relative overflow-hidden">
-          {/* Canvas Toolbar */}
-          <CanvasToolbar
-            zoomLevel={zoomLevel}
-            onZoomChange={setZoomLevel}
-            showGrid={showGrid}
-            onGridToggle={() => setShowGrid(!showGrid)}
-            onResetView={() => {
-              setZoomLevel(1);
-              setPanOffset({ x: 0, y: 0 });
-            }}
-            sidebarOpen={sidebarOpen}
-            onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
-            canvasBlocks={canvasBlocks}
-            selectedBlocks={selectedBlocks}
-            onDeleteSelected={deleteSelectedBlocks}
-            onDuplicateSelected={duplicateBlocks}
-          />
+          {/* Floating "Show toolbar" tab when toolbar is closed */}
+          {!toolbarOpen && !isToolbarExiting && (
+            <CanvasToolbarShowTab onShow={() => setToolbarOpen(true)} />
+          )}
+          {/* Canvas Toolbar (stays mounted during exit animation) */}
+          {(toolbarOpen || isToolbarExiting) && (
+            <CanvasToolbar
+              tool={activeTool}
+              onToolChange={(newTool) => {
+                setActiveTool(newTool);
+                if (newTool === "text") setIsAddingBlock("text");
+                else if (newTool === "shape") setIsAddingBlock("shape");
+                else setIsAddingBlock(null);
+              }}
+              onAddShape={(shapeKind) => {
+                setAddingShapeKind(shapeKind);
+                setActiveTool("shape");
+                setIsAddingBlock("shape");
+              }}
+              zoomLevel={zoomLevel}
+              onZoomChange={setZoomLevel}
+              showGrid={showGrid}
+              onGridToggle={() => setShowGrid(!showGrid)}
+              onResetView={() => {
+                setZoomLevel(1);
+                setPanOffset({ x: 0, y: 0 });
+              }}
+              onFitToView={handleFitToView}
+              onToolbarToggle={() => setIsToolbarExiting(true)}
+              onToolbarExitComplete={() => {
+                setToolbarOpen(false);
+                setIsToolbarExiting(false);
+              }}
+              isExiting={isToolbarExiting}
+              canvasBlocks={canvasBlocks}
+              selectedBlocks={selectedBlocks}
+              onDeleteSelected={deleteSelectedBlocks}
+              onDuplicateSelected={duplicateBlocks}
+            />
+          )}
           {/* Canvas Workspace */}
           <CanvasWorkspace
             ref={canvasRef}
+            activeTool={activeTool}
             blocks={canvasBlocks}
             selectedBlocks={selectedBlocks}
             onBlockSelect={setSelectedBlocks}
@@ -384,6 +568,7 @@ export default function ProjectCanvasPage() {
             onBlockDelete={deleteBlock}
             zoomLevel={zoomLevel}
             panOffset={panOffset}
+            onZoomChange={setZoomLevel}
             onPanOffsetChange={setPanOffset}
             showGrid={showGrid}
             isDragging={isDragging}
@@ -407,6 +592,15 @@ export default function ProjectCanvasPage() {
           selectedBlocks={selectedBlocks}
           canvasBlocks={canvasBlocks}
           onBlockUpdate={updateBlock}
+          onDelete={(blockIds) => {
+            setCanvasBlocks((prev) =>
+              prev.filter((block) => !blockIds.includes(block.id)),
+            );
+            setSelectedBlocks((prev) =>
+              prev.filter((id) => !blockIds.includes(id)),
+            );
+            setShowFloatingToolbar(false);
+          }}
           onClose={() => setShowFloatingToolbar(false)}
           zoomLevel={zoomLevel}
           panOffset={panOffset}

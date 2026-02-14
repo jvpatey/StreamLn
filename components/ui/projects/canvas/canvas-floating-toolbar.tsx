@@ -22,7 +22,10 @@ import {
   AlignRight,
   Link2,
   X,
+  Type,
 } from "lucide-react";
+import { getTextContent } from "./blocks/text-defaults";
+import { getShapeContent } from "./blocks/shape-defaults";
 
 interface CanvasBlock {
   id: string;
@@ -43,6 +46,7 @@ interface CanvasFloatingToolbarProps {
   selectedBlocks: string[];
   canvasBlocks: CanvasBlock[];
   onBlockUpdate: (id: string, updates: Partial<CanvasBlock>) => void;
+  onDelete?: (blockIds: string[]) => void;
   onClose: () => void;
   zoomLevel: number;
   panOffset: { x: number; y: number };
@@ -53,11 +57,14 @@ export function CanvasFloatingToolbar({
   selectedBlocks,
   canvasBlocks,
   onBlockUpdate,
+  onDelete,
   onClose,
   zoomLevel,
   panOffset,
 }: CanvasFloatingToolbarProps) {
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
+  const [textColorPickerOpen, setTextColorPickerOpen] = useState(false);
+  const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
 
   const selectedBlocksData = canvasBlocks.filter((block) =>
     selectedBlocks.includes(block.id),
@@ -83,8 +90,7 @@ export function CanvasFloatingToolbar({
   };
 
   const handleDelete = () => {
-    // Would be handled by parent component
-    console.log("Delete blocks:", selectedBlocks);
+    onDelete?.(selectedBlocks);
     onClose();
   };
 
@@ -104,7 +110,15 @@ export function CanvasFloatingToolbar({
 
   const handleColorChange = (color: string) => {
     selectedBlocks.forEach((blockId) => {
-      onBlockUpdate(blockId, { color });
+      const block = canvasBlocks.find((b) => b.id === blockId);
+      if (block?.type === "shape") {
+        const content = getShapeContent(block.content);
+        onBlockUpdate(blockId, {
+          content: { ...content, strokeColor: color, fillColor: "transparent" },
+        });
+      } else {
+        onBlockUpdate(blockId, { color });
+      }
     });
     setColorPickerOpen(false);
   };
@@ -167,11 +181,68 @@ export function CanvasFloatingToolbar({
     "#84cc16", // Lime
   ];
 
-  // Calculate position accounting for zoom and pan
-  const adjustedPosition = {
-    x: position.x * zoomLevel + panOffset.x,
-    y: position.y * zoomLevel + panOffset.y,
+  const TEXT_FONTS = [
+    { label: "System", value: "system-ui" },
+    { label: "Inter", value: "Inter, system-ui, sans-serif" },
+    { label: "Georgia", value: "Georgia, serif" },
+    { label: "Mono", value: "ui-monospace, monospace" },
+  ];
+
+  const TEXT_SIZES = [12, 14, 16, 18, 24];
+
+  const isSingleTextBlock = singleBlock?.type === "text";
+  const isSingleShapeBlock = singleBlock?.type === "shape";
+
+  const updateTextBlockContent = (
+    blockId: string,
+    updates: Partial<{
+      text: string;
+      fontFamily: string;
+      fontSize: number;
+      color: string;
+      textAlign: "left" | "center" | "right";
+    }>,
+  ) => {
+    const block = canvasBlocks.find((b) => b.id === blockId);
+    if (!block || block.type !== "text") return;
+    const content = getTextContent(block.content);
+    onBlockUpdate(blockId, {
+      content: { ...content, ...updates },
+    });
   };
+
+  const handleTextFontChange = (fontFamily: string) => {
+    if (!singleBlock || singleBlock.type !== "text") return;
+    updateTextBlockContent(singleBlock.id, { fontFamily });
+    setFontDropdownOpen(false);
+  };
+
+  const handleTextSizeChange = (fontSize: number) => {
+    if (!singleBlock || singleBlock.type !== "text") return;
+    updateTextBlockContent(singleBlock.id, { fontSize });
+  };
+
+  const handleTextColorChange = (color: string) => {
+    selectedBlocks.forEach((blockId) => {
+      const block = canvasBlocks.find((b) => b.id === blockId);
+      if (block?.type === "text") {
+        updateTextBlockContent(blockId, { color });
+      }
+    });
+    setTextColorPickerOpen(false);
+  };
+
+  const handleTextAlignChange = (textAlign: "left" | "center" | "right") => {
+    if (!singleBlock || singleBlock.type !== "text") return;
+    updateTextBlockContent(singleBlock.id, { textAlign });
+  };
+
+  // Position is in viewport (client) coordinates; use directly for fixed positioning
+  const toolbarTop = Math.max(64, position.y - 60);
+  const toolbarLeft = Math.min(
+    Math.max(8, position.x - 120),
+    window.innerWidth - 400,
+  );
 
   return (
     <LiquidGlassSurface
@@ -180,8 +251,8 @@ export function CanvasFloatingToolbar({
       rounded="xl"
       className="fixed z-50 p-2 flex items-center space-x-1"
       style={{
-        left: Math.min(adjustedPosition.x, window.innerWidth - 400),
-        top: Math.max(64, adjustedPosition.y - 60),
+        left: toolbarLeft,
+        top: toolbarTop,
       }}
     >
       {/* Duplicate */}
@@ -208,16 +279,33 @@ export function CanvasFloatingToolbar({
 
       <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
 
-      {/* Color Picker */}
+      {/* Color Picker (block color for notes/etc, shape stroke/fill for shapes) */}
       <div className="relative">
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setColorPickerOpen(!colorPickerOpen)}
-          className="h-8 w-8 p-0 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
-          title="Change Color"
+          onClick={() => {
+            setColorPickerOpen(!colorPickerOpen);
+            setTextColorPickerOpen(false);
+          }}
+          className="relative h-8 w-8 p-0 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+          title={
+            isSingleShapeBlock
+              ? "Change shape color"
+              : "Change color"
+          }
         >
           <Palette size={14} />
+          {isSingleShapeBlock && singleBlock && (
+            <span
+              className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full pointer-events-none"
+              style={{
+                backgroundColor:
+                  getShapeContent(singleBlock.content).strokeColor ??
+                  "hsl(var(--foreground) / 0.4)",
+              }}
+            />
+          )}
         </Button>
 
         {colorPickerOpen && (
@@ -226,15 +314,17 @@ export function CanvasFloatingToolbar({
               variant: "popover",
               intensity: "xl",
               rounded: "lg",
-              className: "absolute bottom-full mb-2 left-0 p-2",
+              className:
+                "absolute bottom-full mb-2 left-0 p-2 z-[100] w-[7.5rem]",
             })}
           >
-            <div className="grid grid-cols-4 gap-1">
+            <div className="grid grid-cols-4 gap-1.5">
               {QUICK_COLORS.map((color) => (
                 <button
                   key={color}
+                  type="button"
                   onClick={() => handleColorChange(color)}
-                  className="w-6 h-6 rounded border border-slate-200 dark:border-slate-600 hover:scale-110 transition-transform"
+                  className="aspect-square w-6 h-6 min-w-6 min-h-6 shrink-0 rounded border border-slate-200 dark:border-slate-600 hover:scale-110 transition-transform"
                   style={{ backgroundColor: color }}
                   title={color}
                 />
@@ -314,6 +404,172 @@ export function CanvasFloatingToolbar({
           </Button>
         </>
       )}
+
+      {/* Text formatting (single text block) */}
+      {isSingleTextBlock &&
+        singleBlock &&
+        (() => {
+          const textContent = getTextContent(singleBlock.content);
+          return (
+            <>
+              <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
+              <span className="text-xs text-slate-500 dark:text-slate-400 px-0.5">
+                Text
+              </span>
+              {/* Font */}
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setFontDropdownOpen(!fontDropdownOpen);
+                    setTextColorPickerOpen(false);
+                  }}
+                  className="h-8 px-2 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 min-w-[4rem]"
+                  title="Font"
+                >
+                  {TEXT_FONTS.find((f) => f.value === textContent.fontFamily)
+                    ?.label ?? "Font"}
+                </Button>
+                {fontDropdownOpen && (
+                  <div
+                    className={getLiquidGlassSurfaceClassName({
+                      variant: "popover",
+                      intensity: "xl",
+                      rounded: "lg",
+                      className:
+                        "absolute bottom-full mb-1 left-0 py-1 min-w-[7rem]",
+                    })}
+                  >
+                    {TEXT_FONTS.map((f) => (
+                      <button
+                        key={f.value}
+                        onClick={() => handleTextFontChange(f.value)}
+                        className="w-full text-left px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {/* Size */}
+              <div className="flex items-center gap-0.5">
+                {TEXT_SIZES.map((size) => (
+                  <Button
+                    key={size}
+                    variant={
+                      textContent.fontSize === size ? "default" : "ghost"
+                    }
+                    size="sm"
+                    onClick={() => handleTextSizeChange(size)}
+                    className={`h-8 w-8 p-0 text-xs ${
+                      textContent.fontSize === size
+                        ? "bg-primary-600 hover:bg-primary-700 text-white"
+                        : "text-slate-600 dark:text-slate-400"
+                    }`}
+                    title={`${size}px`}
+                  >
+                    {size}
+                  </Button>
+                ))}
+              </div>
+              {/* Text color */}
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setTextColorPickerOpen(!textColorPickerOpen);
+                    setFontDropdownOpen(false);
+                  }}
+                  className="h-8 w-8 p-0"
+                  title="Text color"
+                >
+                  <Type
+                    size={14}
+                    className="text-slate-600 dark:text-slate-400"
+                  />
+                  <span
+                    className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full"
+                    style={{
+                      backgroundColor:
+                        textContent.color ?? "hsl(var(--foreground))",
+                    }}
+                  />
+                </Button>
+                {textColorPickerOpen && (
+                  <div
+                    className={getLiquidGlassSurfaceClassName({
+                      variant: "popover",
+                      intensity: "xl",
+                      rounded: "lg",
+                      className:
+                        "absolute bottom-full left-0 z-[100] mb-2 w-[7.5rem] p-2",
+                    })}
+                  >
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {QUICK_COLORS.map((color) => (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => handleTextColorChange(color)}
+                          className="aspect-square w-6 h-6 min-w-6 min-h-6 shrink-0 rounded border border-slate-200 dark:border-slate-600 hover:scale-110 transition-transform"
+                          style={{ backgroundColor: color }}
+                          title={color}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* Text alignment */}
+              <Button
+                variant={textContent.textAlign === "left" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => handleTextAlignChange("left")}
+                className={`h-8 w-8 p-0 ${
+                  textContent.textAlign === "left"
+                    ? "bg-primary-600 hover:bg-primary-700 text-white"
+                    : "text-slate-600 dark:text-slate-400"
+                }`}
+                title="Align text left"
+              >
+                <AlignLeft size={14} />
+              </Button>
+              <Button
+                variant={
+                  textContent.textAlign === "center" ? "default" : "ghost"
+                }
+                size="sm"
+                onClick={() => handleTextAlignChange("center")}
+                className={`h-8 w-8 p-0 ${
+                  textContent.textAlign === "center"
+                    ? "bg-primary-600 hover:bg-primary-700 text-white"
+                    : "text-slate-600 dark:text-slate-400"
+                }`}
+                title="Align text center"
+              >
+                <AlignCenter size={14} />
+              </Button>
+              <Button
+                variant={
+                  textContent.textAlign === "right" ? "default" : "ghost"
+                }
+                size="sm"
+                onClick={() => handleTextAlignChange("right")}
+                className={`h-8 w-8 p-0 ${
+                  textContent.textAlign === "right"
+                    ? "bg-primary-600 hover:bg-primary-700 text-white"
+                    : "text-slate-600 dark:text-slate-400"
+                }`}
+                title="Align text right"
+              >
+                <AlignRight size={14} />
+              </Button>
+            </>
+          );
+        })()}
 
       {/* Layer Controls */}
       <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />

@@ -214,6 +214,8 @@ function Column({
   cards,
   isEditable,
   blockColor,
+  isSelected,
+  onSelect,
   onAddCard,
   onColumnTitleChange,
   onCardTextChange,
@@ -222,6 +224,8 @@ function Column({
   cards: Record<string, TaskBoardCard>;
   isEditable: boolean;
   blockColor: string;
+  isSelected: boolean;
+  onSelect: () => void;
   onAddCard: () => void;
   onColumnTitleChange: (title: string) => void;
   onCardTextChange: (cardId: string, text: string) => void;
@@ -265,14 +269,20 @@ function Column({
     <div
       ref={setNodeRef}
       data-no-block-drag
-      className={`flex w-52 shrink-0 flex-col rounded-xl border bg-slate-50/80 dark:bg-slate-900/50 ${
+      onClick={onSelect}
+      className={`flex w-52 shrink-0 flex-col rounded-xl border bg-slate-50/80 dark:bg-slate-900/50 transition-colors ${
         isOver
           ? "border-slate-300 dark:border-slate-500"
-          : "border-slate-200/80 dark:border-slate-700/80"
+          : isSelected
+            ? "border-slate-300 dark:border-slate-500"
+            : "border-slate-200/80 dark:border-slate-700/80"
       }`}
       style={{
         borderTopWidth: 3,
-        borderTopColor: isOver ? blockColor : "transparent",
+        borderTopColor: isOver || isSelected ? blockColor : "transparent",
+        ...(isSelected
+          ? { boxShadow: `inset 0 0 0 2px ${blockColor}50` }
+          : {}),
       }}
     >
       <div
@@ -357,6 +367,7 @@ export function TaskBoardBlock({
   const content = getTaskBoardContent(block.content);
   const [localContent, setLocalContent] = useState(content);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const contentRef = useRef(localContent);
   const clonedContentRef = useRef<TaskBoardContent | null>(null);
@@ -642,6 +653,8 @@ export function TaskBoardBlock({
               cards={localContent.cards}
               isEditable={isEditable}
               blockColor={blockColor}
+              isSelected={selectedColumnId === column.id}
+              onSelect={() => setSelectedColumnId(column.id)}
               onAddCard={() => handleAddCard(column.id)}
               onColumnTitleChange={(title) =>
                 handleColumnTitleChange(column.id, title)

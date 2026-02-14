@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import { getKeyboardShortcut } from "@/lib/utils";
@@ -9,11 +10,14 @@ import {
   ZoomOut,
   Maximize2,
   Grid3x3,
-  PanelLeftClose,
-  PanelLeftOpen,
+  PanelTopClose,
   MousePointer,
   Hand,
   Square,
+  Circle,
+  Minus,
+  ArrowRight,
+  ChevronDown,
   Type,
   Copy,
   Trash2,
@@ -35,6 +39,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/shared/popover";
 import { getLiquidGlassSurfaceClassName } from "@/components/ui/shared/liquid-glass-surface";
+import type { ShapeKind } from "./blocks/shape-defaults";
 
 interface CanvasBlock {
   id: string;
@@ -49,38 +54,55 @@ interface CanvasBlock {
   locked?: boolean;
 }
 
+export type CanvasTool = "select" | "pan" | "text" | "shape";
+
 interface CanvasToolbarProps {
+  tool: CanvasTool;
+  onToolChange: (tool: CanvasTool) => void;
+  onAddShape?: (shapeKind: ShapeKind) => void;
   zoomLevel: number;
   onZoomChange: (zoom: number) => void;
   showGrid: boolean;
   onGridToggle: () => void;
   onResetView: () => void;
-  sidebarOpen?: boolean;
-  onSidebarToggle?: () => void;
+  onFitToView?: () => void;
+  onToolbarToggle?: () => void;
+  onToolbarExitComplete?: () => void;
+  isExiting?: boolean;
   canvasBlocks: CanvasBlock[];
   selectedBlocks: string[];
   onDeleteSelected: () => void;
   onDuplicateSelected: () => void;
 }
 
+const SHAPE_OPTIONS: { kind: ShapeKind; label: string; icon: React.ReactNode }[] = [
+  { kind: "rectangle", label: "Rectangle", icon: <Square size={14} /> },
+  { kind: "circle", label: "Circle", icon: <Circle size={14} /> },
+  { kind: "line", label: "Line", icon: <Minus size={14} /> },
+  { kind: "arrow", label: "Arrow", icon: <ArrowRight size={14} /> },
+];
+
 export function CanvasToolbar({
+  tool,
+  onToolChange,
+  onAddShape,
   zoomLevel,
   onZoomChange,
   showGrid,
   onGridToggle,
   onResetView,
-  sidebarOpen = true,
-  onSidebarToggle,
+  onFitToView,
+  onToolbarToggle,
+  onToolbarExitComplete,
+  isExiting = false,
   canvasBlocks,
   selectedBlocks,
   onDeleteSelected,
   onDuplicateSelected,
 }: CanvasToolbarProps) {
-  const [tool, setTool] = useState<"select" | "pan" | "text" | "shape">(
-    "select"
-  );
   const [alignMenuOpen, setAlignMenuOpen] = useState(false);
   const [layerMenuOpen, setLayerMenuOpen] = useState(false);
+  const [shapeMenuOpen, setShapeMenuOpen] = useState(false);
 
   const hasSelection = selectedBlocks.length > 0;
   const multiSelection = selectedBlocks.length > 1;
@@ -100,49 +122,46 @@ export function CanvasToolbar({
       onResetView();
       return;
     }
+    onFitToView?.();
+  };
 
-    // Calculate bounds of all blocks
-    const bounds = canvasBlocks.reduce(
-      (acc, block) => ({
-        left: Math.min(acc.left, block.x),
-        top: Math.min(acc.top, block.y),
-        right: Math.max(acc.right, block.x + block.width),
-        bottom: Math.max(acc.bottom, block.y + block.height),
-      }),
-      { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity }
-    );
-
-    // Calculate zoom to fit content with padding
-    const padding = 100;
-    const canvasWidth = window.innerWidth;
-    const canvasHeight = window.innerHeight - 180; // Account for header and toolbar
-
-    const contentWidth = bounds.right - bounds.left + padding * 2;
-    const contentHeight = bounds.bottom - bounds.top + padding * 2;
-
-    const scaleX = canvasWidth / contentWidth;
-    const scaleY = canvasHeight / contentHeight;
-    const newZoom = Math.min(scaleX, scaleY, 1);
-
-    onZoomChange(newZoom);
+  const minimizeTransition = {
+    type: "tween" as const,
+    duration: 0.4,
+    ease: [0.32, 0.72, 0, 1] as const,
   };
 
   return (
-    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-40">
-      <div
-        className={getLiquidGlassSurfaceClassName({
-          variant: "toolbar",
-          intensity: "xl",
-          rounded: "xl",
-          className: "flex items-center space-x-2 px-3 py-2",
-        })}
-      >
+    <motion.div
+      className="absolute top-4 left-1/2 z-40"
+      style={{ transformOrigin: "50% 0%" }}
+      initial={{ scale: 0.5, opacity: 0, y: -16 }}
+      animate={
+        isExiting
+          ? { scale: 0.35, opacity: 0, y: -32 }
+          : { scale: 1, opacity: 1, y: 0 }
+      }
+      transition={minimizeTransition}
+      onAnimationComplete={() => {
+        if (isExiting) onToolbarExitComplete?.();
+      }}
+    >
+      <div className="-translate-x-1/2">
+        <div
+          className={getLiquidGlassSurfaceClassName({
+            variant: "toolbar",
+            intensity: "xl",
+            rounded: "xl",
+            className: "flex items-center space-x-2 px-3 py-2",
+          })}
+        >
         {/* Tools Section */}
         <div className="flex items-center space-x-1 pr-3 border-r border-slate-200 dark:border-slate-700">
           <Button
             variant={tool === "select" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setTool("select")}
+            onClick={() => onToolChange("select")}
+            title="Select (V)"
             className={`h-8 w-8 p-0 ${
               tool === "select"
                 ? "bg-primary-600 hover:bg-primary-700 text-white"
@@ -157,7 +176,8 @@ export function CanvasToolbar({
           <Button
             variant={tool === "pan" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setTool("pan")}
+            onClick={() => onToolChange("pan")}
+            title="Pan (H)"
             className={`h-8 w-8 p-0 ${
               tool === "pan"
                 ? "bg-primary-600 hover:bg-primary-700 text-white"
@@ -172,7 +192,8 @@ export function CanvasToolbar({
           <Button
             variant={tool === "text" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setTool("text")}
+            onClick={() => onToolChange("text")}
+            title="Add text (click canvas to place)"
             className={`h-8 w-8 p-0 ${
               tool === "text"
                 ? "bg-primary-600 hover:bg-primary-700 text-white"
@@ -184,21 +205,75 @@ export function CanvasToolbar({
               className={tool === "text" ? "text-white" : undefined}
             />
           </Button>
-          <Button
-            variant={tool === "shape" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => setTool("shape")}
-            className={`h-8 w-8 p-0 ${
-              tool === "shape"
-                ? "bg-primary-600 hover:bg-primary-700 text-white"
-                : ""
-            }`}
-          >
-            <Square
-              size={14}
-              className={tool === "shape" ? "text-white" : undefined}
-            />
-          </Button>
+          {onAddShape ? (
+            <Popover open={shapeMenuOpen} onOpenChange={setShapeMenuOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={tool === "shape" ? "default" : "ghost"}
+                  size="sm"
+                  title="Add shape (click canvas to place)"
+                  className={`h-8 gap-1 px-2 ${
+                    tool === "shape"
+                      ? "bg-primary-600 hover:bg-primary-700 text-white"
+                      : ""
+                  }`}
+                >
+                  <Square
+                    size={14}
+                    className={tool === "shape" ? "text-white" : undefined}
+                  />
+                  <ChevronDown
+                    size={12}
+                    className={tool === "shape" ? "text-white" : undefined}
+                  />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className={getLiquidGlassSurfaceClassName({
+                  variant: "popover",
+                  intensity: "xl",
+                  rounded: "xl",
+                  className: "w-36 p-2",
+                })}
+                align="start"
+                sideOffset={4}
+              >
+                <div className="space-y-0.5">
+                  {SHAPE_OPTIONS.map(({ kind, label, icon }) => (
+                    <button
+                      key={kind}
+                      type="button"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                      onClick={() => {
+                        onAddShape(kind);
+                        setShapeMenuOpen(false);
+                      }}
+                    >
+                      {icon}
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <Button
+              variant={tool === "shape" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => onToolChange("shape")}
+              title="Add shape (click canvas to place)"
+              className={`h-8 w-8 p-0 ${
+                tool === "shape"
+                  ? "bg-primary-600 hover:bg-primary-700 text-white"
+                  : ""
+              }`}
+            >
+              <Square
+                size={14}
+                className={tool === "shape" ? "text-white" : undefined}
+              />
+            </Button>
+          )}
         </div>
 
         {/* Zoom Controls */}
@@ -244,20 +319,16 @@ export function CanvasToolbar({
 
         {/* View Options */}
         <div className="flex items-center space-x-1 pr-3 border-r border-slate-200 dark:border-slate-700">
-          {onSidebarToggle && (
+          {onToolbarToggle && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={onSidebarToggle}
-              title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-              aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+              onClick={onToolbarToggle}
+              title="Hide toolbar"
+              aria-label="Hide toolbar"
               className="h-8 w-8 p-0"
             >
-              {sidebarOpen ? (
-                <PanelLeftClose size={14} />
-              ) : (
-                <PanelLeftOpen size={14} />
-              )}
+              <PanelTopClose size={14} />
             </Button>
           )}
           <Button
@@ -368,8 +439,8 @@ export function CanvasToolbar({
 
         {/* Selection Info */}
         {hasSelection && (
-          <div className="flex items-center space-x-2">
-            <Badge variant="outline" className="text-xs">
+          <div className="flex items-center space-x-2 flex-shrink-0">
+            <Badge variant="outline" className="text-xs whitespace-nowrap">
               {selectedBlocks.length} selected
             </Badge>
           </div>
@@ -382,7 +453,8 @@ export function CanvasToolbar({
             <span>for shortcuts</span>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

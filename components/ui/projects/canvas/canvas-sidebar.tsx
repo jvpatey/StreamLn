@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import {
   LiquidGlassSurface,
   getLiquidGlassSurfaceClassName,
 } from "@/components/ui/shared/liquid-glass-surface";
+import { cn } from "@/lib/utils";
 import {
   FileText,
   Kanban,
@@ -14,8 +16,9 @@ import {
   Image,
   Link,
   Tag,
+  Type,
   Layers,
-  Search,
+  Blocks,
   Plus,
   PanelLeftClose,
   Eye,
@@ -26,7 +29,7 @@ import {
 
 interface CanvasBlock {
   id: string;
-  type: "note" | "task-board" | "code" | "image" | "link" | "tag";
+  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text" | "shape";
   x: number;
   y: number;
   width: number;
@@ -93,6 +96,13 @@ const BLOCK_TYPES = [
     icon: Tag,
     color: "#ef4444",
   },
+  {
+    type: "text",
+    label: "Text",
+    description: "Short labels and comments",
+    icon: Type,
+    color: "#64748b",
+  },
 ];
 
 export function CanvasSidebar({
@@ -105,13 +115,6 @@ export function CanvasSidebar({
   onBlockSelect,
 }: CanvasSidebarProps) {
   const [activeTab, setActiveTab] = useState<"blocks" | "layers">("blocks");
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredBlockTypes = BLOCK_TYPES.filter(
-    (blockType) =>
-      blockType.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      blockType.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -139,7 +142,7 @@ export function CanvasSidebar({
   const renderLayersTab = () => (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+        <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
           Canvas Layers
         </h3>
         <Badge variant="glass" className="text-xs">
@@ -162,7 +165,7 @@ export function CanvasSidebar({
           </Button>
         </div>
       ) : (
-        <div className="space-y-2 max-h-96 overflow-y-auto">
+        <div className="space-y-2 max-h-96 overflow-y-auto overflow-x-hidden">
           {canvasBlocks
             .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
             .map((block) => {
@@ -174,7 +177,7 @@ export function CanvasSidebar({
                 if (e.metaKey || e.ctrlKey) {
                   if (selectedBlocks.includes(block.id)) {
                     onBlockSelect(
-                      selectedBlocks.filter((id) => id !== block.id)
+                      selectedBlocks.filter((id) => id !== block.id),
                     );
                   } else {
                     onBlockSelect([...selectedBlocks, block.id]);
@@ -267,173 +270,200 @@ export function CanvasSidebar({
 
   return (
     <div
-      className={`flex-shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out ${
-        isOpen ? "w-80" : "w-0"
+      className={`flex-shrink-0 transition-[width] duration-300 ease-in-out relative ${
+        isOpen ? "w-80 overflow-visible z-20" : "w-0 overflow-hidden"
       }`}
     >
       <div className="w-80 h-full">
         <LiquidGlassSurface
           variant="panel"
           intensity="xl"
-          className="w-80 h-full flex flex-col border-r border-white/30 dark:border-white/15"
+          className="relative w-80 h-full flex flex-col border-r border-white/30 dark:border-white/15"
         >
-          {/* Header */}
-          <LiquidGlassSurface
-            variant="panel"
-            intensity="md"
-            rounded="none"
-            shadow={false}
-            className="flex items-center justify-between p-4 border-b border-white/25 dark:border-white/10"
+          {/* Hide sidebar tab - on sidebar margin, extends out into canvas */}
+          <button
+            type="button"
+            onClick={onClose}
+            title="Hide sidebar"
+            aria-label="Hide sidebar"
+            className="absolute right-0 top-4 translate-x-full z-[60] cursor-pointer flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 pointer-events-auto"
           >
-            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">
-              Canvas Tools
-            </h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              title="Hide sidebar"
-              aria-label="Hide sidebar"
-              className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full"
-            >
-              <PanelLeftClose size={16} />
-            </Button>
-          </LiquidGlassSurface>
+            <PanelLeftClose size={18} aria-hidden />
+          </button>
 
-          {/* Tabs */}
-          <div className="flex border-b border-white/20 dark:border-white/10 bg-transparent">
-            <button
-              onClick={() => setActiveTab("blocks")}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-t-xl
-            ${
-              activeTab === "blocks"
-                ? "text-primary bg-primary/10 border-b-2 border-primary shadow-none"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 border-b-2 border-transparent"
-            }
-          `}
+          {/* Tabs - Segmented control, same width as block cards below */}
+          <div className="px-4 pt-4 pb-2 shrink-0">
+            <div
+              role="radiogroup"
+              aria-label="Sidebar panel"
+              className={cn(
+                "flex items-center p-1 gap-0.5 relative w-full min-w-0",
+                getLiquidGlassSurfaceClassName({
+                  variant: "toolbar",
+                  intensity: "xl",
+                  rounded: "2xl",
+                  className: "flex w-full min-w-0",
+                }),
+              )}
             >
-              <div className="flex items-center justify-center space-x-2">
-                <Plus size={14} />
-                <span>Blocks</span>
-              </div>
-            </button>
-            <button
-              onClick={() => setActiveTab("layers")}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors rounded-t-xl
-            ${
-              activeTab === "layers"
-                ? "text-primary bg-primary/10 border-b-2 border-primary shadow-none"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 border-b-2 border-transparent"
-            }
-          `}
-            >
-              <div className="flex items-center justify-center space-x-2">
+              {/* Sliding indicator - spring-like easing */}
+              <motion.div
+                className={cn(
+                  "absolute left-1 top-1 h-9 rounded-xl pointer-events-none",
+                  "w-[calc(50%-6px)]",
+                  "bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/20 dark:via-primary-400/25 dark:to-accent-500/20",
+                  "backdrop-blur-2xl",
+                  "border border-white/30 dark:border-white/20",
+                  "shadow-[0_8px_32px_rgba(59,130,246,0.2),0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.3)]",
+                  "dark:shadow-[0_8px_32px_rgba(59,130,246,0.15),0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]",
+                )}
+                animate={{
+                  x: activeTab === "layers" ? "calc(100% + 4px)" : 0,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 30,
+                }}
+              />
+              <button
+                type="button"
+                role="radio"
+                aria-checked={activeTab === "blocks"}
+                onClick={() => setActiveTab("blocks")}
+                className={cn(
+                  "relative z-10 flex-1 min-w-0 text-sm rounded-xl h-9 flex items-center justify-center gap-2 font-medium transition-colors duration-200",
+                  activeTab === "blocks"
+                    ? "text-slate-900 dark:text-white"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100",
+                )}
+              >
+                <Blocks size={14} />
+                Blocks
+              </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={activeTab === "layers"}
+                onClick={() => setActiveTab("layers")}
+                className={cn(
+                  "relative z-10 flex-1 min-w-0 text-sm rounded-xl h-9 flex items-center justify-center gap-2 font-medium transition-colors duration-200",
+                  activeTab === "layers"
+                    ? "text-slate-900 dark:text-white"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100",
+                )}
+              >
                 <Layers size={14} />
-                <span>Layers</span>
-              </div>
-            </button>
+                Layers
+              </button>
+            </div>
           </div>
 
-          {/* Content */}
-          <div className="flex-1 p-4 overflow-y-auto">
-            {activeTab === "blocks" && (
-              <div className="space-y-4">
-                {/* Search */}
-                <div className="relative">
-                  <Search
-                    size={16}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search blocks..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 text-sm border border-white/25 dark:border-white/15 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md rounded-xl text-slate-700 dark:text-slate-300 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-                  />
-                </div>
+          {/* Content - AnimatePresence for tab transitions */}
+          <div className="flex-1 min-w-0 relative overflow-hidden">
+            <AnimatePresence initial={false} mode="wait">
+              {activeTab === "blocks" && (
+                <motion.div
+                  key="blocks"
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -16 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                  className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 space-y-4"
+                >
+                  {/* Compact stats at top - full width */}
+                  <div className="flex items-center justify-between w-full gap-3 text-xs text-slate-500 dark:text-slate-400">
+                    <span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">
+                        {canvasBlocks.length}
+                      </span>{" "}
+                      blocks
+                    </span>
+                    <span className="text-slate-400 dark:text-slate-500">
+                      ·
+                    </span>
+                    <span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">
+                        {selectedBlocks.length}
+                      </span>{" "}
+                      selected
+                    </span>
+                  </div>
 
-                {/* Block Types */}
-                <div className="space-y-2">
-                  <h3 className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                    Add Blocks
-                  </h3>
-                  <div className="grid grid-cols-1 gap-3">
-                    {filteredBlockTypes.map((blockType) => {
-                      const IconComponent = blockType.icon;
-                      return (
-                        <div
-                          key={blockType.type}
-                          className={getLiquidGlassSurfaceClassName({
-                            variant: "panel",
-                            intensity: "md",
-                            rounded: "2xl",
-                            className:
-                              "p-3 cursor-pointer transition-all duration-200 hover:scale-105 border-l-4 hover:border-white/40 dark:hover:border-white/30",
-                          })}
-                          style={{ borderLeftColor: blockType.color }}
-                          onClick={() => onAddBlock(blockType.type)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              onAddBlock(blockType.type);
-                            }
-                          }}
-                          role="button"
-                          tabIndex={0}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div
-                              className="p-2 rounded-xl"
-                              style={{
-                                backgroundColor: `${blockType.color}22`,
-                              }}
-                            >
-                              <IconComponent
-                                size={18}
-                                style={{ color: blockType.color }}
+                  {/* Block Types */}
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                      Add Blocks
+                    </h3>
+                    <div className="grid grid-cols-1 gap-3">
+                      {BLOCK_TYPES.map((blockType) => {
+                        const IconComponent = blockType.icon;
+                        return (
+                          <div
+                            key={blockType.type}
+                            className={getLiquidGlassSurfaceClassName({
+                              variant: "panel",
+                              intensity: "md",
+                              rounded: "2xl",
+                              className:
+                                "p-3 cursor-pointer transition-all duration-200 hover:scale-105 border-l-4 hover:border-white/40 dark:hover:border-white/30",
+                            })}
+                            style={{ borderLeftColor: blockType.color }}
+                            onClick={() => onAddBlock(blockType.type)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                onAddBlock(blockType.type);
+                              }
+                            }}
+                            role="button"
+                            tabIndex={0}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div
+                                className="p-2 rounded-xl flex-shrink-0"
+                                style={{
+                                  backgroundColor: `${blockType.color}22`,
+                                }}
+                              >
+                                <IconComponent
+                                  size={18}
+                                  style={{ color: blockType.color }}
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0 overflow-hidden">
+                                <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100 truncate">
+                                  {blockType.label}
+                                </h4>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 truncate">
+                                  {blockType.description}
+                                </p>
+                              </div>
+                              <Plus
+                                size={16}
+                                className="text-slate-400 flex-shrink-0"
                               />
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                                {blockType.label}
-                              </h4>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                                {blockType.description}
-                              </p>
-                            </div>
-                            <Plus size={16} className="text-slate-400" />
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Quick Stats */}
-                <div className="pt-4 border-t border-white/20 dark:border-white/10">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                        {canvasBlocks.length}
-                      </div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400">
-                        Total Blocks
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                        {selectedBlocks.length}
-                      </div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400">
-                        Selected
-                      </div>
+                        );
+                      })}
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
-            {activeTab === "layers" && renderLayersTab()}
+                </motion.div>
+              )}
+              {activeTab === "layers" && (
+                <motion.div
+                  key="layers"
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 16 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                  className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4"
+                >
+                  {renderLayersTab()}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </LiquidGlassSurface>
       </div>
