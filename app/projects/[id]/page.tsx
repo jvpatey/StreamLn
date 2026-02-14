@@ -21,6 +21,8 @@ import {
   DEFAULT_SHAPE_CONTENT,
   type ShapeKind,
 } from "@/components/ui/projects/canvas/blocks/shape-defaults";
+import { fetchCanvasBlocks, saveCanvasBlocks } from "@/lib/api/canvas";
+import type { CanvasBlock } from "@/lib/types/canvas";
 import { PanelLeftOpen, PanelTopOpen } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -39,20 +41,6 @@ function CanvasToolbarShowTab({ onShow }: { onShow: () => void }) {
       <PanelTopOpen size={18} aria-hidden />
     </motion.button>
   );
-}
-
-interface CanvasBlock {
-  id: string;
-  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text" | "shape";
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  content: any;
-  color?: string;
-  title?: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 interface Project {
@@ -111,6 +99,9 @@ export default function ProjectCanvasPage() {
   });
 
   const canvasRef = useRef<HTMLDivElement>(null);
+  const skipNextSaveRef = useRef(true);
+  const lastSavedAtRef = useRef<string | null>(null);
+  const [saveConflict, setSaveConflict] = useState(false);
 
   const handleFitToView = useCallback(() => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -145,13 +136,14 @@ export default function ProjectCanvasPage() {
     });
   }, [canvasBlocks]);
 
-  // Load project data
+  // Load project data and canvas blocks
   useEffect(() => {
     const loadProject = async () => {
-      if (!id) return;
+      if (!id || typeof id !== "string") return;
 
       setLoading(true);
       setError(null);
+      skipNextSaveRef.current = true;
 
       try {
         const response = await fetch(`/api/projects/${id}`);
@@ -160,18 +152,49 @@ export default function ProjectCanvasPage() {
         }
         const projectData = await response.json();
         setProject(projectData);
+        lastSavedAtRef.current = projectData.updatedAt ?? null;
+        setSaveConflict(false);
 
-        // Start with empty canvas
+        const blocks = await fetchCanvasBlocks(id);
+        setCanvasBlocks(blocks);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to load project");
         setCanvasBlocks([]);
-      } catch (err: any) {
-        setError(err.message || "Failed to load project");
       } finally {
         setLoading(false);
+        // Defer so the save effect runs first and skips (skipNextSaveRef still true)
+        setTimeout(() => {
+          skipNextSaveRef.current = false;
+        }, 0);
       }
     };
 
     loadProject();
   }, [id]);
+
+  // Debounced save (1.5s after last change)
+  useEffect(() => {
+    if (!id || typeof id !== "string") return;
+    if (skipNextSaveRef.current) return;
+
+    const timeout = setTimeout(async () => {
+      const result = await saveCanvasBlocks(
+        id,
+        canvasBlocks,
+        lastSavedAtRef.current ?? undefined
+      );
+      if (result.ok) {
+        lastSavedAtRef.current = result.updatedAt;
+        setSaveConflict(false);
+      } else if ("conflict" in result && result.conflict) {
+        setSaveConflict(true);
+      } else {
+        setError("Failed to save canvas");
+      }
+    }, 1500);
+
+    return () => clearTimeout(timeout);
+  }, [id, canvasBlocks]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -443,6 +466,24 @@ export default function ProjectCanvasPage() {
     }
   };
 
+  const handleReloadFromConflict = useCallback(async () => {
+    if (!id || typeof id !== "string") return;
+    try {
+      const [projectRes, blocks] = await Promise.all([
+        fetch(`/api/projects/${id}`),
+        fetchCanvasBlocks(id),
+      ]);
+      if (!projectRes.ok) throw new Error("Failed to reload");
+      const projectData = await projectRes.json();
+      setProject(projectData);
+      lastSavedAtRef.current = projectData.updatedAt ?? null;
+      setCanvasBlocks(blocks);
+      setSaveConflict(false);
+    } catch {
+      setError("Failed to reload canvas");
+    }
+  }, [id]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
@@ -482,6 +523,21 @@ export default function ProjectCanvasPage() {
           viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
+      {/* Save conflict banner */}
+      {saveConflict && (
+        <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between gap-4">
+          <p className="text-sm text-amber-800 dark:text-amber-200">
+            Canvas was updated elsewhere. Reload to get the latest version.
+          </p>
+          <button
+            type="button"
+            onClick={handleReloadFromConflict}
+            className="shrink-0 px-3 py-1.5 text-sm font-medium rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-900 dark:text-amber-100 transition-colors"
+          >
+            Reload
+          </button>
+        </div>
+      )}
       {/* Main Canvas Layout */}
       <div className="flex h-[calc(100vh-64px)] relative">
         {/* Floating "Show sidebar" tab when sidebar is closed */}

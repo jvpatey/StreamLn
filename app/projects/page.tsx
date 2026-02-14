@@ -150,7 +150,7 @@ export default function DashboardPage() {
   }) => {
     if (!user?.id)
       throw new Error("You must be signed in to create a project.");
-    await createProject({ userId: user.id, name, description, icon });
+    await createProject({ name, description, icon });
     setCreateModalOpen(false);
     // Refetch projects after creating
     loadProjects();

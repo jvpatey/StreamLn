@@ -35,9 +35,8 @@ export async function updateProject(
   return res.json();
 }
 
-// Create a project
+// Create a project (userId comes from auth on the server)
 export async function createProject(data: {
-  userId: string;
   name: string;
   description?: string;
   icon?: string;

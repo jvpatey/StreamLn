@@ -1,5 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/db";
+import {
+  updateProjectSchema,
+  updateProjectStatusSchema,
+} from "@/lib/validations/project";
+import { apiError, handleUnexpectedError } from "@/lib/api/errors";
+
+async function getProjectOrError(id: string) {
+  const { userId } = await auth();
+  if (!userId) {
+    return { error: apiError(401, "Unauthorized") };
+  }
+
+  const project = await prisma.project.findUnique({
+    where: { id },
+  });
+
+  if (!project) {
+    return { error: apiError(404, "Project not found") };
+  }
+
+  if (project.userId !== userId) {
+    return { error: apiError(403, "Forbidden") };
+  }
+
+  return { project };
+}
 
 // Get a project by id
 export async function GET(
@@ -8,20 +35,11 @@ export async function GET(
 ) {
   const { id } = await context.params;
   try {
-    const project = await prisma.project.findUnique({
-      where: { id },
-    });
-
-    if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(project);
+    const result = await getProjectOrError(id);
+    if (result.error) return result.error;
+    return NextResponse.json(result.project);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to fetch project." },
-      { status: 500 }
-    );
+    return handleUnexpectedError(error, "GET /api/projects/[id]");
   }
 }
 
@@ -32,15 +50,15 @@ export async function DELETE(
 ) {
   const { id } = await context.params;
   try {
+    const result = await getProjectOrError(id);
+    if (result.error) return result.error;
+
     await prisma.project.delete({
       where: { id },
     });
     return NextResponse.json({ message: "Project deleted successfully" });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to delete project." },
-      { status: 500 }
-    );
+    return handleUnexpectedError(error, "DELETE /api/projects/[id]");
   }
 }
 
@@ -50,20 +68,24 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
-  const body = await req.json();
   try {
+    const result = await getProjectOrError(id);
+    if (result.error) return result.error;
+
+    const body = await req.json();
+    const parsed = updateProjectStatusSchema.safeParse(body);
+    if (!parsed.success) {
+      const message = parsed.error.issues.map((e) => e.message).join("; ");
+      return apiError(400, { message: "Validation failed", details: message });
+    }
+
     const updated = await prisma.project.update({
       where: { id },
-      data: {
-        status: body.status,
-      },
+      data: { status: parsed.data.status },
     });
     return NextResponse.json(updated);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to update project status." },
-      { status: 500 }
-    );
+    return handleUnexpectedError(error, "PATCH /api/projects/[id]");
   }
 }
 
@@ -73,22 +95,30 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
-  const body = await req.json();
   try {
+    const result = await getProjectOrError(id);
+    if (result.error) return result.error;
+
+    const body = await req.json();
+    const parsed = updateProjectSchema.safeParse(body);
+    if (!parsed.success) {
+      const message = parsed.error.issues.map((e) => e.message).join("; ");
+      return apiError(400, { message: "Validation failed", details: message });
+    }
+
+    const data: { name?: string; description?: string | null; icon?: string | null } =
+      {};
+    if (parsed.data.name !== undefined) data.name = parsed.data.name;
+    if (parsed.data.description !== undefined)
+      data.description = parsed.data.description;
+    if (parsed.data.icon !== undefined) data.icon = parsed.data.icon;
+
     const updated = await prisma.project.update({
       where: { id },
-      data: {
-        name: body.name,
-        description: body.description,
-        icon: body.icon,
-        updatedAt: new Date(),
-      },
+      data: { ...data, updatedAt: new Date() },
     });
     return NextResponse.json(updated);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to update project." },
-      { status: 500 }
-    );
+    return handleUnexpectedError(error, "PUT /api/projects/[id]");
   }
 }
