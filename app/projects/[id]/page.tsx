@@ -21,6 +21,8 @@ import {
   DEFAULT_SHAPE_CONTENT,
   type ShapeKind,
 } from "@/components/ui/projects/canvas/blocks/shape-defaults";
+import { fetchCanvasBlocks, saveCanvasBlocks } from "@/lib/api/canvas";
+import type { CanvasBlock } from "@/lib/types/canvas";
 import { PanelLeftOpen, PanelTopOpen } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -39,20 +41,6 @@ function CanvasToolbarShowTab({ onShow }: { onShow: () => void }) {
       <PanelTopOpen size={18} aria-hidden />
     </motion.button>
   );
-}
-
-interface CanvasBlock {
-  id: string;
-  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text" | "shape";
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  content: any;
-  color?: string;
-  title?: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 interface Project {
@@ -111,6 +99,7 @@ export default function ProjectCanvasPage() {
   });
 
   const canvasRef = useRef<HTMLDivElement>(null);
+  const skipNextSaveRef = useRef(true);
 
   const handleFitToView = useCallback(() => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -145,13 +134,14 @@ export default function ProjectCanvasPage() {
     });
   }, [canvasBlocks]);
 
-  // Load project data
+  // Load project data and canvas blocks
   useEffect(() => {
     const loadProject = async () => {
-      if (!id) return;
+      if (!id || typeof id !== "string") return;
 
       setLoading(true);
       setError(null);
+      skipNextSaveRef.current = true;
 
       try {
         const response = await fetch(`/api/projects/${id}`);
@@ -161,17 +151,36 @@ export default function ProjectCanvasPage() {
         const projectData = await response.json();
         setProject(projectData);
 
-        // Start with empty canvas
+        const blocks = await fetchCanvasBlocks(id);
+        setCanvasBlocks(blocks);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to load project");
         setCanvasBlocks([]);
-      } catch (err: any) {
-        setError(err.message || "Failed to load project");
       } finally {
         setLoading(false);
+        // Defer so the save effect runs first and skips (skipNextSaveRef still true)
+        setTimeout(() => {
+          skipNextSaveRef.current = false;
+        }, 0);
       }
     };
 
     loadProject();
   }, [id]);
+
+  // Debounced save (1.5s after last change)
+  useEffect(() => {
+    if (!id || typeof id !== "string") return;
+    if (skipNextSaveRef.current) return;
+
+    const timeout = setTimeout(() => {
+      saveCanvasBlocks(id, canvasBlocks).catch(() => {
+        setError("Failed to save canvas");
+      });
+    }, 1500);
+
+    return () => clearTimeout(timeout);
+  }, [id, canvasBlocks]);
 
   // Handle keyboard shortcuts
   useEffect(() => {

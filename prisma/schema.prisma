@@ -10,14 +10,34 @@ generator client {
 }
 
 model Project {
-  id String @id @default(cuid())
-  userId String
-  name String
-  description String?
-  icon String?
-  status String @default("active")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String        @id @default(cuid())
+  userId       String
+  name         String
+  description  String?
+  icon         String?
+  status       String        @default("active")
+  canvasBlocks CanvasBlock[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   @@index([userId])
+}
+
+model CanvasBlock {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  order     Int
+  type      String
+  x         Float
+  y         Float
+  width     Float
+  height    Float
+  content   Json
+  color     String?
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([projectId])
 }
