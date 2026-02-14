@@ -22,7 +22,7 @@ export function ShapeBlock({ block }: ShapeBlockProps) {
   const w = block.width ?? 120;
   const h = block.height ?? 80;
   const stroke = content.strokeColor ?? "hsl(var(--foreground) / 0.4)";
-  const fill = content.fillColor ?? "hsl(var(--foreground) / 0.06)";
+  const fill = content.fillColor ?? "transparent";
   const strokeWidth = content.strokeWidth ?? 2;
 
   const renderShape = () => {

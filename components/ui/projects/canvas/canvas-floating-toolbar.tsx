@@ -113,9 +113,8 @@ export function CanvasFloatingToolbar({
       const block = canvasBlocks.find((b) => b.id === blockId);
       if (block?.type === "shape") {
         const content = getShapeContent(block.content);
-        const fillColor = color.startsWith("#") ? `${color}26` : color;
         onBlockUpdate(blockId, {
-          content: { ...content, strokeColor: color, fillColor },
+          content: { ...content, strokeColor: color, fillColor: "transparent" },
         });
       } else {
         onBlockUpdate(blockId, { color });

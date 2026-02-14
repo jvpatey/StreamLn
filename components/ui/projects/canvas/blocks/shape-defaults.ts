@@ -11,13 +11,12 @@ export type ShapeBlockContent = {
 };
 
 const DEFAULT_STROKE = "hsl(var(--foreground) / 0.4)";
-const DEFAULT_FILL = "hsl(var(--foreground) / 0.06)";
 
 /** Default content for new shape blocks. */
 export const DEFAULT_SHAPE_CONTENT: ShapeBlockContent = {
   shapeKind: "rectangle",
   strokeColor: DEFAULT_STROKE,
-  fillColor: DEFAULT_FILL,
+  fillColor: "transparent",
   strokeWidth: 2,
 };
 
@@ -40,7 +39,7 @@ export function getShapeContent(value: unknown): ShapeBlockContent {
     return {
       shapeKind: validKind,
       strokeColor: typeof v.strokeColor === "string" ? v.strokeColor : DEFAULT_STROKE,
-      fillColor: typeof v.fillColor === "string" ? v.fillColor : DEFAULT_FILL,
+      fillColor: typeof v.fillColor === "string" ? v.fillColor : "transparent",
       strokeWidth:
         typeof v.strokeWidth === "number" && v.strokeWidth > 0 ? v.strokeWidth : 2,
     };
