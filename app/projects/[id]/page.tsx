@@ -466,6 +466,24 @@ export default function ProjectCanvasPage() {
     }
   };
 
+  const handleReloadFromConflict = useCallback(async () => {
+    if (!id || typeof id !== "string") return;
+    try {
+      const [projectRes, blocks] = await Promise.all([
+        fetch(`/api/projects/${id}`),
+        fetchCanvasBlocks(id),
+      ]);
+      if (!projectRes.ok) throw new Error("Failed to reload");
+      const projectData = await projectRes.json();
+      setProject(projectData);
+      lastSavedAtRef.current = projectData.updatedAt ?? null;
+      setCanvasBlocks(blocks);
+      setSaveConflict(false);
+    } catch {
+      setError("Failed to reload canvas");
+    }
+  }, [id]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
@@ -496,24 +514,6 @@ export default function ProjectCanvasPage() {
       </div>
     );
   }
-
-  const handleReloadFromConflict = useCallback(async () => {
-    if (!id || typeof id !== "string") return;
-    try {
-      const [projectRes, blocks] = await Promise.all([
-        fetch(`/api/projects/${id}`),
-        fetchCanvasBlocks(id),
-      ]);
-      if (!projectRes.ok) throw new Error("Failed to reload");
-      const projectData = await projectRes.json();
-      setProject(projectData);
-      lastSavedAtRef.current = projectData.updatedAt ?? null;
-      setCanvasBlocks(blocks);
-      setSaveConflict(false);
-    } catch {
-      setError("Failed to reload canvas");
-    }
-  }, [id]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden">
