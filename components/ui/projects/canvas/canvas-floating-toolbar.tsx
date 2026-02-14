@@ -25,6 +25,7 @@ import {
   Type,
 } from "lucide-react";
 import { getTextContent } from "./blocks/text-defaults";
+import { getShapeContent } from "./blocks/shape-defaults";
 
 interface CanvasBlock {
   id: string;
@@ -109,7 +110,16 @@ export function CanvasFloatingToolbar({
 
   const handleColorChange = (color: string) => {
     selectedBlocks.forEach((blockId) => {
-      onBlockUpdate(blockId, { color });
+      const block = canvasBlocks.find((b) => b.id === blockId);
+      if (block?.type === "shape") {
+        const content = getShapeContent(block.content);
+        const fillColor = color.startsWith("#") ? `${color}26` : color;
+        onBlockUpdate(blockId, {
+          content: { ...content, strokeColor: color, fillColor },
+        });
+      } else {
+        onBlockUpdate(blockId, { color });
+      }
     });
     setColorPickerOpen(false);
   };
@@ -182,6 +192,7 @@ export function CanvasFloatingToolbar({
   const TEXT_SIZES = [12, 14, 16, 18, 24];
 
   const isSingleTextBlock = singleBlock?.type === "text";
+  const isSingleShapeBlock = singleBlock?.type === "shape";
 
   const updateTextBlockContent = (
     blockId: string,
@@ -269,16 +280,33 @@ export function CanvasFloatingToolbar({
 
       <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
 
-      {/* Color Picker */}
+      {/* Color Picker (block color for notes/etc, shape stroke/fill for shapes) */}
       <div className="relative">
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setColorPickerOpen(!colorPickerOpen)}
-          className="h-8 w-8 p-0 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
-          title="Change Color"
+          onClick={() => {
+            setColorPickerOpen(!colorPickerOpen);
+            setTextColorPickerOpen(false);
+          }}
+          className="relative h-8 w-8 p-0 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+          title={
+            isSingleShapeBlock
+              ? "Change shape color"
+              : "Change color"
+          }
         >
           <Palette size={14} />
+          {isSingleShapeBlock && singleBlock && (
+            <span
+              className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full pointer-events-none"
+              style={{
+                backgroundColor:
+                  getShapeContent(singleBlock.content).strokeColor ??
+                  "hsl(var(--foreground) / 0.4)",
+              }}
+            />
+          )}
         </Button>
 
         {colorPickerOpen && (
@@ -287,15 +315,17 @@ export function CanvasFloatingToolbar({
               variant: "popover",
               intensity: "xl",
               rounded: "lg",
-              className: "absolute bottom-full mb-2 left-0 p-2",
+              className:
+                "absolute bottom-full mb-2 left-0 p-2 z-[100] w-[7.5rem]",
             })}
           >
-            <div className="grid grid-cols-4 gap-1">
+            <div className="grid grid-cols-4 gap-1.5">
               {QUICK_COLORS.map((color) => (
                 <button
                   key={color}
+                  type="button"
                   onClick={() => handleColorChange(color)}
-                  className="w-6 h-6 rounded border border-slate-200 dark:border-slate-600 hover:scale-110 transition-transform"
+                  className="aspect-square w-6 h-6 min-w-6 min-h-6 shrink-0 rounded border border-slate-200 dark:border-slate-600 hover:scale-110 transition-transform"
                   style={{ backgroundColor: color }}
                   title={color}
                 />
@@ -476,15 +506,16 @@ export function CanvasFloatingToolbar({
                       intensity: "xl",
                       rounded: "lg",
                       className:
-                        "absolute bottom-full left-0 z-50 mb-2 w-[7rem] p-2",
+                        "absolute bottom-full left-0 z-[100] mb-2 w-[7.5rem] p-2",
                     })}
                   >
-                    <div className="grid grid-cols-4 grid-rows-2 gap-1">
+                    <div className="grid grid-cols-4 gap-1.5">
                       {QUICK_COLORS.map((color) => (
                         <button
                           key={color}
+                          type="button"
                           onClick={() => handleTextColorChange(color)}
-                          className="h-6 w-6 shrink-0 rounded border border-slate-200 dark:border-slate-600 hover:scale-110 transition-transform"
+                          className="aspect-square w-6 h-6 min-w-6 min-h-6 shrink-0 rounded border border-slate-200 dark:border-slate-600 hover:scale-110 transition-transform"
                           style={{ backgroundColor: color }}
                           title={color}
                         />

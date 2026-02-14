@@ -13,6 +13,7 @@ import {
   Link,
   Tag,
   Type,
+  Square,
   GripVertical,
   MoreVertical,
   Lock,
@@ -30,10 +31,11 @@ import { ImageBlock } from "./blocks/image-block";
 import { LinkBlock } from "./blocks/link-block";
 import { TagBlock } from "./blocks/tag-block";
 import { TextBlock } from "./blocks/text-block";
+import { ShapeBlock } from "./blocks/shape-block";
 
 interface CanvasBlock {
   id: string;
-  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text";
+  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text" | "shape";
   x: number;
   y: number;
   width: number;
@@ -162,6 +164,8 @@ export function CanvasBlock({
         return <Tag size={12} />;
       case "text":
         return <Type size={12} />;
+      case "shape":
+        return <Square size={12} />;
       default:
         return <FileText size={12} />;
     }
@@ -322,6 +326,8 @@ export function CanvasBlock({
         return <TagBlock {...commonProps} />;
       case "text":
         return <TextBlock {...commonProps} />;
+      case "shape":
+        return <ShapeBlock {...commonProps} />;
       default:
         return <NoteBlock {...commonProps} />;
     }
@@ -352,11 +358,19 @@ export function CanvasBlock({
     >
       <Card
         className={`relative w-full h-full transition-all duration-200 ${
-          block.type === "tag" ? "border" : isSelected ? "border-2" : "border"
+          block.type === "tag"
+            ? "border"
+            : block.type === "shape" && !isSelected
+              ? "border-0"
+              : isSelected
+              ? "border-2"
+              : "border"
         } ${
           block.type === "tag"
             ? "rounded-full overflow-visible"
-            : "overflow-hidden"
+            : block.type === "shape"
+              ? "overflow-visible"
+              : "overflow-hidden"
         } ${
           isSelected
             ? block.type === "tag"
@@ -370,26 +384,31 @@ export function CanvasBlock({
         } ${!isEditable ? "cursor-default" : ""}`}
         style={{
           background:
-            block.type === "tag"
+            block.type === "tag" || block.type === "shape"
               ? "transparent"
               : `linear-gradient(135deg, ${getBlockColor()}05 0%, transparent 100%)`,
-          backdropFilter: block.type === "tag" ? "none" : "blur(10px)",
+          backdropFilter:
+            block.type === "tag" || block.type === "shape" ? "none" : "blur(10px)",
           borderColor:
             block.type === "tag"
               ? "transparent"
-              : isSelected
-              ? `${getBlockColor()}70`
-              : `${getBlockColor()}30`,
+              : block.type === "shape" && !isSelected
+                ? "transparent"
+                : isSelected
+                ? `${getBlockColor()}70`
+                : `${getBlockColor()}30`,
           boxShadow:
             block.type === "tag"
               ? "none"
-              : isSelected
-              ? `0 0 0 1px ${getBlockColor()}50, 0 0 24px ${getBlockColor()}15, 0 4px 12px rgba(0, 0, 0, 0.1)`
-              : `0 0 0 1px ${getBlockColor()}25, 0 0 24px ${getBlockColor()}15, 0 4px 12px rgba(0, 0, 0, 0.1)`,
+              : block.type === "shape" && !isSelected
+                ? "none"
+                : isSelected
+                ? `0 0 0 1px ${getBlockColor()}50, 0 0 24px ${getBlockColor()}15, 0 4px 12px rgba(0, 0, 0, 0.1)`
+                : `0 0 0 1px ${getBlockColor()}25, 0 0 24px ${getBlockColor()}15, 0 4px 12px rgba(0, 0, 0, 0.1)`,
         }}
       >
-        {/* Block Header (hidden for tag and text – both are minimal/subtle) */}
-        {block.type !== "tag" && block.type !== "text" && (
+        {/* Block Header (hidden for tag, text, and shape – minimal/subtle) */}
+        {block.type !== "tag" && block.type !== "text" && block.type !== "shape" && (
           <div
             className="flex items-center justify-between p-3 border-b border-slate-200/50 dark:border-slate-700/50"
             style={{
@@ -661,6 +680,117 @@ export function CanvasBlock({
           </div>
         )}
 
+        {/* Shape block: floating menu (no header) */}
+        {block.type === "shape" && (
+          <div
+            className="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            {block.locked && (
+              <div className="p-1 rounded bg-amber-50 dark:bg-amber-900/20">
+                <Lock
+                  size={10}
+                  className="text-amber-600 dark:text-amber-400"
+                />
+              </div>
+            )}
+            {isEditable && (
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md"
+                    onMouseDown={(e) => e.stopPropagation()}
+                  >
+                    <MoreVertical size={12} />
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content
+                    className="min-w-[10rem] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg p-1 z-[100]"
+                    sideOffset={4}
+                    align="end"
+                  >
+                    {onDuplicate && (
+                      <DropdownMenu.Item
+                        className={dropdownItemClass}
+                        onSelect={() => onDuplicate(block.id)}
+                      >
+                        <Copy size={14} />
+                        Duplicate
+                      </DropdownMenu.Item>
+                    )}
+                    {onDelete && (
+                      <DropdownMenu.Item
+                        className={`${dropdownItemClass} text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300`}
+                        onSelect={() => onDelete(block.id)}
+                      >
+                        <Trash2 size={14} />
+                        Delete
+                      </DropdownMenu.Item>
+                    )}
+                    {(onDuplicate || onDelete) && (
+                      <DropdownMenu.Separator className="h-px bg-slate-200 dark:bg-slate-700 my-1" />
+                    )}
+                    <DropdownMenu.Item
+                      className={dropdownItemClass}
+                      onSelect={() => onUpdate({ locked: !block.locked })}
+                    >
+                      {block.locked ? (
+                        <>
+                          <Unlock size={14} />
+                          Lock
+                        </>
+                      ) : (
+                        <>
+                          <Lock size={14} />
+                          Lock
+                        </>
+                      )}
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item
+                      className={dropdownItemClass}
+                      onSelect={() => onUpdate({ hidden: !block.hidden })}
+                    >
+                      {block.hidden ? (
+                        <>
+                          <Eye size={14} />
+                          Show
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff size={14} />
+                          Hide
+                        </>
+                      )}
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Separator className="h-px bg-slate-200 dark:bg-slate-700 my-1" />
+                    <DropdownMenu.Item
+                      className={dropdownItemClass}
+                      onSelect={() => {
+                        const url = `${
+                          typeof window !== "undefined"
+                            ? window.location.origin + window.location.pathname
+                            : ""
+                        }?block=${block.id}`;
+                        if (
+                          typeof navigator !== "undefined" &&
+                          navigator.clipboard?.writeText
+                        )
+                          navigator.clipboard.writeText(url);
+                      }}
+                    >
+                      <Link2 size={14} />
+                      Copy link
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
+            )}
+          </div>
+        )}
+
         {/* Tag block: floating menu (no header, so menu overlays pill) */}
         {block.type === "tag" && (
           <div
@@ -775,7 +905,7 @@ export function CanvasBlock({
         {/* Block Content */}
         <div
           className={
-            block.type === "tag" || block.type === "code"
+            block.type === "tag" || block.type === "code" || block.type === "shape"
               ? "flex-1 overflow-visible min-h-0"
               : block.type === "task-board"
               ? "flex-1 overflow-auto min-h-0"

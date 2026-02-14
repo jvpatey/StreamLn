@@ -17,6 +17,10 @@ import { DEFAULT_TAG_CONTENT } from "@/components/ui/projects/canvas/blocks/tag-
 import { getDefaultTaskBoardContent } from "@/components/ui/projects/canvas/blocks/task-board-defaults";
 import { DEFAULT_CODE_CONTENT } from "@/components/ui/projects/canvas/blocks/code-defaults";
 import { DEFAULT_TEXT_CONTENT } from "@/components/ui/projects/canvas/blocks/text-defaults";
+import {
+  DEFAULT_SHAPE_CONTENT,
+  type ShapeKind,
+} from "@/components/ui/projects/canvas/blocks/shape-defaults";
 import { PanelLeftOpen, PanelTopOpen } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -39,7 +43,7 @@ function CanvasToolbarShowTab({ onShow }: { onShow: () => void }) {
 
 interface CanvasBlock {
   id: string;
-  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text";
+  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text" | "shape";
   x: number;
   y: number;
   width: number;
@@ -99,6 +103,7 @@ export default function ProjectCanvasPage() {
 
   // Canvas interaction state
   const [isAddingBlock, setIsAddingBlock] = useState<string | null>(null);
+  const [addingShapeKind, setAddingShapeKind] = useState<ShapeKind>("rectangle");
   const [showFloatingToolbar, setShowFloatingToolbar] = useState(false);
   const [floatingToolbarPosition, setFloatingToolbarPosition] = useState({
     x: 0,
@@ -236,7 +241,7 @@ export default function ProjectCanvasPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedBlocks, canvasBlocks]);
 
-  // When a single text block is selected, show floating toolbar above it (outside the text box)
+  // When a single text or shape block is selected, show floating toolbar above it
   useEffect(() => {
     if (selectedBlocks.length === 0) {
       setShowFloatingToolbar(false);
@@ -245,7 +250,7 @@ export default function ProjectCanvasPage() {
     if (selectedBlocks.length !== 1) return;
 
     const block = canvasBlocks.find((b) => b.id === selectedBlocks[0]);
-    if (!block || block.type !== "text") return;
+    if (!block || (block.type !== "text" && block.type !== "shape")) return;
 
     const el = canvasRef.current;
     if (!el) return;
@@ -266,6 +271,11 @@ export default function ProjectCanvasPage() {
 
   // Canvas block manipulation functions
   const addBlock = (type: string, position: { x: number; y: number }) => {
+    const shapeKind = type === "shape" ? addingShapeKind : "rectangle";
+    const isLineOrArrow =
+      type === "shape" &&
+      (shapeKind === "line" || shapeKind === "arrow");
+
     const newBlock: CanvasBlock = {
       id: generateBlockId(type),
       type: type as CanvasBlock["type"],
@@ -282,7 +292,11 @@ export default function ProjectCanvasPage() {
                 ? 240
                 : type === "text"
                   ? 220
-                  : 350,
+                  : type === "shape"
+                    ? isLineOrArrow
+                      ? 150
+                      : 120
+                    : 350,
       height:
         type === "note"
           ? 200
@@ -294,8 +308,15 @@ export default function ProjectCanvasPage() {
                 ? 56
                 : type === "text"
                   ? 80
-                  : 250,
-      content: getDefaultContent(type),
+                  : type === "shape"
+                    ? isLineOrArrow
+                      ? 24
+                      : 80
+                    : 250,
+      content:
+        type === "shape"
+          ? { ...DEFAULT_SHAPE_CONTENT, shapeKind }
+          : getDefaultContent(type),
       title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
       color: getDefaultColor(type),
       createdAt: new Date(),
@@ -305,7 +326,7 @@ export default function ProjectCanvasPage() {
     setCanvasBlocks((prev) => [...prev, newBlock]);
     setSelectedBlocks([newBlock.id]);
     setIsAddingBlock(null);
-    if (type === "text") {
+    if (type === "text" || type === "shape") {
       setActiveTool("select");
     }
   };
@@ -395,6 +416,7 @@ export default function ProjectCanvasPage() {
     if (type === "task-board") return getDefaultTaskBoardContent();
     if (type === "code") return DEFAULT_CODE_CONTENT;
     if (type === "text") return DEFAULT_TEXT_CONTENT;
+    if (type === "shape") return DEFAULT_SHAPE_CONTENT;
     return {};
   };
 
@@ -414,6 +436,8 @@ export default function ProjectCanvasPage() {
         return "#ef4444";
       case "text":
         return "#64748b";
+      case "shape":
+        return "#6b7280";
       default:
         return "#6b7280";
     }
@@ -469,7 +493,7 @@ export default function ProjectCanvasPage() {
             onClick={() => setSidebarOpen(true)}
             title="Show sidebar"
             aria-label="Show sidebar"
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+            className="absolute left-0 top-4 z-30 flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
           >
             <PanelLeftOpen size={18} aria-hidden />
           </button>
@@ -505,6 +529,13 @@ export default function ProjectCanvasPage() {
               onToolChange={(newTool) => {
                 setActiveTool(newTool);
                 if (newTool === "text") setIsAddingBlock("text");
+                else if (newTool === "shape") setIsAddingBlock("shape");
+                else setIsAddingBlock(null);
+              }}
+              onAddShape={(shapeKind) => {
+                setAddingShapeKind(shapeKind);
+                setActiveTool("shape");
+                setIsAddingBlock("shape");
               }}
               zoomLevel={zoomLevel}
               onZoomChange={setZoomLevel}
