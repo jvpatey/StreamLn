@@ -45,6 +45,7 @@ interface CanvasFloatingToolbarProps {
   selectedBlocks: string[];
   canvasBlocks: CanvasBlock[];
   onBlockUpdate: (id: string, updates: Partial<CanvasBlock>) => void;
+  onDelete?: (blockIds: string[]) => void;
   onClose: () => void;
   zoomLevel: number;
   panOffset: { x: number; y: number };
@@ -55,6 +56,7 @@ export function CanvasFloatingToolbar({
   selectedBlocks,
   canvasBlocks,
   onBlockUpdate,
+  onDelete,
   onClose,
   zoomLevel,
   panOffset,
@@ -64,7 +66,7 @@ export function CanvasFloatingToolbar({
   const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
 
   const selectedBlocksData = canvasBlocks.filter((block) =>
-    selectedBlocks.includes(block.id)
+    selectedBlocks.includes(block.id),
   );
 
   const hasMultipleBlocks = selectedBlocks.length > 1;
@@ -87,8 +89,7 @@ export function CanvasFloatingToolbar({
   };
 
   const handleDelete = () => {
-    // Would be handled by parent component
-    console.log("Delete blocks:", selectedBlocks);
+    onDelete?.(selectedBlocks);
     onClose();
   };
 
@@ -125,7 +126,7 @@ export function CanvasFloatingToolbar({
     if (!hasMultipleBlocks) return;
     const leftmost = Math.min(...selectedBlocksData.map((block) => block.x));
     const rightmost = Math.max(
-      ...selectedBlocksData.map((block) => block.x + block.width)
+      ...selectedBlocksData.map((block) => block.x + block.width),
     );
     const center = leftmost + (rightmost - leftmost) / 2;
 
@@ -140,7 +141,7 @@ export function CanvasFloatingToolbar({
   const handleAlignRight = () => {
     if (!hasMultipleBlocks) return;
     const rightmost = Math.max(
-      ...selectedBlocksData.map((block) => block.x + block.width)
+      ...selectedBlocksData.map((block) => block.x + block.width),
     );
     selectedBlocks.forEach((blockId) => {
       const block = selectedBlocksData.find((b) => b.id === blockId);
@@ -190,7 +191,7 @@ export function CanvasFloatingToolbar({
       fontSize: number;
       color: string;
       textAlign: "left" | "center" | "right";
-    }>
+    }>,
   ) => {
     const block = canvasBlocks.find((b) => b.id === blockId);
     if (!block || block.type !== "text") return;
@@ -230,7 +231,7 @@ export function CanvasFloatingToolbar({
   const toolbarTop = Math.max(64, position.y - 60);
   const toolbarLeft = Math.min(
     Math.max(8, position.x - 120),
-    window.innerWidth - 400
+    window.innerWidth - 400,
   );
 
   return (

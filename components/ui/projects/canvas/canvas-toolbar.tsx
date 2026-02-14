@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import { getKeyboardShortcut } from "@/lib/utils";
@@ -9,8 +10,7 @@ import {
   ZoomOut,
   Maximize2,
   Grid3x3,
-  PanelLeftClose,
-  PanelLeftOpen,
+  PanelTopClose,
   MousePointer,
   Hand,
   Square,
@@ -60,8 +60,9 @@ interface CanvasToolbarProps {
   onGridToggle: () => void;
   onResetView: () => void;
   onFitToView?: () => void;
-  sidebarOpen?: boolean;
-  onSidebarToggle?: () => void;
+  onToolbarToggle?: () => void;
+  onToolbarExitComplete?: () => void;
+  isExiting?: boolean;
   canvasBlocks: CanvasBlock[];
   selectedBlocks: string[];
   onDeleteSelected: () => void;
@@ -77,8 +78,9 @@ export function CanvasToolbar({
   onGridToggle,
   onResetView,
   onFitToView,
-  sidebarOpen = true,
-  onSidebarToggle,
+  onToolbarToggle,
+  onToolbarExitComplete,
+  isExiting = false,
   canvasBlocks,
   selectedBlocks,
   onDeleteSelected,
@@ -108,16 +110,36 @@ export function CanvasToolbar({
     onFitToView?.();
   };
 
+  const minimizeTransition = {
+    type: "tween" as const,
+    duration: 0.4,
+    ease: [0.32, 0.72, 0, 1],
+  };
+
   return (
-    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-40">
-      <div
-        className={getLiquidGlassSurfaceClassName({
-          variant: "toolbar",
-          intensity: "xl",
-          rounded: "xl",
-          className: "flex items-center space-x-2 px-3 py-2",
-        })}
-      >
+    <motion.div
+      className="absolute top-4 left-1/2 z-40"
+      style={{ transformOrigin: "50% 0%" }}
+      initial={{ scale: 0.5, opacity: 0, y: -16 }}
+      animate={
+        isExiting
+          ? { scale: 0.35, opacity: 0, y: -32 }
+          : { scale: 1, opacity: 1, y: 0 }
+      }
+      transition={minimizeTransition}
+      onAnimationComplete={() => {
+        if (isExiting) onToolbarExitComplete?.();
+      }}
+    >
+      <div className="-translate-x-1/2">
+        <div
+          className={getLiquidGlassSurfaceClassName({
+            variant: "toolbar",
+            intensity: "xl",
+            rounded: "xl",
+            className: "flex items-center space-x-2 px-3 py-2",
+          })}
+        >
         {/* Tools Section */}
         <div className="flex items-center space-x-1 pr-3 border-r border-slate-200 dark:border-slate-700">
           <Button
@@ -228,20 +250,16 @@ export function CanvasToolbar({
 
         {/* View Options */}
         <div className="flex items-center space-x-1 pr-3 border-r border-slate-200 dark:border-slate-700">
-          {onSidebarToggle && (
+          {onToolbarToggle && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={onSidebarToggle}
-              title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-              aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+              onClick={onToolbarToggle}
+              title="Hide toolbar"
+              aria-label="Hide toolbar"
               className="h-8 w-8 p-0"
             >
-              {sidebarOpen ? (
-                <PanelLeftClose size={14} />
-              ) : (
-                <PanelLeftOpen size={14} />
-              )}
+              <PanelTopClose size={14} />
             </Button>
           )}
           <Button
@@ -366,7 +384,8 @@ export function CanvasToolbar({
             <span>for shortcuts</span>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
