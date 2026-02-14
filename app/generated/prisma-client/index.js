@@ -193,7 +193,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -202,8 +201,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../app/generated/prisma-client\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n}\n\nmodel Project {\n  id           String        @id @default(cuid())\n  userId       String\n  name         String\n  description  String?\n  icon         String?\n  status       String        @default(\"active\")\n  canvasBlocks CanvasBlock[]\n  createdAt    DateTime      @default(now())\n  updatedAt    DateTime      @updatedAt\n\n  @@index([userId])\n}\n\nmodel CanvasBlock {\n  id        String   @id @default(cuid())\n  projectId String\n  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)\n  order     Int\n  type      String\n  x         Float\n  y         Float\n  width     Float\n  height    Float\n  content   Json\n  color     String?\n  title     String?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@index([projectId])\n}\n",
-  "inlineSchemaHash": "8ccb7ceb382c07201dd6198455efb7ecd15d1752e02428f1bda77ea2c12555b3",
+  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../app/generated/prisma-client\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n}\n\nmodel Project {\n  id           String        @id @default(cuid())\n  userId       String\n  name         String\n  description  String?\n  icon         String?\n  status       String        @default(\"active\")\n  canvasBlocks CanvasBlock[]\n  createdAt    DateTime      @default(now())\n  updatedAt    DateTime      @updatedAt\n\n  @@index([userId])\n}\n\nmodel CanvasBlock {\n  id        String   @id @default(cuid())\n  projectId String\n  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)\n  order     Int\n  type      String\n  x         Float\n  y         Float\n  width     Float\n  height    Float\n  content   Json\n  color     String?\n  title     String?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@index([projectId, order])\n}\n",
+  "inlineSchemaHash": "1e8deec5b395d6f401dadf846addb1b8adf510aea9ccbcb66fe8d44cc45616b4",
   "copyEngine": true
 }
 

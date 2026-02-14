@@ -39,5 +39,5 @@ model CanvasBlock {
   createdAt DateTime @default(now())
   updatedAt DateTime  @updatedAt
 
-  @@index([projectId])
+  @@index([projectId, order])
 }
