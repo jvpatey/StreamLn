@@ -82,7 +82,7 @@ export default function HeroSection() {
           >
             Map out your projects, notes, and task boards on a limitless 2D
             canvas. StreamLn gives developers a visual playground to capture
-            ideas, plan work, and connect everything—your workflow, your way.
+            ideas, plan work, and organize your work—your workflow, your way.
           </motion.p>
 
           {/* Call-to-action button with liquid glass effect */}
