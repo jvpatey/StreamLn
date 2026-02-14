@@ -70,7 +70,10 @@ describe("saveCanvasBlocks", () => {
   });
 
   it("sends PUT request with blocks", async () => {
-    const mockFetch = vi.fn().mockResolvedValue({ ok: true });
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ updatedAt: "2024-01-15T10:00:00.000Z" }),
+    });
 
     vi.stubGlobal("fetch", mockFetch);
 
@@ -88,8 +91,12 @@ describe("saveCanvasBlocks", () => {
       },
     ];
 
-    await saveCanvasBlocks("project-123", blocks);
+    const result = await saveCanvasBlocks("project-123", blocks);
 
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.updatedAt).toBe("2024-01-15T10:00:00.000Z");
+    }
     expect(mockFetch).toHaveBeenCalledWith(
       "/api/projects/project-123/canvas",
       expect.objectContaining({
@@ -100,14 +107,28 @@ describe("saveCanvasBlocks", () => {
     );
   });
 
-  it("throws on non-ok response", async () => {
+  it("returns conflict on 409", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue({ ok: false })
+      vi.fn().mockResolvedValue({ ok: false, status: 409 })
     );
 
-    await expect(
-      saveCanvasBlocks("project-123", [])
-    ).rejects.toThrow("Failed to save canvas blocks");
+    const result = await saveCanvasBlocks("project-123", []);
+
+    expect(result.ok).toBe(false);
+    expect(result.conflict).toBe(true);
+  });
+
+  it("returns error on non-ok response", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: false, status: 500 })
+    );
+
+    const result = await saveCanvasBlocks("project-123", []);
+
+    expect(result.ok).toBe(false);
+    expect(result.conflict).toBe(false);
+    expect("error" in result && result.error).toBe("Failed to save canvas blocks");
   });
 });

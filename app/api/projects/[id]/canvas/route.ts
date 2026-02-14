@@ -65,9 +65,21 @@ export async function PUT(
     }
 
     const blocks = parsed.data.blocks;
+    const lastSavedAt = parsed.data.lastSavedAt;
     const incomingIds = blocks.map((b) => b.id);
 
-    await prisma.$transaction(async (tx) => {
+    // Optimistic concurrency: reject if project was updated elsewhere
+    if (lastSavedAt) {
+      const clientTime = new Date(lastSavedAt).getTime();
+      const serverTime = result.project!.updatedAt.getTime();
+      if (serverTime > clientTime) {
+        return apiError(409, {
+          message: "Canvas was updated elsewhere. Please reload.",
+        });
+      }
+    }
+
+    const updatedProject = await prisma.$transaction(async (tx) => {
       // Delete blocks not in the incoming list
       await tx.canvasBlock.deleteMany({
         where: {
@@ -107,9 +119,18 @@ export async function PUT(
           },
         });
       }
+
+      // Update project.updatedAt so clients can use it for optimistic concurrency
+      return tx.project.update({
+        where: { id },
+        data: { updatedAt: new Date() },
+      });
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      updatedAt: updatedProject.updatedAt.toISOString(),
+    });
   } catch (error) {
     return handleUnexpectedError(error, "PUT /api/projects/[id]/canvas");
   }

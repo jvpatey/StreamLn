@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export type ApiErrorStatus = 400 | 401 | 403 | 404 | 500;
+export type ApiErrorStatus = 400 | 401 | 403 | 404 | 409 | 500;
 
 export interface ApiErrorOptions {
   message: string;

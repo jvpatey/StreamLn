@@ -27,6 +27,7 @@ export const canvasBlockSchema = z.object({
 
 export const saveCanvasBlocksSchema = z.object({
   blocks: z.array(canvasBlockSchema).max(500),
+  lastSavedAt: z.string().optional(),
 });
 
 export type CanvasBlockInput = z.infer<typeof canvasBlockSchema>;

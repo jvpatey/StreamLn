@@ -100,6 +100,8 @@ export default function ProjectCanvasPage() {
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const skipNextSaveRef = useRef(true);
+  const lastSavedAtRef = useRef<string | null>(null);
+  const [saveConflict, setSaveConflict] = useState(false);
 
   const handleFitToView = useCallback(() => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -150,6 +152,8 @@ export default function ProjectCanvasPage() {
         }
         const projectData = await response.json();
         setProject(projectData);
+        lastSavedAtRef.current = projectData.updatedAt ?? null;
+        setSaveConflict(false);
 
         const blocks = await fetchCanvasBlocks(id);
         setCanvasBlocks(blocks);
@@ -173,10 +177,20 @@ export default function ProjectCanvasPage() {
     if (!id || typeof id !== "string") return;
     if (skipNextSaveRef.current) return;
 
-    const timeout = setTimeout(() => {
-      saveCanvasBlocks(id, canvasBlocks).catch(() => {
+    const timeout = setTimeout(async () => {
+      const result = await saveCanvasBlocks(
+        id,
+        canvasBlocks,
+        lastSavedAtRef.current ?? undefined
+      );
+      if (result.ok) {
+        lastSavedAtRef.current = result.updatedAt;
+        setSaveConflict(false);
+      } else if ("conflict" in result && result.conflict) {
+        setSaveConflict(true);
+      } else {
         setError("Failed to save canvas");
-      });
+      }
     }, 1500);
 
     return () => clearTimeout(timeout);
@@ -483,6 +497,24 @@ export default function ProjectCanvasPage() {
     );
   }
 
+  const handleReloadFromConflict = useCallback(async () => {
+    if (!id || typeof id !== "string") return;
+    try {
+      const [projectRes, blocks] = await Promise.all([
+        fetch(`/api/projects/${id}`),
+        fetchCanvasBlocks(id),
+      ]);
+      if (!projectRes.ok) throw new Error("Failed to reload");
+      const projectData = await projectRes.json();
+      setProject(projectData);
+      lastSavedAtRef.current = projectData.updatedAt ?? null;
+      setCanvasBlocks(blocks);
+      setSaveConflict(false);
+    } catch {
+      setError("Failed to reload canvas");
+    }
+  }, [id]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden">
       {/* Canvas Header */}
@@ -491,6 +523,21 @@ export default function ProjectCanvasPage() {
           viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
+      {/* Save conflict banner */}
+      {saveConflict && (
+        <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between gap-4">
+          <p className="text-sm text-amber-800 dark:text-amber-200">
+            Canvas was updated elsewhere. Reload to get the latest version.
+          </p>
+          <button
+            type="button"
+            onClick={handleReloadFromConflict}
+            className="shrink-0 px-3 py-1.5 text-sm font-medium rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-900 dark:text-amber-100 transition-colors"
+          >
+            Reload
+          </button>
+        </div>
+      )}
       {/* Main Canvas Layout */}
       <div className="flex h-[calc(100vh-64px)] relative">
         {/* Floating "Show sidebar" tab when sidebar is closed */}

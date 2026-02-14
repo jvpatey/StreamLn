@@ -56,14 +56,30 @@ export async function fetchCanvasBlocks(
   return hydrateBlocks(raw);
 }
 
+export type SaveCanvasResult =
+  | { ok: true; updatedAt: string }
+  | { ok: false; conflict: true }
+  | { ok: false; conflict: false; error: string };
+
 export async function saveCanvasBlocks(
   projectId: string,
-  blocks: CanvasBlock[]
-): Promise<void> {
+  blocks: CanvasBlock[],
+  lastSavedAt?: string
+): Promise<SaveCanvasResult> {
   const res = await fetch(`/api/projects/${projectId}/canvas`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ blocks }),
+    body: JSON.stringify({ blocks, lastSavedAt }),
   });
-  if (!res.ok) throw new Error("Failed to save canvas blocks");
+
+  if (res.status === 409) {
+    return { ok: false, conflict: true };
+  }
+
+  if (!res.ok) {
+    return { ok: false, conflict: false, error: "Failed to save canvas blocks" };
+  }
+
+  const data = await res.json();
+  return { ok: true, updatedAt: data.updatedAt ?? new Date().toISOString() };
 }
