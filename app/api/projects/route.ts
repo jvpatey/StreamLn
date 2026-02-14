@@ -12,8 +12,17 @@ export async function GET(req: NextRequest) {
 
   const projects = await prisma.project.findMany({
     where: { userId },
+    include: {
+      _count: { select: { canvasBlocks: true } },
+    },
   });
-  return NextResponse.json(projects);
+
+  const projectsWithBlocks = projects.map(({ _count, ...project }) => ({
+    ...project,
+    blocks: _count.canvasBlocks,
+  }));
+
+  return NextResponse.json(projectsWithBlocks);
 }
 
 // POST /api/projects - Create a new project
