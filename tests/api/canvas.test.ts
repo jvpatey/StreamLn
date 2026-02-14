@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
+import { Prisma } from "@/app/generated/prisma-client";
 import { GET, PUT } from "@/app/api/projects/[id]/canvas/route";
 
 vi.mock("@clerk/nextjs/server", () => ({
@@ -204,6 +205,58 @@ describe("PUT /api/projects/[id]/canvas", () => {
     expect(json.success).toBe(true);
     expect(json.updatedAt).toBeDefined();
     expect(prisma.$transaction).toHaveBeenCalled();
+  });
+
+  it("returns 400 when block id exists in another project", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
+    vi.mocked(prisma.project.findUnique).mockResolvedValue({
+      id: "proj-1",
+      userId: "user-123",
+      name: "Test",
+      description: null,
+      icon: null,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+    const p2002 = new Prisma.PrismaClientKnownRequestError(
+      "Unique constraint failed",
+      { code: "P2002", clientVersion: "test" }
+    );
+    vi.mocked(prisma.$transaction).mockImplementation(async (fn) => {
+      const tx = {
+        canvasBlock: {
+          deleteMany: vi.fn().mockResolvedValue(undefined),
+          createMany: vi.fn().mockRejectedValue(p2002),
+        },
+        project: {
+          updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+        },
+      };
+      return fn(tx as any);
+    });
+
+    const req = new NextRequest("http://localhost/api/projects/proj-1/canvas", {
+      method: "PUT",
+      body: JSON.stringify({
+        blocks: [
+          {
+            id: "note-1",
+            type: "note",
+            x: 0,
+            y: 0,
+            width: 300,
+            height: 200,
+            content: {},
+          },
+        ],
+      }),
+    });
+    const res = await PUT(req, createContext("proj-1") as any);
+
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toContain("already exists in another project");
   });
 
   it("returns 409 when lastSavedAt is stale", async () => {

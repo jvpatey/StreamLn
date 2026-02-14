@@ -119,6 +119,14 @@ export async function PUT(
         message: "Canvas was updated elsewhere. Please reload.",
       });
     }
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return apiError(400, {
+        message: "Block id already exists in another project.",
+      });
+    }
     return handleUnexpectedError(error, "PUT /api/projects/[id]/canvas");
   }
 }
