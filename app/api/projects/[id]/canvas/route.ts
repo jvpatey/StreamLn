@@ -3,11 +3,12 @@ import { auth } from "@clerk/nextjs/server";
 import { Prisma } from "@/app/generated/prisma-client";
 import prisma from "@/lib/db";
 import { saveCanvasBlocksSchema } from "@/lib/validations/canvas";
+import { apiError, handleUnexpectedError } from "@/lib/api/errors";
 
 async function getProjectOrError(id: string) {
   const { userId } = await auth();
   if (!userId) {
-    return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+    return { error: apiError(401, "Unauthorized") };
   }
 
   const project = await prisma.project.findUnique({
@@ -15,11 +16,11 @@ async function getProjectOrError(id: string) {
   });
 
   if (!project) {
-    return { error: NextResponse.json({ error: "Project not found" }, { status: 404 }) };
+    return { error: apiError(404, "Project not found") };
   }
 
   if (project.userId !== userId) {
-    return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
+    return { error: apiError(403, "Forbidden") };
   }
 
   return { project };
@@ -42,10 +43,7 @@ export async function GET(
 
     return NextResponse.json({ blocks });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to fetch canvas blocks." },
-      { status: 500 }
-    );
+    return handleUnexpectedError(error, "GET /api/projects/[id]/canvas");
   }
 }
 
@@ -63,10 +61,7 @@ export async function PUT(
     const parsed = saveCanvasBlocksSchema.safeParse(body);
     if (!parsed.success) {
       const message = parsed.error.issues.map((e) => e.message).join("; ");
-      return NextResponse.json(
-        { error: "Validation failed", details: message },
-        { status: 400 }
-      );
+      return apiError(400, { message: "Validation failed", details: message });
     }
 
     const blocks = parsed.data.blocks;
@@ -116,9 +111,6 @@ export async function PUT(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to save canvas blocks." },
-      { status: 500 }
-    );
+    return handleUnexpectedError(error, "PUT /api/projects/[id]/canvas");
   }
 }

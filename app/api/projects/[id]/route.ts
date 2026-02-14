@@ -5,11 +5,12 @@ import {
   updateProjectSchema,
   updateProjectStatusSchema,
 } from "@/lib/validations/project";
+import { apiError, handleUnexpectedError } from "@/lib/api/errors";
 
 async function getProjectOrError(id: string) {
   const { userId } = await auth();
   if (!userId) {
-    return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+    return { error: apiError(401, "Unauthorized") };
   }
 
   const project = await prisma.project.findUnique({
@@ -17,11 +18,11 @@ async function getProjectOrError(id: string) {
   });
 
   if (!project) {
-    return { error: NextResponse.json({ error: "Project not found" }, { status: 404 }) };
+    return { error: apiError(404, "Project not found") };
   }
 
   if (project.userId !== userId) {
-    return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
+    return { error: apiError(403, "Forbidden") };
   }
 
   return { project };
@@ -38,10 +39,7 @@ export async function GET(
     if (result.error) return result.error;
     return NextResponse.json(result.project);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to fetch project." },
-      { status: 500 }
-    );
+    return handleUnexpectedError(error, "GET /api/projects/[id]");
   }
 }
 
@@ -60,10 +58,7 @@ export async function DELETE(
     });
     return NextResponse.json({ message: "Project deleted successfully" });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to delete project." },
-      { status: 500 }
-    );
+    return handleUnexpectedError(error, "DELETE /api/projects/[id]");
   }
 }
 
@@ -81,10 +76,7 @@ export async function PATCH(
     const parsed = updateProjectStatusSchema.safeParse(body);
     if (!parsed.success) {
       const message = parsed.error.issues.map((e) => e.message).join("; ");
-      return NextResponse.json(
-        { error: "Validation failed", details: message },
-        { status: 400 }
-      );
+      return apiError(400, { message: "Validation failed", details: message });
     }
 
     const updated = await prisma.project.update({
@@ -93,10 +85,7 @@ export async function PATCH(
     });
     return NextResponse.json(updated);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to update project status." },
-      { status: 500 }
-    );
+    return handleUnexpectedError(error, "PATCH /api/projects/[id]");
   }
 }
 
@@ -114,10 +103,7 @@ export async function PUT(
     const parsed = updateProjectSchema.safeParse(body);
     if (!parsed.success) {
       const message = parsed.error.issues.map((e) => e.message).join("; ");
-      return NextResponse.json(
-        { error: "Validation failed", details: message },
-        { status: 400 }
-      );
+      return apiError(400, { message: "Validation failed", details: message });
     }
 
     const data: { name?: string; description?: string | null; icon?: string | null } =
@@ -133,9 +119,6 @@ export async function PUT(
     });
     return NextResponse.json(updated);
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to update project." },
-      { status: 500 }
-    );
+    return handleUnexpectedError(error, "PUT /api/projects/[id]");
   }
 }
