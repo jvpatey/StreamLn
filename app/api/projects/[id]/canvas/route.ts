@@ -1,5 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/db";
+
+async function getProjectOrError(id: string) {
+  const { userId } = await auth();
+  if (!userId) {
+    return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+  }
+
+  const project = await prisma.project.findUnique({
+    where: { id },
+  });
+
+  if (!project) {
+    return { error: NextResponse.json({ error: "Project not found" }, { status: 404 }) };
+  }
+
+  if (project.userId !== userId) {
+    return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
+  }
+
+  return { project };
+}
 
 // GET /api/projects/[id]/canvas - Fetch all blocks for a project
 export async function GET(
@@ -8,13 +30,8 @@ export async function GET(
 ) {
   const { id } = await context.params;
   try {
-    const project = await prisma.project.findUnique({
-      where: { id },
-    });
-
-    if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
-    }
+    const result = await getProjectOrError(id);
+    if (result.error) return result.error;
 
     const blocks = await prisma.canvasBlock.findMany({
       where: { projectId: id },
@@ -37,13 +54,8 @@ export async function PUT(
 ) {
   const { id } = await context.params;
   try {
-    const project = await prisma.project.findUnique({
-      where: { id },
-    });
-
-    if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
-    }
+    const result = await getProjectOrError(id);
+    if (result.error) return result.error;
 
     const body = await req.json();
     const blocks = Array.isArray(body.blocks) ? body.blocks : [];
