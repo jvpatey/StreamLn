@@ -101,6 +101,35 @@ describe("PUT /api/projects/[id]/canvas", () => {
     vi.clearAllMocks();
   });
 
+  it("returns 400 for invalid lastSavedAt", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
+    vi.mocked(prisma.project.findUnique).mockResolvedValue({
+      id: "proj-1",
+      userId: "user-123",
+      name: "Test",
+      description: null,
+      icon: null,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+
+    const req = new NextRequest("http://localhost/api/projects/proj-1/canvas", {
+      method: "PUT",
+      body: JSON.stringify({
+        blocks: [
+          { id: "b1", type: "note", x: 0, y: 0, width: 300, height: 200, content: {} },
+        ],
+        lastSavedAt: "not-a-date",
+      }),
+    });
+    const res = await PUT(req, createContext("proj-1") as any);
+
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toBe("Validation failed");
+  });
+
   it("returns 400 for invalid blocks", async () => {
     vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
     vi.mocked(prisma.project.findUnique).mockResolvedValue({
@@ -146,10 +175,7 @@ describe("PUT /api/projects/[id]/canvas", () => {
           createMany: vi.fn().mockResolvedValue(undefined),
         },
         project: {
-          update: vi.fn().mockResolvedValue({
-            id: "proj-1",
-            updatedAt: new Date("2024-01-15T10:00:00.000Z"),
-          }),
+          updateMany: vi.fn().mockResolvedValue({ count: 1 }),
         },
       };
       return fn(tx as any);
@@ -195,6 +221,18 @@ describe("PUT /api/projects/[id]/canvas", () => {
       createdAt: new Date(),
       updatedAt: newerDate,
     } as any);
+    vi.mocked(prisma.$transaction).mockImplementation(async (fn) => {
+      const tx = {
+        canvasBlock: {
+          deleteMany: vi.fn().mockResolvedValue(undefined),
+          createMany: vi.fn().mockResolvedValue(undefined),
+        },
+        project: {
+          updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+        },
+      };
+      return fn(tx as any);
+    });
 
     const req = new NextRequest("http://localhost/api/projects/proj-1/canvas", {
       method: "PUT",
@@ -218,6 +256,5 @@ describe("PUT /api/projects/[id]/canvas", () => {
     expect(res.status).toBe(409);
     const json = await res.json();
     expect(json.error).toContain("updated elsewhere");
-    expect(prisma.$transaction).not.toHaveBeenCalled();
   });
 });

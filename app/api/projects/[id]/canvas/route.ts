@@ -5,6 +5,12 @@ import prisma from "@/lib/db";
 import { saveCanvasBlocksSchema } from "@/lib/validations/canvas";
 import { apiError, handleUnexpectedError } from "@/lib/api/errors";
 
+class OptimisticLockConflictError extends Error {
+  constructor() {
+    super("Optimistic lock conflict");
+  }
+}
+
 async function getProjectOrError(id: string) {
   const { userId } = await auth();
   if (!userId) {
@@ -67,18 +73,7 @@ export async function PUT(
     const blocks = parsed.data.blocks;
     const lastSavedAt = parsed.data.lastSavedAt;
 
-    // Optimistic concurrency: reject if project was updated elsewhere
-    if (lastSavedAt) {
-      const clientTime = new Date(lastSavedAt).getTime();
-      const serverTime = result.project!.updatedAt.getTime();
-      if (serverTime > clientTime) {
-        return apiError(409, {
-          message: "Canvas was updated elsewhere. Please reload.",
-        });
-      }
-    }
-
-    const updatedProject = await prisma.$transaction(async (tx) => {
+    const newUpdatedAt = await prisma.$transaction(async (tx) => {
       // Replace-all: delete all blocks, then createMany (2 ops instead of 1 + N upserts)
       await tx.canvasBlock.deleteMany({ where: { projectId: id } });
 
@@ -100,18 +95,30 @@ export async function PUT(
         });
       }
 
-      // Update project.updatedAt so clients can use it for optimistic concurrency
-      return tx.project.update({
-        where: { id },
-        data: { updatedAt: new Date() },
+      // Optimistic lock: conditional update inside tx; 0 rows = conflict
+      const timestamp = new Date();
+      const result = await tx.project.updateMany({
+        where: lastSavedAt
+          ? { id, updatedAt: new Date(lastSavedAt) }
+          : { id },
+        data: { updatedAt: timestamp },
       });
+      if (result.count === 0) {
+        throw new OptimisticLockConflictError();
+      }
+      return timestamp;
     });
 
     return NextResponse.json({
       success: true,
-      updatedAt: updatedProject.updatedAt.toISOString(),
+      updatedAt: newUpdatedAt.toISOString(),
     });
   } catch (error) {
+    if (error instanceof OptimisticLockConflictError) {
+      return apiError(409, {
+        message: "Canvas was updated elsewhere. Please reload.",
+      });
+    }
     return handleUnexpectedError(error, "PUT /api/projects/[id]/canvas");
   }
 }

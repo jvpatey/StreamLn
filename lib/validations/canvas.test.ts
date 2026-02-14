@@ -111,4 +111,20 @@ describe("saveCanvasBlocksSchema", () => {
     const result = saveCanvasBlocksSchema.safeParse({ blocks: "not-array" });
     expect(result.success).toBe(false);
   });
+
+  it("accepts valid lastSavedAt ISO string", () => {
+    const result = saveCanvasBlocksSchema.safeParse({
+      blocks: [validBlock],
+      lastSavedAt: "2024-01-15T10:00:00.000Z",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects invalid lastSavedAt", () => {
+    const result = saveCanvasBlocksSchema.safeParse({
+      blocks: [validBlock],
+      lastSavedAt: "not-a-date",
+    });
+    expect(result.success).toBe(false);
+  });
 });

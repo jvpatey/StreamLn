@@ -27,7 +27,13 @@ export const canvasBlockSchema = z.object({
 
 export const saveCanvasBlocksSchema = z.object({
   blocks: z.array(canvasBlockSchema).max(500),
-  lastSavedAt: z.string().optional(),
+  lastSavedAt: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || Number.isFinite(new Date(val).getTime()),
+      { message: "lastSavedAt must be a valid ISO datetime string" }
+    ),
 });
 
 export type CanvasBlockInput = z.infer<typeof canvasBlockSchema>;
