@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/db";
+import { createProjectSchema } from "@/lib/validations/project";
 
 // GET /api/projects - List projects for the authenticated user
 export async function GET(req: NextRequest) {
@@ -22,7 +23,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { name, description, icon } = await req.json();
+  const body = await req.json();
+  const parsed = createProjectSchema.safeParse(body);
+  if (!parsed.success) {
+    const message = parsed.error.issues.map((e) => e.message).join("; ");
+    return NextResponse.json(
+      { error: "Validation failed", details: message },
+      { status: 400 }
+    );
+  }
+
+  const { name, description, icon } = parsed.data;
 
   const project = await prisma.project.create({
     data: {

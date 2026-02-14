@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/db";
+import {
+  updateProjectSchema,
+  updateProjectStatusSchema,
+} from "@/lib/validations/project";
 
 async function getProjectOrError(id: string) {
   const { userId } = await auth();
@@ -74,11 +78,18 @@ export async function PATCH(
     if (result.error) return result.error;
 
     const body = await req.json();
+    const parsed = updateProjectStatusSchema.safeParse(body);
+    if (!parsed.success) {
+      const message = parsed.error.issues.map((e) => e.message).join("; ");
+      return NextResponse.json(
+        { error: "Validation failed", details: message },
+        { status: 400 }
+      );
+    }
+
     const updated = await prisma.project.update({
       where: { id },
-      data: {
-        status: body.status,
-      },
+      data: { status: parsed.data.status },
     });
     return NextResponse.json(updated);
   } catch (error) {
@@ -100,14 +111,25 @@ export async function PUT(
     if (result.error) return result.error;
 
     const body = await req.json();
+    const parsed = updateProjectSchema.safeParse(body);
+    if (!parsed.success) {
+      const message = parsed.error.issues.map((e) => e.message).join("; ");
+      return NextResponse.json(
+        { error: "Validation failed", details: message },
+        { status: 400 }
+      );
+    }
+
+    const data: { name?: string; description?: string | null; icon?: string | null } =
+      {};
+    if (parsed.data.name !== undefined) data.name = parsed.data.name;
+    if (parsed.data.description !== undefined)
+      data.description = parsed.data.description;
+    if (parsed.data.icon !== undefined) data.icon = parsed.data.icon;
+
     const updated = await prisma.project.update({
       where: { id },
-      data: {
-        name: body.name,
-        description: body.description,
-        icon: body.icon,
-        updatedAt: new Date(),
-      },
+      data: { ...data, updatedAt: new Date() },
     });
     return NextResponse.json(updated);
   } catch (error) {

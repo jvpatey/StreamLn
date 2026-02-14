@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { Prisma } from "@/app/generated/prisma-client";
 import prisma from "@/lib/db";
+import { saveCanvasBlocksSchema } from "@/lib/validations/canvas";
 
 async function getProjectOrError(id: string) {
   const { userId } = await auth();
@@ -58,9 +60,17 @@ export async function PUT(
     if (result.error) return result.error;
 
     const body = await req.json();
-    const blocks = Array.isArray(body.blocks) ? body.blocks : [];
+    const parsed = saveCanvasBlocksSchema.safeParse(body);
+    if (!parsed.success) {
+      const message = parsed.error.issues.map((e) => e.message).join("; ");
+      return NextResponse.json(
+        { error: "Validation failed", details: message },
+        { status: 400 }
+      );
+    }
 
-    const incomingIds = blocks.map((b: { id: string }) => b.id);
+    const blocks = parsed.data.blocks;
+    const incomingIds = blocks.map((b) => b.id);
 
     await prisma.$transaction(async (tx) => {
       // Delete blocks not in the incoming list
@@ -85,7 +95,7 @@ export async function PUT(
             y: typeof b.y === "number" ? b.y : 0,
             width: typeof b.width === "number" ? b.width : 300,
             height: typeof b.height === "number" ? b.height : 200,
-            content: b.content ?? {},
+            content: (b.content ?? {}) as Prisma.InputJsonValue,
             color: b.color ?? null,
             title: b.title ?? null,
           },
@@ -96,7 +106,7 @@ export async function PUT(
             y: typeof b.y === "number" ? b.y : 0,
             width: typeof b.width === "number" ? b.width : 300,
             height: typeof b.height === "number" ? b.height : 200,
-            content: b.content ?? {},
+            content: (b.content ?? {}) as Prisma.InputJsonValue,
             color: b.color ?? null,
             title: b.title ?? null,
           },
