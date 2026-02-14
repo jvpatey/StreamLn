@@ -66,7 +66,6 @@ export async function PUT(
 
     const blocks = parsed.data.blocks;
     const lastSavedAt = parsed.data.lastSavedAt;
-    const incomingIds = blocks.map((b) => b.id);
 
     // Optimistic concurrency: reject if project was updated elsewhere
     if (lastSavedAt) {
@@ -80,20 +79,12 @@ export async function PUT(
     }
 
     const updatedProject = await prisma.$transaction(async (tx) => {
-      // Delete blocks not in the incoming list
-      await tx.canvasBlock.deleteMany({
-        where: {
-          projectId: id,
-          id: { notIn: incomingIds },
-        },
-      });
+      // Replace-all: delete all blocks, then createMany (2 ops instead of 1 + N upserts)
+      await tx.canvasBlock.deleteMany({ where: { projectId: id } });
 
-      // Upsert each block
-      for (let i = 0; i < blocks.length; i++) {
-        const b = blocks[i];
-        await tx.canvasBlock.upsert({
-          where: { id: b.id },
-          create: {
+      if (blocks.length > 0) {
+        await tx.canvasBlock.createMany({
+          data: blocks.map((b, i) => ({
             id: b.id,
             projectId: id,
             order: i,
@@ -105,18 +96,7 @@ export async function PUT(
             content: (b.content ?? {}) as Prisma.InputJsonValue,
             color: b.color ?? null,
             title: b.title ?? null,
-          },
-          update: {
-            order: i,
-            type: b.type ?? "note",
-            x: typeof b.x === "number" ? b.x : 0,
-            y: typeof b.y === "number" ? b.y : 0,
-            width: typeof b.width === "number" ? b.width : 300,
-            height: typeof b.height === "number" ? b.height : 200,
-            content: (b.content ?? {}) as Prisma.InputJsonValue,
-            color: b.color ?? null,
-            title: b.title ?? null,
-          },
+          })),
         });
       }
 

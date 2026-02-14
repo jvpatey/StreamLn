@@ -143,7 +143,7 @@ describe("PUT /api/projects/[id]/canvas", () => {
       const tx = {
         canvasBlock: {
           deleteMany: vi.fn().mockResolvedValue(undefined),
-          upsert: vi.fn().mockResolvedValue(undefined),
+          createMany: vi.fn().mockResolvedValue(undefined),
         },
         project: {
           update: vi.fn().mockResolvedValue({
