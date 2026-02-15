@@ -47,7 +47,17 @@ describe("GET /api/projects", () => {
         status: "active",
         createdAt: new Date(),
         updatedAt: new Date(),
-        _count: { canvasBlocks: 5 },
+        canvases: [
+          {
+            id: "canvas-1",
+            projectId: "proj-1",
+            name: "Main",
+            order: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            _count: { canvasBlocks: 5 },
+          },
+        ],
       },
     ] as any);
 
@@ -61,7 +71,11 @@ describe("GET /api/projects", () => {
     expect(json[0].name).toBe("Test");
     expect(prisma.project.findMany).toHaveBeenCalledWith({
       where: { userId: "user-123" },
-      include: { _count: { select: { canvasBlocks: true } } },
+      include: {
+        canvases: {
+          include: { _count: { select: { canvasBlocks: true } } },
+        },
+      },
     });
   });
 });
@@ -100,7 +114,7 @@ describe("POST /api/projects", () => {
     expect(prisma.project.create).not.toHaveBeenCalled();
   });
 
-  it("creates project with valid input", async () => {
+  it("creates project with valid input and default canvas", async () => {
     vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
     vi.mocked(prisma.project.create).mockResolvedValue({
       id: "proj-new",
@@ -111,6 +125,16 @@ describe("POST /api/projects", () => {
       status: "active",
       createdAt: new Date(),
       updatedAt: new Date(),
+      canvases: [
+        {
+          id: "canvas-new",
+          projectId: "proj-new",
+          name: "Main",
+          order: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
     } as any);
 
     const req = new NextRequest("http://localhost/api/projects", {
@@ -132,7 +156,11 @@ describe("POST /api/projects", () => {
         name: "New Project",
         description: "Desc",
         icon: "Folder",
+        canvases: {
+          create: { name: "Main", order: 0 },
+        },
       },
+      include: { canvases: true },
     });
   });
 });

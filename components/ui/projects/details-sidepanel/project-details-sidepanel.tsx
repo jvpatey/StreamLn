@@ -6,6 +6,7 @@ import {
   ProjectStats,
   ProjectDetails,
   ActionButtons,
+  CanvasesList,
   DeleteConfirmationDialog,
   Project,
 } from "./project-details";
@@ -17,7 +18,7 @@ interface ProjectDetailsSidepanelProps {
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
   onStatusChange?: (projectId: string, newStatus: string) => void;
-  onOpenCanvas?: (project: Project) => void;
+  onOpenCanvas?: (project: Project, canvasId?: string) => void;
 }
 
 export function ProjectDetailsSidepanel({
@@ -140,6 +141,10 @@ export function ProjectDetailsSidepanel({
           <div className="space-y-3 py-3">
             <ProjectStats project={project} />
             <ProjectDetails project={project} />
+            <CanvasesList
+              project={project}
+              onOpenCanvas={(p, canvasId) => onOpenCanvas?.(p, canvasId)}
+            />
           </div>
 
           {/* Action Buttons */}

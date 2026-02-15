@@ -168,9 +168,12 @@ export default function DashboardPage() {
     setSidepanelOpen(true);
   };
 
-  const handleOpenCanvas = (project: any) => {
-    // Navigate to canvas view
-    router.push(`/projects/${project.id}`);
+  const handleOpenCanvas = (project: any, canvasId?: string) => {
+    if (canvasId) {
+      router.push(`/projects/${project.id}/canvas/${canvasId}`);
+    } else {
+      router.push(`/projects/${project.id}`);
+    }
   };
 
   const handleProjectDelete = async (projectId: string) => {

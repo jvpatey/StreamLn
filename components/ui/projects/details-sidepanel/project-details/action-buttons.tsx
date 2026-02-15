@@ -19,7 +19,7 @@ interface ActionButtonsProps {
   onEditClick: () => void;
   onStatusChange?: (projectId: string, newStatus: string) => void;
   onDelete: () => void;
-  onOpenCanvas?: (project: Project) => void;
+  onOpenCanvas?: (project: Project, canvasId?: string) => void;
 }
 
 export function ActionButtons({
@@ -82,7 +82,7 @@ export function ActionButtons({
           shadow-lg hover:shadow-xl
           transition-all duration-200
           flex items-center justify-center"
-        onClick={() => onOpenCanvas?.(project)}
+        onClick={() => onOpenCanvas?.(project, undefined)}
       >
         <ExternalLink className="h-4 w-4 mr-2" />
         Open Project

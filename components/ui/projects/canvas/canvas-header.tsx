@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/shared/button";
-import { Badge } from "@/components/ui/shared/badge";
 import { LiquidGlassButton } from "@/components/ui/shared/liquid-glass-button";
 import {
   LiquidGlassSurface,
@@ -26,6 +26,10 @@ import {
   Sun,
   Moon,
   LogOut,
+  Plus,
+  ChevronDown,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import {
   Popover,
@@ -71,19 +75,40 @@ interface Project {
   updatedAt: string;
 }
 
+interface CanvasItem {
+  id: string;
+  name: string;
+  order: number;
+  updatedAt?: string;
+}
+
 interface CanvasHeaderProps {
   project: Project;
+  canvas?: CanvasItem;
+  canvases?: CanvasItem[];
   viewMode: "edit" | "present";
   onViewModeChange: (mode: "edit" | "present") => void;
+  onCanvasCreate?: () => void;
+  onCanvasRename?: (canvasId: string, name: string) => void;
+  onCanvasDelete?: (canvasId: string) => void;
 }
 
 // Canvas header component used in the canvas page
 export function CanvasHeader({
   project,
+  canvas,
+  canvases = [],
   viewMode,
   onViewModeChange,
+  onCanvasCreate,
+  onCanvasRename,
+  onCanvasDelete,
 }: CanvasHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [canvasSwitcherOpen, setCanvasSwitcherOpen] = useState(false);
+  const [renameCanvasId, setRenameCanvasId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { user } = useUser();
   const { signOut } = useClerk();
@@ -129,7 +154,7 @@ export function CanvasHeader({
               {/* Divider */}
               <div className="h-6 w-px bg-slate-200 dark:bg-slate-700" />
 
-              {/* Project Info */}
+              {/* Project Info + Canvas Switcher */}
               <div className="flex items-center space-x-3">
                 <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
                   {React.createElement(
@@ -139,13 +164,147 @@ export function CanvasHeader({
                     }
                   )}
                 </div>
-                <div>
-                  <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 truncate max-w-[200px] sm:max-w-[300px]">
-                    {project.name}
-                  </h1>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Canvas • Updated {formatDate(project.updatedAt)}
-                  </p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
+                  <div>
+                    <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 truncate max-w-[200px] sm:max-w-[300px]">
+                      {project.name}
+                    </h1>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      {canvas
+                        ? `${canvas.name} • Updated ${formatDate(canvas.updatedAt ?? project.updatedAt)}`
+                        : `Canvas • Updated ${formatDate(project.updatedAt)}`}
+                    </p>
+                  </div>
+                  {/* Canvas Switcher - when multiple canvases */}
+                  {canvases.length > 0 && (
+                    <Popover
+                      open={canvasSwitcherOpen}
+                      onOpenChange={(open) => {
+                        setCanvasSwitcherOpen(open);
+                        if (!open) {
+                          setRenameCanvasId(null);
+                        }
+                      }}
+                    >
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="glass"
+                          size="sm"
+                          className="rounded-xl h-9 px-3 flex items-center gap-1.5 text-sm font-medium"
+                        >
+                          {canvas?.name ?? "Canvas"}
+                          <ChevronDown size={14} />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        align="start"
+                        className={getLiquidGlassSurfaceClassName({
+                          variant: "popover",
+                          intensity: "xl",
+                          rounded: "xl",
+                          className: "w-56 p-2",
+                        })}
+                      >
+                        <div className="space-y-0.5 max-h-64 overflow-y-auto">
+                          {canvases.map((c) => (
+                            <div
+                              key={c.id}
+                              className={cn(
+                                "flex items-center gap-2 rounded-lg px-3 py-2 group",
+                                c.id === canvas?.id
+                                  ? "bg-primary/10 text-primary"
+                                  : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                              )}
+                            >
+                              {renameCanvasId === c.id ? (
+                                <input
+                                  type="text"
+                                  value={renameValue}
+                                  onChange={(e) => setRenameValue(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      onCanvasRename?.(c.id, renameValue.trim() || c.name);
+                                      setRenameCanvasId(null);
+                                    }
+                                    if (e.key === "Escape") {
+                                      setRenameCanvasId(null);
+                                      setRenameValue(c.name);
+                                    }
+                                  }}
+                                  onBlur={() => {
+                                    if (renameValue.trim()) {
+                                      onCanvasRename?.(c.id, renameValue.trim());
+                                    }
+                                    setRenameCanvasId(null);
+                                  }}
+                                  autoFocus
+                                  className="flex-1 bg-transparent border-none outline-none text-sm"
+                                />
+                              ) : (
+                                <>
+                                  <button
+                                    type="button"
+                                    className="flex-1 text-left text-sm truncate"
+                                    onClick={() => {
+                                      if (c.id !== canvas?.id) {
+                                        router.push(`/projects/${project.id}/canvas/${c.id}`);
+                                        setCanvasSwitcherOpen(false);
+                                      }
+                                    }}
+                                  >
+                                    {c.name}
+                                  </button>
+                                  {onCanvasRename && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setRenameCanvasId(c.id);
+                                        setRenameValue(c.name);
+                                      }}
+                                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700"
+                                      aria-label="Rename canvas"
+                                    >
+                                      <Pencil size={12} />
+                                    </button>
+                                  )}
+                                  {onCanvasDelete && canvases.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (c.id === canvas?.id && canvases[0]) {
+                                          const next = canvases.find((x) => x.id !== c.id);
+                                          if (next) router.push(`/projects/${project.id}/canvas/${next.id}`);
+                                        }
+                                        onCanvasDelete(c.id);
+                                        setCanvasSwitcherOpen(false);
+                                      }}
+                                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 dark:text-red-400"
+                                      aria-label="Delete canvas"
+                                    >
+                                      <Trash2 size={12} />
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        {onCanvasCreate && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              onCanvasCreate();
+                              setCanvasSwitcherOpen(false);
+                            }}
+                            className="w-full mt-2 flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                          >
+                            <Plus size={14} />
+                            Add canvas
+                          </button>
+                        )}
+                      </PopoverContent>
+                    </Popover>
+                  )}
                 </div>
               </div>
 

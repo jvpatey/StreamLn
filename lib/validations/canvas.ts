@@ -36,5 +36,17 @@ export const saveCanvasBlocksSchema = z.object({
     ),
 });
 
+export const createCanvasSchema = z.object({
+  name: z.string().min(1).max(200).optional().default("Untitled Canvas"),
+  order: z.number().int().min(0).optional().default(0),
+});
+
+export const updateCanvasSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  order: z.number().int().min(0).optional(),
+});
+
 export type CanvasBlockInput = z.infer<typeof canvasBlockSchema>;
 export type SaveCanvasBlocksInput = z.infer<typeof saveCanvasBlocksSchema>;
+export type CreateCanvasInput = z.infer<typeof createCanvasSchema>;
+export type UpdateCanvasInput = z.infer<typeof updateCanvasSchema>;
