@@ -34,7 +34,7 @@ export default function FeaturesSection() {
     {
       title: "Rich Content Blocks",
       description:
-        "Create notes with markdown and code blocks. Each block is movable and supports rich formatting with lists and inline code.",
+        "Create notes with rich formatting and code blocks. Each block is movable and supports lists, formatting, and inline code.",
       icon: <FileText size={24} />,
       highlight: "Tiptap Powered",
     },
@@ -73,7 +73,7 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="py-24 bg-white dark:bg-slate-800">
+    <section id="features" className="py-24 bg-white dark:bg-slate-800">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section header with gradient text */}
         <AnimatedSection>

@@ -9,7 +9,7 @@ import { motion, useReducedMotion } from "framer-motion";
 export default function HeroSection() {
   const shouldReduceMotion = useReducedMotion();
   return (
-    <section className="relative overflow-hidden min-h-screen flex items-center justify-center py-8 sm:py-0">
+    <section id="hero" className="relative overflow-hidden min-h-screen flex items-center justify-center py-8 sm:py-0">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 w-full">
         <div className="mx-auto max-w-2xl text-center">
           {/* Beta badge with animated rocket icon */}

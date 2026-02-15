@@ -38,12 +38,12 @@ export default function HowItWorksSection() {
     {
       step: "02",
       title: "Rich Content Blocks",
-      subtitle: "Tiptap-Powered Notes",
+      subtitle: "Rich Text Editor",
       description:
-        "Create rich notes with markdown and code blocks directly on the canvas. Each block is movable and supports lists, formatting, and inline code.",
+        "Create rich notes with formatting and code blocks directly on the canvas. Each block is movable and supports lists, formatting, and inline code.",
       icon: <FileText className="w-6 h-6" />,
       features: [
-        "Tiptap rich editor",
+        "Rich text editor",
         "Code blocks",
         "Lists and formatting",
       ],
@@ -71,7 +71,7 @@ export default function HowItWorksSection() {
   ];
 
   return (
-    <section className="relative py-24 bg-slate-50 dark:bg-slate-950 overflow-hidden">
+    <section id="how-it-works" className="relative py-24 bg-slate-50 dark:bg-slate-950 overflow-hidden">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section header with badge and title */}
         <AnimatedSection>
