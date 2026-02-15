@@ -59,6 +59,7 @@ export function ScrollSpyNav() {
           const isActive = activeId === id;
           return (
             <button
+              type="button"
               key={id}
               onClick={() => handleClick(id)}
               className={cn(
