@@ -101,7 +101,7 @@ export function ProjectsSidebar({
                         {getKeyboardShortcut("⌘K")}
                       </kbd>
                       {"\u00A0"}
-                      to instantly access any project or create new content
+                      to instantly access any project or create a new one
                     </p>
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@clerk/nextjs";
 import { useEffect } from "react";
-import { SimpleThemeToggle } from "@/components/ui/shared/theme-toggle";
+import { ScrollSpyNav } from "@/components/sections/home/ScrollSpyNav";
 import HeroSection from "@/components/sections/home/HeroSection";
 import FeaturesSection from "@/components/sections/home/FeaturesSection";
 import HowItWorksSection from "@/components/sections/home/HowItWorksSection";
@@ -28,10 +28,8 @@ export default function Home() {
 
   return (
     <>
-      {/* Floating theme toggle button - positioned in top-right corner */}
-      <div className="fixed top-6 right-6 z-50">
-        <SimpleThemeToggle />
-      </div>
+      {/* Scroll-spy nav with theme toggle - positioned at top-right */}
+      <ScrollSpyNav />
 
       {/* Main content area with responsive background */}
       <main className="min-h-screen bg-gray-50 dark:bg-slate-900">

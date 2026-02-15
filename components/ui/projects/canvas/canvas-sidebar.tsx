@@ -57,7 +57,7 @@ const BLOCK_TYPES = [
   {
     type: "note",
     label: "Note",
-    description: "Rich text notes with markdown",
+    description: "Rich text notes with formatting",
     icon: FileText,
     color: "#3b82f6",
   },
