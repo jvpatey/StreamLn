@@ -107,7 +107,7 @@ export default function FeaturesSection() {
           ))}
         </div>
 
-        {/* Additional features grid - 2 columns on large screens, 3 items wrap */}
+        {/* Additional features grid - 2 columns on large screens, 4 items wrap */}
         <div className="mx-auto mt-8 grid max-w-2xl grid-cols-1 gap-6 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:gap-8">
           {additionalFeatures.map((feature, index) => (
             <AnimatedGridItem key={index} index={index} staggerDelay={0.1}>
