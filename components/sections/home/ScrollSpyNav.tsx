@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { SimpleThemeToggle } from "@/components/ui/shared/theme-toggle";
 
@@ -12,6 +13,7 @@ const SECTIONS = [
 
 export function ScrollSpyNav() {
   const [activeId, setActiveId] = useState<string>("hero");
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -40,7 +42,11 @@ export function ScrollSpyNav() {
   }, []);
 
   const handleClick = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    const target = document.getElementById(id);
+    if (!target) return;
+    target.scrollIntoView({
+      behavior: shouldReduceMotion ? "auto" : "smooth",
+    });
   };
 
   return (
