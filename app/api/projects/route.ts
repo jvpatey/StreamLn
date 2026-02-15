@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       return apiError(400, { message: "Validation failed", details: message });
     }
 
-    const { name, description, icon } = parsed.data;
+    const { name, description, icon, canvasName } = parsed.data;
 
     const project = await prisma.project.create({
       data: {
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
         icon,
         canvases: {
           create: {
-            name: "Main",
+            name: (canvasName?.trim() || "Main"),
             order: 0,
           },
         },

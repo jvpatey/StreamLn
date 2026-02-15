@@ -143,14 +143,16 @@ export default function DashboardPage() {
     name,
     description,
     icon,
+    canvasName,
   }: {
     name: string;
     description?: string;
     icon?: string;
+    canvasName?: string;
   }) => {
     if (!user?.id)
       throw new Error("You must be signed in to create a project.");
-    await createProject({ name, description, icon });
+    await createProject({ name, description, icon, canvasName });
     setCreateModalOpen(false);
     // Refetch projects after creating
     loadProjects();
