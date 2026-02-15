@@ -3,6 +3,7 @@
 import FeatureCard from "@/components/ui/home/FeatureCard";
 import AnimatedSection from "@/components/ui/shared/animated-section";
 import AnimatedGridItem from "@/components/ui/shared/animated-grid-item";
+import { getKeyboardShortcut } from "@/lib/utils";
 import {
   Move,
   Layers,
@@ -58,10 +59,9 @@ export default function FeaturesSection() {
     },
     {
       title: "Quick Command Palette",
-      description:
-        "Press ⌘K to create projects, search by name, filter by status, or browse all. Navigate your workspace without leaving the keyboard.",
+      description: `Press ${getKeyboardShortcut("⌘K")} to create projects, search by name, filter by status, or browse all. Navigate your workspace without leaving the keyboard.`,
       icon: <Command size={24} />,
-      highlight: "⌘K",
+      highlight: getKeyboardShortcut("⌘K"),
     },
     {
       title: "Presentation Mode",

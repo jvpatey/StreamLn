@@ -13,6 +13,7 @@ import {
   Sparkles,
   Layers,
 } from "lucide-react";
+import { getKeyboardShortcut } from "@/lib/utils";
 
 // How it works section component - explains the canvas-based developer workspace
 export default function HowItWorksSection() {
@@ -58,9 +59,9 @@ export default function HowItWorksSection() {
       title: "Task Boards & Projects",
       subtitle: "Visual Task Management",
       description:
-        "Create and organize tasks directly on your canvas with drag-and-drop columns. Use the command palette (⌘K) to search projects and filter by status.",
+        `Create and organize tasks directly on your canvas with drag-and-drop columns. Use the command palette (${getKeyboardShortcut("⌘K")}) to search projects and filter by status.`,
       icon: <Kanban className="w-6 h-6" />,
-      features: ["Visual task boards", "Project search (⌘K)", "Filter by status"],
+      features: ["Visual task boards", `Project search (${getKeyboardShortcut("⌘K")})`, "Filter by status"],
       color: "text-cosmos-star-light",
       bgColor:
         "from-cosmos-star-light/10 via-cosmos-star-dark/5 to-cosmos-star-light/5",
