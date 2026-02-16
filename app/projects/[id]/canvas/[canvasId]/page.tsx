@@ -10,6 +10,11 @@ import { CanvasWorkspace } from "@/components/ui/projects/canvas/canvas-workspac
 import { CanvasSidebar } from "@/components/ui/projects/canvas/canvas-sidebar";
 import { CanvasFloatingToolbar } from "@/components/ui/projects/canvas/canvas-floating-toolbar";
 import { CanvasHeader } from "@/components/ui/projects/canvas/canvas-header";
+import { ExportModal } from "@/components/ui/projects/canvas/export-modal";
+import {
+  exportCanvasAsPNG,
+  exportCanvasAsPDF,
+} from "@/lib/export/canvas-export";
 import { DEFAULT_NOTE_CONTENT } from "@/components/ui/projects/canvas/blocks/note-defaults";
 import { DEFAULT_LINK_CONTENT } from "@/components/ui/projects/canvas/blocks/link-defaults";
 import { DEFAULT_TAG_CONTENT } from "@/components/ui/projects/canvas/blocks/tag-defaults";
@@ -94,6 +99,7 @@ export default function ProjectCanvasPage() {
   const [toolbarOpen, setToolbarOpen] = useState(true);
   const [isToolbarExiting, setIsToolbarExiting] = useState(false);
   const [viewMode, setViewMode] = useState<"edit" | "present">("edit");
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
   // Canvas tool state (select vs pan)
   const [activeTool, setActiveTool] = useState<CanvasTool>("select");
@@ -612,6 +618,41 @@ export default function ProjectCanvasPage() {
         onCanvasRename={handleRenameCanvas}
         onCanvasDelete={handleDeleteCanvas}
         onCanvasReorder={handleReorderCanvases}
+        onExportClick={() => setExportModalOpen(true)}
+      />
+      <ExportModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        project={project}
+        canvas={{
+          id: canvas.id,
+          name: canvas.name,
+          order: canvas.order,
+          projectId: canvas.projectId,
+          createdAt: canvas.createdAt,
+          updatedAt: canvas.updatedAt,
+        }}
+        blocks={canvasBlocks}
+        onExportPNG={() =>
+          exportCanvasAsPNG(canvasRef.current, project, {
+            id: canvas.id,
+            name: canvas.name,
+            order: canvas.order,
+            projectId: canvas.projectId,
+            createdAt: canvas.createdAt,
+            updatedAt: canvas.updatedAt,
+          })
+        }
+        onExportPDF={() =>
+          exportCanvasAsPDF(canvasRef.current, project, {
+            id: canvas.id,
+            name: canvas.name,
+            order: canvas.order,
+            projectId: canvas.projectId,
+            createdAt: canvas.createdAt,
+            updatedAt: canvas.updatedAt,
+          })
+        }
       />
       {saveConflict && (
         <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between gap-4">

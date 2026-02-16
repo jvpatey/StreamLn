@@ -270,7 +270,7 @@ function Column({
       ref={setNodeRef}
       data-no-block-drag
       onClick={onSelect}
-      className={`flex w-52 shrink-0 flex-col rounded-xl border bg-slate-50/80 dark:bg-slate-900/50 transition-colors ${
+      className={`flex w-52 shrink-0 flex-col rounded-xl border bg-slate-50/80 dark:bg-slate-800 transition-colors ${
         isOver
           ? "border-slate-300 dark:border-slate-500"
           : isSelected
