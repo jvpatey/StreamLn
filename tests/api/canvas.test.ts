@@ -443,3 +443,312 @@ describe("PUT /api/projects/[id]/canvases/[canvasId]", () => {
     expect(json.error).toContain("updated elsewhere");
   });
 });
+
+describe("PATCH /api/projects/[id]/canvases/[canvasId]", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("returns 401 when not authenticated", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: null } as any);
+
+    const req = new NextRequest(
+      "http://localhost/api/projects/proj-1/canvases/canvas-1",
+      { method: "PATCH", body: JSON.stringify({ name: "Renamed" }) }
+    );
+    const res = await PatchCanvas(
+      req,
+      createCanvasContext("proj-1", "canvas-1") as any
+    );
+
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 400 for invalid name (empty string)", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
+    vi.mocked(prisma.project.findUnique).mockResolvedValue({
+      id: "proj-1",
+      userId: "user-123",
+      name: "Test",
+      description: null,
+      icon: null,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+    vi.mocked(prisma.canvas.findFirst).mockResolvedValue({
+      id: "canvas-1",
+      projectId: "proj-1",
+      name: "Main",
+      order: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+
+    const req = new NextRequest(
+      "http://localhost/api/projects/proj-1/canvases/canvas-1",
+      { method: "PATCH", body: JSON.stringify({ name: "" }) }
+    );
+    const res = await PatchCanvas(
+      req,
+      createCanvasContext("proj-1", "canvas-1") as any
+    );
+
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toBe("Validation failed");
+  });
+
+  it("returns 400 for invalid order (negative)", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
+    vi.mocked(prisma.project.findUnique).mockResolvedValue({
+      id: "proj-1",
+      userId: "user-123",
+      name: "Test",
+      description: null,
+      icon: null,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+    vi.mocked(prisma.canvas.findFirst).mockResolvedValue({
+      id: "canvas-1",
+      projectId: "proj-1",
+      name: "Main",
+      order: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+
+    const req = new NextRequest(
+      "http://localhost/api/projects/proj-1/canvases/canvas-1",
+      { method: "PATCH", body: JSON.stringify({ order: -1 }) }
+    );
+    const res = await PatchCanvas(
+      req,
+      createCanvasContext("proj-1", "canvas-1") as any
+    );
+
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toBe("Validation failed");
+  });
+
+  it("updates canvas name successfully", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
+    vi.mocked(prisma.project.findUnique).mockResolvedValue({
+      id: "proj-1",
+      userId: "user-123",
+      name: "Test",
+      description: null,
+      icon: null,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+    vi.mocked(prisma.canvas.findFirst).mockResolvedValue({
+      id: "canvas-1",
+      projectId: "proj-1",
+      name: "Main",
+      order: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+    vi.mocked(prisma.canvas.update).mockResolvedValue({
+      id: "canvas-1",
+      projectId: "proj-1",
+      name: "Overview",
+      order: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+
+    const req = new NextRequest(
+      "http://localhost/api/projects/proj-1/canvases/canvas-1",
+      { method: "PATCH", body: JSON.stringify({ name: "Overview" }) }
+    );
+    const res = await PatchCanvas(
+      req,
+      createCanvasContext("proj-1", "canvas-1") as any
+    );
+
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.name).toBe("Overview");
+    expect(prisma.canvas.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "canvas-1" },
+        data: expect.objectContaining({ name: "Overview" }),
+      })
+    );
+  });
+
+  it("updates canvas order successfully", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
+    vi.mocked(prisma.project.findUnique).mockResolvedValue({
+      id: "proj-1",
+      userId: "user-123",
+      name: "Test",
+      description: null,
+      icon: null,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+    vi.mocked(prisma.canvas.findFirst).mockResolvedValue({
+      id: "canvas-1",
+      projectId: "proj-1",
+      name: "Main",
+      order: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+    vi.mocked(prisma.canvas.update).mockResolvedValue({
+      id: "canvas-1",
+      projectId: "proj-1",
+      name: "Main",
+      order: 2,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+
+    const req = new NextRequest(
+      "http://localhost/api/projects/proj-1/canvases/canvas-1",
+      { method: "PATCH", body: JSON.stringify({ order: 2 }) }
+    );
+    const res = await PatchCanvas(
+      req,
+      createCanvasContext("proj-1", "canvas-1") as any
+    );
+
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.order).toBe(2);
+    expect(prisma.canvas.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "canvas-1" },
+        data: expect.objectContaining({ order: 2 }),
+      })
+    );
+  });
+});
+
+describe("DELETE /api/projects/[id]/canvases/[canvasId]", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("returns 401 when not authenticated", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: null } as any);
+
+    const req = new NextRequest(
+      "http://localhost/api/projects/proj-1/canvases/canvas-1",
+      { method: "DELETE" }
+    );
+    const res = await DeleteCanvas(
+      req,
+      createCanvasContext("proj-1", "canvas-1") as any
+    );
+
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 404 when canvas not found", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
+    vi.mocked(prisma.project.findUnique).mockResolvedValue({
+      id: "proj-1",
+      userId: "user-123",
+      name: "Test",
+      description: null,
+      icon: null,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+    vi.mocked(prisma.canvas.findFirst).mockResolvedValue(null);
+
+    const req = new NextRequest(
+      "http://localhost/api/projects/proj-1/canvases/canvas-1",
+      { method: "DELETE" }
+    );
+    const res = await DeleteCanvas(
+      req,
+      createCanvasContext("proj-1", "canvas-1") as any
+    );
+
+    expect(res.status).toBe(404);
+    expect(prisma.canvas.delete).not.toHaveBeenCalled();
+  });
+
+  it("returns 403 when user does not own project", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: "other-user" } as any);
+    vi.mocked(prisma.project.findUnique).mockResolvedValue({
+      id: "proj-1",
+      userId: "user-123",
+      name: "Test",
+      description: null,
+      icon: null,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+
+    const req = new NextRequest(
+      "http://localhost/api/projects/proj-1/canvases/canvas-1",
+      { method: "DELETE" }
+    );
+    const res = await DeleteCanvas(
+      req,
+      createCanvasContext("proj-1", "canvas-1") as any
+    );
+
+    expect(res.status).toBe(403);
+    expect(prisma.canvas.delete).not.toHaveBeenCalled();
+  });
+
+  it("deletes canvas successfully", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
+    vi.mocked(prisma.project.findUnique).mockResolvedValue({
+      id: "proj-1",
+      userId: "user-123",
+      name: "Test",
+      description: null,
+      icon: null,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+    vi.mocked(prisma.canvas.findFirst).mockResolvedValue({
+      id: "canvas-1",
+      projectId: "proj-1",
+      name: "Main",
+      order: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+    vi.mocked(prisma.canvas.delete).mockResolvedValue({
+      id: "canvas-1",
+      projectId: "proj-1",
+      name: "Main",
+      order: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+
+    const req = new NextRequest(
+      "http://localhost/api/projects/proj-1/canvases/canvas-1",
+      { method: "DELETE" }
+    );
+    const res = await DeleteCanvas(
+      req,
+      createCanvasContext("proj-1", "canvas-1") as any
+    );
+
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.message).toBe("Canvas deleted successfully");
+    expect(prisma.canvas.delete).toHaveBeenCalledWith({
+      where: { id: "canvas-1" },
+    });
+  });
+});
