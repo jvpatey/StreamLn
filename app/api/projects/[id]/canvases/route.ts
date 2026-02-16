@@ -73,18 +73,21 @@ export async function POST(
 
     const { name, order } = parsed.data;
 
-    const maxOrder = await prisma.canvas
-      .aggregate({
-        where: { projectId: id },
-        _max: { order: true },
-      })
-      .then((r) => (r._max.order ?? -1) + 1);
+    const effectiveOrder =
+      order !== undefined
+        ? order
+        : await prisma.canvas
+            .aggregate({
+              where: { projectId: id },
+              _max: { order: true },
+            })
+            .then((r) => (r._max.order ?? -1) + 1);
 
     const canvas = await prisma.canvas.create({
       data: {
         projectId: id,
         name: name ?? "Untitled Canvas",
-        order: order ?? maxOrder,
+        order: effectiveOrder,
       },
     });
 
