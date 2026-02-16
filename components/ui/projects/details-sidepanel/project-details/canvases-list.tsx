@@ -12,6 +12,10 @@ import {
 import { fetchCanvases, updateCanvas } from "@/lib/api/canvas";
 import type { Canvas } from "@/lib/types/canvas";
 import { Project } from "./types";
+import {
+  SortableCanvasList,
+  SortableCanvasItem,
+} from "@/components/ui/projects/canvas/sortable-canvas-list";
 
 interface CanvasesListProps {
   project: Project;
@@ -80,6 +84,19 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
     setEditingCanvasId(null);
   };
 
+  const handleReorder = async (reordered: Canvas[]) => {
+    setCanvases(reordered);
+    try {
+      await Promise.all(
+        reordered.map((c, i) =>
+          updateCanvas(project.id, c.id, { order: i })
+        )
+      );
+    } catch {
+      // Keep optimistic update on error
+    }
+  };
+
   if (loading) {
     return (
       <Card className="backdrop-blur-2xl 
@@ -116,88 +133,179 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
       </CardHeader>
       <CardContent>
       <div className="space-y-1.5 max-h-40 overflow-y-auto">
-        {canvases.map((canvas) => (
-          <div
-            key={canvas.id}
-            className="flex items-center justify-between gap-2 rounded-lg px-3 py-2
-              backdrop-blur-sm bg-white/30 dark:bg-slate-800/30
-              border border-white/20 dark:border-slate-700/20
-              hover:border-white/30 dark:hover:border-slate-600/30 transition-colors"
-          >
-            {editingCanvasId === canvas.id ? (
-              <>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleSaveEdit();
-                    if (e.key === "Escape") handleCancelEdit();
-                  }}
-                  className="flex-1 min-w-0 text-sm font-medium text-slate-900 dark:text-slate-100
-                    bg-white/50 dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600
-                    rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 rounded-lg shrink-0
-                    bg-primary/20 dark:bg-primary/30 text-primary
-                    hover:bg-primary/30 dark:hover:bg-primary/40"
-                  onClick={handleSaveEdit}
-                  aria-label="Save"
-                >
-                  <Check size={14} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 rounded-lg shrink-0
-                    hover:bg-slate-200/50 dark:hover:bg-slate-600/50
-                    text-slate-500 dark:text-slate-400"
-                  onClick={handleCancelEdit}
-                  aria-label="Cancel"
-                >
-                  <X size={14} />
-                </Button>
-              </>
-            ) : (
-              <span className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate flex-1">
-                {canvas.name}
-              </span>
-            )}
-            <div className="flex items-center gap-1 shrink-0">
-              {editingCanvasId !== canvas.id && (
+        {canvases.length > 1 ? (
+          <SortableCanvasList canvases={canvases} onReorder={handleReorder}>
+            <div className="space-y-1.5">
+            {canvases.map((canvas) => (
+              <SortableCanvasItem
+                key={canvas.id}
+                id={canvas.id}
+                className="justify-between gap-2 rounded-lg px-3 py-2
+                  backdrop-blur-sm bg-white/30 dark:bg-slate-800/30
+                  border border-white/20 dark:border-slate-700/20
+                  hover:border-white/30 dark:hover:border-slate-600/30 transition-colors"
+                dragHandleClassName="shrink-0 cursor-grab active:cursor-grabbing p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-white/30 dark:hover:text-slate-300 dark:hover:bg-slate-700/50 touch-none opacity-60 hover:opacity-100"
+              >
+                <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                  {editingCanvasId === canvas.id ? (
+                    <>
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleSaveEdit();
+                          if (e.key === "Escape") handleCancelEdit();
+                        }}
+                        className="flex-1 min-w-0 text-sm font-medium text-slate-900 dark:text-slate-100
+                          bg-white/50 dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600
+                          rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 rounded-lg shrink-0
+                          bg-primary/20 dark:bg-primary/30 text-primary
+                          hover:bg-primary/30 dark:hover:bg-primary/40"
+                        onClick={handleSaveEdit}
+                        aria-label="Save"
+                      >
+                        <Check size={14} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 rounded-lg shrink-0
+                          hover:bg-slate-200/50 dark:hover:bg-slate-600/50
+                          text-slate-500 dark:text-slate-400"
+                        onClick={handleCancelEdit}
+                        aria-label="Cancel"
+                      >
+                        <X size={14} />
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate flex-1">
+                        {canvas.name}
+                      </span>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 rounded-lg
+                            hover:bg-slate-200/50 dark:hover:bg-slate-600/50
+                            text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                          onClick={() => handleStartEdit(canvas)}
+                          aria-label="Edit canvas name"
+                        >
+                          <Pencil size={12} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 rounded-lg
+                            backdrop-blur-sm bg-primary/10 dark:bg-primary/20
+                            hover:bg-primary/20 dark:hover:bg-primary/30
+                            text-primary text-xs font-medium"
+                          onClick={() => onOpenCanvas(project, canvas.id)}
+                        >
+                          <ExternalLink size={12} className="mr-1" />
+                          Open
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </SortableCanvasItem>
+            ))}
+            </div>
+          </SortableCanvasList>
+        ) : (
+          canvases.map((canvas) => (
+            <div
+              key={canvas.id}
+              className="flex items-center justify-between gap-2 rounded-lg px-3 py-2
+                backdrop-blur-sm bg-white/30 dark:bg-slate-800/30
+                border border-white/20 dark:border-slate-700/20
+                hover:border-white/30 dark:hover:border-slate-600/30 transition-colors"
+            >
+              {editingCanvasId === canvas.id ? (
                 <>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSaveEdit();
+                      if (e.key === "Escape") handleCancelEdit();
+                    }}
+                    className="flex-1 min-w-0 text-sm font-medium text-slate-900 dark:text-slate-100
+                      bg-white/50 dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600
+                      rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 w-7 p-0 rounded-lg
-                      hover:bg-slate-200/50 dark:hover:bg-slate-600/50
-                      text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                    onClick={() => handleStartEdit(canvas)}
-                    aria-label="Edit canvas name"
+                    className="h-7 w-7 p-0 rounded-lg shrink-0
+                      bg-primary/20 dark:bg-primary/30 text-primary
+                      hover:bg-primary/30 dark:hover:bg-primary/40"
+                    onClick={handleSaveEdit}
+                    aria-label="Save"
                   >
-                    <Pencil size={12} />
+                    <Check size={14} />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 px-2 rounded-lg
-                      backdrop-blur-sm bg-primary/10 dark:bg-primary/20
-                      hover:bg-primary/20 dark:hover:bg-primary/30
-                      text-primary text-xs font-medium"
-                    onClick={() => onOpenCanvas(project, canvas.id)}
+                    className="h-7 w-7 p-0 rounded-lg shrink-0
+                      hover:bg-slate-200/50 dark:hover:bg-slate-600/50
+                      text-slate-500 dark:text-slate-400"
+                    onClick={handleCancelEdit}
+                    aria-label="Cancel"
                   >
-                    <ExternalLink size={12} className="mr-1" />
-                    Open
+                    <X size={14} />
                   </Button>
                 </>
+              ) : (
+                <span className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate flex-1">
+                  {canvas.name}
+                </span>
               )}
+              <div className="flex items-center gap-1 shrink-0">
+                {editingCanvasId !== canvas.id && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 rounded-lg
+                        hover:bg-slate-200/50 dark:hover:bg-slate-600/50
+                        text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                      onClick={() => handleStartEdit(canvas)}
+                      aria-label="Edit canvas name"
+                    >
+                      <Pencil size={12} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 rounded-lg
+                        backdrop-blur-sm bg-primary/10 dark:bg-primary/20
+                        hover:bg-primary/20 dark:hover:bg-primary/30
+                        text-primary text-xs font-medium"
+                      onClick={() => onOpenCanvas(project, canvas.id)}
+                    >
+                      <ExternalLink size={12} className="mr-1" />
+                      Open
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
       </CardContent>
     </Card>

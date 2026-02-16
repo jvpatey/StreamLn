@@ -40,6 +40,10 @@ import React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { cn } from "@/lib/utils";
 import { CreateCanvasModal } from "./create-canvas-modal";
+import {
+  SortableCanvasList,
+  SortableCanvasItem,
+} from "./sortable-canvas-list";
 
 function Tooltip({
   children,
@@ -92,6 +96,7 @@ interface CanvasHeaderProps {
   onCanvasCreate?: (name: string) => void;
   onCanvasRename?: (canvasId: string, name: string) => void;
   onCanvasDelete?: (canvasId: string) => void;
+  onCanvasReorder?: (reordered: CanvasItem[]) => void;
 }
 
 // Canvas header component used in the canvas page
@@ -104,6 +109,7 @@ export function CanvasHeader({
   onCanvasCreate,
   onCanvasRename,
   onCanvasDelete,
+  onCanvasReorder,
 }: CanvasHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [canvasSwitcherOpen, setCanvasSwitcherOpen] = useState(false);
@@ -224,88 +230,182 @@ export function CanvasHeader({
                   </div>
                   {/* Canvas list */}
                   <div className="p-2 max-h-64 overflow-y-auto">
-                    {canvases.map((c) => (
-                      <div
-                        key={c.id}
-                        className={cn(
-                          "flex items-center gap-2 rounded-lg px-3 py-2 group",
-                          c.id === canvas?.id
-                            ? "bg-primary/10 text-primary"
-                            : "hover:bg-slate-100 dark:hover:bg-slate-800"
-                        )}
+                    {onCanvasReorder && canvases.length > 1 ? (
+                      <SortableCanvasList
+                        canvases={canvases}
+                        onReorder={onCanvasReorder}
                       >
-                        {renameCanvasId === c.id ? (
-                          <input
-                            type="text"
-                            value={renameValue}
-                            onChange={(e) => setRenameValue(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                onCanvasRename?.(c.id, renameValue.trim() || c.name);
-                                setRenameCanvasId(null);
-                              }
-                              if (e.key === "Escape") {
-                                setRenameCanvasId(null);
-                                setRenameValue(c.name);
-                              }
-                            }}
-                            onBlur={() => {
-                              if (renameValue.trim()) {
-                                onCanvasRename?.(c.id, renameValue.trim());
-                              }
-                              setRenameCanvasId(null);
-                            }}
-                            autoFocus
-                            className="flex-1 bg-transparent border-none outline-none text-sm"
-                          />
-                        ) : (
-                          <>
-                            <button
-                              type="button"
-                              className="flex-1 text-left text-sm truncate"
-                              onClick={() => {
-                                if (c.id !== canvas?.id) {
-                                  router.push(`/projects/${project.id}/canvas/${c.id}`);
-                                  setCanvasSwitcherOpen(false);
+                        <div className="space-y-1">
+                        {canvases.map((c) => (
+                          <SortableCanvasItem
+                            key={c.id}
+                            id={c.id}
+                            className={cn(
+                              "rounded-lg px-3 py-2 group",
+                              c.id === canvas?.id
+                                ? "bg-primary/10 text-primary"
+                                : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                            )}
+                            dragHandleClassName="shrink-0 cursor-grab active:cursor-grabbing p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-300 dark:hover:bg-slate-700 touch-none opacity-60 hover:opacity-100"
+                          >
+                            {renameCanvasId === c.id ? (
+                              <input
+                                type="text"
+                                value={renameValue}
+                                onChange={(e) => setRenameValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    onCanvasRename?.(c.id, renameValue.trim() || c.name);
+                                    setRenameCanvasId(null);
+                                  }
+                                  if (e.key === "Escape") {
+                                    setRenameCanvasId(null);
+                                    setRenameValue(c.name);
+                                  }
+                                }}
+                                onBlur={() => {
+                                  if (renameValue.trim()) {
+                                    onCanvasRename?.(c.id, renameValue.trim());
+                                  }
+                                  setRenameCanvasId(null);
+                                }}
+                                autoFocus
+                                className="flex-1 bg-transparent border-none outline-none text-sm min-w-0"
+                              />
+                            ) : (
+                              <>
+                                <button
+                                  type="button"
+                                  className="flex-1 text-left text-sm truncate min-w-0"
+                                  onClick={() => {
+                                    if (c.id !== canvas?.id) {
+                                      router.push(`/projects/${project.id}/canvas/${c.id}`);
+                                      setCanvasSwitcherOpen(false);
+                                    }
+                                  }}
+                                >
+                                  {c.name}
+                                </button>
+                                {onCanvasRename && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setRenameCanvasId(c.id);
+                                      setRenameValue(c.name);
+                                    }}
+                                    className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
+                                    aria-label="Rename canvas"
+                                  >
+                                    <Pencil size={12} />
+                                  </button>
+                                )}
+                                {onCanvasDelete && canvases.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (c.id === canvas?.id) {
+                                        const next = canvases.find((x) => x.id !== c.id);
+                                        if (next) router.push(`/projects/${project.id}/canvas/${next.id}`);
+                                      }
+                                      onCanvasDelete(c.id);
+                                      setCanvasSwitcherOpen(false);
+                                    }}
+                                    className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 dark:text-red-400 shrink-0"
+                                    aria-label="Delete canvas"
+                                  >
+                                    <Trash2 size={12} />
+                                  </button>
+                                )}
+                              </>
+                            )}
+                          </SortableCanvasItem>
+                        ))}
+                        </div>
+                      </SortableCanvasList>
+                    ) : (
+                      canvases.map((c) => (
+                        <div
+                          key={c.id}
+                          className={cn(
+                            "flex items-center gap-2 rounded-lg px-3 py-2 group",
+                            c.id === canvas?.id
+                              ? "bg-primary/10 text-primary"
+                              : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                          )}
+                        >
+                          {renameCanvasId === c.id ? (
+                            <input
+                              type="text"
+                              value={renameValue}
+                              onChange={(e) => setRenameValue(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  onCanvasRename?.(c.id, renameValue.trim() || c.name);
+                                  setRenameCanvasId(null);
+                                }
+                                if (e.key === "Escape") {
+                                  setRenameCanvasId(null);
+                                  setRenameValue(c.name);
                                 }
                               }}
-                            >
-                              {c.name}
-                            </button>
-                            {onCanvasRename && (
+                              onBlur={() => {
+                                if (renameValue.trim()) {
+                                  onCanvasRename?.(c.id, renameValue.trim());
+                                }
+                                setRenameCanvasId(null);
+                              }}
+                              autoFocus
+                              className="flex-1 bg-transparent border-none outline-none text-sm"
+                            />
+                          ) : (
+                            <>
                               <button
                                 type="button"
+                                className="flex-1 text-left text-sm truncate"
                                 onClick={() => {
-                                  setRenameCanvasId(c.id);
-                                  setRenameValue(c.name);
-                                }}
-                                className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700"
-                                aria-label="Rename canvas"
-                              >
-                                <Pencil size={12} />
-                              </button>
-                            )}
-                            {onCanvasDelete && canvases.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (c.id === canvas?.id) {
-                                    const next = canvases.find((x) => x.id !== c.id);
-                                    if (next) router.push(`/projects/${project.id}/canvas/${next.id}`);
+                                  if (c.id !== canvas?.id) {
+                                    router.push(`/projects/${project.id}/canvas/${c.id}`);
+                                    setCanvasSwitcherOpen(false);
                                   }
-                                  onCanvasDelete(c.id);
-                                  setCanvasSwitcherOpen(false);
                                 }}
-                                className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 dark:text-red-400"
-                                aria-label="Delete canvas"
                               >
-                                <Trash2 size={12} />
+                                {c.name}
                               </button>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    ))}
+                              {onCanvasRename && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setRenameCanvasId(c.id);
+                                    setRenameValue(c.name);
+                                  }}
+                                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700"
+                                  aria-label="Rename canvas"
+                                >
+                                  <Pencil size={12} />
+                                </button>
+                              )}
+                              {onCanvasDelete && canvases.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (c.id === canvas?.id) {
+                                      const next = canvases.find((x) => x.id !== c.id);
+                                      if (next) router.push(`/projects/${project.id}/canvas/${next.id}`);
+                                    }
+                                    onCanvasDelete(c.id);
+                                    setCanvasSwitcherOpen(false);
+                                  }}
+                                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 dark:text-red-400"
+                                  aria-label="Delete canvas"
+                                >
+                                  <Trash2 size={12} />
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      ))
+                    )}
                   </div>
                   {onCanvasCreate && (
                     <div className="p-2 border-t border-slate-200/50 dark:border-slate-700/50">

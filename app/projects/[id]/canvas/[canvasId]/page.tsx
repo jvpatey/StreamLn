@@ -491,6 +491,24 @@ export default function ProjectCanvasPage() {
     }
   }, [projectId, canvases.length, router]);
 
+  const handleReorderCanvases = useCallback(
+    async (reordered: Canvas[]) => {
+      const pid = typeof projectId === "string" ? projectId : null;
+      if (!pid) return;
+      setCanvases(reordered);
+      try {
+        await Promise.all(
+          reordered.map((c, i) =>
+            updateCanvas(pid, c.id, { order: i })
+          )
+        );
+      } catch {
+        setError("Failed to reorder canvases");
+      }
+    },
+    [projectId]
+  );
+
   const handleRenameCanvas = useCallback(
     async (targetCanvasId: string, name: string) => {
       if (!projectId || typeof projectId !== "string") return;
@@ -595,6 +613,7 @@ export default function ProjectCanvasPage() {
         onCanvasCreate={handleCreateCanvas}
         onCanvasRename={handleRenameCanvas}
         onCanvasDelete={handleDeleteCanvas}
+        onCanvasReorder={handleReorderCanvases}
       />
       {saveConflict && (
         <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between gap-4">
