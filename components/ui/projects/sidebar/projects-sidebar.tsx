@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/shared/badge";
 import { LiquidGlassSurface } from "@/components/ui/shared/liquid-glass-surface";
 import { LiquidGlassButton } from "@/components/ui/shared/liquid-glass-button";
 import { getKeyboardShortcut } from "@/lib/utils";
-import { Search, FileText, Zap, X, Sparkles } from "lucide-react";
+import { Search, FileText, Zap, X, Sparkles, Upload } from "lucide-react";
 import { CreateProjectButton } from "../project-content/create-project/create-project-button";
 
 interface ProjectsSidebarProps {
@@ -15,6 +15,7 @@ interface ProjectsSidebarProps {
   onClose: () => void;
   onCommandPaletteOpen: () => void;
   onCreateProject?: () => void;
+  onImportProject?: () => void;
 }
 
 export function ProjectsSidebar({
@@ -22,6 +23,7 @@ export function ProjectsSidebar({
   onClose,
   onCommandPaletteOpen,
   onCreateProject,
+  onImportProject,
 }: ProjectsSidebarProps) {
   return (
     <>
@@ -51,8 +53,22 @@ export function ProjectsSidebar({
           <div className="space-y-2 mb-8">
             <CreateProjectButton
               onClick={onCreateProject}
-              className="mb-4 w-full"
+              className="mb-2 w-full"
             />
+            {onImportProject && (
+              <LiquidGlassButton
+                variant="glass"
+                size="lg"
+                className="mb-4 w-full group justify-start"
+                onClick={onImportProject}
+              >
+                <Upload
+                  size={18}
+                  className="mr-3 text-slate-600 dark:text-slate-400"
+                />
+                Import Project
+              </LiquidGlassButton>
+            )}
 
             <LiquidGlassSurface
               variant="panel"

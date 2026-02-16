@@ -11,6 +11,7 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
   open,
   onOpenChange,
   onCreateProject,
+  onImportProject,
   initialSearchMode = false,
   initialBrowseMode = false,
   projects,
@@ -25,6 +26,7 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
   // Create command actions
   const actions = createCommandActions(
     onCreateProject,
+    onImportProject,
     openFilterPopover,
     setSearchMode,
     setBrowseMode,
@@ -74,6 +76,7 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
   // Update actions with the correct ref
   const actionsWithRef = createCommandActions(
     onCreateProject,
+    onImportProject,
     openFilterPopover,
     setSearchMode,
     setBrowseMode,

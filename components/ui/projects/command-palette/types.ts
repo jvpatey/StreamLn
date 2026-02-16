@@ -10,6 +10,7 @@ export interface ProjectCommandPaletteProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreateProject?: () => void;
+  onImportProject?: () => void;
   initialSearchMode?: boolean;
   initialBrowseMode?: boolean;
   projects: Project[];
