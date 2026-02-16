@@ -681,6 +681,7 @@ export default function ProjectCanvasPage() {
             ref={canvasRef}
             activeTool={activeTool}
             blocks={canvasBlocks}
+            canvasName={canvas?.name}
             selectedBlocks={selectedBlocks}
             onBlockSelect={setSelectedBlocks}
             onBlockUpdate={updateBlock}

@@ -32,6 +32,7 @@ import {
   Send,
   ArrowUp,
   ArrowDown,
+  Keyboard,
 } from "lucide-react";
 import {
   Popover,
@@ -146,17 +147,17 @@ export function CanvasToolbar({
         if (isExiting) onToolbarExitComplete?.();
       }}
     >
-      <div className="-translate-x-1/2">
+      <div className="-translate-x-1/2 max-w-[calc(100vw-2rem)]">
         <div
           className={getLiquidGlassSurfaceClassName({
             variant: "toolbar",
             intensity: "xl",
             rounded: "xl",
-            className: "flex items-center space-x-2 px-3 py-2",
+            className: "flex items-center flex-nowrap gap-2 px-3 py-2 overflow-x-auto overflow-y-hidden scroll-smooth",
           })}
         >
         {/* Tools Section */}
-        <div className="flex items-center space-x-1 pr-3 border-r border-slate-200 dark:border-slate-700">
+        <div className="flex items-center gap-1 pr-3 border-r border-slate-200 dark:border-slate-700 shrink-0">
           <Button
             variant={tool === "select" ? "default" : "ghost"}
             size="sm"
@@ -277,7 +278,7 @@ export function CanvasToolbar({
         </div>
 
         {/* Zoom Controls */}
-        <div className="flex items-center space-x-1 pr-3 border-r border-slate-200 dark:border-slate-700">
+        <div className="flex items-center gap-1 pr-3 border-r border-slate-200 dark:border-slate-700 shrink-0">
           <Button
             variant="ghost"
             size="sm"
@@ -318,7 +319,7 @@ export function CanvasToolbar({
         </div>
 
         {/* View Options */}
-        <div className="flex items-center space-x-1 pr-3 border-r border-slate-200 dark:border-slate-700">
+        <div className="flex items-center gap-1 pr-3 border-r border-slate-200 dark:border-slate-700 shrink-0">
           {onToolbarToggle && (
             <Button
               variant="ghost"
@@ -348,7 +349,7 @@ export function CanvasToolbar({
 
         {/* Selection Actions */}
         {hasSelection && (
-          <div className="flex items-center space-x-1 pr-3 border-r border-slate-200 dark:border-slate-700">
+          <div className="flex items-center gap-1 pr-3 border-r border-slate-200 dark:border-slate-700 shrink-0">
             <Button
               variant="ghost"
               size="sm"
@@ -446,11 +447,11 @@ export function CanvasToolbar({
           </div>
         )}
 
-        {/* Keyboard Shortcuts Hint */}
+        {/* Keyboard Shortcuts Hint - icon + shortcut to avoid font rendering issues */}
         {!hasSelection && (
-          <div className="hidden lg:flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
-            <span>{getKeyboardShortcut("⌘+/")}</span>
-            <span>for shortcuts</span>
+          <div className="hidden xl:flex items-center gap-1.5 shrink-0 text-xs text-slate-500 dark:text-slate-400">
+            <Keyboard size={14} />
+            <span>{getKeyboardShortcut("⌘/")} shortcuts</span>
           </div>
         )}
         </div>

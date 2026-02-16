@@ -38,7 +38,7 @@ export function ProjectsSidebar({
         <div className="p-6">
           {/* Welcome Section */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">
               Project Hub
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">

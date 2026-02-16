@@ -22,6 +22,7 @@ interface CanvasBlock {
 interface CanvasWorkspaceProps {
   activeTool: CanvasTool;
   blocks: CanvasBlock[];
+  canvasName?: string;
   selectedBlocks: string[];
   onBlockSelect: (blockIds: string[]) => void;
   onBlockUpdate: (id: string, updates: Partial<CanvasBlock>) => void;
@@ -47,6 +48,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
     {
       activeTool,
       blocks,
+      canvasName,
       selectedBlocks,
       onBlockSelect,
       onBlockUpdate,
@@ -394,7 +396,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
             <div className="text-center">
               <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl px-8 py-6 shadow-lg max-w-md">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                  Welcome to your Canvas
+                  Welcome to {canvasName ?? "your Canvas"}
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
                   Start building your project workspace by adding blocks
