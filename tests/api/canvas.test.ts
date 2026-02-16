@@ -4,6 +4,7 @@ import { Prisma } from "@/app/generated/prisma-client";
 import {
   GET as GetCanvases,
   POST as PostCanvas,
+  PATCH as PatchCanvases,
 } from "@/app/api/projects/[id]/canvases/route";
 import {
   GET as GetCanvasBlocks,
@@ -35,8 +36,9 @@ vi.mock("@/lib/db", () => ({
       deleteMany: vi.fn(),
       createMany: vi.fn(),
     },
-    $transaction: vi.fn((fn) =>
-      fn({
+    $transaction: vi.fn((arg) => {
+      if (Array.isArray(arg)) return Promise.all(arg);
+      return arg({
         canvasBlock: {
           deleteMany: vi.fn(),
           createMany: vi.fn(),
@@ -44,8 +46,8 @@ vi.mock("@/lib/db", () => ({
         canvas: {
           updateMany: vi.fn(),
         },
-      })
-    ),
+      });
+    }),
   },
 }));
 
@@ -158,6 +160,111 @@ describe("POST /api/projects/[id]/canvases", () => {
     const json = await res.json();
     expect(json.id).toBe("canvas-new");
     expect(json.name).toBe("Untitled Canvas");
+  });
+});
+
+describe("PATCH /api/projects/[id]/canvases (batch reorder)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("returns 401 when not authenticated", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: null } as any);
+
+    const req = new NextRequest(
+      "http://localhost/api/projects/proj-1/canvases",
+      {
+        method: "PATCH",
+        body: JSON.stringify({
+          updates: [{ id: "canvas-1", order: 0 }],
+        }),
+      }
+    );
+    const res = await PatchCanvases(req, createCanvasesContext("proj-1") as any);
+
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 400 for invalid body (empty updates)", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
+    vi.mocked(prisma.project.findUnique).mockResolvedValue({
+      id: "proj-1",
+      userId: "user-123",
+      name: "Test",
+      description: null,
+      icon: null,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+
+    const req = new NextRequest(
+      "http://localhost/api/projects/proj-1/canvases",
+      {
+        method: "PATCH",
+        body: JSON.stringify({ updates: [] }),
+      }
+    );
+    const res = await PatchCanvases(req, createCanvasesContext("proj-1") as any);
+
+    expect(res.status).toBe(400);
+  });
+
+  it("reorders canvases successfully", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
+    vi.mocked(prisma.project.findUnique).mockResolvedValue({
+      id: "proj-1",
+      userId: "user-123",
+      name: "Test",
+      description: null,
+      icon: null,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any);
+    vi.mocked(prisma.canvas.updateMany).mockResolvedValue({ count: 1 });
+    vi.mocked(prisma.canvas.findMany).mockResolvedValue([
+      {
+        id: "canvas-2",
+        projectId: "proj-1",
+        name: "Second",
+        order: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        _count: { canvasBlocks: 0 },
+      },
+      {
+        id: "canvas-1",
+        projectId: "proj-1",
+        name: "First",
+        order: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        _count: { canvasBlocks: 2 },
+      },
+    ] as any);
+
+    const req = new NextRequest(
+      "http://localhost/api/projects/proj-1/canvases",
+      {
+        method: "PATCH",
+        body: JSON.stringify({
+          updates: [
+            { id: "canvas-2", order: 0 },
+            { id: "canvas-1", order: 1 },
+          ],
+        }),
+      }
+    );
+    const res = await PatchCanvases(req, createCanvasesContext("proj-1") as any);
+
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.canvases).toHaveLength(2);
+    expect(json.canvases[0].id).toBe("canvas-2");
+    expect(json.canvases[0].order).toBe(0);
+    expect(json.canvases[1].id).toBe("canvas-1");
+    expect(json.canvases[1].order).toBe(1);
   });
 });
 

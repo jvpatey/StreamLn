@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/shared/card";
-import { fetchCanvases, updateCanvas } from "@/lib/api/canvas";
+import { fetchCanvases, updateCanvas, reorderCanvases } from "@/lib/api/canvas";
 import type { Canvas } from "@/lib/types/canvas";
 import { Project } from "./types";
 import {
@@ -87,11 +87,11 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
   const handleReorder = async (reordered: Canvas[]) => {
     setCanvases(reordered);
     try {
-      await Promise.all(
-        reordered.map((c, i) =>
-          updateCanvas(project.id, c.id, { order: i })
-        )
+      const updated = await reorderCanvases(
+        project.id,
+        reordered.map((c, i) => ({ id: c.id, order: i }))
       );
+      if (updated.length) setCanvases(updated);
     } catch {
       // Keep optimistic update on error
     }

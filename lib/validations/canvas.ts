@@ -46,7 +46,20 @@ export const updateCanvasSchema = z.object({
   order: z.number().int().min(0).optional(),
 });
 
+export const reorderCanvasesSchema = z.object({
+  updates: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        order: z.number().int().min(0),
+      })
+    )
+    .min(1)
+    .max(100),
+});
+
 export type CanvasBlockInput = z.infer<typeof canvasBlockSchema>;
 export type SaveCanvasBlocksInput = z.infer<typeof saveCanvasBlocksSchema>;
 export type CreateCanvasInput = z.infer<typeof createCanvasSchema>;
 export type UpdateCanvasInput = z.infer<typeof updateCanvasSchema>;
+export type ReorderCanvasesInput = z.infer<typeof reorderCanvasesSchema>;

@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/db";
-import { createCanvasSchema } from "@/lib/validations/canvas";
+import {
+  createCanvasSchema,
+  reorderCanvasesSchema,
+} from "@/lib/validations/canvas";
 import { apiError, handleUnexpectedError } from "@/lib/api/errors";
 
 async function getProjectOrError(id: string) {
@@ -94,5 +97,52 @@ export async function POST(
     return NextResponse.json(canvas);
   } catch (error) {
     return handleUnexpectedError(error, "POST /api/projects/[id]/canvases");
+  }
+}
+
+// PATCH /api/projects/[id]/canvases - Batch reorder canvases (single request)
+export async function PATCH(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
+  try {
+    const result = await getProjectOrError(id);
+    if (result.error) return result.error;
+
+    const body = await req.json().catch(() => ({}));
+    const parsed = reorderCanvasesSchema.safeParse(body);
+    if (!parsed.success) {
+      const message = parsed.error.issues.map((e) => e.message).join("; ");
+      return apiError(400, { message: "Validation failed", details: message });
+    }
+
+    const { updates } = parsed.data;
+
+    await prisma.$transaction(
+      updates.map(({ id: canvasId, order }) =>
+        prisma.canvas.updateMany({
+          where: { id: canvasId, projectId: id },
+          data: { order, updatedAt: new Date() },
+        })
+      )
+    );
+
+    const canvases = await prisma.canvas.findMany({
+      where: { projectId: id },
+      orderBy: { order: "asc" },
+      include: {
+        _count: { select: { canvasBlocks: true } },
+      },
+    });
+
+    const canvasesWithBlocks = canvases.map(({ _count, ...canvas }) => ({
+      ...canvas,
+      blocksCount: _count.canvasBlocks,
+    }));
+
+    return NextResponse.json({ canvases: canvasesWithBlocks });
+  } catch (error) {
+    return handleUnexpectedError(error, "PATCH /api/projects/[id]/canvases");
   }
 }

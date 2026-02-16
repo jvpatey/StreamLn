@@ -27,6 +27,7 @@ import {
   createCanvas,
   updateCanvas,
   deleteCanvas,
+  reorderCanvases,
 } from "@/lib/api/canvas";
 import type { CanvasBlock } from "@/lib/types/canvas";
 import type { Canvas } from "@/lib/types/canvas";
@@ -497,11 +498,11 @@ export default function ProjectCanvasPage() {
       if (!pid) return;
       setCanvases(reordered);
       try {
-        await Promise.all(
-          reordered.map((c, i) =>
-            updateCanvas(pid, c.id, { order: i })
-          )
+        const updated = await reorderCanvases(
+          pid,
+          reordered.map((c, i) => ({ id: c.id, order: i }))
         );
+        if (updated.length) setCanvases(updated);
       } catch {
         setError("Failed to reorder canvases");
       }

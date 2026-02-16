@@ -84,6 +84,20 @@ export async function updateCanvas(
   return res.json();
 }
 
+export async function reorderCanvases(
+  projectId: string,
+  updates: { id: string; order: number }[]
+): Promise<Canvas[]> {
+  const res = await fetch(`/api/projects/${projectId}/canvases`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ updates }),
+  });
+  if (!res.ok) throw new Error("Failed to reorder canvases");
+  const data = await res.json();
+  return data.canvases ?? [];
+}
+
 export async function deleteCanvas(
   projectId: string,
   canvasId: string
