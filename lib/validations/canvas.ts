@@ -37,8 +37,8 @@ export const saveCanvasBlocksSchema = z.object({
 });
 
 export const createCanvasSchema = z.object({
-  name: z.string().min(1).max(200).optional().default("Untitled Canvas"),
-  order: z.number().int().min(0).optional().default(0),
+  name: z.string().min(1).max(200).optional(),
+  order: z.number().int().min(0).optional(),
 });
 
 export const updateCanvasSchema = z.object({
