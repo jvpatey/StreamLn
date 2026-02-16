@@ -480,10 +480,10 @@ export default function ProjectCanvasPage() {
     }
   };
 
-  const handleCreateCanvas = useCallback(async () => {
+  const handleCreateCanvas = useCallback(async (name: string) => {
     if (!projectId || typeof projectId !== "string") return;
     try {
-      const newCanvas = await createCanvas(projectId, "Untitled Canvas", canvases.length);
+      const newCanvas = await createCanvas(projectId, name.trim() || "Untitled Canvas", canvases.length);
       setCanvases((prev) => [...prev, newCanvas]);
       router.push(`/projects/${projectId}/canvas/${newCanvas.id}`);
     } catch {

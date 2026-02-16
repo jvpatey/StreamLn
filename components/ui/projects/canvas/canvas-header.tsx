@@ -39,6 +39,7 @@ import {
 import React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { cn } from "@/lib/utils";
+import { CreateCanvasModal } from "./create-canvas-modal";
 
 function Tooltip({
   children,
@@ -88,7 +89,7 @@ interface CanvasHeaderProps {
   canvases?: CanvasItem[];
   viewMode: "edit" | "present";
   onViewModeChange: (mode: "edit" | "present") => void;
-  onCanvasCreate?: () => void;
+  onCanvasCreate?: (name: string) => void;
   onCanvasRename?: (canvasId: string, name: string) => void;
   onCanvasDelete?: (canvasId: string) => void;
 }
@@ -106,6 +107,7 @@ export function CanvasHeader({
 }: CanvasHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [canvasSwitcherOpen, setCanvasSwitcherOpen] = useState(false);
+  const [createCanvasModalOpen, setCreateCanvasModalOpen] = useState(false);
   const [renameCanvasId, setRenameCanvasId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const router = useRouter();
@@ -129,6 +131,7 @@ export function CanvasHeader({
   };
 
   return (
+    <>
     <LiquidGlassSurface asChild variant="header" intensity="2xl">
       <header>
         <div className="px-4 sm:px-6 lg:px-8">
@@ -309,8 +312,8 @@ export function CanvasHeader({
                       <button
                         type="button"
                         onClick={() => {
-                          onCanvasCreate();
                           setCanvasSwitcherOpen(false);
+                          setCreateCanvasModalOpen(true);
                         }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-primary/10 rounded-lg transition-colors"
                       >
@@ -602,5 +605,13 @@ export function CanvasHeader({
         </div>
       </header>
     </LiquidGlassSurface>
+    {onCanvasCreate && (
+      <CreateCanvasModal
+        open={createCanvasModalOpen}
+        onOpenChange={setCreateCanvasModalOpen}
+        onCreate={onCanvasCreate}
+      />
+    )}
+    </>
   );
 }

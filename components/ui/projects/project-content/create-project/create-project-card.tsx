@@ -20,10 +20,10 @@ export function CreateProjectCard({ onClick }: CreateProjectCardProps) {
           <Plus size={24} className="text-primary-600 dark:text-primary-400" />
         </div>
         <p className="text-base font-medium text-slate-700 dark:text-slate-200 mb-1">
-          New Project
+          Create Project
         </p>
         <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-          Click to create a new project workspace
+          Click to create a project workspace
         </p>
       </div>
     </Card>
