@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MoreHorizontal, Archive, Trash2, CheckCircle } from "lucide-react";
+import { MoreHorizontal, Archive, Trash2, CheckCircle, Download } from "lucide-react";
 
 interface ProjectCardMenuProps {
   isArchived: boolean;
   onArchive: () => void;
   onUnarchive: () => void;
   onDelete: () => void;
+  onExport?: () => void;
 }
 
 // Project Card Menu component, used in project-card.tsx
@@ -14,6 +15,7 @@ export function ProjectCardMenu({
   onArchive,
   onUnarchive,
   onDelete,
+  onExport,
 }: ProjectCardMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -45,8 +47,21 @@ export function ProjectCardMenu({
       </button>
       {menuOpen && (
         <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg z-20 animate-in fade-in slide-in-from-top-2">
+          {onExport && (
+            <button
+              className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 rounded-t-xl"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuOpen(false);
+                onExport();
+              }}
+            >
+              <Download size={16} className="text-slate-600 dark:text-slate-400 shrink-0" />
+              Export
+            </button>
+          )}
           <button
-            className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 rounded-t-xl"
+            className={`w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 ${!onExport ? "rounded-t-xl" : ""}`}
             onClick={(e) => {
               e.stopPropagation();
               setMenuOpen(false);

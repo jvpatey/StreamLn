@@ -1,8 +1,10 @@
 import { Card } from "@/components/ui/shared/card";
 import { Clock, CheckCircle, Archive, Layout, SquareStack } from "lucide-react";
 import React from "react";
+import { motion } from "framer-motion";
 import { ProjectCardMenu } from "./project-card-menu";
 import { getIconComponent } from "./icon-picker";
+import { cn } from "@/lib/utils";
 
 interface ProjectCardProps {
   id: string;
@@ -20,6 +22,7 @@ interface ProjectCardProps {
   onClick?: () => void;
   onDelete?: () => void;
   onStatusChange?: (newStatus: string) => void;
+  onExportProject?: () => void;
 }
 
 export function ProjectCard({
@@ -38,6 +41,7 @@ export function ProjectCard({
   onClick,
   onDelete,
   onStatusChange,
+  onExportProject,
 }: ProjectCardProps) {
   const isArchived = status === "archived";
   const statusColor = isArchived
@@ -47,31 +51,46 @@ export function ProjectCard({
   // Accent color (use icon color or default blue)
   const accentColor = icon === "Folder" || !icon ? "#3b82f6" : undefined;
   return (
-    <Card
-      className={`group relative overflow-hidden transition-all duration-200 cursor-pointer rounded-2xl 
-        backdrop-blur-2xl 
-        bg-gradient-to-br from-primary-500/10 via-primary-400/15 to-accent-500/10 
-        dark:from-primary-500/5 dark:via-primary-400/10 dark:to-accent-500/5
-        border border-white/30 dark:border-white/20
-        hover:border-white/40 dark:hover:border-white/30
-        shadow-lg hover:shadow-xl
-        flex flex-col h-full
-        ${isArchived ? "opacity-60" : ""}`}
-      onClick={onClick}
+    <motion.div
+      initial={false}
+      animate={{
+        opacity: isArchived ? 0.65 : 1,
+      }}
+      transition={{
+        duration: 0.5,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      }}
+      className="h-full"
     >
+      <Card
+        className={`group relative overflow-hidden transition-all duration-200 cursor-pointer rounded-2xl 
+          backdrop-blur-2xl 
+          bg-gradient-to-br from-primary-500/10 via-primary-400/15 to-accent-500/10 
+          dark:from-primary-500/5 dark:via-primary-400/10 dark:to-accent-500/5
+          border border-white/30 dark:border-white/20
+          hover:border-white/40 dark:hover:border-white/30
+          shadow-lg hover:shadow-xl
+          flex flex-col h-full`}
+        onClick={onClick}
+      >
       {/* Main Info */}
       <div className="p-5 pb-4 flex flex-col flex-1">
         {/* Primary: Icon + Title + Menu */}
         <div className="flex items-center space-x-3 mb-4 pr-8">
           <div
-            className="p-3 rounded-xl backdrop-blur-sm bg-white/40 dark:bg-slate-800/40 border border-white/30 dark:border-slate-700/30 flex-shrink-0"
+            className={cn(
+              "p-3 rounded-xl backdrop-blur-sm bg-white/40 dark:bg-slate-800/40 border border-white/30 dark:border-slate-700/30 flex-shrink-0",
+              isArchived && "opacity-60"
+            )}
             style={{
-              color: accentColor || "#3b82f6",
+              color: isArchived ? undefined : accentColor || "#3b82f6",
             }}
           >
             {React.createElement(getIconComponent(icon || "Folder"), {
               size: 24,
-              style: { color: accentColor || "#3b82f6" },
+              style: {
+                color: isArchived ? "#94a3b8" : accentColor || "#3b82f6",
+              },
             })}
           </div>
           <div className="flex-1 min-w-0">
@@ -86,6 +105,7 @@ export function ProjectCard({
               onArchive={() => onStatusChange?.("archived")}
               onUnarchive={() => onStatusChange?.("active")}
               onDelete={onDelete}
+              onExport={onExportProject}
             />
           </div>
         </div>
@@ -128,5 +148,6 @@ export function ProjectCard({
         </div>
       </div>
     </Card>
+    </motion.div>
   );
 }

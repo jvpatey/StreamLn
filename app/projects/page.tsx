@@ -10,6 +10,7 @@ import { ProjectsContent } from "@/components/ui/projects/project-content";
 import { CreateProjectModal } from "@/components/ui/projects/project-content";
 import { ProjectSkeletonGrid } from "@/components/ui/projects/project-content/project-skeleton";
 import { ProjectDetailsSidepanel } from "@/components/ui/projects/details-sidepanel";
+import { ProjectExportModal } from "@/components/ui/projects/canvas/project-export-modal";
 import {
   fetchProjects,
   createProject,
@@ -28,6 +29,10 @@ export default function DashboardPage() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [sidepanelOpen, setSidepanelOpen] = useState(false);
+  const [exportModalProject, setExportModalProject] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
   const { user } = useUser();
   const router = useRouter();
@@ -193,15 +198,23 @@ export default function DashboardPage() {
     projectId: string,
     newStatus: string,
   ) => {
+    const previousProjects = projects;
+    setProjects((prev) =>
+      prev.map((p) =>
+        p.id === projectId ? { ...p, status: newStatus } : p
+      )
+    );
+    if (selectedProject?.id === projectId) {
+      setSelectedProject({ ...selectedProject, status: newStatus });
+    }
     try {
       await updateProjectStatus(projectId, newStatus);
-      loadProjects();
-      // Update selected project if it's the one being modified
-      if (selectedProject && selectedProject.id === projectId) {
-        setSelectedProject({ ...selectedProject, status: newStatus });
-      }
     } catch (error) {
       console.error("Failed to update project status:", error);
+      setProjects(previousProjects);
+      if (selectedProject?.id === projectId) {
+        setSelectedProject(selectedProject);
+      }
     }
   };
 
@@ -274,6 +287,13 @@ export default function DashboardPage() {
         onDelete={handleProjectDelete}
         onStatusChange={handleProjectStatusChange}
         onOpenCanvas={handleOpenCanvas}
+        onExportProject={(p) => setExportModalProject({ id: p.id, name: p.name })}
+      />
+
+      <ProjectExportModal
+        open={!!exportModalProject}
+        onOpenChange={(open) => !open && setExportModalProject(null)}
+        project={exportModalProject ?? { id: "", name: "" }}
       />
       {/* Header - sticky, always on top */}
       <div className="shrink-0 relative z-[60]">
@@ -317,6 +337,7 @@ export default function DashboardPage() {
             onProjectClick={handleProjectClick}
             onProjectDelete={handleProjectDelete}
             onProjectStatusChange={handleProjectStatusChange}
+            onExportProject={(p) => setExportModalProject(p)}
             sortBy={sortBy}
             setSortBy={setSortBy}
             statusFilter={statusFilter}

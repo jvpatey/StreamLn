@@ -17,6 +17,8 @@ interface ProjectHeaderProps {
   };
   onInputChange: (field: string, value: string) => void;
   onStatusChange?: (projectId: string, newStatus: string) => void;
+  /** Renders on the right of row 1 (icons have priority, title truncates) */
+  renderActions?: React.ReactNode;
 }
 
 export function ProjectHeader({
@@ -25,61 +27,76 @@ export function ProjectHeader({
   editForm,
   onInputChange,
   onStatusChange,
+  renderActions,
 }: ProjectHeaderProps) {
-
   return (
-    <div className="flex items-start justify-between">
-      <div className="flex items-start space-x-4 group">
-        <div className="p-4 rounded-xl backdrop-blur-sm bg-white/30 dark:bg-slate-800/30 border border-white/20 dark:border-slate-700/20 transition-all duration-200 hover:bg-white/40 dark:hover:bg-slate-800/40 hover:border-white/30 dark:hover:border-slate-700/30 hover:scale-105 cursor-pointer flex-shrink-0">
+    <div className="space-y-3">
+      {/* Row 1: Icon + Title (truncates) | Actions (priority) */}
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="h-11 w-11 flex items-center justify-center rounded-xl backdrop-blur-sm bg-white/30 dark:bg-slate-800/30 border border-white/20 dark:border-slate-700/20 flex-shrink-0">
           {React.createElement(
             getIconComponent(editForm.icon || project.icon || "Folder"),
             {
-              className:
-                "h-8 w-8 text-primary transition-colors duration-200 group-hover:text-primary/80",
+              className: cn(
+                "h-6 w-6 transition-colors duration-200",
+                project.status === "archived"
+                  ? "text-slate-400 dark:text-slate-500"
+                  : "text-primary"
+              ),
             }
           )}
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0 h-11 flex items-center">
           {isEditMode ? (
-            <div className="space-y-3">
-              <input
-                type="text"
-                value={editForm.name}
-                onChange={(e) => onInputChange("name", e.target.value)}
-                className="w-full text-xl font-semibold 
-                  backdrop-blur-sm bg-white/30 dark:bg-slate-800/30
-                  border-b border-white/30 dark:border-slate-700/30
-                  focus:border-primary/50 focus:outline-none 
-                  transition-colors duration-200 rounded-t-lg px-2 py-1"
-                placeholder="Project name"
-              />
-              <textarea
-                value={editForm.description}
-                onChange={(e) => onInputChange("description", e.target.value)}
-                className="w-full text-sm 
-                  backdrop-blur-sm bg-white/30 dark:bg-slate-800/30
-                  border border-white/30 dark:border-slate-700/30
-                  rounded-lg p-2 
-                  focus:border-primary/50 focus:outline-none 
-                  transition-colors duration-200 resize-none"
-                placeholder="Project description (optional)"
-                rows={3}
-              />
-            </div>
+            <input
+              type="text"
+              value={editForm.name}
+              onChange={(e) => onInputChange("name", e.target.value)}
+              className="w-full h-full text-2xl font-semibold 
+                backdrop-blur-sm bg-white/30 dark:bg-slate-800/30
+                border-b border-white/30 dark:border-slate-700/30
+                focus:border-primary/50 focus:outline-none 
+                transition-colors duration-200 rounded-t-lg px-2"
+              placeholder="Project name"
+            />
           ) : (
-            <>
-              <SheetTitle className="text-xl font-semibold text-foreground transition-colors duration-200 group-hover:text-primary/80 cursor-pointer">
-                {project.name}
-              </SheetTitle>
-              {project.description && (
-                <SheetDescription className="text-sm text-muted-foreground leading-relaxed transition-colors duration-200 hover:text-foreground/80">
-                  {project.description}
-                </SheetDescription>
-              )}
-            </>
+            <SheetTitle className="text-2xl font-semibold text-foreground truncate block leading-[2.75rem]">
+              {project.name}
+            </SheetTitle>
           )}
-          <div className="mt-2">
-            {onStatusChange ? (
+        </div>
+        {renderActions && (
+          <div className="flex items-center gap-1 shrink-0">{renderActions}</div>
+        )}
+      </div>
+
+      {/* Row 2: Description full width */}
+      <div className="w-full">
+        {isEditMode ? (
+          <textarea
+            value={editForm.description}
+            onChange={(e) => onInputChange("description", e.target.value)}
+            className="w-full text-sm 
+              backdrop-blur-sm bg-white/30 dark:bg-slate-800/30
+              border border-white/30 dark:border-slate-700/30
+              rounded-lg p-2 
+              focus:border-primary/50 focus:outline-none 
+              transition-colors duration-200 resize-none"
+            placeholder="Project description (optional)"
+            rows={3}
+          />
+        ) : (
+          project.description && (
+            <SheetDescription className="text-sm text-muted-foreground leading-relaxed">
+              {project.description}
+            </SheetDescription>
+          )
+        )}
+      </div>
+
+      {/* Row 3: Toggle left-aligned */}
+      <div className="flex justify-start">
+        {onStatusChange ? (
               <div
                 role="radiogroup"
                 aria-label="Project status"
@@ -145,7 +162,7 @@ export function ProjectHeader({
                   Archived
                 </button>
               </div>
-            ) : (
+          ) : (
               <span
                 className={cn(
                   "inline-flex items-center gap-1.5 text-sm font-medium",
@@ -167,8 +184,6 @@ export function ProjectHeader({
                 )}
               </span>
             )}
-          </div>
-        </div>
       </div>
     </div>
   );
