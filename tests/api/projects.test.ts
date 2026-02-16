@@ -68,6 +68,7 @@ describe("GET /api/projects", () => {
     const json = await res.json();
     expect(json).toHaveLength(1);
     expect(json[0].blocks).toBe(5);
+    expect(json[0].canvasCount).toBe(1);
     expect(json[0].name).toBe("Test");
     expect(prisma.project.findMany).toHaveBeenCalledWith({
       where: { userId: "user-123" },

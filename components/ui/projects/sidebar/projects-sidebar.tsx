@@ -31,8 +31,8 @@ export function ProjectsSidebar({
         intensity="2xl"
         className={`${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed lg:relative lg:translate-x-0 z-50 w-72 
-        lg:rounded-[24px] lg:mt-2 lg:mb-2 lg:ml-2 lg:h-[calc(100%-1rem)] lg:max-h-[calc(100%-1rem)]
+        } fixed lg:relative lg:translate-x-0 z-40 w-72 
+        lg:rounded-[24px] lg:mt-2 lg:mb-2 lg:ml-2 lg:h-[calc(100vh-4.5rem)] lg:min-h-[calc(100vh-4.5rem)]
         transition-transform duration-300 ease-in-out overflow-y-auto hidden lg:block`}
       >
         <div className="p-6">

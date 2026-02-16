@@ -28,8 +28,9 @@ export async function GET(req: NextRequest) {
         (sum, c) => sum + c._count.canvasBlocks,
         0
       );
+      const canvasCount = project.canvases.length;
       const { canvases, ...rest } = project;
-      return { ...rest, blocks };
+      return { ...rest, blocks, canvasCount };
     });
 
     return NextResponse.json(projectsWithBlocks);

@@ -257,7 +257,7 @@ export default function DashboardPage() {
     });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-primary-50/40 to-slate-100 dark:from-[#0b0d17] dark:via-[#151c2e] dark:to-[#1e3a8a]">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-100 via-primary-50/40 to-slate-100 dark:from-[#0b0d17] dark:via-[#151c2e] dark:to-[#1e3a8a]">
       <CreateProjectModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
@@ -275,14 +275,16 @@ export default function DashboardPage() {
         onStatusChange={handleProjectStatusChange}
         onOpenCanvas={handleOpenCanvas}
       />
-      {/* Modern Header */}
-      <ProjectsHeader
-        onCommandPaletteOpen={() => setCommandPaletteOpen(true)}
-        onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
-      />
+      {/* Header - sticky, always on top */}
+      <div className="shrink-0 relative z-[60]">
+        <ProjectsHeader
+          onCommandPaletteOpen={() => setCommandPaletteOpen(true)}
+          onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
+        />
+      </div>
 
-      {/* Main Layout */}
-      <div className="flex relative lg:h-[calc(100vh-3.5rem)]">
+      {/* Main Layout - flex row, content scrolls internally */}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Sidebar */}
         <ProjectsSidebar
           isOpen={sidebarOpen}
@@ -291,9 +293,9 @@ export default function DashboardPage() {
           onCreateProject={handleCreateProject}
         />
 
-        {/* Main Content Area */}
+        {/* Main Content Area - only this scrolls */}
         {loading ? (
-          <div className="flex-1 min-h-screen">
+          <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="p-6 lg:p-8">
               <div className="mb-8">
                 <div className="h-8 w-48 rounded-lg bg-slate-200/60 dark:bg-slate-700/60 mb-2 animate-pulse" />
@@ -303,10 +305,11 @@ export default function DashboardPage() {
             </div>
           </div>
         ) : error ? (
-          <div className="flex-1 flex items-center justify-center text-destructive-500 dark:text-destructive-400 text-lg">
+          <div className="flex-1 flex items-center justify-center text-destructive-500 dark:text-destructive-400 text-lg min-h-0 overflow-y-auto">
             {error}
           </div>
         ) : (
+          <div className="flex-1 min-h-0 overflow-y-auto">
           <ProjectsContent
             onCreateProject={handleCreateProject}
             projects={filteredAndSortedProjects}
@@ -321,6 +324,7 @@ export default function DashboardPage() {
             filterPopoverOpen={filterPopoverOpen}
             setFilterPopoverOpen={setFilterPopoverOpen}
           />
+          </div>
         )}
       </div>
 
