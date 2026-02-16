@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/shared/card";
-import { Clock, BarChart3, Layout, SquareStack } from "lucide-react";
+import { Clock, CheckCircle, Archive, Layout, SquareStack } from "lucide-react";
 import React from "react";
 import { ProjectCardMenu } from "./project-card-menu";
 import { getIconComponent } from "./icon-picker";
@@ -116,7 +116,11 @@ export function ProjectCard({
             <span>{lastModified}</span>
           </div>
           <div className="flex items-center space-x-1">
-            <BarChart3 size={12} />
+            {isArchived ? (
+              <Archive size={12} className={statusColor} />
+            ) : (
+              <CheckCircle size={12} className={statusColor} />
+            )}
             <span className={`font-semibold ${statusColor}`}>
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </span>

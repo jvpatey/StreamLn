@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Sheet, SheetContent, SheetHeader } from "@/components/ui/shared/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetClose,
+} from "@/components/ui/shared/sheet";
+import { Pencil, Trash2, X } from "lucide-react";
 import { IconPicker } from "../project-content/icon-picker";
 import {
   ProjectHeader,
@@ -59,8 +65,6 @@ export function ProjectDetailsSidepanel({
 
   if (!project) return null;
 
-  const isArchived = project.status === "archived";
-
   const handleDelete = () => {
     setConfirmDelete(true);
   };
@@ -110,17 +114,55 @@ export function ProjectDetailsSidepanel({
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent
           side="right"
+          hideClose
           className="w-full sm:max-w-lg flex flex-col overflow-hidden
             backdrop-blur-2xl bg-white/40 dark:bg-slate-900/30 
             border border-white/30 dark:border-white/20
             rounded-[24px] !top-16 !bottom-8 !right-4 !h-[calc(100vh-6rem)]"
         >
-          <SheetHeader className="shrink-0 space-y-2 pb-4 border-b border-white/20 dark:border-slate-700/20">
+          <SheetHeader className="shrink-0 space-y-2 pb-4 border-b border-white/20 dark:border-slate-700/20 relative">
+            {/* Edit, Delete, Close - aligned row with consistent styling */}
+            <div className="absolute right-0 top-0 flex items-center gap-1">
+              <button
+                type="button"
+                onClick={handleEditClick}
+                disabled={isEditMode}
+                className="h-9 w-9 rounded-full flex items-center justify-center
+                  bg-white/20 dark:bg-slate-700/50
+                  hover:bg-white/30 dark:hover:bg-slate-600/50
+                  transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50
+                  disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/20 dark:disabled:hover:bg-slate-700/50"
+                aria-label="Edit project"
+              >
+                <Pencil size={16} className="text-slate-700 dark:text-slate-200" />
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="h-9 w-9 rounded-full flex items-center justify-center group
+                  bg-white/20 dark:bg-slate-700/50
+                  hover:bg-red-500/20 transition-colors
+                  focus:outline-none focus:ring-2 focus:ring-red-500/50"
+                aria-label="Delete project"
+              >
+                <Trash2 size={16} className="text-slate-700 dark:text-slate-200 group-hover:text-red-600 dark:group-hover:text-red-400" />
+              </button>
+              <SheetClose
+                className="h-9 w-9 rounded-full flex items-center justify-center
+                  bg-white/20 dark:bg-slate-700/50
+                  hover:bg-white/30 dark:hover:bg-slate-600/50
+                  transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+                aria-label="Close"
+              >
+                <X size={16} className="text-slate-700 dark:text-slate-200" />
+              </SheetClose>
+            </div>
             <ProjectHeader
               project={project}
               isEditMode={isEditMode}
               editForm={editForm}
               onInputChange={handleInputChange}
+              onStatusChange={onStatusChange}
             />
 
             {isEditMode && (
@@ -152,12 +194,8 @@ export function ProjectDetailsSidepanel({
             <ActionButtons
               isEditMode={isEditMode}
               project={project}
-              isArchived={isArchived}
               onSaveEdit={handleSaveEdit}
               onCancelEdit={handleCancelEdit}
-              onEditClick={handleEditClick}
-              onStatusChange={onStatusChange}
-              onDelete={handleDelete}
               onOpenCanvas={onOpenCanvas}
             />
           </div>

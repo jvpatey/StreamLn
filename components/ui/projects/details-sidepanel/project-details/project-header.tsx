@@ -1,8 +1,11 @@
 import React from "react";
+import { motion } from "framer-motion";
 import { SheetTitle, SheetDescription } from "@/components/ui/shared/sheet";
 import { getIconComponent } from "../../project-content/icon-picker";
-import { ProjectStatusIconText } from "@/components/ui/projects/shared";
+import { getLiquidGlassSurfaceClassName } from "@/components/ui/shared/liquid-glass-surface";
+import { Archive, CheckCircle } from "lucide-react";
 import { Project } from "./types";
+import { cn } from "@/lib/utils";
 
 interface ProjectHeaderProps {
   project: Project;
@@ -13,6 +16,7 @@ interface ProjectHeaderProps {
     icon: string;
   };
   onInputChange: (field: string, value: string) => void;
+  onStatusChange?: (projectId: string, newStatus: string) => void;
 }
 
 export function ProjectHeader({
@@ -20,6 +24,7 @@ export function ProjectHeader({
   isEditMode,
   editForm,
   onInputChange,
+  onStatusChange,
 }: ProjectHeaderProps) {
 
   return (
@@ -73,11 +78,95 @@ export function ProjectHeader({
               )}
             </>
           )}
-          <div className="mt-1">
-            <ProjectStatusIconText 
-              status={project.status} 
-              className="transition-colors duration-200 group-hover:opacity-80"
-            />
+          <div className="mt-2">
+            {onStatusChange ? (
+              <div
+                role="radiogroup"
+                aria-label="Project status"
+                className={cn(
+                  "flex items-center p-1 gap-0.5 relative w-[11.5rem]",
+                  getLiquidGlassSurfaceClassName({
+                    variant: "toolbar",
+                    intensity: "xl",
+                    rounded: "2xl",
+                    className: "inline-flex",
+                  })
+                )}
+              >
+                {/* Sliding indicator - matches canvas Edit/View toggle pattern */}
+                <motion.div
+                  className={cn(
+                    "absolute left-1 top-1 h-7 rounded-xl pointer-events-none",
+                    "w-[calc(50%-6px)]",
+                    project.status === "active"
+                      ? "bg-gradient-to-r from-green-500/25 via-green-400/30 to-emerald-500/25 dark:from-green-500/20 dark:via-green-400/25 dark:to-emerald-500/20"
+                      : "bg-gradient-to-r from-slate-500/25 via-slate-400/30 to-slate-500/25 dark:from-slate-500/20 dark:via-slate-400/25 dark:to-slate-500/20",
+                    "backdrop-blur-2xl",
+                    "border border-white/30 dark:border-white/20",
+                    "shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.2)]",
+                    "dark:shadow-[0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.08)]"
+                  )}
+                  initial={false}
+                  animate={{
+                    x: project.status === "archived" ? "calc(100% + 4px)" : 0,
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={project.status === "active"}
+                  onClick={() => onStatusChange(project.id, "active")}
+                  className={cn(
+                    "relative z-10 flex-1 min-w-0 text-xs rounded-xl h-7 flex items-center justify-center gap-1.5 font-medium transition-colors duration-200",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-inset",
+                    project.status === "active"
+                      ? "text-slate-900 dark:text-white"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100"
+                  )}
+                >
+                  <CheckCircle size={12} className="shrink-0" />
+                  Active
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={project.status === "archived"}
+                  onClick={() => onStatusChange(project.id, "archived")}
+                  className={cn(
+                    "relative z-10 flex-1 min-w-0 text-xs rounded-xl h-7 flex items-center justify-center gap-1.5 font-medium transition-colors duration-200",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-inset",
+                    project.status === "archived"
+                      ? "text-slate-900 dark:text-white"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100"
+                  )}
+                >
+                  <Archive size={12} className="shrink-0" />
+                  Archived
+                </button>
+              </div>
+            ) : (
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 text-sm font-medium",
+                  project.status === "archived"
+                    ? "text-slate-500 dark:text-slate-400"
+                    : "text-green-600 dark:text-green-400"
+                )}
+              >
+                {project.status === "archived" ? (
+                  <>
+                    <Archive size={14} />
+                    Archived
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle size={14} />
+                    Active
+                  </>
+                )}
+              </span>
+            )}
           </div>
         </div>
       </div>
