@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/shared/badge";
 import { Button } from "@/components/ui/shared/button";
-import { Card } from "@/components/ui/shared/card";
 import { Plus } from "lucide-react";
 import { IconPicker } from "../icon-picker";
 
@@ -12,6 +11,7 @@ interface CreateProjectModalProps {
     name: string;
     description?: string;
     icon?: string;
+    canvasName?: string;
   }) => Promise<void> | void;
 }
 
@@ -23,6 +23,7 @@ export function CreateProjectModal({
 }: CreateProjectModalProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [canvasName, setCanvasName] = useState("Main");
   const [selectedIcon, setSelectedIcon] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +36,7 @@ export function CreateProjectModal({
     } else {
       setName("");
       setDescription("");
+      setCanvasName("Main");
       setSelectedIcon("");
       setError(null);
       setLoading(false);
@@ -72,6 +74,7 @@ export function CreateProjectModal({
         name: name.trim(),
         description: description.trim() || undefined,
         icon: selectedIcon || undefined,
+        canvasName: canvasName.trim() || "Main",
       });
       onOpenChange(false);
     } catch (err: any) {
@@ -85,16 +88,16 @@ export function CreateProjectModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center"
+      className="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center py-8 px-4 sm:py-20 sm:px-8"
       onClick={() => onOpenChange(false)}
       aria-modal="true"
       role="dialog"
     >
       <div
-        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl"
+        className="w-full max-w-xl max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-10rem)] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-4 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-10rem)]">
           {/* Header */}
           <div className="flex items-center border-b border-slate-200 dark:border-slate-700 p-4">
             <div className="flex items-center space-x-3 flex-1">
@@ -120,13 +123,14 @@ export function CreateProjectModal({
 
           {/* Form */}
           <form
-            className="space-y-6 p-6"
+            className="flex flex-col flex-1 min-h-0 overflow-hidden"
             onSubmit={(e) => {
               e.preventDefault();
               handleSubmit();
             }}
             autoComplete="off"
           >
+            <div className="space-y-4 p-6 overflow-y-auto flex-1 min-h-0">
             <div>
               <label
                 htmlFor="project-name"
@@ -150,6 +154,24 @@ export function CreateProjectModal({
             </div>
             <div>
               <label
+                htmlFor="first-canvas-name"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1"
+              >
+                Canvas Name
+              </label>
+              <input
+                id="first-canvas-name"
+                type="text"
+                className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 px-4 py-3 text-base text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition"
+                placeholder="e.g. Main, Overview, Ideas..."
+                value={canvasName}
+                onChange={(e) => setCanvasName(e.target.value)}
+                maxLength={200}
+                disabled={loading}
+              />
+            </div>
+            <div>
+              <label
                 htmlFor="project-description"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1"
               >
@@ -157,7 +179,7 @@ export function CreateProjectModal({
               </label>
               <textarea
                 id="project-description"
-                className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 px-4 py-3 text-base text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition min-h-[64px] resize-none"
+                className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 px-4 py-3 text-base text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition min-h-[56px] resize-none"
                 placeholder="Describe your project, goals, or ideas..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -166,6 +188,7 @@ export function CreateProjectModal({
               />
             </div>
 
+            <div className="space-y-4">
             <IconPicker
               selectedIcon={selectedIcon}
               onIconSelect={setSelectedIcon}
@@ -175,7 +198,9 @@ export function CreateProjectModal({
                 {error}
               </div>
             )}
-            <div className="flex items-center justify-end space-x-3 pt-2">
+            </div>
+            </div>
+            <div className="flex items-center justify-end space-x-3 p-6 pt-4 border-t border-slate-200 dark:border-slate-700 shrink-0">
               <Button
                 type="button"
                 variant="ghost"

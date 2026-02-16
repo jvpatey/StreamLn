@@ -40,6 +40,7 @@ export async function createProject(data: {
   name: string;
   description?: string;
   icon?: string;
+  canvasName?: string;
 }) {
   const res = await fetch("/api/projects", {
     method: "POST",

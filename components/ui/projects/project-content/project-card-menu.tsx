@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Archive, Trash2, CheckCircle } from "lucide-react";
 
 interface ProjectCardMenuProps {
   isArchived: boolean;
@@ -46,23 +46,29 @@ export function ProjectCardMenu({
       {menuOpen && (
         <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg z-20 animate-in fade-in slide-in-from-top-2">
           <button
-            className="w-full text-left px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 rounded-t-xl"
+            className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 rounded-t-xl"
             onClick={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
               isArchived ? onUnarchive() : onArchive();
             }}
           >
+            {isArchived ? (
+              <CheckCircle size={16} className="text-slate-600 dark:text-slate-400 shrink-0" />
+            ) : (
+              <Archive size={16} className="text-slate-600 dark:text-slate-400 shrink-0" />
+            )}
             {isArchived ? "Unarchive" : "Archive"}
           </button>
           <button
-            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded-b-xl"
+            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded-b-xl"
             onClick={(e) => {
               e.stopPropagation();
               setMenuOpen(false);
               setConfirmOpen(true);
             }}
           >
+            <Trash2 size={16} className="shrink-0" />
             Delete
           </button>
         </div>

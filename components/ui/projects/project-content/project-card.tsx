@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/shared/card";
-import { Folder, Users, Clock, BarChart3 } from "lucide-react";
-import React, { useState } from "react";
+import { Clock, CheckCircle, Archive, Layout, SquareStack } from "lucide-react";
+import React from "react";
 import { ProjectCardMenu } from "./project-card-menu";
 import { getIconComponent } from "./icon-picker";
 
@@ -8,10 +8,9 @@ interface ProjectCardProps {
   id: string;
   name: string;
   type: string;
-  progress: number;
   lastModified: string;
-  collaborators: number;
   blocks: number;
+  canvasCount: number;
   status: string;
   description?: string;
   icon?: string;
@@ -27,10 +26,9 @@ export function ProjectCard({
   id,
   name,
   type,
-  progress,
   lastModified,
-  collaborators,
   blocks,
+  canvasCount,
   status,
   description,
   icon,
@@ -41,17 +39,6 @@ export function ProjectCard({
   onDelete,
   onStatusChange,
 }: ProjectCardProps) {
-  // Color for progress
-  const getProgressColor = () => {
-    if (progress >= 80) return "bg-green-500";
-    if (progress >= 50) return "bg-yellow-500";
-    return "bg-red-500";
-  };
-  const getProgressTextColor = () => {
-    if (progress >= 80) return "text-green-500 dark:text-green-400";
-    if (progress >= 50) return "text-yellow-600 dark:text-yellow-400";
-    return "text-red-600 dark:text-red-400";
-  };
   const isArchived = status === "archived";
   const statusColor = isArchived
     ? "text-slate-500 dark:text-slate-400"
@@ -74,21 +61,21 @@ export function ProjectCard({
     >
       {/* Main Info */}
       <div className="p-5 pb-4 flex flex-col flex-1">
-        {/* First line: Icon, Title, Menu */}
-        <div className="flex items-center space-x-3 mb-3 pr-8">
+        {/* Primary: Icon + Title + Menu */}
+        <div className="flex items-center space-x-3 mb-4 pr-8">
           <div
-            className="p-2.5 rounded-lg backdrop-blur-sm bg-white/30 dark:bg-slate-800/30 border border-white/20 dark:border-slate-700/20 flex-shrink-0"
+            className="p-3 rounded-xl backdrop-blur-sm bg-white/40 dark:bg-slate-800/40 border border-white/30 dark:border-slate-700/30 flex-shrink-0"
             style={{
               color: accentColor || "#3b82f6",
             }}
           >
             {React.createElement(getIconComponent(icon || "Folder"), {
-              size: 20,
+              size: 24,
               style: { color: accentColor || "#3b82f6" },
             })}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-lg truncate group-hover:text-primary-400 transition-colors">
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-xl truncate group-hover:text-primary-400 transition-colors">
               {name}
             </h3>
           </div>
@@ -102,45 +89,38 @@ export function ProjectCard({
             />
           </div>
         </div>
-        
-        {/* Second line: Description and Progress % */}
-        <div className="flex items-center justify-between mb-3">
-          {description ? (
-            <p className="text-sm text-slate-500 dark:text-slate-400 truncate flex-1 pr-2">
-              {description}
-            </p>
-          ) : (
-            <div className="flex-1" />
-          )}
-          <span
-            className={`font-bold text-base flex-shrink-0 ${getProgressTextColor()}`}
-          >
-            {progress}%
+
+        {/* Secondary: Description */}
+        {description && (
+          <p className="text-sm text-slate-500 dark:text-slate-400 truncate mb-2">
+            {description}
+          </p>
+        )}
+
+        {/* Secondary: Stats row */}
+        <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mb-3">
+          <span className="flex items-center gap-1">
+            <Layout size={12} />
+            {canvasCount} canvas{canvasCount !== 1 ? "es" : ""}
+          </span>
+          <span className="flex items-center gap-1">
+            <SquareStack size={12} />
+            {blocks} block{blocks !== 1 ? "s" : ""}
           </span>
         </div>
-        
-        {/* Third line: Progress bar */}
-        <div className="w-full h-2 bg-slate-200/50 dark:bg-slate-700/50 rounded-full overflow-hidden mb-3">
-          <div
-            className={`h-2 rounded-full transition-all duration-300 ${getProgressColor()}`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
 
-        {/* Metadata Row - pushed to bottom */}
-        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2.5 border-t border-white/20 dark:border-slate-700/20 mt-auto">
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-1">
-              <Clock size={12} />
-              <span>{lastModified}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Users size={12} />
-              <span>{collaborators}</span>
-            </div>
+        {/* Tertiary: Metadata Row - pushed to bottom */}
+        <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 pt-2.5 border-t border-white/20 dark:border-slate-700/20 mt-auto">
+          <div className="flex items-center space-x-1">
+            <Clock size={12} />
+            <span>{lastModified}</span>
           </div>
           <div className="flex items-center space-x-1">
-            <BarChart3 size={12} />
+            {isArchived ? (
+              <Archive size={12} className={statusColor} />
+            ) : (
+              <CheckCircle size={12} className={statusColor} />
+            )}
             <span className={`font-semibold ${statusColor}`}>
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </span>

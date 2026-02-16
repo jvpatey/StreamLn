@@ -31,14 +31,14 @@ export function ProjectsSidebar({
         intensity="2xl"
         className={`${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed lg:relative lg:translate-x-0 z-50 w-72 
-        lg:rounded-[24px] lg:mt-2 lg:mb-2 lg:ml-2 lg:h-[calc(100%-1rem)] lg:max-h-[calc(100%-1rem)]
+        } fixed lg:relative lg:translate-x-0 z-40 w-72 
+        lg:rounded-[24px] lg:mt-2 lg:mb-2 lg:ml-2 lg:h-[calc(100vh-4.5rem)] lg:min-h-[calc(100vh-4.5rem)]
         transition-transform duration-300 ease-in-out overflow-y-auto hidden lg:block`}
       >
         <div className="p-6">
           {/* Welcome Section */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">
               Project Hub
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">

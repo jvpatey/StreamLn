@@ -33,11 +33,10 @@ interface Project {
   name: string;
   description?: string;
   status?: string;
-  progress?: number;
   updatedAt?: string;
   createdAt?: string;
-  collaborators?: number;
   blocks?: number;
+  canvasCount?: number;
   userId?: string;
   icon?: string;
 }
@@ -203,16 +202,13 @@ export function ProjectsContent({
                 id={project.id}
                 name={project.name}
                 type={project.description || "Project Workspace"}
-                progress={
-                  typeof project.progress === "number" ? project.progress : 0
-                }
                 lastModified={formatTimeAgo(project.updatedAt)}
-                collaborators={
-                  typeof project.collaborators === "number"
-                    ? project.collaborators
+                blocks={typeof project.blocks === "number" ? project.blocks : 0}
+                canvasCount={
+                  typeof project.canvasCount === "number"
+                    ? project.canvasCount
                     : 1
                 }
-                blocks={typeof project.blocks === "number" ? project.blocks : 0}
                 status={project.status || "active"}
                 description={project.description}
                 icon={project.icon}

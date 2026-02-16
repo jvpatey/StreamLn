@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type Project = $Result.DefaultSelection<Prisma.$ProjectPayload>
 /**
+ * Model Canvas
+ * 
+ */
+export type Canvas = $Result.DefaultSelection<Prisma.$CanvasPayload>
+/**
  * Model CanvasBlock
  * 
  */
@@ -158,6 +163,16 @@ export class PrismaClient<
     * ```
     */
   get project(): Prisma.ProjectDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.canvas`: Exposes CRUD operations for the **Canvas** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Canvas
+    * const canvas = await prisma.canvas.findMany()
+    * ```
+    */
+  get canvas(): Prisma.CanvasDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.canvasBlock`: Exposes CRUD operations for the **CanvasBlock** model.
@@ -609,6 +624,7 @@ export namespace Prisma {
 
   export const ModelName: {
     Project: 'Project',
+    Canvas: 'Canvas',
     CanvasBlock: 'CanvasBlock'
   };
 
@@ -628,7 +644,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "project" | "canvasBlock"
+      modelProps: "project" | "canvas" | "canvasBlock"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -703,6 +719,80 @@ export namespace Prisma {
           count: {
             args: Prisma.ProjectCountArgs<ExtArgs>
             result: $Utils.Optional<ProjectCountAggregateOutputType> | number
+          }
+        }
+      }
+      Canvas: {
+        payload: Prisma.$CanvasPayload<ExtArgs>
+        fields: Prisma.CanvasFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CanvasFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CanvasFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasPayload>
+          }
+          findFirst: {
+            args: Prisma.CanvasFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CanvasFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasPayload>
+          }
+          findMany: {
+            args: Prisma.CanvasFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasPayload>[]
+          }
+          create: {
+            args: Prisma.CanvasCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasPayload>
+          }
+          createMany: {
+            args: Prisma.CanvasCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CanvasCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasPayload>[]
+          }
+          delete: {
+            args: Prisma.CanvasDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasPayload>
+          }
+          update: {
+            args: Prisma.CanvasUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasPayload>
+          }
+          deleteMany: {
+            args: Prisma.CanvasDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CanvasUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CanvasUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasPayload>[]
+          }
+          upsert: {
+            args: Prisma.CanvasUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasPayload>
+          }
+          aggregate: {
+            args: Prisma.CanvasAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCanvas>
+          }
+          groupBy: {
+            args: Prisma.CanvasGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CanvasGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CanvasCountArgs<ExtArgs>
+            result: $Utils.Optional<CanvasCountAggregateOutputType> | number
           }
         }
       }
@@ -865,6 +955,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     project?: ProjectOmit
+    canvas?: CanvasOmit
     canvasBlock?: CanvasBlockOmit
   }
 
@@ -960,11 +1051,11 @@ export namespace Prisma {
    */
 
   export type ProjectCountOutputType = {
-    canvasBlocks: number
+    canvases: number
   }
 
   export type ProjectCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    canvasBlocks?: boolean | ProjectCountOutputTypeCountCanvasBlocksArgs
+    canvases?: boolean | ProjectCountOutputTypeCountCanvasesArgs
   }
 
   // Custom InputTypes
@@ -981,7 +1072,38 @@ export namespace Prisma {
   /**
    * ProjectCountOutputType without action
    */
-  export type ProjectCountOutputTypeCountCanvasBlocksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type ProjectCountOutputTypeCountCanvasesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CanvasWhereInput
+  }
+
+
+  /**
+   * Count Type CanvasCountOutputType
+   */
+
+  export type CanvasCountOutputType = {
+    canvasBlocks: number
+  }
+
+  export type CanvasCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    canvasBlocks?: boolean | CanvasCountOutputTypeCountCanvasBlocksArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * CanvasCountOutputType without action
+   */
+  export type CanvasCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasCountOutputType
+     */
+    select?: CanvasCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * CanvasCountOutputType without action
+   */
+  export type CanvasCountOutputTypeCountCanvasBlocksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CanvasBlockWhereInput
   }
 
@@ -1178,7 +1300,7 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    canvasBlocks?: boolean | Project$canvasBlocksArgs<ExtArgs>
+    canvases?: boolean | Project$canvasesArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
@@ -1217,7 +1339,7 @@ export namespace Prisma {
 
   export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "description" | "icon" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    canvasBlocks?: boolean | Project$canvasBlocksArgs<ExtArgs>
+    canvases?: boolean | Project$canvasesArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProjectIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1226,7 +1348,7 @@ export namespace Prisma {
   export type $ProjectPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Project"
     objects: {
-      canvasBlocks: Prisma.$CanvasBlockPayload<ExtArgs>[]
+      canvases: Prisma.$CanvasPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -1631,7 +1753,7 @@ export namespace Prisma {
    */
   export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    canvasBlocks<T extends Project$canvasBlocksArgs<ExtArgs> = {}>(args?: Subset<T, Project$canvasBlocksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    canvases<T extends Project$canvasesArgs<ExtArgs> = {}>(args?: Subset<T, Project$canvasesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2057,9 +2179,1144 @@ export namespace Prisma {
   }
 
   /**
-   * Project.canvasBlocks
+   * Project.canvases
    */
-  export type Project$canvasBlocksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Project$canvasesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Canvas
+     */
+    select?: CanvasSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Canvas
+     */
+    omit?: CanvasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasInclude<ExtArgs> | null
+    where?: CanvasWhereInput
+    orderBy?: CanvasOrderByWithRelationInput | CanvasOrderByWithRelationInput[]
+    cursor?: CanvasWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CanvasScalarFieldEnum | CanvasScalarFieldEnum[]
+  }
+
+  /**
+   * Project without action
+   */
+  export type ProjectDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Project
+     */
+    select?: ProjectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Project
+     */
+    omit?: ProjectOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Canvas
+   */
+
+  export type AggregateCanvas = {
+    _count: CanvasCountAggregateOutputType | null
+    _avg: CanvasAvgAggregateOutputType | null
+    _sum: CanvasSumAggregateOutputType | null
+    _min: CanvasMinAggregateOutputType | null
+    _max: CanvasMaxAggregateOutputType | null
+  }
+
+  export type CanvasAvgAggregateOutputType = {
+    order: number | null
+  }
+
+  export type CanvasSumAggregateOutputType = {
+    order: number | null
+  }
+
+  export type CanvasMinAggregateOutputType = {
+    id: string | null
+    projectId: string | null
+    name: string | null
+    order: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CanvasMaxAggregateOutputType = {
+    id: string | null
+    projectId: string | null
+    name: string | null
+    order: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CanvasCountAggregateOutputType = {
+    id: number
+    projectId: number
+    name: number
+    order: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type CanvasAvgAggregateInputType = {
+    order?: true
+  }
+
+  export type CanvasSumAggregateInputType = {
+    order?: true
+  }
+
+  export type CanvasMinAggregateInputType = {
+    id?: true
+    projectId?: true
+    name?: true
+    order?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CanvasMaxAggregateInputType = {
+    id?: true
+    projectId?: true
+    name?: true
+    order?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CanvasCountAggregateInputType = {
+    id?: true
+    projectId?: true
+    name?: true
+    order?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type CanvasAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Canvas to aggregate.
+     */
+    where?: CanvasWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Canvas to fetch.
+     */
+    orderBy?: CanvasOrderByWithRelationInput | CanvasOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CanvasWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Canvas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Canvas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Canvas
+    **/
+    _count?: true | CanvasCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CanvasAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CanvasSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CanvasMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CanvasMaxAggregateInputType
+  }
+
+  export type GetCanvasAggregateType<T extends CanvasAggregateArgs> = {
+        [P in keyof T & keyof AggregateCanvas]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCanvas[P]>
+      : GetScalarType<T[P], AggregateCanvas[P]>
+  }
+
+
+
+
+  export type CanvasGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CanvasWhereInput
+    orderBy?: CanvasOrderByWithAggregationInput | CanvasOrderByWithAggregationInput[]
+    by: CanvasScalarFieldEnum[] | CanvasScalarFieldEnum
+    having?: CanvasScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CanvasCountAggregateInputType | true
+    _avg?: CanvasAvgAggregateInputType
+    _sum?: CanvasSumAggregateInputType
+    _min?: CanvasMinAggregateInputType
+    _max?: CanvasMaxAggregateInputType
+  }
+
+  export type CanvasGroupByOutputType = {
+    id: string
+    projectId: string
+    name: string
+    order: number
+    createdAt: Date
+    updatedAt: Date
+    _count: CanvasCountAggregateOutputType | null
+    _avg: CanvasAvgAggregateOutputType | null
+    _sum: CanvasSumAggregateOutputType | null
+    _min: CanvasMinAggregateOutputType | null
+    _max: CanvasMaxAggregateOutputType | null
+  }
+
+  type GetCanvasGroupByPayload<T extends CanvasGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CanvasGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CanvasGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CanvasGroupByOutputType[P]>
+            : GetScalarType<T[P], CanvasGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CanvasSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    name?: boolean
+    order?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    canvasBlocks?: boolean | Canvas$canvasBlocksArgs<ExtArgs>
+    _count?: boolean | CanvasCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["canvas"]>
+
+  export type CanvasSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    name?: boolean
+    order?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["canvas"]>
+
+  export type CanvasSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    name?: boolean
+    order?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["canvas"]>
+
+  export type CanvasSelectScalar = {
+    id?: boolean
+    projectId?: boolean
+    name?: boolean
+    order?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type CanvasOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "name" | "order" | "createdAt" | "updatedAt", ExtArgs["result"]["canvas"]>
+  export type CanvasInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    canvasBlocks?: boolean | Canvas$canvasBlocksArgs<ExtArgs>
+    _count?: boolean | CanvasCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type CanvasIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }
+  export type CanvasIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }
+
+  export type $CanvasPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Canvas"
+    objects: {
+      project: Prisma.$ProjectPayload<ExtArgs>
+      canvasBlocks: Prisma.$CanvasBlockPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      projectId: string
+      name: string
+      order: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["canvas"]>
+    composites: {}
+  }
+
+  type CanvasGetPayload<S extends boolean | null | undefined | CanvasDefaultArgs> = $Result.GetResult<Prisma.$CanvasPayload, S>
+
+  type CanvasCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CanvasFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CanvasCountAggregateInputType | true
+    }
+
+  export interface CanvasDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Canvas'], meta: { name: 'Canvas' } }
+    /**
+     * Find zero or one Canvas that matches the filter.
+     * @param {CanvasFindUniqueArgs} args - Arguments to find a Canvas
+     * @example
+     * // Get one Canvas
+     * const canvas = await prisma.canvas.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CanvasFindUniqueArgs>(args: SelectSubset<T, CanvasFindUniqueArgs<ExtArgs>>): Prisma__CanvasClient<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Canvas that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CanvasFindUniqueOrThrowArgs} args - Arguments to find a Canvas
+     * @example
+     * // Get one Canvas
+     * const canvas = await prisma.canvas.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CanvasFindUniqueOrThrowArgs>(args: SelectSubset<T, CanvasFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CanvasClient<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Canvas that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasFindFirstArgs} args - Arguments to find a Canvas
+     * @example
+     * // Get one Canvas
+     * const canvas = await prisma.canvas.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CanvasFindFirstArgs>(args?: SelectSubset<T, CanvasFindFirstArgs<ExtArgs>>): Prisma__CanvasClient<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Canvas that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasFindFirstOrThrowArgs} args - Arguments to find a Canvas
+     * @example
+     * // Get one Canvas
+     * const canvas = await prisma.canvas.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CanvasFindFirstOrThrowArgs>(args?: SelectSubset<T, CanvasFindFirstOrThrowArgs<ExtArgs>>): Prisma__CanvasClient<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Canvas that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Canvas
+     * const canvas = await prisma.canvas.findMany()
+     * 
+     * // Get first 10 Canvas
+     * const canvas = await prisma.canvas.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const canvasWithIdOnly = await prisma.canvas.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CanvasFindManyArgs>(args?: SelectSubset<T, CanvasFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Canvas.
+     * @param {CanvasCreateArgs} args - Arguments to create a Canvas.
+     * @example
+     * // Create one Canvas
+     * const Canvas = await prisma.canvas.create({
+     *   data: {
+     *     // ... data to create a Canvas
+     *   }
+     * })
+     * 
+     */
+    create<T extends CanvasCreateArgs>(args: SelectSubset<T, CanvasCreateArgs<ExtArgs>>): Prisma__CanvasClient<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Canvas.
+     * @param {CanvasCreateManyArgs} args - Arguments to create many Canvas.
+     * @example
+     * // Create many Canvas
+     * const canvas = await prisma.canvas.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CanvasCreateManyArgs>(args?: SelectSubset<T, CanvasCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Canvas and returns the data saved in the database.
+     * @param {CanvasCreateManyAndReturnArgs} args - Arguments to create many Canvas.
+     * @example
+     * // Create many Canvas
+     * const canvas = await prisma.canvas.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Canvas and only return the `id`
+     * const canvasWithIdOnly = await prisma.canvas.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CanvasCreateManyAndReturnArgs>(args?: SelectSubset<T, CanvasCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Canvas.
+     * @param {CanvasDeleteArgs} args - Arguments to delete one Canvas.
+     * @example
+     * // Delete one Canvas
+     * const Canvas = await prisma.canvas.delete({
+     *   where: {
+     *     // ... filter to delete one Canvas
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CanvasDeleteArgs>(args: SelectSubset<T, CanvasDeleteArgs<ExtArgs>>): Prisma__CanvasClient<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Canvas.
+     * @param {CanvasUpdateArgs} args - Arguments to update one Canvas.
+     * @example
+     * // Update one Canvas
+     * const canvas = await prisma.canvas.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CanvasUpdateArgs>(args: SelectSubset<T, CanvasUpdateArgs<ExtArgs>>): Prisma__CanvasClient<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Canvas.
+     * @param {CanvasDeleteManyArgs} args - Arguments to filter Canvas to delete.
+     * @example
+     * // Delete a few Canvas
+     * const { count } = await prisma.canvas.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CanvasDeleteManyArgs>(args?: SelectSubset<T, CanvasDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Canvas.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Canvas
+     * const canvas = await prisma.canvas.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CanvasUpdateManyArgs>(args: SelectSubset<T, CanvasUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Canvas and returns the data updated in the database.
+     * @param {CanvasUpdateManyAndReturnArgs} args - Arguments to update many Canvas.
+     * @example
+     * // Update many Canvas
+     * const canvas = await prisma.canvas.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Canvas and only return the `id`
+     * const canvasWithIdOnly = await prisma.canvas.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CanvasUpdateManyAndReturnArgs>(args: SelectSubset<T, CanvasUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Canvas.
+     * @param {CanvasUpsertArgs} args - Arguments to update or create a Canvas.
+     * @example
+     * // Update or create a Canvas
+     * const canvas = await prisma.canvas.upsert({
+     *   create: {
+     *     // ... data to create a Canvas
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Canvas we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CanvasUpsertArgs>(args: SelectSubset<T, CanvasUpsertArgs<ExtArgs>>): Prisma__CanvasClient<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Canvas.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasCountArgs} args - Arguments to filter Canvas to count.
+     * @example
+     * // Count the number of Canvas
+     * const count = await prisma.canvas.count({
+     *   where: {
+     *     // ... the filter for the Canvas we want to count
+     *   }
+     * })
+    **/
+    count<T extends CanvasCountArgs>(
+      args?: Subset<T, CanvasCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CanvasCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Canvas.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CanvasAggregateArgs>(args: Subset<T, CanvasAggregateArgs>): Prisma.PrismaPromise<GetCanvasAggregateType<T>>
+
+    /**
+     * Group by Canvas.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CanvasGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CanvasGroupByArgs['orderBy'] }
+        : { orderBy?: CanvasGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CanvasGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCanvasGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Canvas model
+   */
+  readonly fields: CanvasFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Canvas.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CanvasClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    canvasBlocks<T extends Canvas$canvasBlocksArgs<ExtArgs> = {}>(args?: Subset<T, Canvas$canvasBlocksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Canvas model
+   */
+  interface CanvasFieldRefs {
+    readonly id: FieldRef<"Canvas", 'String'>
+    readonly projectId: FieldRef<"Canvas", 'String'>
+    readonly name: FieldRef<"Canvas", 'String'>
+    readonly order: FieldRef<"Canvas", 'Int'>
+    readonly createdAt: FieldRef<"Canvas", 'DateTime'>
+    readonly updatedAt: FieldRef<"Canvas", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Canvas findUnique
+   */
+  export type CanvasFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Canvas
+     */
+    select?: CanvasSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Canvas
+     */
+    omit?: CanvasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasInclude<ExtArgs> | null
+    /**
+     * Filter, which Canvas to fetch.
+     */
+    where: CanvasWhereUniqueInput
+  }
+
+  /**
+   * Canvas findUniqueOrThrow
+   */
+  export type CanvasFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Canvas
+     */
+    select?: CanvasSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Canvas
+     */
+    omit?: CanvasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasInclude<ExtArgs> | null
+    /**
+     * Filter, which Canvas to fetch.
+     */
+    where: CanvasWhereUniqueInput
+  }
+
+  /**
+   * Canvas findFirst
+   */
+  export type CanvasFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Canvas
+     */
+    select?: CanvasSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Canvas
+     */
+    omit?: CanvasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasInclude<ExtArgs> | null
+    /**
+     * Filter, which Canvas to fetch.
+     */
+    where?: CanvasWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Canvas to fetch.
+     */
+    orderBy?: CanvasOrderByWithRelationInput | CanvasOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Canvas.
+     */
+    cursor?: CanvasWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Canvas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Canvas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Canvas.
+     */
+    distinct?: CanvasScalarFieldEnum | CanvasScalarFieldEnum[]
+  }
+
+  /**
+   * Canvas findFirstOrThrow
+   */
+  export type CanvasFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Canvas
+     */
+    select?: CanvasSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Canvas
+     */
+    omit?: CanvasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasInclude<ExtArgs> | null
+    /**
+     * Filter, which Canvas to fetch.
+     */
+    where?: CanvasWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Canvas to fetch.
+     */
+    orderBy?: CanvasOrderByWithRelationInput | CanvasOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Canvas.
+     */
+    cursor?: CanvasWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Canvas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Canvas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Canvas.
+     */
+    distinct?: CanvasScalarFieldEnum | CanvasScalarFieldEnum[]
+  }
+
+  /**
+   * Canvas findMany
+   */
+  export type CanvasFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Canvas
+     */
+    select?: CanvasSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Canvas
+     */
+    omit?: CanvasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasInclude<ExtArgs> | null
+    /**
+     * Filter, which Canvas to fetch.
+     */
+    where?: CanvasWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Canvas to fetch.
+     */
+    orderBy?: CanvasOrderByWithRelationInput | CanvasOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Canvas.
+     */
+    cursor?: CanvasWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Canvas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Canvas.
+     */
+    skip?: number
+    distinct?: CanvasScalarFieldEnum | CanvasScalarFieldEnum[]
+  }
+
+  /**
+   * Canvas create
+   */
+  export type CanvasCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Canvas
+     */
+    select?: CanvasSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Canvas
+     */
+    omit?: CanvasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Canvas.
+     */
+    data: XOR<CanvasCreateInput, CanvasUncheckedCreateInput>
+  }
+
+  /**
+   * Canvas createMany
+   */
+  export type CanvasCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Canvas.
+     */
+    data: CanvasCreateManyInput | CanvasCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Canvas createManyAndReturn
+   */
+  export type CanvasCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Canvas
+     */
+    select?: CanvasSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Canvas
+     */
+    omit?: CanvasOmit<ExtArgs> | null
+    /**
+     * The data used to create many Canvas.
+     */
+    data: CanvasCreateManyInput | CanvasCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Canvas update
+   */
+  export type CanvasUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Canvas
+     */
+    select?: CanvasSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Canvas
+     */
+    omit?: CanvasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Canvas.
+     */
+    data: XOR<CanvasUpdateInput, CanvasUncheckedUpdateInput>
+    /**
+     * Choose, which Canvas to update.
+     */
+    where: CanvasWhereUniqueInput
+  }
+
+  /**
+   * Canvas updateMany
+   */
+  export type CanvasUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Canvas.
+     */
+    data: XOR<CanvasUpdateManyMutationInput, CanvasUncheckedUpdateManyInput>
+    /**
+     * Filter which Canvas to update
+     */
+    where?: CanvasWhereInput
+    /**
+     * Limit how many Canvas to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Canvas updateManyAndReturn
+   */
+  export type CanvasUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Canvas
+     */
+    select?: CanvasSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Canvas
+     */
+    omit?: CanvasOmit<ExtArgs> | null
+    /**
+     * The data used to update Canvas.
+     */
+    data: XOR<CanvasUpdateManyMutationInput, CanvasUncheckedUpdateManyInput>
+    /**
+     * Filter which Canvas to update
+     */
+    where?: CanvasWhereInput
+    /**
+     * Limit how many Canvas to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Canvas upsert
+   */
+  export type CanvasUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Canvas
+     */
+    select?: CanvasSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Canvas
+     */
+    omit?: CanvasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Canvas to update in case it exists.
+     */
+    where: CanvasWhereUniqueInput
+    /**
+     * In case the Canvas found by the `where` argument doesn't exist, create a new Canvas with this data.
+     */
+    create: XOR<CanvasCreateInput, CanvasUncheckedCreateInput>
+    /**
+     * In case the Canvas was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CanvasUpdateInput, CanvasUncheckedUpdateInput>
+  }
+
+  /**
+   * Canvas delete
+   */
+  export type CanvasDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Canvas
+     */
+    select?: CanvasSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Canvas
+     */
+    omit?: CanvasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasInclude<ExtArgs> | null
+    /**
+     * Filter which Canvas to delete.
+     */
+    where: CanvasWhereUniqueInput
+  }
+
+  /**
+   * Canvas deleteMany
+   */
+  export type CanvasDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Canvas to delete
+     */
+    where?: CanvasWhereInput
+    /**
+     * Limit how many Canvas to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Canvas.canvasBlocks
+   */
+  export type Canvas$canvasBlocksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the CanvasBlock
      */
@@ -2081,21 +3338,21 @@ export namespace Prisma {
   }
 
   /**
-   * Project without action
+   * Canvas without action
    */
-  export type ProjectDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type CanvasDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Project
+     * Select specific fields to fetch from the Canvas
      */
-    select?: ProjectSelect<ExtArgs> | null
+    select?: CanvasSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Project
+     * Omit specific fields from the Canvas
      */
-    omit?: ProjectOmit<ExtArgs> | null
+    omit?: CanvasOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ProjectInclude<ExtArgs> | null
+    include?: CanvasInclude<ExtArgs> | null
   }
 
 
@@ -2129,7 +3386,7 @@ export namespace Prisma {
 
   export type CanvasBlockMinAggregateOutputType = {
     id: string | null
-    projectId: string | null
+    canvasId: string | null
     order: number | null
     type: string | null
     x: number | null
@@ -2144,7 +3401,7 @@ export namespace Prisma {
 
   export type CanvasBlockMaxAggregateOutputType = {
     id: string | null
-    projectId: string | null
+    canvasId: string | null
     order: number | null
     type: string | null
     x: number | null
@@ -2159,7 +3416,7 @@ export namespace Prisma {
 
   export type CanvasBlockCountAggregateOutputType = {
     id: number
-    projectId: number
+    canvasId: number
     order: number
     type: number
     x: number
@@ -2193,7 +3450,7 @@ export namespace Prisma {
 
   export type CanvasBlockMinAggregateInputType = {
     id?: true
-    projectId?: true
+    canvasId?: true
     order?: true
     type?: true
     x?: true
@@ -2208,7 +3465,7 @@ export namespace Prisma {
 
   export type CanvasBlockMaxAggregateInputType = {
     id?: true
-    projectId?: true
+    canvasId?: true
     order?: true
     type?: true
     x?: true
@@ -2223,7 +3480,7 @@ export namespace Prisma {
 
   export type CanvasBlockCountAggregateInputType = {
     id?: true
-    projectId?: true
+    canvasId?: true
     order?: true
     type?: true
     x?: true
@@ -2326,7 +3583,7 @@ export namespace Prisma {
 
   export type CanvasBlockGroupByOutputType = {
     id: string
-    projectId: string
+    canvasId: string
     order: number
     type: string
     x: number
@@ -2361,7 +3618,7 @@ export namespace Prisma {
 
   export type CanvasBlockSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    projectId?: boolean
+    canvasId?: boolean
     order?: boolean
     type?: boolean
     x?: boolean
@@ -2373,12 +3630,12 @@ export namespace Prisma {
     title?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["canvasBlock"]>
 
   export type CanvasBlockSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    projectId?: boolean
+    canvasId?: boolean
     order?: boolean
     type?: boolean
     x?: boolean
@@ -2390,12 +3647,12 @@ export namespace Prisma {
     title?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["canvasBlock"]>
 
   export type CanvasBlockSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    projectId?: boolean
+    canvasId?: boolean
     order?: boolean
     type?: boolean
     x?: boolean
@@ -2407,12 +3664,12 @@ export namespace Prisma {
     title?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["canvasBlock"]>
 
   export type CanvasBlockSelectScalar = {
     id?: boolean
-    projectId?: boolean
+    canvasId?: boolean
     order?: boolean
     type?: boolean
     x?: boolean
@@ -2426,25 +3683,25 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type CanvasBlockOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "order" | "type" | "x" | "y" | "width" | "height" | "content" | "color" | "title" | "createdAt" | "updatedAt", ExtArgs["result"]["canvasBlock"]>
+  export type CanvasBlockOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "canvasId" | "order" | "type" | "x" | "y" | "width" | "height" | "content" | "color" | "title" | "createdAt" | "updatedAt", ExtArgs["result"]["canvasBlock"]>
   export type CanvasBlockInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
   }
   export type CanvasBlockIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
   }
   export type CanvasBlockIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
   }
 
   export type $CanvasBlockPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "CanvasBlock"
     objects: {
-      project: Prisma.$ProjectPayload<ExtArgs>
+      canvas: Prisma.$CanvasPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      projectId: string
+      canvasId: string
       order: number
       type: string
       x: number
@@ -2850,7 +4107,7 @@ export namespace Prisma {
    */
   export interface Prisma__CanvasBlockClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    canvas<T extends CanvasDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CanvasDefaultArgs<ExtArgs>>): Prisma__CanvasClient<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2881,7 +4138,7 @@ export namespace Prisma {
    */
   interface CanvasBlockFieldRefs {
     readonly id: FieldRef<"CanvasBlock", 'String'>
-    readonly projectId: FieldRef<"CanvasBlock", 'String'>
+    readonly canvasId: FieldRef<"CanvasBlock", 'String'>
     readonly order: FieldRef<"CanvasBlock", 'Int'>
     readonly type: FieldRef<"CanvasBlock", 'String'>
     readonly x: FieldRef<"CanvasBlock", 'Float'>
@@ -3335,9 +4592,21 @@ export namespace Prisma {
   export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
 
 
-  export const CanvasBlockScalarFieldEnum: {
+  export const CanvasScalarFieldEnum: {
     id: 'id',
     projectId: 'projectId',
+    name: 'name',
+    order: 'order',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type CanvasScalarFieldEnum = (typeof CanvasScalarFieldEnum)[keyof typeof CanvasScalarFieldEnum]
+
+
+  export const CanvasBlockScalarFieldEnum: {
+    id: 'id',
+    canvasId: 'canvasId',
     order: 'order',
     type: 'type',
     x: 'x',
@@ -3484,7 +4753,7 @@ export namespace Prisma {
     status?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
-    canvasBlocks?: CanvasBlockListRelationFilter
+    canvases?: CanvasListRelationFilter
   }
 
   export type ProjectOrderByWithRelationInput = {
@@ -3496,7 +4765,7 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    canvasBlocks?: CanvasBlockOrderByRelationAggregateInput
+    canvases?: CanvasOrderByRelationAggregateInput
   }
 
   export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -3511,7 +4780,7 @@ export namespace Prisma {
     status?: StringFilter<"Project"> | string
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
-    canvasBlocks?: CanvasBlockListRelationFilter
+    canvases?: CanvasListRelationFilter
   }, "id">
 
   export type ProjectOrderByWithAggregationInput = {
@@ -3542,12 +4811,77 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
   }
 
+  export type CanvasWhereInput = {
+    AND?: CanvasWhereInput | CanvasWhereInput[]
+    OR?: CanvasWhereInput[]
+    NOT?: CanvasWhereInput | CanvasWhereInput[]
+    id?: StringFilter<"Canvas"> | string
+    projectId?: StringFilter<"Canvas"> | string
+    name?: StringFilter<"Canvas"> | string
+    order?: IntFilter<"Canvas"> | number
+    createdAt?: DateTimeFilter<"Canvas"> | Date | string
+    updatedAt?: DateTimeFilter<"Canvas"> | Date | string
+    project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
+    canvasBlocks?: CanvasBlockListRelationFilter
+  }
+
+  export type CanvasOrderByWithRelationInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    name?: SortOrder
+    order?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    project?: ProjectOrderByWithRelationInput
+    canvasBlocks?: CanvasBlockOrderByRelationAggregateInput
+  }
+
+  export type CanvasWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: CanvasWhereInput | CanvasWhereInput[]
+    OR?: CanvasWhereInput[]
+    NOT?: CanvasWhereInput | CanvasWhereInput[]
+    projectId?: StringFilter<"Canvas"> | string
+    name?: StringFilter<"Canvas"> | string
+    order?: IntFilter<"Canvas"> | number
+    createdAt?: DateTimeFilter<"Canvas"> | Date | string
+    updatedAt?: DateTimeFilter<"Canvas"> | Date | string
+    project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
+    canvasBlocks?: CanvasBlockListRelationFilter
+  }, "id">
+
+  export type CanvasOrderByWithAggregationInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    name?: SortOrder
+    order?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: CanvasCountOrderByAggregateInput
+    _avg?: CanvasAvgOrderByAggregateInput
+    _max?: CanvasMaxOrderByAggregateInput
+    _min?: CanvasMinOrderByAggregateInput
+    _sum?: CanvasSumOrderByAggregateInput
+  }
+
+  export type CanvasScalarWhereWithAggregatesInput = {
+    AND?: CanvasScalarWhereWithAggregatesInput | CanvasScalarWhereWithAggregatesInput[]
+    OR?: CanvasScalarWhereWithAggregatesInput[]
+    NOT?: CanvasScalarWhereWithAggregatesInput | CanvasScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Canvas"> | string
+    projectId?: StringWithAggregatesFilter<"Canvas"> | string
+    name?: StringWithAggregatesFilter<"Canvas"> | string
+    order?: IntWithAggregatesFilter<"Canvas"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"Canvas"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Canvas"> | Date | string
+  }
+
   export type CanvasBlockWhereInput = {
     AND?: CanvasBlockWhereInput | CanvasBlockWhereInput[]
     OR?: CanvasBlockWhereInput[]
     NOT?: CanvasBlockWhereInput | CanvasBlockWhereInput[]
     id?: StringFilter<"CanvasBlock"> | string
-    projectId?: StringFilter<"CanvasBlock"> | string
+    canvasId?: StringFilter<"CanvasBlock"> | string
     order?: IntFilter<"CanvasBlock"> | number
     type?: StringFilter<"CanvasBlock"> | string
     x?: FloatFilter<"CanvasBlock"> | number
@@ -3559,12 +4893,12 @@ export namespace Prisma {
     title?: StringNullableFilter<"CanvasBlock"> | string | null
     createdAt?: DateTimeFilter<"CanvasBlock"> | Date | string
     updatedAt?: DateTimeFilter<"CanvasBlock"> | Date | string
-    project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
+    canvas?: XOR<CanvasScalarRelationFilter, CanvasWhereInput>
   }
 
   export type CanvasBlockOrderByWithRelationInput = {
     id?: SortOrder
-    projectId?: SortOrder
+    canvasId?: SortOrder
     order?: SortOrder
     type?: SortOrder
     x?: SortOrder
@@ -3576,7 +4910,7 @@ export namespace Prisma {
     title?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    project?: ProjectOrderByWithRelationInput
+    canvas?: CanvasOrderByWithRelationInput
   }
 
   export type CanvasBlockWhereUniqueInput = Prisma.AtLeast<{
@@ -3584,7 +4918,7 @@ export namespace Prisma {
     AND?: CanvasBlockWhereInput | CanvasBlockWhereInput[]
     OR?: CanvasBlockWhereInput[]
     NOT?: CanvasBlockWhereInput | CanvasBlockWhereInput[]
-    projectId?: StringFilter<"CanvasBlock"> | string
+    canvasId?: StringFilter<"CanvasBlock"> | string
     order?: IntFilter<"CanvasBlock"> | number
     type?: StringFilter<"CanvasBlock"> | string
     x?: FloatFilter<"CanvasBlock"> | number
@@ -3596,12 +4930,12 @@ export namespace Prisma {
     title?: StringNullableFilter<"CanvasBlock"> | string | null
     createdAt?: DateTimeFilter<"CanvasBlock"> | Date | string
     updatedAt?: DateTimeFilter<"CanvasBlock"> | Date | string
-    project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
+    canvas?: XOR<CanvasScalarRelationFilter, CanvasWhereInput>
   }, "id">
 
   export type CanvasBlockOrderByWithAggregationInput = {
     id?: SortOrder
-    projectId?: SortOrder
+    canvasId?: SortOrder
     order?: SortOrder
     type?: SortOrder
     x?: SortOrder
@@ -3625,7 +4959,7 @@ export namespace Prisma {
     OR?: CanvasBlockScalarWhereWithAggregatesInput[]
     NOT?: CanvasBlockScalarWhereWithAggregatesInput | CanvasBlockScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"CanvasBlock"> | string
-    projectId?: StringWithAggregatesFilter<"CanvasBlock"> | string
+    canvasId?: StringWithAggregatesFilter<"CanvasBlock"> | string
     order?: IntWithAggregatesFilter<"CanvasBlock"> | number
     type?: StringWithAggregatesFilter<"CanvasBlock"> | string
     x?: FloatWithAggregatesFilter<"CanvasBlock"> | number
@@ -3648,7 +4982,7 @@ export namespace Prisma {
     status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    canvasBlocks?: CanvasBlockCreateNestedManyWithoutProjectInput
+    canvases?: CanvasCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateInput = {
@@ -3660,7 +4994,7 @@ export namespace Prisma {
     status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutProjectInput
+    canvases?: CanvasUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUpdateInput = {
@@ -3672,7 +5006,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    canvasBlocks?: CanvasBlockUpdateManyWithoutProjectNestedInput
+    canvases?: CanvasUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateInput = {
@@ -3684,7 +5018,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutProjectNestedInput
+    canvases?: CanvasUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateManyInput = {
@@ -3720,6 +5054,72 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type CanvasCreateInput = {
+    id?: string
+    name?: string
+    order?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutCanvasesInput
+    canvasBlocks?: CanvasBlockCreateNestedManyWithoutCanvasInput
+  }
+
+  export type CanvasUncheckedCreateInput = {
+    id?: string
+    projectId: string
+    name?: string
+    order?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput
+  }
+
+  export type CanvasUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutCanvasesNestedInput
+    canvasBlocks?: CanvasBlockUpdateManyWithoutCanvasNestedInput
+  }
+
+  export type CanvasUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput
+  }
+
+  export type CanvasCreateManyInput = {
+    id?: string
+    projectId: string
+    name?: string
+    order?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CanvasUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CanvasUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CanvasBlockCreateInput = {
     id?: string
     order: number
@@ -3733,12 +5133,12 @@ export namespace Prisma {
     title?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    project: ProjectCreateNestedOneWithoutCanvasBlocksInput
+    canvas: CanvasCreateNestedOneWithoutCanvasBlocksInput
   }
 
   export type CanvasBlockUncheckedCreateInput = {
     id?: string
-    projectId: string
+    canvasId: string
     order: number
     type: string
     x: number
@@ -3765,12 +5165,12 @@ export namespace Prisma {
     title?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    project?: ProjectUpdateOneRequiredWithoutCanvasBlocksNestedInput
+    canvas?: CanvasUpdateOneRequiredWithoutCanvasBlocksNestedInput
   }
 
   export type CanvasBlockUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    projectId?: StringFieldUpdateOperationsInput | string
+    canvasId?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     type?: StringFieldUpdateOperationsInput | string
     x?: FloatFieldUpdateOperationsInput | number
@@ -3786,7 +5186,7 @@ export namespace Prisma {
 
   export type CanvasBlockCreateManyInput = {
     id?: string
-    projectId: string
+    canvasId: string
     order: number
     type: string
     x: number
@@ -3817,7 +5217,7 @@ export namespace Prisma {
 
   export type CanvasBlockUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    projectId?: StringFieldUpdateOperationsInput | string
+    canvasId?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     type?: StringFieldUpdateOperationsInput | string
     x?: FloatFieldUpdateOperationsInput | number
@@ -3872,10 +5272,10 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
-  export type CanvasBlockListRelationFilter = {
-    every?: CanvasBlockWhereInput
-    some?: CanvasBlockWhereInput
-    none?: CanvasBlockWhereInput
+  export type CanvasListRelationFilter = {
+    every?: CanvasWhereInput
+    some?: CanvasWhereInput
+    none?: CanvasWhereInput
   }
 
   export type SortOrderInput = {
@@ -3883,7 +5283,7 @@ export namespace Prisma {
     nulls?: NullsOrder
   }
 
-  export type CanvasBlockOrderByRelationAggregateInput = {
+  export type CanvasOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -3981,6 +5381,72 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type ProjectScalarRelationFilter = {
+    is?: ProjectWhereInput
+    isNot?: ProjectWhereInput
+  }
+
+  export type CanvasBlockListRelationFilter = {
+    every?: CanvasBlockWhereInput
+    some?: CanvasBlockWhereInput
+    none?: CanvasBlockWhereInput
+  }
+
+  export type CanvasBlockOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CanvasCountOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    name?: SortOrder
+    order?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CanvasAvgOrderByAggregateInput = {
+    order?: SortOrder
+  }
+
+  export type CanvasMaxOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    name?: SortOrder
+    order?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CanvasMinOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    name?: SortOrder
+    order?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CanvasSumOrderByAggregateInput = {
+    order?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
   export type FloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
     in?: number[] | ListFloatFieldRefInput<$PrismaModel>
@@ -4015,14 +5481,14 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type ProjectScalarRelationFilter = {
-    is?: ProjectWhereInput
-    isNot?: ProjectWhereInput
+  export type CanvasScalarRelationFilter = {
+    is?: CanvasWhereInput
+    isNot?: CanvasWhereInput
   }
 
   export type CanvasBlockCountOrderByAggregateInput = {
     id?: SortOrder
-    projectId?: SortOrder
+    canvasId?: SortOrder
     order?: SortOrder
     type?: SortOrder
     x?: SortOrder
@@ -4046,7 +5512,7 @@ export namespace Prisma {
 
   export type CanvasBlockMaxOrderByAggregateInput = {
     id?: SortOrder
-    projectId?: SortOrder
+    canvasId?: SortOrder
     order?: SortOrder
     type?: SortOrder
     x?: SortOrder
@@ -4061,7 +5527,7 @@ export namespace Prisma {
 
   export type CanvasBlockMinOrderByAggregateInput = {
     id?: SortOrder
-    projectId?: SortOrder
+    canvasId?: SortOrder
     order?: SortOrder
     type?: SortOrder
     x?: SortOrder
@@ -4080,22 +5546,6 @@ export namespace Prisma {
     y?: SortOrder
     width?: SortOrder
     height?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -4140,18 +5590,18 @@ export namespace Prisma {
     _max?: NestedJsonFilter<$PrismaModel>
   }
 
-  export type CanvasBlockCreateNestedManyWithoutProjectInput = {
-    create?: XOR<CanvasBlockCreateWithoutProjectInput, CanvasBlockUncheckedCreateWithoutProjectInput> | CanvasBlockCreateWithoutProjectInput[] | CanvasBlockUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: CanvasBlockCreateOrConnectWithoutProjectInput | CanvasBlockCreateOrConnectWithoutProjectInput[]
-    createMany?: CanvasBlockCreateManyProjectInputEnvelope
-    connect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+  export type CanvasCreateNestedManyWithoutProjectInput = {
+    create?: XOR<CanvasCreateWithoutProjectInput, CanvasUncheckedCreateWithoutProjectInput> | CanvasCreateWithoutProjectInput[] | CanvasUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: CanvasCreateOrConnectWithoutProjectInput | CanvasCreateOrConnectWithoutProjectInput[]
+    createMany?: CanvasCreateManyProjectInputEnvelope
+    connect?: CanvasWhereUniqueInput | CanvasWhereUniqueInput[]
   }
 
-  export type CanvasBlockUncheckedCreateNestedManyWithoutProjectInput = {
-    create?: XOR<CanvasBlockCreateWithoutProjectInput, CanvasBlockUncheckedCreateWithoutProjectInput> | CanvasBlockCreateWithoutProjectInput[] | CanvasBlockUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: CanvasBlockCreateOrConnectWithoutProjectInput | CanvasBlockCreateOrConnectWithoutProjectInput[]
-    createMany?: CanvasBlockCreateManyProjectInputEnvelope
-    connect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+  export type CanvasUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<CanvasCreateWithoutProjectInput, CanvasUncheckedCreateWithoutProjectInput> | CanvasCreateWithoutProjectInput[] | CanvasUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: CanvasCreateOrConnectWithoutProjectInput | CanvasCreateOrConnectWithoutProjectInput[]
+    createMany?: CanvasCreateManyProjectInputEnvelope
+    connect?: CanvasWhereUniqueInput | CanvasWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -4166,38 +5616,52 @@ export namespace Prisma {
     set?: Date | string
   }
 
-  export type CanvasBlockUpdateManyWithoutProjectNestedInput = {
-    create?: XOR<CanvasBlockCreateWithoutProjectInput, CanvasBlockUncheckedCreateWithoutProjectInput> | CanvasBlockCreateWithoutProjectInput[] | CanvasBlockUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: CanvasBlockCreateOrConnectWithoutProjectInput | CanvasBlockCreateOrConnectWithoutProjectInput[]
-    upsert?: CanvasBlockUpsertWithWhereUniqueWithoutProjectInput | CanvasBlockUpsertWithWhereUniqueWithoutProjectInput[]
-    createMany?: CanvasBlockCreateManyProjectInputEnvelope
-    set?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
-    disconnect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
-    delete?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
-    connect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
-    update?: CanvasBlockUpdateWithWhereUniqueWithoutProjectInput | CanvasBlockUpdateWithWhereUniqueWithoutProjectInput[]
-    updateMany?: CanvasBlockUpdateManyWithWhereWithoutProjectInput | CanvasBlockUpdateManyWithWhereWithoutProjectInput[]
-    deleteMany?: CanvasBlockScalarWhereInput | CanvasBlockScalarWhereInput[]
+  export type CanvasUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<CanvasCreateWithoutProjectInput, CanvasUncheckedCreateWithoutProjectInput> | CanvasCreateWithoutProjectInput[] | CanvasUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: CanvasCreateOrConnectWithoutProjectInput | CanvasCreateOrConnectWithoutProjectInput[]
+    upsert?: CanvasUpsertWithWhereUniqueWithoutProjectInput | CanvasUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: CanvasCreateManyProjectInputEnvelope
+    set?: CanvasWhereUniqueInput | CanvasWhereUniqueInput[]
+    disconnect?: CanvasWhereUniqueInput | CanvasWhereUniqueInput[]
+    delete?: CanvasWhereUniqueInput | CanvasWhereUniqueInput[]
+    connect?: CanvasWhereUniqueInput | CanvasWhereUniqueInput[]
+    update?: CanvasUpdateWithWhereUniqueWithoutProjectInput | CanvasUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: CanvasUpdateManyWithWhereWithoutProjectInput | CanvasUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: CanvasScalarWhereInput | CanvasScalarWhereInput[]
   }
 
-  export type CanvasBlockUncheckedUpdateManyWithoutProjectNestedInput = {
-    create?: XOR<CanvasBlockCreateWithoutProjectInput, CanvasBlockUncheckedCreateWithoutProjectInput> | CanvasBlockCreateWithoutProjectInput[] | CanvasBlockUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: CanvasBlockCreateOrConnectWithoutProjectInput | CanvasBlockCreateOrConnectWithoutProjectInput[]
-    upsert?: CanvasBlockUpsertWithWhereUniqueWithoutProjectInput | CanvasBlockUpsertWithWhereUniqueWithoutProjectInput[]
-    createMany?: CanvasBlockCreateManyProjectInputEnvelope
-    set?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
-    disconnect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
-    delete?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
-    connect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
-    update?: CanvasBlockUpdateWithWhereUniqueWithoutProjectInput | CanvasBlockUpdateWithWhereUniqueWithoutProjectInput[]
-    updateMany?: CanvasBlockUpdateManyWithWhereWithoutProjectInput | CanvasBlockUpdateManyWithWhereWithoutProjectInput[]
-    deleteMany?: CanvasBlockScalarWhereInput | CanvasBlockScalarWhereInput[]
+  export type CanvasUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<CanvasCreateWithoutProjectInput, CanvasUncheckedCreateWithoutProjectInput> | CanvasCreateWithoutProjectInput[] | CanvasUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: CanvasCreateOrConnectWithoutProjectInput | CanvasCreateOrConnectWithoutProjectInput[]
+    upsert?: CanvasUpsertWithWhereUniqueWithoutProjectInput | CanvasUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: CanvasCreateManyProjectInputEnvelope
+    set?: CanvasWhereUniqueInput | CanvasWhereUniqueInput[]
+    disconnect?: CanvasWhereUniqueInput | CanvasWhereUniqueInput[]
+    delete?: CanvasWhereUniqueInput | CanvasWhereUniqueInput[]
+    connect?: CanvasWhereUniqueInput | CanvasWhereUniqueInput[]
+    update?: CanvasUpdateWithWhereUniqueWithoutProjectInput | CanvasUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: CanvasUpdateManyWithWhereWithoutProjectInput | CanvasUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: CanvasScalarWhereInput | CanvasScalarWhereInput[]
   }
 
-  export type ProjectCreateNestedOneWithoutCanvasBlocksInput = {
-    create?: XOR<ProjectCreateWithoutCanvasBlocksInput, ProjectUncheckedCreateWithoutCanvasBlocksInput>
-    connectOrCreate?: ProjectCreateOrConnectWithoutCanvasBlocksInput
+  export type ProjectCreateNestedOneWithoutCanvasesInput = {
+    create?: XOR<ProjectCreateWithoutCanvasesInput, ProjectUncheckedCreateWithoutCanvasesInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutCanvasesInput
     connect?: ProjectWhereUniqueInput
+  }
+
+  export type CanvasBlockCreateNestedManyWithoutCanvasInput = {
+    create?: XOR<CanvasBlockCreateWithoutCanvasInput, CanvasBlockUncheckedCreateWithoutCanvasInput> | CanvasBlockCreateWithoutCanvasInput[] | CanvasBlockUncheckedCreateWithoutCanvasInput[]
+    connectOrCreate?: CanvasBlockCreateOrConnectWithoutCanvasInput | CanvasBlockCreateOrConnectWithoutCanvasInput[]
+    createMany?: CanvasBlockCreateManyCanvasInputEnvelope
+    connect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+  }
+
+  export type CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput = {
+    create?: XOR<CanvasBlockCreateWithoutCanvasInput, CanvasBlockUncheckedCreateWithoutCanvasInput> | CanvasBlockCreateWithoutCanvasInput[] | CanvasBlockUncheckedCreateWithoutCanvasInput[]
+    connectOrCreate?: CanvasBlockCreateOrConnectWithoutCanvasInput | CanvasBlockCreateOrConnectWithoutCanvasInput[]
+    createMany?: CanvasBlockCreateManyCanvasInputEnvelope
+    connect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -4208,6 +5672,48 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type ProjectUpdateOneRequiredWithoutCanvasesNestedInput = {
+    create?: XOR<ProjectCreateWithoutCanvasesInput, ProjectUncheckedCreateWithoutCanvasesInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutCanvasesInput
+    upsert?: ProjectUpsertWithoutCanvasesInput
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutCanvasesInput, ProjectUpdateWithoutCanvasesInput>, ProjectUncheckedUpdateWithoutCanvasesInput>
+  }
+
+  export type CanvasBlockUpdateManyWithoutCanvasNestedInput = {
+    create?: XOR<CanvasBlockCreateWithoutCanvasInput, CanvasBlockUncheckedCreateWithoutCanvasInput> | CanvasBlockCreateWithoutCanvasInput[] | CanvasBlockUncheckedCreateWithoutCanvasInput[]
+    connectOrCreate?: CanvasBlockCreateOrConnectWithoutCanvasInput | CanvasBlockCreateOrConnectWithoutCanvasInput[]
+    upsert?: CanvasBlockUpsertWithWhereUniqueWithoutCanvasInput | CanvasBlockUpsertWithWhereUniqueWithoutCanvasInput[]
+    createMany?: CanvasBlockCreateManyCanvasInputEnvelope
+    set?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+    disconnect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+    delete?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+    connect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+    update?: CanvasBlockUpdateWithWhereUniqueWithoutCanvasInput | CanvasBlockUpdateWithWhereUniqueWithoutCanvasInput[]
+    updateMany?: CanvasBlockUpdateManyWithWhereWithoutCanvasInput | CanvasBlockUpdateManyWithWhereWithoutCanvasInput[]
+    deleteMany?: CanvasBlockScalarWhereInput | CanvasBlockScalarWhereInput[]
+  }
+
+  export type CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput = {
+    create?: XOR<CanvasBlockCreateWithoutCanvasInput, CanvasBlockUncheckedCreateWithoutCanvasInput> | CanvasBlockCreateWithoutCanvasInput[] | CanvasBlockUncheckedCreateWithoutCanvasInput[]
+    connectOrCreate?: CanvasBlockCreateOrConnectWithoutCanvasInput | CanvasBlockCreateOrConnectWithoutCanvasInput[]
+    upsert?: CanvasBlockUpsertWithWhereUniqueWithoutCanvasInput | CanvasBlockUpsertWithWhereUniqueWithoutCanvasInput[]
+    createMany?: CanvasBlockCreateManyCanvasInputEnvelope
+    set?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+    disconnect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+    delete?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+    connect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+    update?: CanvasBlockUpdateWithWhereUniqueWithoutCanvasInput | CanvasBlockUpdateWithWhereUniqueWithoutCanvasInput[]
+    updateMany?: CanvasBlockUpdateManyWithWhereWithoutCanvasInput | CanvasBlockUpdateManyWithWhereWithoutCanvasInput[]
+    deleteMany?: CanvasBlockScalarWhereInput | CanvasBlockScalarWhereInput[]
+  }
+
+  export type CanvasCreateNestedOneWithoutCanvasBlocksInput = {
+    create?: XOR<CanvasCreateWithoutCanvasBlocksInput, CanvasUncheckedCreateWithoutCanvasBlocksInput>
+    connectOrCreate?: CanvasCreateOrConnectWithoutCanvasBlocksInput
+    connect?: CanvasWhereUniqueInput
+  }
+
   export type FloatFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -4216,12 +5722,12 @@ export namespace Prisma {
     divide?: number
   }
 
-  export type ProjectUpdateOneRequiredWithoutCanvasBlocksNestedInput = {
-    create?: XOR<ProjectCreateWithoutCanvasBlocksInput, ProjectUncheckedCreateWithoutCanvasBlocksInput>
-    connectOrCreate?: ProjectCreateOrConnectWithoutCanvasBlocksInput
-    upsert?: ProjectUpsertWithoutCanvasBlocksInput
-    connect?: ProjectWhereUniqueInput
-    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutCanvasBlocksInput, ProjectUpdateWithoutCanvasBlocksInput>, ProjectUncheckedUpdateWithoutCanvasBlocksInput>
+  export type CanvasUpdateOneRequiredWithoutCanvasBlocksNestedInput = {
+    create?: XOR<CanvasCreateWithoutCanvasBlocksInput, CanvasUncheckedCreateWithoutCanvasBlocksInput>
+    connectOrCreate?: CanvasCreateOrConnectWithoutCanvasBlocksInput
+    upsert?: CanvasUpsertWithoutCanvasBlocksInput
+    connect?: CanvasWhereUniqueInput
+    update?: XOR<XOR<CanvasUpdateToOneWithWhereWithoutCanvasBlocksInput, CanvasUpdateWithoutCanvasBlocksInput>, CanvasUncheckedUpdateWithoutCanvasBlocksInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -4333,17 +5839,6 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -4358,6 +5853,17 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -4399,60 +5905,176 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type CanvasBlockCreateWithoutProjectInput = {
+  export type CanvasCreateWithoutProjectInput = {
     id?: string
-    order: number
-    type: string
-    x: number
-    y: number
-    width: number
-    height: number
-    content: JsonNullValueInput | InputJsonValue
-    color?: string | null
-    title?: string | null
+    name?: string
+    order?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    canvasBlocks?: CanvasBlockCreateNestedManyWithoutCanvasInput
   }
 
-  export type CanvasBlockUncheckedCreateWithoutProjectInput = {
+  export type CanvasUncheckedCreateWithoutProjectInput = {
     id?: string
-    order: number
-    type: string
-    x: number
-    y: number
-    width: number
-    height: number
-    content: JsonNullValueInput | InputJsonValue
-    color?: string | null
-    title?: string | null
+    name?: string
+    order?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput
   }
 
-  export type CanvasBlockCreateOrConnectWithoutProjectInput = {
-    where: CanvasBlockWhereUniqueInput
-    create: XOR<CanvasBlockCreateWithoutProjectInput, CanvasBlockUncheckedCreateWithoutProjectInput>
+  export type CanvasCreateOrConnectWithoutProjectInput = {
+    where: CanvasWhereUniqueInput
+    create: XOR<CanvasCreateWithoutProjectInput, CanvasUncheckedCreateWithoutProjectInput>
   }
 
-  export type CanvasBlockCreateManyProjectInputEnvelope = {
-    data: CanvasBlockCreateManyProjectInput | CanvasBlockCreateManyProjectInput[]
+  export type CanvasCreateManyProjectInputEnvelope = {
+    data: CanvasCreateManyProjectInput | CanvasCreateManyProjectInput[]
     skipDuplicates?: boolean
   }
 
-  export type CanvasBlockUpsertWithWhereUniqueWithoutProjectInput = {
-    where: CanvasBlockWhereUniqueInput
-    update: XOR<CanvasBlockUpdateWithoutProjectInput, CanvasBlockUncheckedUpdateWithoutProjectInput>
-    create: XOR<CanvasBlockCreateWithoutProjectInput, CanvasBlockUncheckedCreateWithoutProjectInput>
+  export type CanvasUpsertWithWhereUniqueWithoutProjectInput = {
+    where: CanvasWhereUniqueInput
+    update: XOR<CanvasUpdateWithoutProjectInput, CanvasUncheckedUpdateWithoutProjectInput>
+    create: XOR<CanvasCreateWithoutProjectInput, CanvasUncheckedCreateWithoutProjectInput>
   }
 
-  export type CanvasBlockUpdateWithWhereUniqueWithoutProjectInput = {
-    where: CanvasBlockWhereUniqueInput
-    data: XOR<CanvasBlockUpdateWithoutProjectInput, CanvasBlockUncheckedUpdateWithoutProjectInput>
+  export type CanvasUpdateWithWhereUniqueWithoutProjectInput = {
+    where: CanvasWhereUniqueInput
+    data: XOR<CanvasUpdateWithoutProjectInput, CanvasUncheckedUpdateWithoutProjectInput>
   }
 
-  export type CanvasBlockUpdateManyWithWhereWithoutProjectInput = {
+  export type CanvasUpdateManyWithWhereWithoutProjectInput = {
+    where: CanvasScalarWhereInput
+    data: XOR<CanvasUpdateManyMutationInput, CanvasUncheckedUpdateManyWithoutProjectInput>
+  }
+
+  export type CanvasScalarWhereInput = {
+    AND?: CanvasScalarWhereInput | CanvasScalarWhereInput[]
+    OR?: CanvasScalarWhereInput[]
+    NOT?: CanvasScalarWhereInput | CanvasScalarWhereInput[]
+    id?: StringFilter<"Canvas"> | string
+    projectId?: StringFilter<"Canvas"> | string
+    name?: StringFilter<"Canvas"> | string
+    order?: IntFilter<"Canvas"> | number
+    createdAt?: DateTimeFilter<"Canvas"> | Date | string
+    updatedAt?: DateTimeFilter<"Canvas"> | Date | string
+  }
+
+  export type ProjectCreateWithoutCanvasesInput = {
+    id?: string
+    userId: string
+    name: string
+    description?: string | null
+    icon?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProjectUncheckedCreateWithoutCanvasesInput = {
+    id?: string
+    userId: string
+    name: string
+    description?: string | null
+    icon?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProjectCreateOrConnectWithoutCanvasesInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutCanvasesInput, ProjectUncheckedCreateWithoutCanvasesInput>
+  }
+
+  export type CanvasBlockCreateWithoutCanvasInput = {
+    id?: string
+    order: number
+    type: string
+    x: number
+    y: number
+    width: number
+    height: number
+    content: JsonNullValueInput | InputJsonValue
+    color?: string | null
+    title?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CanvasBlockUncheckedCreateWithoutCanvasInput = {
+    id?: string
+    order: number
+    type: string
+    x: number
+    y: number
+    width: number
+    height: number
+    content: JsonNullValueInput | InputJsonValue
+    color?: string | null
+    title?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CanvasBlockCreateOrConnectWithoutCanvasInput = {
+    where: CanvasBlockWhereUniqueInput
+    create: XOR<CanvasBlockCreateWithoutCanvasInput, CanvasBlockUncheckedCreateWithoutCanvasInput>
+  }
+
+  export type CanvasBlockCreateManyCanvasInputEnvelope = {
+    data: CanvasBlockCreateManyCanvasInput | CanvasBlockCreateManyCanvasInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ProjectUpsertWithoutCanvasesInput = {
+    update: XOR<ProjectUpdateWithoutCanvasesInput, ProjectUncheckedUpdateWithoutCanvasesInput>
+    create: XOR<ProjectCreateWithoutCanvasesInput, ProjectUncheckedCreateWithoutCanvasesInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutCanvasesInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutCanvasesInput, ProjectUncheckedUpdateWithoutCanvasesInput>
+  }
+
+  export type ProjectUpdateWithoutCanvasesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectUncheckedUpdateWithoutCanvasesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CanvasBlockUpsertWithWhereUniqueWithoutCanvasInput = {
+    where: CanvasBlockWhereUniqueInput
+    update: XOR<CanvasBlockUpdateWithoutCanvasInput, CanvasBlockUncheckedUpdateWithoutCanvasInput>
+    create: XOR<CanvasBlockCreateWithoutCanvasInput, CanvasBlockUncheckedCreateWithoutCanvasInput>
+  }
+
+  export type CanvasBlockUpdateWithWhereUniqueWithoutCanvasInput = {
+    where: CanvasBlockWhereUniqueInput
+    data: XOR<CanvasBlockUpdateWithoutCanvasInput, CanvasBlockUncheckedUpdateWithoutCanvasInput>
+  }
+
+  export type CanvasBlockUpdateManyWithWhereWithoutCanvasInput = {
     where: CanvasBlockScalarWhereInput
-    data: XOR<CanvasBlockUpdateManyMutationInput, CanvasBlockUncheckedUpdateManyWithoutProjectInput>
+    data: XOR<CanvasBlockUpdateManyMutationInput, CanvasBlockUncheckedUpdateManyWithoutCanvasInput>
   }
 
   export type CanvasBlockScalarWhereInput = {
@@ -4460,7 +6082,7 @@ export namespace Prisma {
     OR?: CanvasBlockScalarWhereInput[]
     NOT?: CanvasBlockScalarWhereInput | CanvasBlockScalarWhereInput[]
     id?: StringFilter<"CanvasBlock"> | string
-    projectId?: StringFilter<"CanvasBlock"> | string
+    canvasId?: StringFilter<"CanvasBlock"> | string
     order?: IntFilter<"CanvasBlock"> | number
     type?: StringFilter<"CanvasBlock"> | string
     x?: FloatFilter<"CanvasBlock"> | number
@@ -4474,67 +6096,93 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"CanvasBlock"> | Date | string
   }
 
-  export type ProjectCreateWithoutCanvasBlocksInput = {
+  export type CanvasCreateWithoutCanvasBlocksInput = {
     id?: string
-    userId: string
-    name: string
-    description?: string | null
-    icon?: string | null
-    status?: string
+    name?: string
+    order?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutCanvasesInput
+  }
+
+  export type CanvasUncheckedCreateWithoutCanvasBlocksInput = {
+    id?: string
+    projectId: string
+    name?: string
+    order?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
-  export type ProjectUncheckedCreateWithoutCanvasBlocksInput = {
+  export type CanvasCreateOrConnectWithoutCanvasBlocksInput = {
+    where: CanvasWhereUniqueInput
+    create: XOR<CanvasCreateWithoutCanvasBlocksInput, CanvasUncheckedCreateWithoutCanvasBlocksInput>
+  }
+
+  export type CanvasUpsertWithoutCanvasBlocksInput = {
+    update: XOR<CanvasUpdateWithoutCanvasBlocksInput, CanvasUncheckedUpdateWithoutCanvasBlocksInput>
+    create: XOR<CanvasCreateWithoutCanvasBlocksInput, CanvasUncheckedCreateWithoutCanvasBlocksInput>
+    where?: CanvasWhereInput
+  }
+
+  export type CanvasUpdateToOneWithWhereWithoutCanvasBlocksInput = {
+    where?: CanvasWhereInput
+    data: XOR<CanvasUpdateWithoutCanvasBlocksInput, CanvasUncheckedUpdateWithoutCanvasBlocksInput>
+  }
+
+  export type CanvasUpdateWithoutCanvasBlocksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutCanvasesNestedInput
+  }
+
+  export type CanvasUncheckedUpdateWithoutCanvasBlocksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CanvasCreateManyProjectInput = {
     id?: string
-    userId: string
-    name: string
-    description?: string | null
-    icon?: string | null
-    status?: string
+    name?: string
+    order?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
-  export type ProjectCreateOrConnectWithoutCanvasBlocksInput = {
-    where: ProjectWhereUniqueInput
-    create: XOR<ProjectCreateWithoutCanvasBlocksInput, ProjectUncheckedCreateWithoutCanvasBlocksInput>
-  }
-
-  export type ProjectUpsertWithoutCanvasBlocksInput = {
-    update: XOR<ProjectUpdateWithoutCanvasBlocksInput, ProjectUncheckedUpdateWithoutCanvasBlocksInput>
-    create: XOR<ProjectCreateWithoutCanvasBlocksInput, ProjectUncheckedCreateWithoutCanvasBlocksInput>
-    where?: ProjectWhereInput
-  }
-
-  export type ProjectUpdateToOneWithWhereWithoutCanvasBlocksInput = {
-    where?: ProjectWhereInput
-    data: XOR<ProjectUpdateWithoutCanvasBlocksInput, ProjectUncheckedUpdateWithoutCanvasBlocksInput>
-  }
-
-  export type ProjectUpdateWithoutCanvasBlocksInput = {
+  export type CanvasUpdateWithoutProjectInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    icon?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    canvasBlocks?: CanvasBlockUpdateManyWithoutCanvasNestedInput
+  }
+
+  export type CanvasUncheckedUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput
+  }
+
+  export type CanvasUncheckedUpdateManyWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type ProjectUncheckedUpdateWithoutCanvasBlocksInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    icon?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type CanvasBlockCreateManyProjectInput = {
+  export type CanvasBlockCreateManyCanvasInput = {
     id?: string
     order: number
     type: string
@@ -4549,7 +6197,7 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type CanvasBlockUpdateWithoutProjectInput = {
+  export type CanvasBlockUpdateWithoutCanvasInput = {
     id?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     type?: StringFieldUpdateOperationsInput | string
@@ -4564,7 +6212,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type CanvasBlockUncheckedUpdateWithoutProjectInput = {
+  export type CanvasBlockUncheckedUpdateWithoutCanvasInput = {
     id?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     type?: StringFieldUpdateOperationsInput | string
@@ -4579,7 +6227,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type CanvasBlockUncheckedUpdateManyWithoutProjectInput = {
+  export type CanvasBlockUncheckedUpdateManyWithoutCanvasInput = {
     id?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     type?: StringFieldUpdateOperationsInput | string

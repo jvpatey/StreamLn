@@ -47,7 +47,17 @@ describe("GET /api/projects", () => {
         status: "active",
         createdAt: new Date(),
         updatedAt: new Date(),
-        _count: { canvasBlocks: 5 },
+        canvases: [
+          {
+            id: "canvas-1",
+            projectId: "proj-1",
+            name: "Main",
+            order: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            _count: { canvasBlocks: 5 },
+          },
+        ],
       },
     ] as any);
 
@@ -58,10 +68,15 @@ describe("GET /api/projects", () => {
     const json = await res.json();
     expect(json).toHaveLength(1);
     expect(json[0].blocks).toBe(5);
+    expect(json[0].canvasCount).toBe(1);
     expect(json[0].name).toBe("Test");
     expect(prisma.project.findMany).toHaveBeenCalledWith({
       where: { userId: "user-123" },
-      include: { _count: { select: { canvasBlocks: true } } },
+      include: {
+        canvases: {
+          include: { _count: { select: { canvasBlocks: true } } },
+        },
+      },
     });
   });
 });
@@ -100,7 +115,7 @@ describe("POST /api/projects", () => {
     expect(prisma.project.create).not.toHaveBeenCalled();
   });
 
-  it("creates project with valid input", async () => {
+  it("creates project with valid input and default canvas", async () => {
     vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
     vi.mocked(prisma.project.create).mockResolvedValue({
       id: "proj-new",
@@ -111,6 +126,16 @@ describe("POST /api/projects", () => {
       status: "active",
       createdAt: new Date(),
       updatedAt: new Date(),
+      canvases: [
+        {
+          id: "canvas-new",
+          projectId: "proj-new",
+          name: "Main",
+          order: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
     } as any);
 
     const req = new NextRequest("http://localhost/api/projects", {
@@ -132,7 +157,49 @@ describe("POST /api/projects", () => {
         name: "New Project",
         description: "Desc",
         icon: "Folder",
+        canvases: {
+          create: { name: "Main", order: 0 },
+        },
       },
+      include: { canvases: true },
     });
+  });
+
+  it("creates project with custom canvas name", async () => {
+    vi.mocked(auth).mockResolvedValue({ userId: "user-123" } as any);
+    vi.mocked(prisma.project.create).mockResolvedValue({
+      id: "proj-new",
+      userId: "user-123",
+      name: "New Project",
+      description: null,
+      icon: null,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      canvases: [
+        {
+          id: "canvas-new",
+          projectId: "proj-new",
+          name: "Overview",
+          order: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    } as any);
+
+    const req = new NextRequest("http://localhost/api/projects", {
+      method: "POST",
+      body: JSON.stringify({
+        name: "New Project",
+        canvasName: "Overview",
+      }),
+    });
+    const res = await POST(req);
+
+    expect(res.status).toBe(200);
+    const createCall = vi.mocked(prisma.project.create).mock.calls[0][0];
+    expect(createCall.data.canvases.create.name).toBe("Overview");
+    expect(createCall.data.name).toBe("New Project");
   });
 });

@@ -131,9 +131,18 @@ exports.Prisma.ProjectScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.CanvasBlockScalarFieldEnum = {
+exports.Prisma.CanvasScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
+  name: 'name',
+  order: 'order',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CanvasBlockScalarFieldEnum = {
+  id: 'id',
+  canvasId: 'canvasId',
   order: 'order',
   type: 'type',
   x: 'x',
@@ -175,6 +184,7 @@ exports.Prisma.JsonNullValueFilter = {
 
 exports.Prisma.ModelName = {
   Project: 'Project',
+  Canvas: 'Canvas',
   CanvasBlock: 'CanvasBlock'
 };
 

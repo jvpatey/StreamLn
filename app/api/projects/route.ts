@@ -15,14 +15,23 @@ export async function GET(req: NextRequest) {
     const projects = await prisma.project.findMany({
       where: { userId },
       include: {
-        _count: { select: { canvasBlocks: true } },
+        canvases: {
+          include: {
+            _count: { select: { canvasBlocks: true } },
+          },
+        },
       },
     });
 
-    const projectsWithBlocks = projects.map(({ _count, ...project }) => ({
-      ...project,
-      blocks: _count.canvasBlocks,
-    }));
+    const projectsWithBlocks = projects.map((project) => {
+      const blocks = project.canvases.reduce(
+        (sum, c) => sum + c._count.canvasBlocks,
+        0
+      );
+      const canvasCount = project.canvases.length;
+      const { canvases, ...rest } = project;
+      return { ...rest, blocks, canvasCount };
+    });
 
     return NextResponse.json(projectsWithBlocks);
   } catch (error) {
@@ -45,7 +54,7 @@ export async function POST(req: NextRequest) {
       return apiError(400, { message: "Validation failed", details: message });
     }
 
-    const { name, description, icon } = parsed.data;
+    const { name, description, icon, canvasName } = parsed.data;
 
     const project = await prisma.project.create({
       data: {
@@ -53,10 +62,20 @@ export async function POST(req: NextRequest) {
         name,
         description,
         icon,
+        canvases: {
+          create: {
+            name: (canvasName?.trim() || "Main"),
+            order: 0,
+          },
+        },
+      },
+      include: {
+        canvases: true,
       },
     });
 
-    return NextResponse.json(project);
+    const { canvases, ...projectData } = project;
+    return NextResponse.json(projectData);
   } catch (error) {
     return handleUnexpectedError(error, "POST /api/projects");
   }

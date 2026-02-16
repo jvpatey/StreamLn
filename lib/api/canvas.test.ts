@@ -29,9 +29,12 @@ describe("fetchCanvasBlocks", () => {
       })
     );
 
-    const blocks = await fetchCanvasBlocks("project-123");
+    const blocks = await fetchCanvasBlocks("project-123", "canvas-456");
 
     expect(blocks).toHaveLength(1);
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/projects/project-123/canvases/canvas-456"
+    );
     expect(blocks[0].id).toBe("note-1");
     expect(blocks[0].type).toBe("note");
     expect(blocks[0].createdAt).toBeInstanceOf(Date);
@@ -45,7 +48,7 @@ describe("fetchCanvasBlocks", () => {
       vi.fn().mockResolvedValue({ ok: false })
     );
 
-    await expect(fetchCanvasBlocks("project-123")).rejects.toThrow(
+    await expect(fetchCanvasBlocks("project-123", "canvas-456")).rejects.toThrow(
       "Failed to fetch canvas blocks"
     );
   });
@@ -59,7 +62,7 @@ describe("fetchCanvasBlocks", () => {
       })
     );
 
-    const blocks = await fetchCanvasBlocks("project-123");
+    const blocks = await fetchCanvasBlocks("project-123", "canvas-456");
     expect(blocks).toEqual([]);
   });
 });
@@ -91,14 +94,18 @@ describe("saveCanvasBlocks", () => {
       },
     ];
 
-    const result = await saveCanvasBlocks("project-123", blocks);
+    const result = await saveCanvasBlocks(
+      "project-123",
+      "canvas-456",
+      blocks
+    );
 
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.updatedAt).toBe("2024-01-15T10:00:00.000Z");
     }
     expect(mockFetch).toHaveBeenCalledWith(
-      "/api/projects/project-123/canvas",
+      "/api/projects/project-123/canvases/canvas-456",
       expect.objectContaining({
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -113,7 +120,7 @@ describe("saveCanvasBlocks", () => {
       vi.fn().mockResolvedValue({ ok: false, status: 409 })
     );
 
-    const result = await saveCanvasBlocks("project-123", []);
+    const result = await saveCanvasBlocks("project-123", "canvas-456", []);
 
     expect(result.ok).toBe(false);
     expect(result.conflict).toBe(true);
@@ -125,7 +132,7 @@ describe("saveCanvasBlocks", () => {
       vi.fn().mockResolvedValue({ ok: false, status: 500 })
     );
 
-    const result = await saveCanvasBlocks("project-123", []);
+    const result = await saveCanvasBlocks("project-123", "canvas-456", []);
 
     expect(result.ok).toBe(false);
     expect(result.conflict).toBe(false);
