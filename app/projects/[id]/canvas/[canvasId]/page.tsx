@@ -155,16 +155,14 @@ export default function ProjectCanvasPage() {
       skipNextSaveRef.current = true;
 
       try {
-        const [projectRes, canvasesRes] = await Promise.all([
+        const [projectRes, canvasesList] = await Promise.all([
           fetch(`/api/projects/${projectId}`),
-          fetch(`/api/projects/${projectId}/canvases`),
+          fetchCanvases(projectId),
         ]);
         if (!projectRes.ok) throw new Error("Project not found");
         const projectData = await projectRes.json();
         setProject(projectData);
 
-        const canvasesData = await canvasesRes.json();
-        const canvasesList = canvasesData.canvases ?? [];
         setCanvases(canvasesList);
 
         const currentCanvas = canvasesList.find((c: Canvas) => c.id === canvasId);
@@ -548,17 +546,16 @@ export default function ProjectCanvasPage() {
   const handleReloadFromConflict = useCallback(async () => {
     if (!projectId || typeof projectId !== "string" || !canvasId || typeof canvasId !== "string") return;
     try {
-      const [projectRes, canvasesRes, blocks] = await Promise.all([
+      const [projectRes, canvasesList, blocks] = await Promise.all([
         fetch(`/api/projects/${projectId}`),
-        fetch(`/api/projects/${projectId}/canvases`),
+        fetchCanvases(projectId),
         fetchCanvasBlocks(projectId, canvasId),
       ]);
       if (!projectRes.ok) throw new Error("Failed to reload");
       const projectData = await projectRes.json();
       setProject(projectData);
-      const canvasesData = await canvasesRes.json();
-      setCanvases(canvasesData.canvases ?? []);
-      const currentCanvas = (canvasesData.canvases ?? []).find(
+      setCanvases(canvasesList);
+      const currentCanvas = canvasesList.find(
         (c: Canvas) => c.id === canvasId
       );
       if (currentCanvas) {
