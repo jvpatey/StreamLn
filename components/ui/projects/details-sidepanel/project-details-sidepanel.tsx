@@ -110,12 +110,12 @@ export function ProjectDetailsSidepanel({
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent
           side="right"
-          className="w-full sm:max-w-lg overflow-y-auto 
+          className="w-full sm:max-w-lg flex flex-col overflow-hidden
             backdrop-blur-2xl bg-white/40 dark:bg-slate-900/30 
             border border-white/30 dark:border-white/20
-            rounded-[24px] !top-2 !bottom-2 !right-2 !h-[calc(100vh-1rem)] max-h-[calc(100vh-1rem)]"
+            rounded-[24px] !top-16 !bottom-8 !right-4 !h-[calc(100vh-6rem)]"
         >
-          <SheetHeader className="space-y-2 pb-4 border-b border-white/20 dark:border-slate-700/20">
+          <SheetHeader className="shrink-0 space-y-2 pb-4 border-b border-white/20 dark:border-slate-700/20">
             <ProjectHeader
               project={project}
               isEditMode={isEditMode}
@@ -138,17 +138,17 @@ export function ProjectDetailsSidepanel({
             )}
           </SheetHeader>
 
-          <div className="space-y-3 py-3">
+          <div className="flex-1 min-h-0 overflow-y-auto space-y-3 py-3">
             <ProjectStats project={project} />
-            <ProjectDetails project={project} />
             <CanvasesList
               project={project}
               onOpenCanvas={(p, canvasId) => onOpenCanvas?.(p, canvasId)}
             />
+            <ProjectDetails project={project} />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col space-y-2 pt-4 border-t border-white/20 dark:border-slate-700/20">
+          <div className="shrink-0 flex flex-col space-y-2 pt-4 border-t border-white/20 dark:border-slate-700/20">
             <ActionButtons
               isEditMode={isEditMode}
               project={project}
