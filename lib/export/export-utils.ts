@@ -12,6 +12,8 @@ export interface ExportProject {
   description?: string;
   icon?: string;
   status: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ExportCanvas {

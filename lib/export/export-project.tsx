@@ -29,6 +29,8 @@ export function exportProjectAsJSON(data: ExportProjectData): void {
       description: data.project.description,
       icon: data.project.icon,
       status: data.project.status,
+      createdAt: data.project.createdAt,
+      updatedAt: data.project.updatedAt,
     },
     canvases: data.canvases.map((c) => ({
       id: c.id,
@@ -112,6 +114,8 @@ export async function exportProjectAsZip(data: ExportProjectData): Promise<void>
       description: data.project.description,
       icon: data.project.icon,
       status: data.project.status,
+      createdAt: data.project.createdAt,
+      updatedAt: data.project.updatedAt,
     },
     canvases: data.canvases.map((c) => ({
       id: c.id,
@@ -159,6 +163,8 @@ export async function exportProjectAsZip(data: ExportProjectData): Promise<void>
         description: data.project.description,
         icon: data.project.icon,
         status: data.project.status,
+        createdAt: data.project.createdAt,
+        updatedAt: data.project.updatedAt,
       },
       canvas: {
         id: canvas.id,
