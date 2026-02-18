@@ -47,9 +47,9 @@ export function exportProjectAsJSON(data: ExportProjectData): void {
 }
 
 /**
- * Export entire project as a single combined Markdown file
+ * Get project as combined Markdown string (for download or clipboard)
  */
-export function exportProjectAsMarkdown(data: ExportProjectData): void {
+export function getProjectMarkdown(data: ExportProjectData): string {
   const sections: string[] = [];
   const header = `# ${data.project.name}\n\n*Exported project • ${new Date().toISOString().slice(0, 10)}*\n\n---\n\n`;
   sections.push(header);
@@ -68,9 +68,26 @@ export function exportProjectAsMarkdown(data: ExportProjectData): void {
     }
   }
 
-  const md = sections.join("");
+  return sections.join("");
+}
+
+/**
+ * Export entire project as a single combined Markdown file
+ */
+export function exportProjectAsMarkdown(data: ExportProjectData): void {
+  const md = getProjectMarkdown(data);
   const base = sanitizeFilename(data.project.name);
   downloadFile(md, `${base}-project.md`, "text/markdown");
+}
+
+/**
+ * Copy project Markdown to clipboard
+ */
+export async function copyProjectMarkdownToClipboard(
+  data: ExportProjectData,
+): Promise<void> {
+  const md = getProjectMarkdown(data);
+  await navigator.clipboard.writeText(md);
 }
 
 /**

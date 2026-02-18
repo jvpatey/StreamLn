@@ -33,6 +33,7 @@ export {
   exportProjectAsJSON,
   exportProjectAsMarkdown,
   exportProjectAsZip,
+  copyProjectMarkdownToClipboard,
   captureElementAsPng,
   buildProjectPDF,
   buildProjectPNGZip,

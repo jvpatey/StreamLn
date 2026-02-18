@@ -1,4 +1,4 @@
-import { FileJson, FileText, FileArchive, Image } from "lucide-react";
+import { FileJson, FileText, FileArchive, Image, Copy } from "lucide-react";
 
 export const PROJECT_EXPORT_FORMATS = [
   {
@@ -12,6 +12,12 @@ export const PROJECT_EXPORT_FORMATS = [
     label: "Markdown",
     description: "Combined document, all canvases in one file",
     icon: FileText,
+  },
+  {
+    id: "copy-markdown" as const,
+    label: "Copy Markdown",
+    description: "Copy combined Markdown to clipboard",
+    icon: Copy,
   },
   {
     id: "zip" as const,

@@ -5,6 +5,7 @@ import {
   exportProjectAsJSON,
   exportProjectAsMarkdown,
   exportProjectAsZip,
+  copyProjectMarkdownToClipboard,
   captureElementAsPng,
   buildProjectPDF,
   buildProjectPNGZip,
@@ -241,6 +242,10 @@ export function useProjectExport({
             break;
           case "markdown":
             exportProjectAsMarkdown(filteredData);
+            onOpenChange(false);
+            break;
+          case "copy-markdown":
+            await copyProjectMarkdownToClipboard(filteredData);
             onOpenChange(false);
             break;
           case "zip":
