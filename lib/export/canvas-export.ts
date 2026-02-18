@@ -12,7 +12,10 @@ export {
   downloadFile,
   serializeBlock,
   toCanvasBlock,
+  filterExportData,
 } from "./export-utils";
+
+export { PROJECT_EXPORT_FORMATS, type ProjectExportFormatId } from "./project-export-formats";
 
 export {
   exportAsJSON,

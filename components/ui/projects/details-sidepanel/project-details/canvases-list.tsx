@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Check, ExternalLink, Layout, Pencil, X } from "lucide-react";
+import { Check, Download, ExternalLink, Layout, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/shared/button";
 import {
   Card,
@@ -16,6 +16,7 @@ import {
   SortableCanvasList,
   SortableCanvasItem,
 } from "@/components/ui/projects/canvas/sortable-canvas-list";
+import { CanvasExportFromListModal } from "@/components/ui/projects/canvas/canvas-export-from-list-modal";
 
 interface CanvasesListProps {
   project: Project;
@@ -27,6 +28,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
   const [loading, setLoading] = useState(true);
   const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const [exportCanvasId, setExportCanvasId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -118,7 +120,12 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
 
   if (canvases.length === 0) return null;
 
+  const exportCanvas = exportCanvasId
+    ? canvases.find((c) => c.id === exportCanvasId)
+    : null;
+
   return (
+    <>
     <Card className="backdrop-blur-2xl 
       bg-gradient-to-br from-primary-500/10 via-primary-400/15 to-accent-500/10 
       dark:from-primary-500/5 dark:via-primary-400/10 dark:to-accent-500/5
@@ -201,6 +208,17 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                           aria-label="Edit canvas name"
                         >
                           <Pencil size={12} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 rounded-lg
+                            hover:bg-slate-200/50 dark:hover:bg-slate-600/50
+                            text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                          onClick={() => setExportCanvasId(canvas.id)}
+                          aria-label="Export canvas"
+                        >
+                          <Download size={12} />
                         </Button>
                         <Button
                           variant="ghost"
@@ -291,6 +309,17 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                     <Button
                       variant="ghost"
                       size="sm"
+                      className="h-7 w-7 p-0 rounded-lg
+                        hover:bg-slate-200/50 dark:hover:bg-slate-600/50
+                        text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                      onClick={() => setExportCanvasId(canvas.id)}
+                      aria-label="Export canvas"
+                    >
+                      <Download size={12} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="h-7 px-2 rounded-lg
                         backdrop-blur-sm bg-primary/10 dark:bg-primary/20
                         hover:bg-primary/20 dark:hover:bg-primary/30
@@ -309,5 +338,21 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
       </div>
       </CardContent>
     </Card>
+
+    {exportCanvas && (
+      <CanvasExportFromListModal
+        open={!!exportCanvasId}
+        onOpenChange={(open) => !open && setExportCanvasId(null)}
+        project={{
+          id: project.id,
+          name: project.name,
+          description: project.description,
+          icon: project.icon,
+          status: project.status,
+        }}
+        canvas={exportCanvas}
+      />
+    )}
+    </>
   );
 }

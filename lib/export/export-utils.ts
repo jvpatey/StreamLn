@@ -49,6 +49,19 @@ export interface ExportProjectData {
   canvases: ExportCanvasWithBlocks[];
 }
 
+/** Filter export data by selected canvas IDs and optionally exclude empty canvases */
+export function filterExportData<T extends { project: unknown; canvases: Array<{ id: string; blocks: unknown[] }> }>(
+  data: T,
+  selectedIds: Set<string>,
+  excludeEmpty: boolean
+): T {
+  let canvases = data.canvases.filter((c) => selectedIds.has(c.id));
+  if (excludeEmpty) {
+    canvases = canvases.filter((c) => c.blocks.length > 0);
+  }
+  return { ...data, canvases };
+}
+
 /** Sanitize a string for use in filenames (replace spaces, remove invalid chars) */
 export function sanitizeFilename(name: string): string {
   return name
