@@ -75,10 +75,7 @@ export function ProjectExportModal({
           />
         </div>
       )}
-      <div
-        className="w-full max-w-md"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
           <div className="flex items-center border-b border-slate-200 dark:border-slate-700 p-4">
             <div className="flex items-center space-x-3 flex-1">
@@ -107,7 +104,9 @@ export function ProjectExportModal({
               </div>
             ) : error ? (
               <div className="py-8 text-center">
-                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {error}
+                </p>
                 <Button
                   variant="outline"
                   size="sm"

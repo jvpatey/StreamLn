@@ -2,7 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/shared/button";
-import { Download, FileJson, FileText, FileSpreadsheet, Loader2 } from "lucide-react";
+import {
+  Download,
+  FileJson,
+  FileText,
+  FileSpreadsheet,
+  Loader2,
+} from "lucide-react";
 import {
   exportAsJSON,
   exportAsMarkdown,
@@ -50,7 +56,9 @@ export function CanvasExportFromListModal({
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to load canvas");
+          setError(
+            err instanceof Error ? err.message : "Failed to load canvas",
+          );
         }
       })
       .finally(() => {
@@ -93,10 +101,7 @@ export function CanvasExportFromListModal({
       aria-modal="true"
       role="dialog"
     >
-      <div
-        className="w-full max-w-md"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
           <div className="flex items-center border-b border-slate-200 dark:border-slate-700 p-4">
             <div className="flex items-center space-x-3 flex-1">
@@ -125,7 +130,9 @@ export function CanvasExportFromListModal({
               </div>
             ) : error ? (
               <div className="py-8 text-center">
-                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {error}
+                </p>
                 <Button
                   variant="outline"
                   size="sm"
@@ -148,7 +155,10 @@ export function CanvasExportFromListModal({
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                   >
                     <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
-                      <Icon size={18} className="text-slate-600 dark:text-slate-400" />
+                      <Icon
+                        size={18}
+                        className="text-slate-600 dark:text-slate-400"
+                      />
                     </div>
                     <p className="font-medium text-slate-900 dark:text-slate-100">
                       {opt.label}

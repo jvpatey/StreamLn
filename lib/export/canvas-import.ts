@@ -52,6 +52,7 @@ const importCanvasSchema = z.object({
 
 /** Single-canvas export format */
 const singleCanvasPayloadSchema = z.object({
+  exportVersion: z.string().optional(),
   project: importProjectSchema,
   canvas: z.object({
     id: z.string().optional(),
@@ -65,6 +66,7 @@ const singleCanvasPayloadSchema = z.object({
 
 /** Project-level export format */
 const projectPayloadSchema = z.object({
+  exportVersion: z.string().optional(),
   project: importProjectSchema,
   canvases: z.array(importCanvasSchema).max(100),
   exportedAt: z.string().optional(),

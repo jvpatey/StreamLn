@@ -58,12 +58,16 @@ export function useProjectExport({
   const [loading, setLoading] = useState(false);
   const [exportData, setExportData] = useState<ExportProjectData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [exporting, setExporting] = useState<ProjectExportFormatId | null>(null);
+  const [exporting, setExporting] = useState<ProjectExportFormatId | null>(
+    null,
+  );
   const [exportProgress, setExportProgress] = useState<{
     current: number;
     total: number;
   } | null>(null);
-  const [selectedCanvasIds, setSelectedCanvasIds] = useState<Set<string>>(new Set());
+  const [selectedCanvasIds, setSelectedCanvasIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [excludeEmptyCanvases, setExcludeEmptyCanvases] = useState(false);
   const [imageExportState, setImageExportState] = useState<{
     format: "png" | "pdf";
@@ -90,7 +94,9 @@ export function useProjectExport({
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to load project");
+          setError(
+            err instanceof Error ? err.message : "Failed to load project",
+          );
         }
       })
       .finally(() => {
@@ -143,7 +149,10 @@ export function useProjectExport({
         captureInProgressRef.current = false;
 
         if (state.canvasIndex < canvases.length - 1) {
-          setExportProgress({ current: state.canvasIndex + 2, total: canvases.length });
+          setExportProgress({
+            current: state.canvasIndex + 2,
+            total: canvases.length,
+          });
           setImageExportState({
             format: state.format,
             canvasIndex: state.canvasIndex + 1,
@@ -156,8 +165,11 @@ export function useProjectExport({
             await buildProjectPDF(newDataUrls, base);
           } else {
             await buildProjectPNGZip(
-              newDataUrls.map((url, i) => ({ dataUrl: url, canvasName: newCanvasNames[i] })),
-              base
+              newDataUrls.map((url, i) => ({
+                dataUrl: url,
+                canvasName: newCanvasNames[i],
+              })),
+              base,
             );
           }
           onOpenChange(false);
@@ -187,8 +199,11 @@ export function useProjectExport({
     ? [...exportData.canvases].sort((a, b) => a.order - b.order)
     : [];
   const allSelected =
-    sortedCanvases.length > 0 && sortedCanvases.every((c) => selectedCanvasIds.has(c.id));
-  const noneSelected = sortedCanvases.every((c) => !selectedCanvasIds.has(c.id));
+    sortedCanvases.length > 0 &&
+    sortedCanvases.every((c) => selectedCanvasIds.has(c.id));
+  const noneSelected = sortedCanvases.every(
+    (c) => !selectedCanvasIds.has(c.id),
+  );
 
   const toggleCanvas = useCallback((id: string) => {
     setSelectedCanvasIds((prev) => {
@@ -235,7 +250,10 @@ export function useProjectExport({
           case "png":
           case "pdf":
             imageExportDataRef.current = filteredData;
-            setExportProgress({ current: 1, total: filteredData.canvases.length });
+            setExportProgress({
+              current: 1,
+              total: filteredData.canvases.length,
+            });
             setImageExportState({
               format,
               canvasIndex: 0,
@@ -254,13 +272,12 @@ export function useProjectExport({
         }
       }
     },
-    [exportData, filteredData, hasCanvasesToExport, onOpenChange]
+    [exportData, filteredData, hasCanvasesToExport, onOpenChange],
   );
 
-  const canvasesForCapture =
-    imageExportDataRef.current
-      ? [...imageExportDataRef.current.canvases].sort((a, b) => a.order - b.order)
-      : [];
+  const canvasesForCapture = imageExportDataRef.current
+    ? [...imageExportDataRef.current.canvases].sort((a, b) => a.order - b.order)
+    : [];
   const currentCanvas =
     imageExportState && canvasesForCapture[imageExportState.canvasIndex];
 

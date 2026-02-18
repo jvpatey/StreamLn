@@ -8,6 +8,7 @@ export {
   type ExportCanvas,
   type ExportCanvasWithBlocks,
   type ExportProjectData,
+  EXPORT_SCHEMA_VERSION,
   sanitizeFilename,
   downloadFile,
   serializeBlock,
@@ -15,7 +16,10 @@ export {
   filterExportData,
 } from "./export-utils";
 
-export { PROJECT_EXPORT_FORMATS, type ProjectExportFormatId } from "./project-export-formats";
+export {
+  PROJECT_EXPORT_FORMATS,
+  type ProjectExportFormatId,
+} from "./project-export-formats";
 
 export {
   exportAsJSON,

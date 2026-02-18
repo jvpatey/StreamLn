@@ -2,7 +2,10 @@
 
 import React from "react";
 import { Loader2 } from "lucide-react";
-import { PROJECT_EXPORT_FORMATS, type ProjectExportFormatId } from "@/lib/export/canvas-export";
+import {
+  PROJECT_EXPORT_FORMATS,
+  type ProjectExportFormatId,
+} from "@/lib/export/canvas-export";
 
 interface ExportFormatOptionsProps {
   exporting: ProjectExportFormatId | null;

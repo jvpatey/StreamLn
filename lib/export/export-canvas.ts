@@ -11,6 +11,7 @@ import {
 import {
   type ExportProject,
   type ExportCanvas,
+  EXPORT_SCHEMA_VERSION,
   sanitizeFilename,
   downloadFile,
   serializeBlock,
@@ -31,6 +32,8 @@ export function exportAsJSON(
   blocks: CanvasBlock[]
 ): void {
   const payload = {
+    exportVersion: EXPORT_SCHEMA_VERSION,
+    exportedAt: new Date().toISOString(),
     project: {
       id: project.id,
       name: project.name,
@@ -47,7 +50,6 @@ export function exportAsJSON(
       updatedAt: canvas.updatedAt,
     },
     blocks: blocks.map(serializeBlock),
-    exportedAt: new Date().toISOString(),
   };
 
   const json = JSON.stringify(payload, null, 2);

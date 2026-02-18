@@ -9,6 +9,7 @@ import {
 } from "./markdown-serializers";
 import {
   type ExportProjectData,
+  EXPORT_SCHEMA_VERSION,
   sanitizeFilename,
   downloadFile,
   serializeBlock,
@@ -20,6 +21,8 @@ import {
  */
 export function exportProjectAsJSON(data: ExportProjectData): void {
   const payload = {
+    exportVersion: EXPORT_SCHEMA_VERSION,
+    exportedAt: new Date().toISOString(),
     project: {
       id: data.project.id,
       name: data.project.name,
@@ -36,7 +39,6 @@ export function exportProjectAsJSON(data: ExportProjectData): void {
       updatedAt: c.updatedAt,
       blocks: c.blocks.map((b) => serializeBlock(toCanvasBlock(b))),
     })),
-    exportedAt: new Date().toISOString(),
   };
 
   const json = JSON.stringify(payload, null, 2);
@@ -85,6 +87,8 @@ export async function exportProjectAsZip(data: ExportProjectData): Promise<void>
 
   // Add combined project JSON at root
   const projectPayload = {
+    exportVersion: EXPORT_SCHEMA_VERSION,
+    exportedAt: new Date().toISOString(),
     project: {
       id: data.project.id,
       name: data.project.name,
@@ -101,7 +105,6 @@ export async function exportProjectAsZip(data: ExportProjectData): Promise<void>
       updatedAt: c.updatedAt,
       blocks: c.blocks.map((b) => serializeBlock(toCanvasBlock(b))),
     })),
-    exportedAt: new Date().toISOString(),
   };
   projectFolder.file(
     `${base}-project.json`,
@@ -131,6 +134,8 @@ export async function exportProjectAsZip(data: ExportProjectData): Promise<void>
   for (const canvas of data.canvases) {
     const canvasBase = sanitizeFilename(canvas.name);
     const canvasPayload = {
+      exportVersion: EXPORT_SCHEMA_VERSION,
+      exportedAt: new Date().toISOString(),
       project: {
         id: data.project.id,
         name: data.project.name,
@@ -147,7 +152,6 @@ export async function exportProjectAsZip(data: ExportProjectData): Promise<void>
         updatedAt: canvas.updatedAt,
       },
       blocks: canvas.blocks.map((b) => serializeBlock(toCanvasBlock(b))),
-      exportedAt: new Date().toISOString(),
     };
     projectFolder.file(`${canvasBase}.json`, JSON.stringify(canvasPayload, null, 2));
 

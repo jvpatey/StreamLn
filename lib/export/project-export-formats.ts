@@ -33,4 +33,5 @@ export const PROJECT_EXPORT_FORMATS = [
   },
 ] as const;
 
-export type ProjectExportFormatId = (typeof PROJECT_EXPORT_FORMATS)[number]["id"];
+export type ProjectExportFormatId =
+  (typeof PROJECT_EXPORT_FORMATS)[number]["id"];
