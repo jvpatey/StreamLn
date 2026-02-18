@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/shared/button";
+import { Tooltip } from "@/components/ui/shared/tooltip";
 import { Download, FileJson, FileText, Image, FileSpreadsheet } from "lucide-react";
 import {
   exportAsJSON,
@@ -101,7 +102,7 @@ export function ExportModal({
       role="dialog"
     >
       <div
-        className="w-full max-w-md"
+        className="w-full max-w-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -126,33 +127,37 @@ export function ExportModal({
           </div>
 
           {/* Format options */}
-          <div className="p-4 space-y-1 max-h-80 overflow-y-auto">
-            {FORMAT_OPTIONS.map((opt) => {
-              const Icon = opt.icon;
-              const disabled =
-                opt.id === "csv" && !hasTaskBoards;
-              return (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => !disabled && handleExport(opt.id)}
-                  disabled={disabled}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                >
-                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
-                    <Icon size={18} className="text-slate-600 dark:text-slate-400" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-slate-900 dark:text-slate-100">
-                      {opt.label}
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                      {opt.description}
-                    </p>
-                  </div>
-                </button>
-              );
-            })}
+          <div className="p-4">
+            <div className="grid grid-cols-2 gap-3">
+              {FORMAT_OPTIONS.map((opt) => {
+                const Icon = opt.icon;
+                const disabled =
+                  opt.id === "csv" && !hasTaskBoards;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => !disabled && handleExport(opt.id)}
+                    disabled={disabled}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                  >
+                    <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
+                      <Icon size={18} className="text-slate-600 dark:text-slate-400" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-slate-900 dark:text-slate-100">
+                        {opt.label}
+                      </p>
+                      <Tooltip content={opt.description} side="top">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate cursor-default">
+                          {opt.description}
+                        </p>
+                      </Tooltip>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="flex items-center justify-end p-4 pt-2 border-t border-slate-200 dark:border-slate-700">

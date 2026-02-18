@@ -75,9 +75,9 @@ export function ProjectExportModal({
           />
         </div>
       )}
-      <div className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-        <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <div className="flex items-center border-b border-slate-200 dark:border-slate-700 p-4">
+      <div className="w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+        <div className="flex flex-col max-h-[calc(100vh-4rem)] overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="flex items-center shrink-0 border-b border-slate-200 dark:border-slate-700 p-4">
             <div className="flex items-center space-x-3 flex-1">
               <div className="p-2 rounded-lg bg-gradient-to-br from-primary-500/10 to-accent-500/10">
                 <Download
@@ -96,7 +96,7 @@ export function ProjectExportModal({
             </div>
           </div>
 
-          <div className="p-4 space-y-1 max-h-80 overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 flex flex-col gap-6">
             {loading ? (
               <div className="flex items-center justify-center py-12 gap-2 text-slate-500 dark:text-slate-400">
                 <Loader2 size={20} className="animate-spin" />
@@ -154,7 +154,7 @@ export function ProjectExportModal({
             )}
           </div>
 
-          <div className="flex items-center justify-end p-4 pt-2 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex shrink-0 items-center justify-end p-4 pt-2 border-t border-slate-200 dark:border-slate-700">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>

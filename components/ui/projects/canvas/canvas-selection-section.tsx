@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Checkbox } from "@/components/ui/shared/checkbox";
+import { Tooltip } from "@/components/ui/shared/tooltip";
 import type { ExportProjectData } from "@/lib/api/project-export";
 
 interface CanvasSelectionSectionProps {
@@ -30,7 +31,7 @@ export function CanvasSelectionSection({
   hasCanvasesToExport,
 }: CanvasSelectionSectionProps) {
   return (
-    <div className="space-y-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+    <div className="space-y-4 pb-4 border-b border-slate-200 dark:border-slate-700">
       <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
         Choose canvases to export
       </p>
@@ -62,7 +63,7 @@ export function CanvasSelectionSection({
           Deselect all
         </button>
       </div>
-      <div className="max-h-32 overflow-y-auto space-y-1">
+      <div className="max-h-48 min-h-32 overflow-y-auto space-y-1">
         {canvases.map((canvas) => {
           const isEmpty = canvas.blocks.length === 0;
           return (
@@ -74,9 +75,11 @@ export function CanvasSelectionSection({
                 checked={selectedCanvasIds.has(canvas.id)}
                 onCheckedChange={() => onToggleCanvas(canvas.id)}
               />
-              <span className="flex-1 min-w-0 truncate text-sm text-slate-900 dark:text-slate-100">
-                {canvas.name}
-              </span>
+              <Tooltip content={canvas.name} side="top">
+                <span className="flex-1 min-w-0 truncate text-sm text-slate-900 dark:text-slate-100 cursor-default">
+                  {canvas.name}
+                </span>
+              </Tooltip>
               <span
                 className={`text-xs shrink-0 ${
                   isEmpty
