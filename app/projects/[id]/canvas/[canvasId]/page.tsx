@@ -35,6 +35,7 @@ import {
   deleteCanvas,
   reorderCanvases,
 } from "@/lib/api/canvas";
+import { addProjectToRecent } from "@/lib/recent-projects";
 import type { CanvasBlock } from "@/lib/types/canvas";
 import type { Canvas } from "@/lib/types/canvas";
 import { PanelLeftOpen, PanelTopOpen } from "lucide-react";
@@ -193,6 +194,13 @@ export default function ProjectCanvasPage() {
 
     loadProject();
   }, [projectId, canvasId]);
+
+  // Track project as recently opened
+  useEffect(() => {
+    if (projectId && typeof projectId === "string") {
+      addProjectToRecent(projectId);
+    }
+  }, [projectId]);
 
   // Debounced save (1.5s after last change)
   useEffect(() => {

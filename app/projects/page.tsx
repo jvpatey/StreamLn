@@ -19,6 +19,7 @@ import {
   updateProjectStatus,
   updateProject,
 } from "@/lib/api/projects";
+import { addProjectToRecent } from "@/lib/recent-projects";
 
 export default function DashboardPage() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -79,6 +80,7 @@ export default function DashboardPage() {
 
   const handleImportSuccess = useCallback(
     (projectId: string, firstCanvasId: string | null) => {
+      addProjectToRecent(projectId);
       loadProjects();
       if (firstCanvasId) {
         router.push(`/projects/${projectId}/canvas/${firstCanvasId}`);
@@ -195,6 +197,7 @@ export default function DashboardPage() {
   };
 
   const handleOpenCanvas = (project: any, canvasId?: string) => {
+    addProjectToRecent(project.id);
     if (canvasId) {
       router.push(`/projects/${project.id}/canvas/${canvasId}`);
     } else {
@@ -339,9 +342,13 @@ export default function DashboardPage() {
         <ProjectsSidebar
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
-          onCommandPaletteOpen={() => setCommandPaletteOpen(true)}
           onCreateProject={handleCreateProject}
           onImportProject={handleImportProject}
+          projects={projects}
+          onOpenProject={(project) => {
+            addProjectToRecent(project.id);
+            router.push(`/projects/${project.id}`);
+          }}
         />
 
         {/* Main Content Area - only this scrolls */}

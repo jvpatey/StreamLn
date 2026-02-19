@@ -2,7 +2,12 @@
 
 // Header component for the projects page - contains logo, search, and user controls
 // Used in: app/projects/page.tsx
-import { UserButton } from "@clerk/nextjs";
+import dynamic from "next/dynamic";
+
+const UserButton = dynamic(
+  () => import("@clerk/nextjs").then((mod) => mod.UserButton),
+  { ssr: false }
+);
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import { LiquidGlassButton } from "@/components/ui/shared/liquid-glass-button";
