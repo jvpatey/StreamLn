@@ -242,12 +242,14 @@ export function CanvasBlock({
         const newY = worldY - dragStart.y;
         onUpdate({ x: newX, y: newY });
       } else if (isResizing) {
+        const minW = block.type === "task-board" ? 400 : 150;
+        const minH = block.type === "task-board" ? 280 : 100;
         const newWidth = Math.max(
-          150,
+          minW,
           e.clientX - resizeStart.x + resizeStart.width
         );
         const newHeight = Math.max(
-          100,
+          minH,
           e.clientY - resizeStart.y + resizeStart.height
         );
         onUpdate({ width: newWidth, height: newHeight });
@@ -263,6 +265,7 @@ export function CanvasBlock({
       onDragStart,
       panOffset,
       zoomLevel,
+      block.type,
     ]
   );
 

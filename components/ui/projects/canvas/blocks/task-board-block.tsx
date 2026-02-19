@@ -27,7 +27,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Plus, GripVertical, LayoutList } from "lucide-react";
+import { Plus, GripVertical, LayoutList, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/shared/button";
 import {
   getTaskBoardContent,
@@ -38,6 +38,14 @@ import {
 } from "./task-board-defaults";
 
 const DEBOUNCE_MS = 300;
+const EXPAND_DEBOUNCE_MS = 120;
+
+const COLUMN_WIDTH = 224;
+const COLUMN_GAP = 16;
+const ADD_BOARD_WIDTH = 224;
+const CONTENT_PADDING = 32;
+const MIN_BLOCK_WIDTH = 400;
+const MIN_BLOCK_HEIGHT = 280;
 
 const dropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -53,6 +61,8 @@ interface CanvasBlock {
   content: unknown;
   color?: string;
   title?: string;
+  width?: number;
+  height?: number;
 }
 
 interface TaskBoardBlockProps {
@@ -100,14 +110,14 @@ function CardContent({
   return (
     <div
       data-no-block-drag
-      className={`flex items-start gap-2 rounded-lg border px-2.5 py-2 ${
+      className={`flex items-start gap-3 rounded-xl border px-4 py-3 transition-all duration-150 ${
         isOverlay
           ? "cursor-grabbing border-slate-300/80 bg-white shadow-xl dark:border-slate-500/80 dark:bg-slate-800"
-          : "border-slate-200/80 bg-white shadow-sm transition-shadow hover:shadow dark:border-slate-600/80 dark:bg-slate-800/80"
+          : "border-slate-200/80 bg-white shadow-sm hover:shadow-md dark:border-slate-600/80 dark:bg-slate-800/80 focus-within:border-slate-300 dark:focus-within:border-slate-500"
       }`}
     >
       {isEditable && showGrip && !isOverlay && (
-        <div className="mt-0.5 shrink-0 rounded p-0.5 text-slate-400">
+        <div className="mt-0.5 shrink-0 rounded p-1 text-slate-400">
           <GripVertical size={14} />
         </div>
       )}
@@ -134,14 +144,14 @@ function CardContent({
               (e.target as HTMLInputElement).blur();
             }
           }}
-          className="min-w-0 flex-1 bg-transparent text-sm text-slate-800 outline-none dark:text-slate-200"
+          className="min-w-0 flex-1 bg-transparent text-[15px] leading-snug text-slate-800 outline-none rounded focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1 dark:text-slate-200 dark:focus-visible:ring-slate-500"
           onMouseDown={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
         />
       ) : (
         <button
           type="button"
-          className="min-w-0 flex-1 text-left text-sm text-slate-800 dark:text-slate-200"
+          className="min-w-0 flex-1 text-left text-[15px] leading-snug text-slate-800 dark:text-slate-200 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1 dark:focus-visible:ring-slate-500"
           onClick={() => !isOverlay && isEditable && setIsEditing(true)}
           onMouseDown={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
@@ -157,10 +167,12 @@ function SortableCard({
   card,
   isEditable,
   onTextChange,
+  onDelete,
 }: {
   card: TaskBoardCard;
   isEditable: boolean;
   onTextChange: (text: string) => void;
+  onDelete: () => void;
 }) {
   const {
     attributes,
@@ -186,15 +198,30 @@ function SortableCard({
       className="group flex"
     >
       {isEditable && (
-        <button
-          type="button"
-          className="shrink-0 cursor-grab touch-none rounded p-1 text-slate-400 opacity-0 transition-opacity hover:bg-slate-100 hover:text-slate-600 group-hover:opacity-100 active:cursor-grabbing dark:hover:bg-slate-700 dark:hover:text-slate-300"
-          aria-label="Drag to reorder"
-          {...listeners}
-          {...attributes}
-        >
-          <GripVertical size={14} />
-        </button>
+        <div className="flex shrink-0 items-center gap-0.5">
+          <button
+            type="button"
+            className="cursor-grab touch-none rounded p-1.5 text-slate-400 opacity-0 transition-opacity hover:bg-slate-100 hover:text-slate-600 group-hover:opacity-100 active:cursor-grabbing dark:hover:bg-slate-700 dark:hover:text-slate-300"
+            aria-label="Drag to reorder"
+            {...listeners}
+            {...attributes}
+          >
+            <GripVertical size={14} />
+          </button>
+          <button
+            type="button"
+            className="rounded p-1.5 text-slate-400 opacity-0 transition-opacity hover:bg-red-100 hover:text-red-600 group-hover:opacity-100 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            aria-label="Delete task"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
       )}
       <div className="min-w-0 flex-1">
         <CardContent
@@ -215,8 +242,10 @@ function Column({
   isEditable,
   blockColor,
   isSelected,
+  canDelete,
   onSelect,
   onAddCard,
+  onDelete,
   onColumnTitleChange,
   onCardTextChange,
 }: {
@@ -225,10 +254,13 @@ function Column({
   isEditable: boolean;
   blockColor: string;
   isSelected: boolean;
+  canDelete: boolean;
   onSelect: () => void;
   onAddCard: () => void;
+  onDelete: () => void;
   onColumnTitleChange: (title: string) => void;
   onCardTextChange: (cardId: string, text: string) => void;
+  onCardDelete: (cardId: string) => void;
 }) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [localTitle, setLocalTitle] = useState(column.title);
@@ -270,23 +302,24 @@ function Column({
       ref={setNodeRef}
       data-no-block-drag
       onClick={onSelect}
-      className={`flex w-52 shrink-0 flex-col rounded-xl border bg-slate-50/80 dark:bg-slate-800 transition-colors ${
+      className={`flex w-56 shrink-0 flex-col overflow-hidden rounded-2xl border bg-slate-50/90 dark:bg-slate-800/95 shadow-sm transition-all duration-200 ${
         isOver
-          ? "border-slate-300 dark:border-slate-500"
+          ? "border-slate-300 dark:border-slate-500 shadow-md"
           : isSelected
-            ? "border-slate-300 dark:border-slate-500"
-            : "border-slate-200/80 dark:border-slate-700/80"
+            ? "border-slate-300 dark:border-slate-500 shadow-md"
+            : "border-slate-200/80 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600"
       }`}
       style={{
-        borderTopWidth: 3,
-        borderTopColor: isOver || isSelected ? blockColor : "transparent",
+        ...(isOver || isSelected
+          ? { borderTopWidth: 3, borderTopColor: blockColor }
+          : {}),
         ...(isSelected
           ? { boxShadow: `inset 0 0 0 2px ${blockColor}50` }
           : {}),
       }}
     >
       <div
-        className="flex items-center justify-between gap-2 border-b border-slate-200/80 px-3 py-2 dark:border-slate-700/80"
+        className="flex items-center justify-between gap-3 border-b border-slate-200/80 px-4 py-3 dark:border-slate-700/80"
         style={{ background: `${blockColor}12` }}
       >
         {isEditingTitle ? (
@@ -304,14 +337,14 @@ function Column({
                 (e.target as HTMLInputElement).blur();
               }
             }}
-            className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-slate-800 outline-none dark:text-slate-200"
+            className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-800 outline-none dark:text-slate-200"
             onMouseDown={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
           />
         ) : (
           <button
             type="button"
-            className="min-w-0 flex-1 text-left text-sm font-semibold text-slate-800 dark:text-slate-200"
+            className="min-w-0 flex-1 text-left text-sm font-medium text-slate-800 dark:text-slate-200"
             onClick={() => isEditable && setIsEditingTitle(true)}
             onMouseDown={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
@@ -324,23 +357,41 @@ function Column({
           </button>
         )}
         {isEditable && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 w-7 p-0 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddCard();
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-            onPointerDown={(e) => e.stopPropagation()}
-            aria-label="Add card"
-          >
-            <Plus size={14} />
-          </Button>
+          <div className="flex shrink-0 items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-slate-500 transition-colors hover:bg-slate-200/60 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700/60 dark:hover:text-slate-200"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddCard();
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              aria-label="Add card"
+            >
+              <Plus size={14} />
+            </Button>
+            {canDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-slate-400 transition-colors hover:bg-red-100 hover:text-red-600 dark:text-slate-500 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                onMouseDown={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+                aria-label="Delete column"
+              >
+                <Trash2 size={14} />
+              </Button>
+            )}
+          </div>
         )}
       </div>
-      <div className="flex min-h-[80px] flex-1 flex-col gap-2 overflow-y-auto p-2">
+      <div className="flex min-h-[120px] flex-1 flex-col gap-3 overflow-y-auto p-3">
         <SortableContext
           items={column.cardIds}
           strategy={verticalListSortingStrategy}
@@ -351,9 +402,17 @@ function Column({
               card={card}
               isEditable={isEditable}
               onTextChange={(text) => onCardTextChange(card.id, text)}
+              onDelete={() => onCardDelete(card.id)}
             />
           ))}
         </SortableContext>
+        {columnCards.length === 0 && (
+          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-slate-200/80 py-6 dark:border-slate-600/80">
+            <span className="text-sm text-slate-400 dark:text-slate-500">
+              No tasks
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -372,6 +431,7 @@ export function TaskBoardBlock({
   const contentRef = useRef(localContent);
   const clonedContentRef = useRef<TaskBoardContent | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const expandDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onUpdateRef = useRef(onUpdate);
   const lastOverId = useRef<UniqueIdentifier | null>(null);
   const recentlyMovedToNewContainer = useRef(false);
@@ -388,6 +448,32 @@ export function TaskBoardBlock({
     const next = getTaskBoardContent(block.content);
     setLocalContent(next);
   }, [block.content]);
+
+  useEffect(() => {
+    const columnCount = localContent.columns.length;
+    const addButtonSpace = isEditable ? COLUMN_GAP + ADD_BOARD_WIDTH : 0;
+    const contentWidth =
+      CONTENT_PADDING * 2 +
+      columnCount * COLUMN_WIDTH +
+      Math.max(0, columnCount - 1) * COLUMN_GAP +
+      addButtonSpace;
+    const newWidth = Math.max(MIN_BLOCK_WIDTH, contentWidth);
+
+    if (expandDebounceRef.current) clearTimeout(expandDebounceRef.current);
+    expandDebounceRef.current = setTimeout(() => {
+      expandDebounceRef.current = null;
+      const currentWidth = block.width ?? MIN_BLOCK_WIDTH;
+      if (newWidth > currentWidth) {
+        onUpdateRef.current({ width: newWidth });
+      }
+    }, EXPAND_DEBOUNCE_MS);
+    return () => {
+      if (expandDebounceRef.current) {
+        clearTimeout(expandDebounceRef.current);
+        expandDebounceRef.current = null;
+      }
+    };
+  }, [localContent.columns.length, isEditable, block.width]);
 
   const persist = useCallback((next: TaskBoardContent) => {
     setLocalContent(next);
@@ -567,6 +653,10 @@ export function TaskBoardBlock({
         clearTimeout(debounceRef.current);
         debounceRef.current = null;
       }
+      if (expandDebounceRef.current) {
+        clearTimeout(expandDebounceRef.current);
+        expandDebounceRef.current = null;
+      }
     };
   }, []);
 
@@ -602,6 +692,29 @@ export function TaskBoardBlock({
     persist(next);
   }, [persist]);
 
+  const handleDeleteColumn = useCallback(
+    (columnId: string) => {
+      const current = contentRef.current;
+      if (current.columns.length <= 1) return;
+      const column = current.columns.find((c) => c.id === columnId);
+      if (!column) return;
+      const cardIdsToRemove = new Set(column.cardIds);
+      const newCards = { ...current.cards };
+      for (const id of cardIdsToRemove) {
+        delete newCards[id];
+      }
+      const next: TaskBoardContent = {
+        columns: current.columns.filter((c) => c.id !== columnId),
+        cards: newCards,
+      };
+      persist(next);
+      if (selectedColumnId === columnId) {
+        setSelectedColumnId(null);
+      }
+    },
+    [persist, selectedColumnId]
+  );
+
   const handleColumnTitleChange = useCallback(
     (columnId: string, title: string) => {
       const current = contentRef.current;
@@ -630,9 +743,35 @@ export function TaskBoardBlock({
     [persist]
   );
 
+  const handleDeleteCard = useCallback(
+    (cardId: string) => {
+      const current = contentRef.current;
+      const next: TaskBoardContent = {
+        columns: current.columns.map((col) => ({
+          ...col,
+          cardIds: col.cardIds.filter((id) => id !== cardId),
+        })),
+        cards: { ...current.cards },
+      };
+      delete next.cards[cardId];
+      persist(next);
+    },
+    [persist]
+  );
+
+  const columnCount = localContent.columns.length;
+  const addButtonSpace = isEditable ? COLUMN_GAP + ADD_BOARD_WIDTH : 0;
+  const requiredContentWidth =
+    CONTENT_PADDING * 2 +
+    columnCount * COLUMN_WIDTH +
+    Math.max(0, columnCount - 1) * COLUMN_GAP +
+    addButtonSpace;
+  const blockWidth = block.width ?? MIN_BLOCK_WIDTH;
+  const needsHorizontalScroll = requiredContentWidth > blockWidth;
+
   return (
     <div
-      className="h-full min-h-0 overflow-auto p-3"
+      className={`h-full min-h-0 p-4 ${needsHorizontalScroll ? "overflow-auto" : "overflow-visible"}`}
       data-no-block-drag
       onMouseDown={(e) => e.stopPropagation()}
       onPointerDown={(e) => e.stopPropagation()}
@@ -645,7 +784,7 @@ export function TaskBoardBlock({
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        <div className="flex gap-3 overflow-x-auto pb-2">
+        <div className="flex gap-4 pb-2">
           {localContent.columns.map((column) => (
             <Column
               key={column.id}
@@ -654,12 +793,15 @@ export function TaskBoardBlock({
               isEditable={isEditable}
               blockColor={blockColor}
               isSelected={selectedColumnId === column.id}
+              canDelete={localContent.columns.length > 1}
               onSelect={() => setSelectedColumnId(column.id)}
               onAddCard={() => handleAddCard(column.id)}
+              onDelete={() => handleDeleteColumn(column.id)}
               onColumnTitleChange={(title) =>
                 handleColumnTitleChange(column.id, title)
               }
               onCardTextChange={handleCardTextChange}
+              onCardDelete={handleDeleteCard}
             />
           ))}
           {isEditable && (
@@ -669,9 +811,9 @@ export function TaskBoardBlock({
               onMouseDown={(e) => e.stopPropagation()}
               onPointerDown={(e) => e.stopPropagation()}
               data-no-block-drag
-              className="flex w-52 shrink-0 items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/50 py-8 text-sm font-medium text-slate-500 transition-colors hover:border-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-600 dark:bg-slate-900/30 dark:text-slate-400 dark:hover:border-slate-500 dark:hover:bg-slate-800/50 dark:hover:text-slate-300"
+              className="flex min-h-[140px] w-56 shrink-0 flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 py-10 text-sm font-medium text-slate-500 transition-all duration-200 hover:border-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:border-slate-600 dark:bg-slate-900/40 dark:text-slate-400 dark:hover:border-slate-500 dark:hover:bg-slate-800/60 dark:hover:text-slate-300"
             >
-              <LayoutList size={18} />
+              <LayoutList size={20} className="opacity-70" />
               Add board
             </button>
           )}
