@@ -11,7 +11,6 @@ import {
   buildProjectPNGZip,
   filterExportData,
   sanitizeFilename,
-  PROJECT_EXPORT_FORMATS,
   type ProjectExportFormatId,
 } from "@/lib/export/canvas-export";
 import { fetchProjectForExport } from "@/lib/api/project-export";
