@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useTheme } from "next-themes";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Card } from "@/components/ui/shared/card";
 import { Button } from "@/components/ui/shared/button";
@@ -87,6 +88,9 @@ export function CanvasBlock({
   zoomLevel,
   panOffset,
 }: CanvasBlockProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
   const DRAG_THRESHOLD_PX = 8;
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -386,7 +390,9 @@ export function CanvasBlock({
           background:
             block.type === "tag" || block.type === "shape"
               ? "transparent"
-              : `linear-gradient(135deg, ${getBlockColor()}05 0%, transparent 100%)`,
+              : isDark
+                ? `linear-gradient(135deg, rgb(30,41,59) 0%, ${getBlockColor()}40 25%, ${getBlockColor()}25 60%, rgb(30,41,59) 100%)`
+                : `linear-gradient(135deg, ${getBlockColor()}05 0%, transparent 100%)`,
           backdropFilter:
             block.type === "tag" || block.type === "shape" ? "none" : "blur(10px)",
           borderColor:
@@ -395,7 +401,9 @@ export function CanvasBlock({
               : block.type === "shape" && !isSelected
                 ? "transparent"
                 : isSelected
-                ? `${getBlockColor()}70`
+                ? `${getBlockColor()}80`
+                : isDark
+                ? `${getBlockColor()}50`
                 : `${getBlockColor()}30`,
           boxShadow:
             block.type === "tag"
@@ -412,15 +420,17 @@ export function CanvasBlock({
           <div
             className="flex items-center justify-between p-3 border-b border-slate-200/50 dark:border-slate-700/50"
             style={{
-              background: `linear-gradient(90deg, ${getBlockColor()}08 0%, transparent 100%)`,
+              background: isDark
+                ? `linear-gradient(90deg, ${getBlockColor()}35 0%, ${getBlockColor()}18 50%, ${getBlockColor()}08 100%)`
+                : `linear-gradient(90deg, ${getBlockColor()}08 0%, transparent 100%)`,
             }}
           >
             <div className="flex items-center space-x-3 min-w-0 flex-1">
               <div
-                className="p-2 rounded-xl shadow-sm ring-1 ring-white/20"
+                className="p-2 rounded-xl shadow-sm ring-1 ring-white/20 dark:ring-white/10"
                 style={{
-                  backgroundColor: `${getBlockColor()}15`,
-                  boxShadow: `0 2px 8px ${getBlockColor()}20`,
+                  backgroundColor: isDark ? `${getBlockColor()}50` : `${getBlockColor()}15`,
+                  boxShadow: isDark ? `0 2px 8px ${getBlockColor()}40` : `0 2px 8px ${getBlockColor()}20`,
                 }}
               >
                 <div style={{ color: getBlockColor() }}>{getBlockIcon()}</div>

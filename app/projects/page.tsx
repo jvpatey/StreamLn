@@ -10,6 +10,8 @@ import { ProjectsContent } from "@/components/ui/projects/project-content";
 import { CreateProjectModal } from "@/components/ui/projects/project-content";
 import { ProjectSkeletonGrid } from "@/components/ui/projects/project-content/project-skeleton";
 import { ProjectDetailsSidepanel } from "@/components/ui/projects/details-sidepanel";
+import { ProjectExportModal } from "@/components/ui/projects/canvas/project-export-modal";
+import { ImportModal } from "@/components/ui/projects/import-modal";
 import {
   fetchProjects,
   createProject,
@@ -26,8 +28,13 @@ export default function DashboardPage() {
     useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [sidepanelOpen, setSidepanelOpen] = useState(false);
+  const [exportModalProject, setExportModalProject] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
   const { user } = useUser();
   const router = useRouter();
@@ -64,6 +71,23 @@ export default function DashboardPage() {
     setCommandPaletteOpen(false); // Close the command palette if open
     setCreateModalOpen(true);
   }, []);
+
+  const handleImportProject = useCallback(() => {
+    setCommandPaletteOpen(false);
+    setImportModalOpen(true);
+  }, []);
+
+  const handleImportSuccess = useCallback(
+    (projectId: string, firstCanvasId: string | null) => {
+      loadProjects();
+      if (firstCanvasId) {
+        router.push(`/projects/${projectId}/canvas/${firstCanvasId}`);
+      } else {
+        router.push(`/projects/${projectId}`);
+      }
+    },
+    [router]
+  );
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -193,15 +217,23 @@ export default function DashboardPage() {
     projectId: string,
     newStatus: string,
   ) => {
+    const previousProjects = projects;
+    setProjects((prev) =>
+      prev.map((p) =>
+        p.id === projectId ? { ...p, status: newStatus } : p
+      )
+    );
+    if (selectedProject?.id === projectId) {
+      setSelectedProject({ ...selectedProject, status: newStatus });
+    }
     try {
       await updateProjectStatus(projectId, newStatus);
-      loadProjects();
-      // Update selected project if it's the one being modified
-      if (selectedProject && selectedProject.id === projectId) {
-        setSelectedProject({ ...selectedProject, status: newStatus });
-      }
     } catch (error) {
       console.error("Failed to update project status:", error);
+      setProjects(previousProjects);
+      if (selectedProject?.id === projectId) {
+        setSelectedProject(selectedProject);
+      }
     }
   };
 
@@ -274,6 +306,18 @@ export default function DashboardPage() {
         onDelete={handleProjectDelete}
         onStatusChange={handleProjectStatusChange}
         onOpenCanvas={handleOpenCanvas}
+        onExportProject={(p) => setExportModalProject({ id: p.id, name: p.name })}
+      />
+
+      <ProjectExportModal
+        open={!!exportModalProject}
+        onOpenChange={(open) => !open && setExportModalProject(null)}
+        project={exportModalProject ?? { id: "", name: "" }}
+      />
+      <ImportModal
+        open={importModalOpen}
+        onOpenChange={setImportModalOpen}
+        onSuccess={handleImportSuccess}
       />
       {/* Header - sticky, always on top */}
       <div className="shrink-0 relative z-[60]">
@@ -291,6 +335,7 @@ export default function DashboardPage() {
           onClose={() => setSidebarOpen(false)}
           onCommandPaletteOpen={() => setCommandPaletteOpen(true)}
           onCreateProject={handleCreateProject}
+          onImportProject={handleImportProject}
         />
 
         {/* Main Content Area - only this scrolls */}
@@ -317,6 +362,7 @@ export default function DashboardPage() {
             onProjectClick={handleProjectClick}
             onProjectDelete={handleProjectDelete}
             onProjectStatusChange={handleProjectStatusChange}
+            onExportProject={(p) => setExportModalProject(p)}
             sortBy={sortBy}
             setSortBy={setSortBy}
             statusFilter={statusFilter}
@@ -339,6 +385,7 @@ export default function DashboardPage() {
           }
         }}
         onCreateProject={handleCreateProject}
+        onImportProject={handleImportProject}
         initialSearchMode={commandPaletteSearchMode}
         initialBrowseMode={commandPaletteBrowseMode}
         projects={projects}

@@ -1,10 +1,11 @@
 import React from "react";
-import { Search, Plus, Filter, Folder } from "lucide-react";
+import { Search, Plus, Filter, Folder, Upload } from "lucide-react";
 import { getKeyboardShortcut } from "@/lib/utils";
 import { CommandAction } from "./types";
 
 export const createCommandActions = (
   onCreateProject: (() => void) | undefined,
+  onImportProject: (() => void) | undefined,
   openFilterPopover: (() => void) | undefined,
   setSearchMode: (mode: boolean) => void,
   setBrowseMode: (mode: boolean) => void,
@@ -20,6 +21,17 @@ export const createCommandActions = (
     category: "Create",
     onSelect: () => {
       onCreateProject?.();
+    },
+  },
+  {
+    id: "import-project",
+    title: "Import Project",
+    description: "Restore from JSON backup",
+    icon: <Upload size={16} />,
+    shortcut: "",
+    category: "Create",
+    onSelect: () => {
+      onImportProject?.();
     },
   },
   {

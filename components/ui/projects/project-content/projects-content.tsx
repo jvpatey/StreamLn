@@ -51,6 +51,7 @@ interface ProjectsContentProps {
     projectId: string,
     newStatus: string
   ) => Promise<void>;
+  onExportProject?: (project: { id: string; name: string }) => void;
   sortBy: "updated" | "alpha";
   setSortBy: (val: "updated" | "alpha") => void;
   statusFilter: "all" | "active" | "archived";
@@ -67,6 +68,7 @@ export function ProjectsContent({
   onProjectClick,
   onProjectDelete,
   onProjectStatusChange,
+  onExportProject,
   sortBy,
   setSortBy,
   statusFilter,
@@ -223,6 +225,9 @@ export function ProjectsContent({
                   onProjectStatusChange?.(project.id, newStatus) ||
                   handleStatusChange(project.id, newStatus)
                 }
+                onExportProject={() =>
+                  onExportProject?.({ id: project.id, name: project.name })
+                }
               />
             ))}
             {/* Create New Project Card - Hidden on mobile when no projects */}
@@ -250,7 +255,10 @@ export function ProjectsContent({
                     getIconComponent(project.icon || "Folder"),
                     {
                       size: 20,
-                      className: "text-primary-500",
+                      className:
+                        project.status === "archived"
+                          ? "text-slate-400 dark:text-slate-500"
+                          : "text-primary-500",
                     }
                   )}
                 </div>

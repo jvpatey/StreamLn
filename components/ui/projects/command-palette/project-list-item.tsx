@@ -39,7 +39,10 @@ export function ProjectListItem({
         {showIcon ? (
           React.createElement(getIconComponent(project.icon || "Folder"), {
             size: 18,
-            className: "text-primary-500",
+            className:
+              project.status === "archived"
+                ? "text-slate-400 dark:text-slate-500"
+                : "text-primary-500",
           })
         ) : (
           <Folder size={16} />

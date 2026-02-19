@@ -5,7 +5,12 @@ import {
   SheetHeader,
   SheetClose,
 } from "@/components/ui/shared/sheet";
-import { Pencil, Trash2, X } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/shared/popover";
+import { Pencil, Trash2, X, Download, MoreHorizontal } from "lucide-react";
 import { IconPicker } from "../project-content/icon-picker";
 import {
   ProjectHeader,
@@ -25,6 +30,7 @@ interface ProjectDetailsSidepanelProps {
   onDelete?: (projectId: string) => void;
   onStatusChange?: (projectId: string, newStatus: string) => void;
   onOpenCanvas?: (project: Project, canvasId?: string) => void;
+  onExportProject?: (project: Project) => void;
 }
 
 export function ProjectDetailsSidepanel({
@@ -35,8 +41,10 @@ export function ProjectDetailsSidepanel({
   onDelete,
   onStatusChange,
   onOpenCanvas,
+  onExportProject,
 }: ProjectDetailsSidepanelProps) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [projectMenuOpen, setProjectMenuOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editForm, setEditForm] = useState({
     name: "",
@@ -48,6 +56,7 @@ export function ProjectDetailsSidepanel({
   React.useEffect(() => {
     if (!isOpen) {
       setConfirmDelete(false);
+      setProjectMenuOpen(false);
       setIsEditMode(false);
     }
   }, [isOpen]);
@@ -116,53 +125,84 @@ export function ProjectDetailsSidepanel({
           side="right"
           hideClose
           className="w-full sm:max-w-lg flex flex-col overflow-hidden
-            backdrop-blur-2xl bg-white/40 dark:bg-slate-900/30 
+            backdrop-blur-2xl
+            bg-[linear-gradient(to_bottom,rgba(251,191,36,0.1)_0%,rgba(251,191,36,0.05)_25%,rgba(59,130,246,0.08)_55%,rgba(255,255,255,0.4)_100%)]
+            dark:bg-[linear-gradient(to_bottom,rgba(245,158,11,0.12)_0%,rgba(245,158,11,0.06)_25%,rgba(59,130,246,0.1)_55%,rgba(15,23,42,0.3)_100%)]
             border border-white/30 dark:border-white/20
             rounded-[24px] !top-16 !bottom-8 !right-4 !h-[calc(100vh-6rem)]"
         >
-          <SheetHeader className="shrink-0 space-y-2 pb-4 border-b border-white/20 dark:border-slate-700/20 relative">
-            {/* Edit, Delete, Close - aligned row with consistent styling */}
-            <div className="absolute right-0 top-0 flex items-center gap-1">
-              <button
-                type="button"
-                onClick={handleEditClick}
-                disabled={isEditMode}
-                className="h-9 w-9 rounded-full flex items-center justify-center
-                  bg-white/20 dark:bg-slate-700/50
-                  hover:bg-white/30 dark:hover:bg-slate-600/50
-                  transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50
-                  disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/20 dark:disabled:hover:bg-slate-700/50"
-                aria-label="Edit project"
-              >
-                <Pencil size={16} className="text-slate-700 dark:text-slate-200" />
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                className="h-9 w-9 rounded-full flex items-center justify-center group
-                  bg-white/20 dark:bg-slate-700/50
-                  hover:bg-red-500/20 transition-colors
-                  focus:outline-none focus:ring-2 focus:ring-red-500/50"
-                aria-label="Delete project"
-              >
-                <Trash2 size={16} className="text-slate-700 dark:text-slate-200 group-hover:text-red-600 dark:group-hover:text-red-400" />
-              </button>
-              <SheetClose
-                className="h-9 w-9 rounded-full flex items-center justify-center
-                  bg-white/20 dark:bg-slate-700/50
-                  hover:bg-white/30 dark:hover:bg-slate-600/50
-                  transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-                aria-label="Close"
-              >
-                <X size={16} className="text-slate-700 dark:text-slate-200" />
-              </SheetClose>
-            </div>
+          <SheetHeader className="shrink-0 space-y-3 pb-4 border-b border-white/20 dark:border-slate-700/20">
             <ProjectHeader
               project={project}
               isEditMode={isEditMode}
               editForm={editForm}
               onInputChange={handleInputChange}
               onStatusChange={onStatusChange}
+              renderActions={
+                <>
+                  <Popover open={projectMenuOpen} onOpenChange={setProjectMenuOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="h-9 w-9 rounded-full flex items-center justify-center
+                          bg-white/20 dark:bg-slate-700/50
+                          hover:bg-white/30 dark:hover:bg-slate-600/50
+                          transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        aria-label="Project menu"
+                      >
+                        <MoreHorizontal size={16} className="text-slate-700 dark:text-slate-200" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" side="bottom" className="w-48 p-1 backdrop-blur-xl bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700">
+                      {onExportProject && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onExportProject(project);
+                            setProjectMenuOpen(false);
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                        >
+                          <Download size={16} className="text-slate-600 dark:text-slate-400" />
+                          Export
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleEditClick();
+                          setProjectMenuOpen(false);
+                        }}
+                        disabled={isEditMode}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Pencil size={16} className="text-slate-600 dark:text-slate-400" />
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleDelete();
+                          setProjectMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                      >
+                        <Trash2 size={16} />
+                        Delete
+                      </button>
+                    </PopoverContent>
+                  </Popover>
+                  <SheetClose
+                    className="h-9 w-9 rounded-full flex items-center justify-center
+                      bg-white/20 dark:bg-slate-700/50
+                      hover:bg-white/30 dark:hover:bg-slate-600/50
+                      transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+                    aria-label="Close"
+                  >
+                    <X size={16} className="text-slate-700 dark:text-slate-200" />
+                  </SheetClose>
+                </>
+              }
             />
 
             {isEditMode && (
