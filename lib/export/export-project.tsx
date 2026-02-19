@@ -133,23 +133,7 @@ export async function exportProjectAsZip(data: ExportProjectData): Promise<void>
   );
 
   // Add combined project Markdown
-  const mdSections: string[] = [];
-  mdSections.push(`# ${data.project.name}\n\n*Exported project • ${new Date().toISOString().slice(0, 10)}*\n\n---\n\n`);
-
-  for (const canvas of data.canvases) {
-    const blocks = canvas.blocks.map(toCanvasBlock);
-    const sorted = sortBlocksForExport(blocks);
-    const blockSections = sorted
-      .map((block) => blockToMarkdown(block))
-      .filter((s) => s.trim());
-
-    if (blockSections.length > 0) {
-      mdSections.push(`## ${canvas.name}\n\n`);
-      mdSections.push(blockSections.join("\n\n---\n\n"));
-      mdSections.push("\n\n");
-    }
-  }
-  projectFolder.file(`${base}-project.md`, mdSections.join(""));
+  projectFolder.file(`${base}-project.md`, getProjectMarkdown(data));
 
   // Add per-canvas JSON and Markdown
   for (const canvas of data.canvases) {
