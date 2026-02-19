@@ -21,6 +21,13 @@ import {
 } from "lucide-react";
 
 const DEBOUNCE_MS = 350;
+const RESIZE_DEBOUNCE_MS = 350;
+/** Only update height when change exceeds this (px) to reduce jumpiness. */
+const RESIZE_HEIGHT_THRESHOLD = 8;
+const MIN_NOTE_HEIGHT = 120;
+const MAX_NOTE_HEIGHT = 560;
+/** Header (icon, title, padding, border) height for note blocks. */
+const NOTE_HEADER_HEIGHT = 56;
 
 /** Toolbar buttons for the bubble menu; uses useEditorState so only re-renders when marks change. */
 function NoteBubbleToolbar({ editor }: { editor: Editor }) {
@@ -196,6 +203,8 @@ interface CanvasBlock {
   content: unknown;
   color?: string;
   title?: string;
+  width?: number;
+  height?: number;
 }
 
 interface NoteBlockProps {
@@ -206,6 +215,7 @@ interface NoteBlockProps {
 
 export function NoteBlock({ block, onUpdate, isEditable }: NoteBlockProps) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resizeDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const blockRef = useRef(block);
   blockRef.current = block;
   const initialContent = useMemo(
@@ -253,14 +263,70 @@ export function NoteBlock({ block, onUpdate, isEditable }: NoteBlockProps) {
       }, DEBOUNCE_MS);
     };
 
-    editor.on("update", handleUpdate);
+    const handleResize = () => {
+      if (resizeDebounceRef.current) clearTimeout(resizeDebounceRef.current);
+      resizeDebounceRef.current = setTimeout(() => {
+        resizeDebounceRef.current = null;
+        requestAnimationFrame(() => {
+          if (editor.isDestroyed || !editor.view?.dom) return;
+          const contentHeight = editor.view.dom.scrollHeight;
+          const newHeight = Math.max(
+            MIN_NOTE_HEIGHT,
+            Math.min(
+              MAX_NOTE_HEIGHT,
+              NOTE_HEADER_HEIGHT + contentHeight
+            )
+          );
+          const currentHeight = blockRef.current?.height ?? 0;
+          if (
+            Math.abs(newHeight - currentHeight) >= RESIZE_HEIGHT_THRESHOLD ||
+            newHeight === MIN_NOTE_HEIGHT ||
+            newHeight === MAX_NOTE_HEIGHT
+          ) {
+            onUpdateRef.current({ height: newHeight });
+          }
+        });
+      }, RESIZE_DEBOUNCE_MS);
+    };
+
+    const handleUpdateAndResize = () => {
+      handleUpdate();
+      handleResize();
+    };
+
+    editor.on("update", handleUpdateAndResize);
     return () => {
-      editor.off("update", handleUpdate);
+      editor.off("update", handleUpdateAndResize);
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
         debounceRef.current = null;
       }
+      if (resizeDebounceRef.current) {
+        clearTimeout(resizeDebounceRef.current);
+        resizeDebounceRef.current = null;
+      }
     };
+  }, [editor]);
+
+  // Initial resize when editor mounts with existing content
+  useEffect(() => {
+    if (!editor) return;
+    const resizeToFit = () => {
+      requestAnimationFrame(() => {
+        if (editor.isDestroyed || !editor.view?.dom) return;
+        const contentHeight = editor.view.dom.scrollHeight;
+        const newHeight = Math.max(
+          MIN_NOTE_HEIGHT,
+          Math.min(
+            MAX_NOTE_HEIGHT,
+            NOTE_HEADER_HEIGHT + contentHeight
+          )
+        );
+        onUpdateRef.current({ height: newHeight });
+      });
+    };
+    const id = setTimeout(resizeToFit, 50);
+    return () => clearTimeout(id);
   }, [editor]);
 
   const handleMenuMouseDown = useCallback((e: React.MouseEvent) => {
@@ -277,11 +343,16 @@ export function NoteBlock({ block, onUpdate, isEditable }: NoteBlockProps) {
   }
 
   return (
-    <div className="h-full min-h-0 overflow-auto">
+    <div
+      className="h-full min-h-0 overflow-auto"
+      onWheel={(e) => e.stopPropagation()}
+    >
       <BubbleMenu
         editor={editor}
+        updateDelay={300}
+        shouldShow={({ editor: ed }) => !ed.isDestroyed}
         options={{ placement: "top", offset: 8 }}
-        className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg px-1 py-0.5"
+        className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg px-1 py-0.5 transition-opacity duration-150"
         onMouseDown={handleMenuMouseDown}
         onPointerDown={handleMenuMouseDown}
       >
@@ -289,8 +360,10 @@ export function NoteBlock({ block, onUpdate, isEditable }: NoteBlockProps) {
       </BubbleMenu>
       <FloatingMenu
         editor={editor}
+        updateDelay={400}
+        shouldShow={({ editor: ed }) => !ed.isDestroyed}
         options={{ placement: "top", offset: 8 }}
-        className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg px-1 py-0.5"
+        className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg px-1 py-0.5 transition-opacity duration-200"
         onMouseDown={handleMenuMouseDown}
         onPointerDown={handleMenuMouseDown}
       >

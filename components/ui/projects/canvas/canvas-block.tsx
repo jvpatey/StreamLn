@@ -27,6 +27,7 @@ import {
   Link2,
 } from "lucide-react";
 import { NoteBlock } from "./blocks/note-block";
+import { NoteBlockErrorBoundary } from "./blocks/note-block-error-boundary";
 import { TaskBoardBlock } from "./blocks/task-board-block";
 import { CodeBlock } from "./blocks/code-block";
 import { ImageBlock } from "./blocks/image-block";
@@ -323,7 +324,11 @@ export function CanvasBlock({
 
     switch (block.type) {
       case "note":
-        return <NoteBlock {...commonProps} />;
+        return (
+          <NoteBlockErrorBoundary>
+            <NoteBlock {...commonProps} />
+          </NoteBlockErrorBoundary>
+        );
       case "task-board":
         return <TaskBoardBlock {...commonProps} />;
       case "code":
@@ -339,7 +344,11 @@ export function CanvasBlock({
       case "shape":
         return <ShapeBlock {...commonProps} />;
       default:
-        return <NoteBlock {...commonProps} />;
+        return (
+          <NoteBlockErrorBoundary>
+            <NoteBlock {...commonProps} />
+          </NoteBlockErrorBoundary>
+        );
     }
   };
 
@@ -376,16 +385,19 @@ export function CanvasBlock({
             duration: 0.3,
             delay: entranceIndex * STAGGER_DELAY,
             ease: ENTRANCE_EASE,
+            layout: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
           },
         }
       : {
           exit: { opacity: 0, scale: 0.98 },
+          transition: { layout: { duration: 0.28, ease: [0.32, 0.72, 0, 1] } },
         };
 
   return (
-    <motion.div layout {...wrapperProps} {...animationProps}>
-      <Card
-        className={`relative w-full h-full transition-all duration-200 ${
+    <motion.div layout="position" {...wrapperProps} {...animationProps}>
+      <div className="relative h-full w-full">
+        <Card
+          className={`relative h-full w-full flex flex-col min-h-0 transition-all duration-200 ${
           block.type === "tag"
             ? "border"
             : block.type === "shape" && !isSelected
@@ -442,7 +454,7 @@ export function CanvasBlock({
         {/* Block Header (hidden for tag, text, and shape – minimal/subtle) */}
         {block.type !== "tag" && block.type !== "text" && block.type !== "shape" && (
           <div
-            className="flex items-center justify-between p-3 border-b border-slate-200/50 dark:border-slate-700/50"
+            className="flex shrink-0 items-center justify-between p-3 border-b border-slate-200/50 dark:border-slate-700/50"
             style={{
               background: isDark
                 ? `linear-gradient(90deg, ${getBlockColor()}35 0%, ${getBlockColor()}18 50%, ${getBlockColor()}08 100%)`
@@ -949,12 +961,18 @@ export function CanvasBlock({
           {renderBlockContent()}
         </div>
 
-        {/* Selection Indicator */}
+        {/* Drag Preview */}
+        {(isDragging || (isSelected && isSelectionDragging)) && (
+          <div className="absolute inset-0 bg-primary/10 border-2 border-primary border-dashed rounded pointer-events-none" />
+        )}
+      </Card>
+
+        {/* Selection Indicator - outside Card so always at block bounds */}
         {isSelected && isEditable && (
           <>
-            {/* Resize Handle */}
+            {/* Resize Handle - fixed at block bottom-right corner */}
             <div
-              className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize opacity-80 hover:opacity-100"
+              className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize opacity-80 hover:opacity-100 pointer-events-auto"
               style={{
                 clipPath: "polygon(100% 0%, 0% 100%, 100% 100%)",
                 backgroundColor: getBlockColor(),
@@ -963,19 +981,14 @@ export function CanvasBlock({
             />
 
             {/* Drag Handle */}
-            <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto">
               <div className="p-1 bg-white/90 dark:bg-slate-800/90 rounded border border-slate-200 dark:border-slate-700 cursor-grab active:cursor-grabbing">
                 <GripVertical size={10} className="text-slate-400" />
               </div>
             </div>
           </>
         )}
-
-        {/* Drag Preview */}
-        {(isDragging || (isSelected && isSelectionDragging)) && (
-          <div className="absolute inset-0 bg-primary/10 border-2 border-primary border-dashed rounded pointer-events-none" />
-        )}
-      </Card>
+      </div>
     </motion.div>
   );
 }
