@@ -271,6 +271,7 @@ export default function DashboardPage() {
   };
 
   // Filter and sort projects before rendering
+  // Active projects always appear before archived; within each group, apply selected sort
   const filteredAndSortedProjects = projects
     .filter((project) => {
       if (statusFilter === "all") return true;
@@ -279,6 +280,16 @@ export default function DashboardPage() {
       return true;
     })
     .sort((a, b) => {
+      // Always put active before archived
+      const statusOrder = (status: string | undefined) => {
+        if (status === "active" || !status) return 0;
+        if (status === "archived") return 1;
+        return 2;
+      };
+      const statusDiff = statusOrder(a.status) - statusOrder(b.status);
+      if (statusDiff !== 0) return statusDiff;
+
+      // Within same status group, apply selected sort
       if (sortBy === "updated") {
         return (
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
@@ -286,13 +297,10 @@ export default function DashboardPage() {
       } else if (sortBy === "alpha") {
         return a.name.localeCompare(b.name);
       } else if (sortBy === "status") {
-        // Active first, then archived, then others
-        const statusOrder = (status: string | undefined) => {
-          if (status === "active") return 0;
-          if (status === "archived") return 1;
-          return 2;
-        };
-        return statusOrder(a.status) - statusOrder(b.status);
+        // Same status - use updatedAt as tiebreaker
+        return (
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
       }
       return 0;
     });
