@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef, useState, useRef, useCallback } from "react";
+import { AnimatePresence } from "framer-motion";
 import { CanvasBlock } from "./canvas-block";
 import { getKeyboardShortcut } from "@/lib/utils";
 import type { CanvasTool } from "./canvas-toolbar";
@@ -331,10 +332,12 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
           }}
         >
           {/* Canvas Blocks */}
-          {blocks.map((block) => (
-            <CanvasBlock
-              key={block.id}
-              block={block}
+          <AnimatePresence mode="popLayout">
+            {blocks.map((block, index) => (
+              <CanvasBlock
+                key={block.id}
+                block={block}
+                entranceIndex={index}
               isSelected={selectedBlocks.includes(block.id)}
               isEditable={viewMode === "edit"}
               isSelectionDragging={isDragging}
@@ -357,7 +360,8 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
               zoomLevel={zoomLevel}
               panOffset={panOffset}
             />
-          ))}
+            ))}
+          </AnimatePresence>
 
           {/* Selection Box */}
           {selectionBox && (

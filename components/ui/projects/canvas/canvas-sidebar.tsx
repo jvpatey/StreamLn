@@ -274,7 +274,7 @@ export function CanvasSidebar({
         isOpen ? "w-80 overflow-visible z-20" : "w-0 overflow-hidden"
       }`}
     >
-      <div className="w-80 h-full">
+      <div className="w-80 h-full animate-sidebar-enter">
         <LiquidGlassSurface
           variant="panel"
           intensity="xl"

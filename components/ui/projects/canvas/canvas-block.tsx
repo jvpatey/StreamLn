@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Card } from "@/components/ui/shared/card";
@@ -52,6 +53,7 @@ interface CanvasBlock {
 
 interface CanvasBlockProps {
   block: CanvasBlock;
+  entranceIndex?: number;
   isSelected: boolean;
   isEditable: boolean;
   isSelectionDragging?: boolean;
@@ -71,8 +73,12 @@ interface CanvasBlockProps {
 const dropdownItemClass =
   "flex items-center gap-2 px-2 py-1.5 text-sm rounded-md cursor-pointer outline-none focus:bg-slate-100 dark:focus:bg-slate-700 text-slate-700 dark:text-slate-300 data-[highlighted]:bg-slate-100 dark:data-[highlighted]:bg-slate-700";
 
+const STAGGER_DELAY = 0.045;
+const ENTRANCE_EASE = [0.25, 0.46, 0.45, 0.94] as const;
+
 export function CanvasBlock({
   block,
+  entranceIndex,
   isSelected,
   isEditable,
   isSelectionDragging = false,
@@ -341,25 +347,43 @@ export function CanvasBlock({
     return null;
   }
 
+  const wrapperProps = {
+    ref: blockRef,
+    className: `absolute group cursor-move select-none ${
+      isDragging || (isSelected && isSelectionDragging)
+        ? "z-50"
+        : isSelected
+        ? "z-40"
+        : "z-10"
+    }`,
+    style: {
+      left: block.x,
+      top: block.y,
+      width: block.width,
+      height: block.height,
+    },
+    onMouseDown: handleMouseDown,
+    onContextMenu: handleContextMenu,
+  };
+
+  const animationProps =
+    entranceIndex !== undefined
+      ? {
+          initial: { opacity: 0, y: 12 },
+          animate: { opacity: 1, y: 0 },
+          exit: { opacity: 0, scale: 0.98 },
+          transition: {
+            duration: 0.3,
+            delay: entranceIndex * STAGGER_DELAY,
+            ease: ENTRANCE_EASE,
+          },
+        }
+      : {
+          exit: { opacity: 0, scale: 0.98 },
+        };
+
   return (
-    <div
-      ref={blockRef}
-      className={`absolute group cursor-move select-none ${
-        isDragging || (isSelected && isSelectionDragging)
-          ? "z-50"
-          : isSelected
-          ? "z-40"
-          : "z-10"
-      }`}
-      style={{
-        left: block.x,
-        top: block.y,
-        width: block.width,
-        height: block.height,
-      }}
-      onMouseDown={handleMouseDown}
-      onContextMenu={handleContextMenu}
-    >
+    <motion.div layout {...wrapperProps} {...animationProps}>
       <Card
         className={`relative w-full h-full transition-all duration-200 ${
           block.type === "tag"
@@ -952,6 +976,6 @@ export function CanvasBlock({
           <div className="absolute inset-0 bg-primary/10 border-2 border-primary border-dashed rounded pointer-events-none" />
         )}
       </Card>
-    </div>
+    </motion.div>
   );
 }
