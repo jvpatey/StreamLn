@@ -102,7 +102,7 @@ export function ProjectsSidebar({
                   >
                     <FolderOpen
                       size={14}
-                      className="shrink-0 text-slate-500 dark:text-slate-500"
+                      className="shrink-0 text-primary-500 dark:text-primary-400"
                     />
                     <span className="truncate">{project.name}</span>
                   </button>

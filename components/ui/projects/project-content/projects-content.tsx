@@ -140,9 +140,18 @@ export function ProjectsContent({
             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 sm:text-2xl">
               All Projects
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 sm:text-sm">
-              {activeCount} active project{activeCount === 1 ? "" : "s"}
-              {archivedCount > 0 && <> &middot; {archivedCount} archived</>}
+            <p className="text-xs mt-1 sm:text-sm">
+              <span className="text-emerald-600 dark:text-emerald-500">
+                {activeCount} active project{activeCount === 1 ? "" : "s"}
+              </span>
+              {archivedCount > 0 && (
+                <>
+                  <span className="text-slate-400 dark:text-slate-500"> · </span>
+                  <span className="text-slate-400 dark:text-slate-500">
+                    {archivedCount} archived project{archivedCount === 1 ? "" : "s"}
+                  </span>
+                </>
+              )}
             </p>
           </div>
           <div className="flex items-center space-x-3">
