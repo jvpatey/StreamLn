@@ -1,6 +1,12 @@
 "use client";
 
-import { forwardRef, useState, useRef, useCallback } from "react";
+import {
+  forwardRef,
+  useState,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import { AnimatePresence } from "framer-motion";
 import { CanvasBlock } from "./canvas-block";
 import { getKeyboardShortcut } from "@/lib/utils";
@@ -73,6 +79,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isPanning, setIsPanning] = useState(false);
+    const [canvasOrigin, setCanvasOrigin] = useState({ x: 0, y: 0 });
     const [panStart, setPanStart] = useState({ x: 0, y: 0 });
     const [selectionBox, setSelectionBox] = useState<{
       start: { x: number; y: number };
@@ -80,6 +87,27 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
       additive: boolean;
       initialSelection: string[];
     } | null>(null);
+
+    // Keep canvas origin in sync for accurate block drag coordinates (container rect + pan)
+    useLayoutEffect(() => {
+      const el = containerRef.current;
+      if (!el) return;
+      const update = () => {
+        const rect = el.getBoundingClientRect();
+        setCanvasOrigin({
+          x: rect.left + panOffset.x,
+          y: rect.top + panOffset.y,
+        });
+      };
+      update();
+      const ro = new ResizeObserver(update);
+      ro.observe(el);
+      window.addEventListener("scroll", update, true);
+      return () => {
+        ro.disconnect();
+        window.removeEventListener("scroll", update, true);
+      };
+    }, [panOffset.x, panOffset.y]);
 
     // Handle mouse events for panning and selection
     const handleMouseDown = useCallback(
@@ -359,6 +387,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
               }}
               zoomLevel={zoomLevel}
               panOffset={panOffset}
+              canvasOrigin={canvasOrigin}
             />
             ))}
           </AnimatePresence>

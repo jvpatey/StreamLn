@@ -69,6 +69,8 @@ interface CanvasBlockProps {
   onContextMenu: (position: { x: number; y: number }) => void;
   zoomLevel: number;
   panOffset: { x: number; y: number };
+  /** Canvas origin in viewport coordinates (container rect + pan). Used for accurate mouse-to-world conversion. */
+  canvasOrigin: { x: number; y: number };
 }
 
 const dropdownItemClass =
@@ -94,6 +96,7 @@ export function CanvasBlock({
   onContextMenu,
   zoomLevel,
   panOffset,
+  canvasOrigin,
 }: CanvasBlockProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
@@ -118,6 +121,7 @@ export function CanvasBlock({
   });
   const blockRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
 
   const getDisplayTitle = useCallback(() => {
     if (block.type === "tag") return "Tag";
@@ -196,9 +200,9 @@ export function CanvasBlock({
       // Don't start block drag when interacting with task board (cards, columns, etc.)
       if ((e.target as HTMLElement).closest("[data-no-block-drag]")) return;
 
-      // Convert screen coordinates to world coordinates
-      const worldX = (e.clientX - panOffset.x) / zoomLevel;
-      const worldY = (e.clientY - panOffset.y) / zoomLevel;
+      // Convert screen coordinates to world coordinates (canvasOrigin = container rect + pan)
+      const worldX = (e.clientX - canvasOrigin.x) / zoomLevel;
+      const worldY = (e.clientY - canvasOrigin.y) / zoomLevel;
 
       // Record pending drag; start real drag only after pointer moves past threshold
       const offsetX = worldX - block.x;
@@ -210,7 +214,7 @@ export function CanvasBlock({
         offsetY,
       });
     },
-    [onSelect, isEditable, block.locked, panOffset, zoomLevel, block.x, block.y]
+    [onSelect, isEditable, block.locked, canvasOrigin, zoomLevel, block.x, block.y]
   );
 
   const handleMouseMove = useCallback(
@@ -220,6 +224,10 @@ export function CanvasBlock({
         const dy = e.clientY - pendingDrag.startClientY;
         const distance = Math.sqrt(dx * dx + dy * dy);
         if (distance > DRAG_THRESHOLD_PX) {
+          dragOffsetRef.current = {
+            x: pendingDrag.offsetX,
+            y: pendingDrag.offsetY,
+          };
           setDragStart({ x: pendingDrag.offsetX, y: pendingDrag.offsetY });
           setIsDragging(true);
           onDragStart();
@@ -228,19 +236,18 @@ export function CanvasBlock({
             typeof document !== "undefined" ? document.activeElement : null;
           if (el && "blur" in el && typeof el.blur === "function") el.blur();
 
-          const worldX = (e.clientX - panOffset.x) / zoomLevel;
-          const worldY = (e.clientY - panOffset.y) / zoomLevel;
+          const worldX = (e.clientX - canvasOrigin.x) / zoomLevel;
+          const worldY = (e.clientY - canvasOrigin.y) / zoomLevel;
           onUpdate({
             x: worldX - pendingDrag.offsetX,
             y: worldY - pendingDrag.offsetY,
           });
         }
       } else if (isDragging) {
-        const worldX = (e.clientX - panOffset.x) / zoomLevel;
-        const worldY = (e.clientY - panOffset.y) / zoomLevel;
-        const newX = worldX - dragStart.x;
-        const newY = worldY - dragStart.y;
-        onUpdate({ x: newX, y: newY });
+        const worldX = (e.clientX - canvasOrigin.x) / zoomLevel;
+        const worldY = (e.clientY - canvasOrigin.y) / zoomLevel;
+        const offset = dragOffsetRef.current;
+        onUpdate({ x: worldX - offset.x, y: worldY - offset.y });
       } else if (isResizing) {
         const minW = block.type === "task-board" ? 400 : 150;
         const minH = block.type === "task-board" ? 280 : 100;
@@ -259,11 +266,10 @@ export function CanvasBlock({
       pendingDrag,
       isDragging,
       isResizing,
-      dragStart,
       resizeStart,
       onUpdate,
       onDragStart,
-      panOffset,
+      canvasOrigin,
       zoomLevel,
       block.type,
     ]
@@ -378,6 +384,7 @@ export function CanvasBlock({
     onContextMenu: handleContextMenu,
   };
 
+  const isActivelyDragging = isDragging || (isSelected && isSelectionDragging);
   const animationProps =
     entranceIndex !== undefined
       ? {
@@ -388,16 +395,26 @@ export function CanvasBlock({
             duration: 0.3,
             delay: entranceIndex * STAGGER_DELAY,
             ease: ENTRANCE_EASE,
-            layout: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
+            layout: isActivelyDragging
+              ? { duration: 0 }
+              : { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
           },
         }
       : {
           exit: { opacity: 0, scale: 0.98 },
-          transition: { layout: { duration: 0.28, ease: [0.32, 0.72, 0, 1] } },
+          transition: {
+            layout: isActivelyDragging
+              ? { duration: 0 }
+              : { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
+          },
         };
 
   return (
-    <motion.div layout="position" {...wrapperProps} {...animationProps}>
+    <motion.div
+      layout={isActivelyDragging ? false : "position"}
+      {...wrapperProps}
+      {...animationProps}
+    >
       <div className="relative h-full w-full">
         <Card
           className={`relative h-full w-full flex flex-col min-h-0 transition-all duration-200 ${
