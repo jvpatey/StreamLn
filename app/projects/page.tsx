@@ -203,13 +203,19 @@ export default function DashboardPage() {
   };
 
   const handleProjectDelete = async (projectId: string) => {
+    const projectToRestore = projects.find((p) => p.id === projectId);
+    setProjects((prev) => prev.filter((p) => p.id !== projectId));
+    setSidepanelOpen(false);
+    setSelectedProject(null);
     try {
       await deleteProject(projectId);
-      loadProjects();
-      setSidepanelOpen(false);
-      setSelectedProject(null);
     } catch (error) {
       console.error("Failed to delete project:", error);
+      if (projectToRestore) {
+        setProjects((prev) => [...prev, projectToRestore]);
+      } else {
+        loadProjects();
+      }
     }
   };
 

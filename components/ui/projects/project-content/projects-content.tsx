@@ -6,6 +6,7 @@ import { CreateProjectCard } from "./create-project/create-project-card";
 import { CreateProjectButton } from "./create-project/create-project-button";
 import { ProjectCard } from "./project-card";
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { deleteProject, updateProjectStatus } from "@/lib/api/projects";
 import {
   Popover,
@@ -87,13 +88,17 @@ export function ProjectsContent({
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
+    const projectToRestore = projects.find((p) => p.id === id);
+    if (setProjects) {
+      setProjects((prev) => prev.filter((p) => p.id !== id));
+    }
     try {
       await deleteProject(id);
-      if (setProjects) {
-        setProjects((prev) => prev.filter((p) => p.id !== id));
-      }
     } catch (err) {
       console.log("Failed to delete project", err);
+      if (setProjects && projectToRestore) {
+        setProjects((prev) => [...prev, projectToRestore]);
+      }
     } finally {
       setDeletingId(null);
     }
@@ -198,10 +203,12 @@ export function ProjectsContent({
         {/* Projects Grid or List */}
         {viewMode === "grid" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-            {projects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                id={project.id}
+            <AnimatePresence mode="popLayout">
+              {projects.map((project, index) => (
+                <ProjectCard
+                  key={project.id}
+                  index={index}
+                  id={project.id}
                 name={project.name}
                 type={project.description || "Project Workspace"}
                 lastModified={formatTimeAgo(project.updatedAt)}
@@ -229,7 +236,8 @@ export function ProjectsContent({
                   onExportProject?.({ id: project.id, name: project.name })
                 }
               />
-            ))}
+              ))}
+            </AnimatePresence>
             {/* Create New Project Card - Hidden on mobile when no projects */}
             <div className="hidden lg:block">
               <CreateProjectCard onClick={onCreateProject} />

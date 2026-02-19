@@ -2,12 +2,11 @@
 
 // Sidebar component for the projects page - contains quick actions and navigation
 // Used in: app/projects/page.tsx
-import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import { LiquidGlassSurface } from "@/components/ui/shared/liquid-glass-surface";
 import { LiquidGlassButton } from "@/components/ui/shared/liquid-glass-button";
 import { getKeyboardShortcut } from "@/lib/utils";
-import { Search, FileText, Zap, X, Sparkles, Upload } from "lucide-react";
+import { Zap, Sparkles, Upload } from "lucide-react";
 import { CreateProjectButton } from "../project-content/create-project/create-project-button";
 
 interface ProjectsSidebarProps {
@@ -27,16 +26,20 @@ export function ProjectsSidebar({
 }: ProjectsSidebarProps) {
   return (
     <>
-      {/* Collapsible Sidebar - Hidden on mobile */}
-      <LiquidGlassSurface
-        variant="panel"
-        intensity="2xl"
+      {/* Collapsible Sidebar - Hidden on mobile. CSS animation runs immediately (before hydration). */}
+      <div
         className={`${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } fixed lg:relative lg:translate-x-0 z-40 w-72 
         lg:rounded-[24px] lg:mt-2 lg:mb-2 lg:ml-2 lg:h-[calc(100vh-4.5rem)] lg:min-h-[calc(100vh-4.5rem)]
-        transition-transform duration-300 ease-in-out overflow-y-auto hidden lg:block`}
+        transition-transform duration-300 ease-in-out overflow-hidden hidden lg:block
+        animate-sidebar-enter`}
       >
+        <LiquidGlassSurface
+          variant="panel"
+          intensity="2xl"
+          className="w-full h-full overflow-y-auto lg:rounded-[24px]"
+        >
         <div className="p-6">
           {/* Welcome Section */}
           <div className="mb-6">
@@ -126,6 +129,7 @@ export function ProjectsSidebar({
           </div>
         </div>
       </LiquidGlassSurface>
+      </div>
     </>
   );
 }

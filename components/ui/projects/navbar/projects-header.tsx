@@ -23,7 +23,7 @@ export function ProjectsHeader({
 }: ProjectsHeaderProps) {
   return (
     <LiquidGlassSurface asChild variant="header" intensity="2xl">
-      <header>
+      <header className="animate-navbar-enter">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14">
             {/* Left section */}

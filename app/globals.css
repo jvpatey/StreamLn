@@ -159,6 +159,38 @@
   .animate-shimmer {
     animation: shimmer 2s infinite;
   }
+
+  /* Sidebar entrance - runs immediately when element is in DOM (before hydration) */
+  @keyframes sidebar-enter {
+    from {
+      opacity: 0;
+      transform: translateX(-16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-sidebar-enter {
+    animation: sidebar-enter 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  /* Navbar entrance - runs immediately when element is in DOM (before hydration) */
+  @keyframes navbar-enter {
+    from {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-navbar-enter {
+    animation: navbar-enter 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
 }
 
 /* Note block Tiptap editor (canvas) */
