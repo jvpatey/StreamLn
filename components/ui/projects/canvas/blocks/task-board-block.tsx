@@ -248,6 +248,7 @@ function Column({
   onDelete,
   onColumnTitleChange,
   onCardTextChange,
+  onCardDelete,
 }: {
   column: TaskBoardColumn;
   cards: Record<string, TaskBoardCard>;
