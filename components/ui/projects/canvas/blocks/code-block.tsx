@@ -13,7 +13,7 @@ import { githubLight } from "@uiw/codemirror-theme-github";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import type { Extension } from "@codemirror/state";
 import { tooltips } from "@codemirror/view";
-import { Copy } from "lucide-react";
+import { Copy, Check, Code2 } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Button } from "@/components/ui/shared/button";
 import {
@@ -63,7 +63,9 @@ export function CodeBlock({ block, onUpdate, isEditable }: CodeBlockProps) {
   const content = getCodeContent(block.content);
   const [code, setCode] = useState(content.code);
   const [language, setLanguage] = useState(content.language ?? "javascript");
+  const [copied, setCopied] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipNextPersistRef = useRef(false);
   const onUpdateRef = useRef(onUpdate);
   onUpdateRef.current = onUpdate;
@@ -93,6 +95,12 @@ export function CodeBlock({ block, onUpdate, isEditable }: CodeBlockProps) {
     }
     return exts;
   }, [themeExtension, languageExtension, isMounted]);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+    };
+  }, []);
 
   // Sync from block when content changes externally
   useEffect(() => {
@@ -125,9 +133,18 @@ export function CodeBlock({ block, onUpdate, isEditable }: CodeBlockProps) {
     };
   }, [code, language]);
 
-  const handleCopy = useCallback(() => {
-    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(code);
+  const handleCopy = useCallback(async () => {
+    if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) return;
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = setTimeout(() => {
+        copyTimeoutRef.current = null;
+        setCopied(false);
+      }, 2000);
+    } catch {
+      // Clipboard API rejected (e.g. permissions); no feedback
     }
   }, [code]);
 
@@ -139,7 +156,11 @@ export function CodeBlock({ block, onUpdate, isEditable }: CodeBlockProps) {
     CODE_BLOCK_LANGUAGES.find((l) => l.id === language)?.label ?? "JavaScript";
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden">
+    <div
+      className="flex h-full min-h-0 flex-col overflow-hidden"
+      role="region"
+      aria-label="Code block"
+    >
       <div
         className="flex shrink-0 items-center justify-between gap-2 border-b border-slate-200 px-2 py-1.5 dark:border-slate-700"
         onMouseDown={(e) => e.stopPropagation()}
@@ -150,10 +171,11 @@ export function CodeBlock({ block, onUpdate, isEditable }: CodeBlockProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 text-xs font-medium text-slate-600 dark:text-slate-400"
+              className="h-8 gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-400"
               aria-label="Select language"
               aria-haspopup="menu"
             >
+              <Code2 size={14} />
               {currentLanguageLabel}
             </Button>
           </DropdownMenu.Trigger>
@@ -180,21 +202,38 @@ export function CodeBlock({ block, onUpdate, isEditable }: CodeBlockProps) {
           size="sm"
           className="h-8 gap-1.5 px-2 text-slate-600 dark:text-slate-400"
           onClick={handleCopy}
-          aria-label="Copy code"
+          aria-label={copied ? "Copied" : "Copy code"}
+          aria-live="polite"
           title="Copy code"
         >
-          <Copy size={14} />
-          Copy
+          {copied ? (
+            <>
+              <Check size={14} className="text-green-600 dark:text-green-400" />
+              Copied!
+            </>
+          ) : (
+            <>
+              <Copy size={14} />
+              Copy
+            </>
+          )}
         </Button>
       </div>
-      <div className="min-h-0 flex-1 overflow-visible px-4">
+      <div className="code-block-editor min-h-0 flex-1 overflow-visible bg-slate-100 px-4 py-2 dark:bg-slate-900/50">
         <CodeMirror
           value={code}
           onChange={setCode}
           extensions={extensions}
           theme="none"
           editable={isEditable}
-          basicSetup={true}
+          placeholder="Enter code here..."
+          basicSetup={{
+            lineNumbers: true,
+            highlightActiveLine: true,
+            highlightActiveLineGutter: true,
+            foldGutter: false,
+            tabSize: 2,
+          }}
           indentWithTab={true}
           className="h-full text-sm [&_.cm-editor]:h-full [&_.cm-scroller]:min-h-full [&_.cm-content]:min-h-full"
           aria-label="Code editor"

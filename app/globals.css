@@ -256,3 +256,33 @@
   border: none;
   font-size: inherit;
 }
+
+/* Code block CodeMirror scrollbar styling */
+.code-block-editor .cm-scroller {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(148 163 184 / 0.4) transparent;
+}
+.dark .code-block-editor .cm-scroller {
+  scrollbar-color: rgb(71 85 105 / 0.5) transparent;
+}
+.code-block-editor .cm-scroller::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.code-block-editor .cm-scroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+.code-block-editor .cm-scroller::-webkit-scrollbar-thumb {
+  background: rgb(148 163 184 / 0.4);
+  border-radius: 4px;
+}
+.code-block-editor .cm-scroller::-webkit-scrollbar-thumb:hover {
+  background: rgb(148 163 184 / 0.6);
+}
+.dark .code-block-editor .cm-scroller::-webkit-scrollbar-thumb {
+  background: rgb(71 85 105 / 0.5);
+}
+.dark .code-block-editor .cm-scroller::-webkit-scrollbar-thumb:hover {
+  background: rgb(71 85 105 / 0.7);
+}
