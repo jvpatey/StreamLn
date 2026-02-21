@@ -4,7 +4,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
-import { getKeyboardShortcut } from "@/lib/utils";
 import {
   ZoomIn,
   ZoomOut,
@@ -32,7 +31,6 @@ import {
   Send,
   ArrowUp,
   ArrowDown,
-  Keyboard,
 } from "lucide-react";
 import {
   Popover,
@@ -153,7 +151,7 @@ export function CanvasToolbar({
             variant: "toolbar",
             intensity: "xl",
             rounded: "xl",
-            className: "flex items-center flex-nowrap gap-2 px-3 py-2 overflow-x-auto overflow-y-hidden scroll-smooth",
+            className: "flex items-center flex-nowrap gap-2 px-3 py-2 min-w-0 overflow-hidden",
           })}
         >
         {/* Tools Section */}
@@ -319,7 +317,13 @@ export function CanvasToolbar({
         </div>
 
         {/* View Options */}
-        <div className="flex items-center gap-1 pr-3 border-r border-slate-200 dark:border-slate-700 shrink-0">
+        <div
+          className={`flex items-center gap-1 shrink-0 ${
+            hasSelection
+              ? "pr-3 border-r border-slate-200 dark:border-slate-700"
+              : ""
+          }`}
+        >
           {onToolbarToggle && (
             <Button
               variant="ghost"
@@ -349,7 +353,7 @@ export function CanvasToolbar({
 
         {/* Selection Actions */}
         {hasSelection && (
-          <div className="flex items-center gap-1 pr-3 border-r border-slate-200 dark:border-slate-700 shrink-0">
+          <div className="flex items-center gap-1 shrink-0">
             <Button
               variant="ghost"
               size="sm"
@@ -447,13 +451,6 @@ export function CanvasToolbar({
           </div>
         )}
 
-        {/* Keyboard Shortcuts Hint - icon + shortcut to avoid font rendering issues */}
-        {!hasSelection && (
-          <div className="hidden xl:flex items-center gap-1.5 shrink-0 text-xs text-slate-500 dark:text-slate-400">
-            <Keyboard size={14} />
-            <span>{getKeyboardShortcut("⌘/")} shortcuts</span>
-          </div>
-        )}
         </div>
       </div>
     </motion.div>
