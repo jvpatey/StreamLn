@@ -347,7 +347,121 @@ export function CanvasBlock({
       case "link":
         return <LinkBlock {...commonProps} />;
       case "tag":
-        return <TagBlock {...commonProps} />;
+        return (
+          <TagBlock
+            {...commonProps}
+            isSelected={isSelected}
+            trailingAction={
+              (block.locked || isEditable) && (
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center">
+                  {block.locked && (
+                    <div className="p-1 rounded bg-amber-50 dark:bg-amber-900/20 mr-0.5">
+                      <Lock
+                        size={10}
+                        className="text-amber-600 dark:text-amber-400"
+                      />
+                    </div>
+                  )}
+                  {isEditable && (
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-5 w-5 p-0 min-w-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                          onMouseDown={(e) => e.stopPropagation()}
+                        >
+                          <MoreVertical size={12} />
+                        </Button>
+                      </DropdownMenu.Trigger>
+                      <DropdownMenu.Portal>
+                        <DropdownMenu.Content
+                          className="min-w-[10rem] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg p-1 z-[100]"
+                          sideOffset={4}
+                          align="end"
+                        >
+                          {onDuplicate && (
+                            <DropdownMenu.Item
+                              className={dropdownItemClass}
+                              onSelect={() => onDuplicate(block.id)}
+                            >
+                              <Copy size={14} />
+                              Duplicate
+                            </DropdownMenu.Item>
+                          )}
+                          {onDelete && (
+                            <DropdownMenu.Item
+                              className={`${dropdownItemClass} text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300`}
+                              onSelect={() => onDelete(block.id)}
+                            >
+                              <Trash2 size={14} />
+                              Delete
+                            </DropdownMenu.Item>
+                          )}
+                          {(onDuplicate || onDelete) && (
+                            <DropdownMenu.Separator className="h-px bg-slate-200 dark:bg-slate-700 my-1" />
+                          )}
+                          <DropdownMenu.Item
+                            className={dropdownItemClass}
+                            onSelect={() => onUpdate({ locked: !block.locked })}
+                          >
+                            {block.locked ? (
+                              <>
+                                <Unlock size={14} />
+                                Unlock
+                              </>
+                            ) : (
+                              <>
+                                <Lock size={14} />
+                                Lock
+                              </>
+                            )}
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Item
+                            className={dropdownItemClass}
+                            onSelect={() => onUpdate({ hidden: !block.hidden })}
+                          >
+                            {block.hidden ? (
+                              <>
+                                <Eye size={14} />
+                                Show
+                              </>
+                            ) : (
+                              <>
+                                <EyeOff size={14} />
+                                Hide
+                              </>
+                            )}
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Separator className="h-px bg-slate-200 dark:bg-slate-700 my-1" />
+                          <DropdownMenu.Item
+                            className={dropdownItemClass}
+                            onSelect={() => {
+                              const url = `${
+                                typeof window !== "undefined"
+                                  ? window.location.origin +
+                                    window.location.pathname
+                                  : ""
+                              }?block=${block.id}`;
+                              if (
+                                typeof navigator !== "undefined" &&
+                                navigator.clipboard?.writeText
+                              )
+                                navigator.clipboard.writeText(url);
+                            }}
+                          >
+                            <Link2 size={14} />
+                            Copy link
+                          </DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                      </DropdownMenu.Portal>
+                    </DropdownMenu.Root>
+                  )}
+                </span>
+              )
+            }
+          />
+        );
       case "text":
         return <TextBlock {...commonProps} />;
       case "shape":
@@ -857,117 +971,6 @@ export function CanvasBlock({
           </div>
         )}
 
-        {/* Tag block: floating menu (no header, so menu overlays pill) */}
-        {block.type === "tag" && (
-          <div
-            className="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-            onMouseDown={(e) => e.stopPropagation()}
-          >
-            {block.locked && (
-              <div className="p-1 rounded bg-amber-50 dark:bg-amber-900/20">
-                <Lock
-                  size={10}
-                  className="text-amber-600 dark:text-amber-400"
-                />
-              </div>
-            )}
-            {isEditable && (
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md"
-                    onMouseDown={(e) => e.stopPropagation()}
-                  >
-                    <MoreVertical size={12} />
-                  </Button>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Portal>
-                  <DropdownMenu.Content
-                    className="min-w-[10rem] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg p-1 z-[100]"
-                    sideOffset={4}
-                    align="end"
-                  >
-                    {onDuplicate && (
-                      <DropdownMenu.Item
-                        className={dropdownItemClass}
-                        onSelect={() => onDuplicate(block.id)}
-                      >
-                        <Copy size={14} />
-                        Duplicate
-                      </DropdownMenu.Item>
-                    )}
-                    {onDelete && (
-                      <DropdownMenu.Item
-                        className={`${dropdownItemClass} text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300`}
-                        onSelect={() => onDelete(block.id)}
-                      >
-                        <Trash2 size={14} />
-                        Delete
-                      </DropdownMenu.Item>
-                    )}
-                    {(onDuplicate || onDelete) && (
-                      <DropdownMenu.Separator className="h-px bg-slate-200 dark:bg-slate-700 my-1" />
-                    )}
-                    <DropdownMenu.Item
-                      className={dropdownItemClass}
-                      onSelect={() => onUpdate({ locked: !block.locked })}
-                    >
-                      {block.locked ? (
-                        <>
-                          <Unlock size={14} />
-                          Unlock
-                        </>
-                      ) : (
-                        <>
-                          <Lock size={14} />
-                          Lock
-                        </>
-                      )}
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item
-                      className={dropdownItemClass}
-                      onSelect={() => onUpdate({ hidden: !block.hidden })}
-                    >
-                      {block.hidden ? (
-                        <>
-                          <Eye size={14} />
-                          Show
-                        </>
-                      ) : (
-                        <>
-                          <EyeOff size={14} />
-                          Hide
-                        </>
-                      )}
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Separator className="h-px bg-slate-200 dark:bg-slate-700 my-1" />
-                    <DropdownMenu.Item
-                      className={dropdownItemClass}
-                      onSelect={() => {
-                        const url = `${
-                          typeof window !== "undefined"
-                            ? window.location.origin + window.location.pathname
-                            : ""
-                        }?block=${block.id}`;
-                        if (
-                          typeof navigator !== "undefined" &&
-                          navigator.clipboard?.writeText
-                        )
-                          navigator.clipboard.writeText(url);
-                      }}
-                    >
-                      <Link2 size={14} />
-                      Copy link
-                    </DropdownMenu.Item>
-                  </DropdownMenu.Content>
-                </DropdownMenu.Portal>
-              </DropdownMenu.Root>
-            )}
-          </div>
-        )}
-
         {/* Block Content */}
         <div
           className={
@@ -984,24 +987,27 @@ export function CanvasBlock({
           {renderBlockContent()}
         </div>
 
-        {/* Drag Preview */}
-        {(isDragging || (isSelected && isSelectionDragging)) && (
-          <div className="absolute inset-0 bg-primary/10 border-2 border-primary border-dashed rounded pointer-events-none" />
-        )}
+        {/* Drag Preview - tag blocks use Card border instead */}
+        {(isDragging || (isSelected && isSelectionDragging)) &&
+          block.type !== "tag" && (
+            <div className="absolute inset-0 bg-primary/10 border-2 border-primary border-dashed rounded pointer-events-none" />
+          )}
       </Card>
 
         {/* Selection Indicator - outside Card so always at block bounds */}
         {isSelected && isEditable && (
           <>
-            {/* Resize Handle - fixed at block bottom-right corner */}
-            <div
-              className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize opacity-80 hover:opacity-100 pointer-events-auto"
-              style={{
-                clipPath: "polygon(100% 0%, 0% 100%, 100% 100%)",
-                backgroundColor: getBlockColor(),
-              }}
-              onMouseDown={handleResizeStart}
-            />
+            {/* Resize Handle - hidden for tag blocks (they auto-size) */}
+            {block.type !== "tag" && (
+              <div
+                className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize opacity-80 hover:opacity-100 pointer-events-auto"
+                style={{
+                  clipPath: "polygon(100% 0%, 0% 100%, 100% 100%)",
+                  backgroundColor: getBlockColor(),
+                }}
+                onMouseDown={handleResizeStart}
+              />
+            )}
 
             {/* Drag Handle */}
             <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto">

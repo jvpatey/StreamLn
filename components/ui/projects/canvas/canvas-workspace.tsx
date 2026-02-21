@@ -14,7 +14,15 @@ import type { CanvasTool } from "./canvas-toolbar";
 
 interface CanvasBlock {
   id: string;
-  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text" | "shape";
+  type:
+    | "note"
+    | "task-board"
+    | "code"
+    | "image"
+    | "link"
+    | "tag"
+    | "text"
+    | "shape";
   x: number;
   y: number;
   width: number;
@@ -75,7 +83,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
       onFloatingToolbarShow,
       viewMode,
     },
-    ref
+    ref,
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isPanning, setIsPanning] = useState(false);
@@ -124,7 +132,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
             x >= block.x &&
             x <= block.x + block.width &&
             y >= block.y &&
-            y <= block.y + block.height
+            y <= block.y + block.height,
         );
 
         if (isAddingBlock) {
@@ -139,7 +147,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
             // Multi-select
             if (selectedBlocks.includes(clickedBlock.id)) {
               onBlockSelect(
-                selectedBlocks.filter((id) => id !== clickedBlock.id)
+                selectedBlocks.filter((id) => id !== clickedBlock.id),
               );
             } else {
               onBlockSelect([...selectedBlocks, clickedBlock.id]);
@@ -182,7 +190,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         zoomLevel,
         isAddingBlock,
         onAddBlock,
-      ]
+      ],
     );
 
     const handleMouseMove = useCallback(
@@ -246,7 +254,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         onBlockSelect,
         panOffset,
         zoomLevel,
-      ]
+      ],
     );
 
     const handleMouseUp = useCallback(() => {
@@ -270,7 +278,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         const MAX_ZOOM = 3;
         const newZoom = Math.min(
           MAX_ZOOM,
-          Math.max(MIN_ZOOM, zoomLevel * (1 - e.deltaY * ZOOM_SENSITIVITY))
+          Math.max(MIN_ZOOM, zoomLevel * (1 - e.deltaY * ZOOM_SENSITIVITY)),
         );
 
         // Keep the point under the cursor fixed in screen space
@@ -281,7 +289,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         onZoomChange(newZoom);
         onPanOffsetChange({ x: newPanX, y: newPanY });
       },
-      [zoomLevel, panOffset, onZoomChange, onPanOffsetChange]
+      [zoomLevel, panOffset, onZoomChange, onPanOffsetChange],
     );
 
     // Double-click to add note
@@ -301,14 +309,14 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
             x >= block.x &&
             x <= block.x + block.width &&
             y >= block.y &&
-            y <= block.y + block.height
+            y <= block.y + block.height,
         );
 
         if (!clickedBlock) {
           onAddBlock("note", { x: x - 150, y: y - 100 }); // Center the new note
         }
       },
-      [blocks, onAddBlock, panOffset, zoomLevel, viewMode]
+      [blocks, onAddBlock, panOffset, zoomLevel, viewMode],
     );
 
     // Cursor: grab/grabbing in pan mode, crosshair in select mode
@@ -366,29 +374,29 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
                 key={block.id}
                 block={block}
                 entranceIndex={index}
-              isSelected={selectedBlocks.includes(block.id)}
-              isEditable={viewMode === "edit"}
-              isSelectionDragging={isDragging}
-              onUpdate={(updates) => onBlockUpdate(block.id, updates)}
-              onDuplicate={onBlockDuplicate}
-              onDelete={onBlockDelete}
-              onSelect={() => {
-                if (!selectedBlocks.includes(block.id)) {
+                isSelected={selectedBlocks.includes(block.id)}
+                isEditable={viewMode === "edit"}
+                isSelectionDragging={isDragging}
+                onUpdate={(updates) => onBlockUpdate(block.id, updates)}
+                onDuplicate={onBlockDuplicate}
+                onDelete={onBlockDelete}
+                onSelect={() => {
+                  if (!selectedBlocks.includes(block.id)) {
+                    onBlockSelect([block.id]);
+                  }
+                }}
+                onDragStart={() => onDraggingChange(true)}
+                onDragEnd={() => onDraggingChange(false)}
+                onResizeStart={() => onResizingChange(true)}
+                onResizeEnd={() => onResizingChange(false)}
+                onContextMenu={(position) => {
                   onBlockSelect([block.id]);
-                }
-              }}
-              onDragStart={() => onDraggingChange(true)}
-              onDragEnd={() => onDraggingChange(false)}
-              onResizeStart={() => onResizingChange(true)}
-              onResizeEnd={() => onResizingChange(false)}
-              onContextMenu={(position) => {
-                onBlockSelect([block.id]);
-                onFloatingToolbarShow(position);
-              }}
-              zoomLevel={zoomLevel}
-              panOffset={panOffset}
-              canvasOrigin={canvasOrigin}
-            />
+                  onFloatingToolbarShow(position);
+                }}
+                zoomLevel={zoomLevel}
+                panOffset={panOffset}
+                canvasOrigin={canvasOrigin}
+              />
             ))}
           </AnimatePresence>
 
@@ -457,5 +465,5 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         )}
       </div>
     );
-  }
+  },
 );
