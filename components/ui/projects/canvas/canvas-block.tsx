@@ -971,7 +971,10 @@ export function CanvasBlock({
         {/* Block Content */}
         <div
           className={
-            block.type === "tag" || block.type === "code" || block.type === "shape"
+            block.type === "tag" ||
+            block.type === "code" ||
+            block.type === "shape" ||
+            block.type === "link"
               ? "flex-1 overflow-visible min-h-0"
               : block.type === "task-board"
               ? "flex-1 overflow-auto min-h-0"

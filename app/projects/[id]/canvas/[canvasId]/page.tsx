@@ -354,7 +354,7 @@ export default function ProjectCanvasPage() {
           : type === "task-board"
             ? 320
             : type === "link"
-              ? 180
+              ? 240
               : type === "tag"
                 ? 56
                 : type === "text"
