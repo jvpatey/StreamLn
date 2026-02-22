@@ -264,7 +264,7 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
     hrefUrl && !content.preview && !urlError;
   const showInputs =
     isEditable &&
-    (!hrefUrl || isFetchingPreview || isEditing);
+    (!hrefUrl || isEditing);
 
   const normalizedUrlForButton = normalizeUrl(url);
   const isUrlValidForDone = normalizedUrlForButton && isValidHttpUrl(normalizedUrlForButton);
