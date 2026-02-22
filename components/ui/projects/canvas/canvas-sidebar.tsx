@@ -91,8 +91,12 @@ const BLOCK_CATEGORIES = [
   },
 ] as const;
 
+type BlockTypeInfo = (typeof BLOCK_CATEGORIES)[number]["blocks"][number];
+
 /** Flattened list for Layers tab lookup (icon, color, label) */
-const ALL_BLOCK_TYPES = BLOCK_CATEGORIES.flatMap((cat) => cat.blocks);
+const ALL_BLOCK_TYPES: BlockTypeInfo[] = BLOCK_CATEGORIES.flatMap((cat) =>
+  [...cat.blocks] as BlockTypeInfo[],
+);
 
 export function CanvasSidebar({
   isOpen,

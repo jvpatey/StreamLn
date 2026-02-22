@@ -110,7 +110,7 @@ export function ProjectsContent({
 
   const textTransition = shouldReduceMotion
     ? { duration: 0.01 }
-    : { duration: 0.2, ease: "easeOut" };
+    : { duration: 0.2, ease: "easeOut" as const };
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);

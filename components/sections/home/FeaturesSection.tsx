@@ -73,8 +73,23 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section id="features" className="py-24 bg-white dark:bg-slate-800">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section id="features" className="relative overflow-hidden py-24 bg-white dark:bg-slate-800">
+      {/* Bottom fade to blend into How it works section */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-[1] dark:hidden"
+        aria-hidden
+        style={{
+          background: "linear-gradient(to bottom, transparent 0%, rgb(248 250 252) 100%)",
+        }}
+      />
+      <div
+        className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-[1] hidden dark:block"
+        aria-hidden
+        style={{
+          background: "linear-gradient(to bottom, transparent 0%, rgb(2 6 23) 100%)",
+        }}
+      />
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section header with gradient text */}
         <AnimatedSection>
           <div className="mx-auto max-w-2xl text-center">

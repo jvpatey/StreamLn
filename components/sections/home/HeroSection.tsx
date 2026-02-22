@@ -2,15 +2,54 @@
 
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
-import { Rocket, Layers } from "lucide-react";
+import { Layers } from "lucide-react";
 import { SignInButton, SignedOut } from "@clerk/nextjs";
 import { motion, useReducedMotion } from "framer-motion";
 
 export default function HeroSection() {
   const shouldReduceMotion = useReducedMotion();
   return (
-    <section id="hero" className="relative overflow-hidden min-h-screen flex items-center justify-center py-8 sm:py-0">
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 w-full">
+    <section
+      id="hero"
+      className="relative overflow-hidden min-h-screen flex items-center justify-center py-8 sm:py-0 bg-gradient-to-br from-gray-50 via-primary-50/30 to-gray-50 dark:from-[#0b0d17] dark:via-[#151c2e] dark:to-[#1e3a8a]"
+    >
+      {/* Radial orbs for depth - static for reduced-motion compatibility */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        aria-hidden
+      >
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-primary-500/10 dark:bg-primary-500/15 blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-accent-500/10 dark:bg-accent-500/12 blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary-400/5 dark:bg-primary-400/8 blur-3xl" />
+      </div>
+      {/* Subtle grid overlay hinting at canvas */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.4] dark:opacity-[0.15]"
+        aria-hidden
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(148, 163, 184, 0.4) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148, 163, 184, 0.4) 1px, transparent 1px)
+          `,
+          backgroundSize: "32px 32px",
+        }}
+      />
+      {/* Bottom fade to blend into Features section */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-[1] dark:hidden"
+        aria-hidden
+        style={{
+          background: "linear-gradient(to bottom, transparent 0%, rgb(255 255 255) 100%)",
+        }}
+      />
+      <div
+        className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-[1] hidden dark:block"
+        aria-hidden
+        style={{
+          background: "linear-gradient(to bottom, transparent 0%, rgb(30 41 59) 100%)",
+        }}
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 w-full z-10">
         <div className="mx-auto max-w-2xl text-center">
           {/* Beta badge with animated rocket icon */}
           <motion.div
@@ -46,30 +85,33 @@ export default function HeroSection() {
                 : { duration: 0.6, ease: "easeOut", delay: 0.2 }
             }
           >
-            {/* Logo text with modern hover effect */}
+            {/* Logo text with two-tone brand treatment */}
             <h1 className="text-6xl leading-tight sm:text-7xl lg:text-8xl font-extrabold tracking-tight">
-              <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-primary-500 via-primary-600 to-accent-500 bg-clip-text text-transparent transition-all duration-300 group-hover:from-primary-400 group-hover:via-primary-500 group-hover:to-accent-400 group-hover:scale-[1.02] group-hover:tracking-wide">
-                  StreamLn
+              <span className="relative inline-block transition-all duration-300 group-hover:scale-[1.02] group-hover:tracking-wide">
+                <span className="text-primary-500 group-hover:text-primary-400">
+                  Stream
+                </span>
+                <span className="text-accent-500 group-hover:text-accent-400">
+                  Ln
                 </span>
               </span>
             </h1>
 
             {/* Tagline with animated decorative line */}
             <div className="mt-2 relative">
-              <p className="text-xs sm:text-sm font-medium tracking-wide text-slate-600/80 dark:text-slate-300/80">
+              <p className="text-base sm:text-lg font-medium tracking-wide text-slate-600/90 dark:text-slate-300/90">
                 Your infinite canvas for dev notes, planning, and execution.
               </p>
-              {/* Animated decorative line that expands on hover */}
+              {/* Decorative line - always visible for stronger structure */}
               <div className="mx-auto mt-2 sm:mt-3 w-40 sm:w-72 h-1 flex justify-center items-center">
-                <div className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)] w-24 sm:w-36 group-hover:w-40 sm:group-hover:w-72 group-hover:via-primary-500" />
+                <div className="h-1 w-full bg-gradient-to-r from-transparent via-primary-500 to-transparent" />
               </div>
             </div>
           </motion.div>
 
           {/* Main description text */}
           <motion.p
-            className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-slate-600 dark:text-slate-300"
+            className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-slate-600 dark:text-slate-300 max-w-xl mx-auto"
             initial={
               shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15 }
             }
@@ -87,7 +129,7 @@ export default function HeroSection() {
 
           {/* Call-to-action button with liquid glass effect */}
           <motion.div
-            className="mt-8 sm:mt-10 flex items-center justify-center"
+            className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-4"
             initial={
               shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15 }
             }
@@ -124,6 +166,12 @@ export default function HeroSection() {
                 </Button>
               </SignInButton>
             </SignedOut>
+            <a
+              href="#how-it-works"
+              className="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+            >
+              See how it works
+            </a>
           </motion.div>
 
           {/* Feature preview dots with hover animations */}
