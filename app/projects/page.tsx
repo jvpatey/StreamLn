@@ -379,6 +379,7 @@ export default function DashboardPage() {
           <ProjectsContent
             onCreateProject={handleCreateProject}
             projects={filteredAndSortedProjects}
+            totalProjectCount={projects.length}
             setProjects={setProjects}
             onProjectClick={handleProjectClick}
             onProjectDelete={handleProjectDelete}
