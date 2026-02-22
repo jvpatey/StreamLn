@@ -87,7 +87,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isPanning, setIsPanning] = useState(false);
-    const [canvasOrigin, setCanvasOrigin] = useState({ x: 0, y: 0 });
+    const canvasOriginRef = useRef({ x: 0, y: 0 });
     const [panStart, setPanStart] = useState({ x: 0, y: 0 });
     const [selectionBox, setSelectionBox] = useState<{
       start: { x: number; y: number };
@@ -102,10 +102,8 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
       if (!el) return;
       const update = () => {
         const rect = el.getBoundingClientRect();
-        setCanvasOrigin({
-          x: rect.left + panOffset.x,
-          y: rect.top + panOffset.y,
-        });
+        canvasOriginRef.current.x = rect.left + panOffset.x;
+        canvasOriginRef.current.y = rect.top + panOffset.y;
       };
       update();
       const ro = new ResizeObserver(update);
@@ -395,7 +393,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
                 }}
                 zoomLevel={zoomLevel}
                 panOffset={panOffset}
-                canvasOrigin={canvasOrigin}
+                canvasOriginRef={canvasOriginRef}
               />
             ))}
           </AnimatePresence>

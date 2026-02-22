@@ -69,8 +69,8 @@ interface CanvasBlockProps {
   onContextMenu: (position: { x: number; y: number }) => void;
   zoomLevel: number;
   panOffset: { x: number; y: number };
-  /** Canvas origin in viewport coordinates (container rect + pan). Used for accurate mouse-to-world conversion. */
-  canvasOrigin: { x: number; y: number };
+  /** Ref to canvas origin in viewport coordinates (container rect + pan). Used for accurate mouse-to-world conversion without triggering re-renders. */
+  canvasOriginRef: React.RefObject<{ x: number; y: number }>;
 }
 
 const dropdownItemClass =
@@ -96,7 +96,7 @@ export function CanvasBlock({
   onContextMenu,
   zoomLevel,
   panOffset,
-  canvasOrigin,
+  canvasOriginRef,
 }: CanvasBlockProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
@@ -201,8 +201,9 @@ export function CanvasBlock({
       if ((e.target as HTMLElement).closest("[data-no-block-drag]")) return;
 
       // Convert screen coordinates to world coordinates (canvasOrigin = container rect + pan)
-      const worldX = (e.clientX - canvasOrigin.x) / zoomLevel;
-      const worldY = (e.clientY - canvasOrigin.y) / zoomLevel;
+      const origin = canvasOriginRef.current;
+      const worldX = (e.clientX - origin.x) / zoomLevel;
+      const worldY = (e.clientY - origin.y) / zoomLevel;
 
       // Record pending drag; start real drag only after pointer moves past threshold
       const offsetX = worldX - block.x;
@@ -214,7 +215,7 @@ export function CanvasBlock({
         offsetY,
       });
     },
-    [onSelect, isEditable, block.locked, canvasOrigin, zoomLevel, block.x, block.y]
+    [onSelect, isEditable, block.locked, canvasOriginRef, zoomLevel, block.x, block.y]
   );
 
   const handleMouseMove = useCallback(
@@ -236,16 +237,18 @@ export function CanvasBlock({
             typeof document !== "undefined" ? document.activeElement : null;
           if (el && "blur" in el && typeof el.blur === "function") el.blur();
 
-          const worldX = (e.clientX - canvasOrigin.x) / zoomLevel;
-          const worldY = (e.clientY - canvasOrigin.y) / zoomLevel;
+          const origin = canvasOriginRef.current;
+          const worldX = (e.clientX - origin.x) / zoomLevel;
+          const worldY = (e.clientY - origin.y) / zoomLevel;
           onUpdate({
             x: worldX - pendingDrag.offsetX,
             y: worldY - pendingDrag.offsetY,
           });
         }
       } else if (isDragging) {
-        const worldX = (e.clientX - canvasOrigin.x) / zoomLevel;
-        const worldY = (e.clientY - canvasOrigin.y) / zoomLevel;
+        const origin = canvasOriginRef.current;
+        const worldX = (e.clientX - origin.x) / zoomLevel;
+        const worldY = (e.clientY - origin.y) / zoomLevel;
         const offset = dragOffsetRef.current;
         onUpdate({ x: worldX - offset.x, y: worldY - offset.y });
       } else if (isResizing) {
@@ -269,7 +272,7 @@ export function CanvasBlock({
       resizeStart,
       onUpdate,
       onDragStart,
-      canvasOrigin,
+      canvasOriginRef,
       zoomLevel,
       block.type,
     ]
