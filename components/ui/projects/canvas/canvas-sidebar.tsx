@@ -29,7 +29,15 @@ import {
 
 interface CanvasBlock {
   id: string;
-  type: "note" | "task-board" | "code" | "image" | "link" | "tag" | "text" | "shape";
+  type:
+    | "note"
+    | "task-board"
+    | "code"
+    | "image"
+    | "link"
+    | "tag"
+    | "text"
+    | "shape";
   x: number;
   y: number;
   width: number;
@@ -53,57 +61,38 @@ interface CanvasSidebarProps {
   onBlockSelect: (blockIds: string[]) => void;
 }
 
-const BLOCK_TYPES = [
+const BLOCK_CATEGORIES = [
   {
-    type: "note",
-    label: "Note",
-    description: "Rich text notes with formatting",
-    icon: FileText,
-    color: "#3b82f6",
+    label: "Content",
+    blocks: [
+      { type: "note", label: "Note", description: "Rich text notes with formatting", icon: FileText, color: "#3b82f6" },
+      { type: "text", label: "Text", description: "Short labels and comments", icon: Type, color: "#64748b" },
+    ],
   },
   {
-    type: "task-board",
-    label: "Task Board",
-    description: "Kanban-style task management",
-    icon: Kanban,
-    color: "#10b981",
+    label: "Organization",
+    blocks: [
+      { type: "task-board", label: "Task Board", description: "Kanban-style task management", icon: Kanban, color: "#10b981" },
+      { type: "tag", label: "Tag", description: "Labels and categories", icon: Tag, color: "#ef4444" },
+    ],
   },
   {
-    type: "code",
-    label: "Code",
-    description: "Code snippets with syntax highlighting",
-    icon: Code2,
-    color: "#8b5cf6",
+    label: "Media & References",
+    blocks: [
+      { type: "image", label: "Image", description: "Images and visual content", icon: Image, color: "#f59e0b" },
+      { type: "link", label: "Link", description: "Web links and references", icon: Link, color: "#06b6d4" },
+    ],
   },
   {
-    type: "image",
-    label: "Image",
-    description: "Images and visual content",
-    icon: Image,
-    color: "#f59e0b",
+    label: "Technical",
+    blocks: [
+      { type: "code", label: "Code", description: "Code snippets with syntax highlighting", icon: Code2, color: "#8b5cf6" },
+    ],
   },
-  {
-    type: "link",
-    label: "Link",
-    description: "Web links and references",
-    icon: Link,
-    color: "#06b6d4",
-  },
-  {
-    type: "tag",
-    label: "Tag",
-    description: "Labels and categories",
-    icon: Tag,
-    color: "#ef4444",
-  },
-  {
-    type: "text",
-    label: "Text",
-    description: "Short labels and comments",
-    icon: Type,
-    color: "#64748b",
-  },
-];
+] as const;
+
+/** Flattened list for Layers tab lookup (icon, color, label) */
+const ALL_BLOCK_TYPES = BLOCK_CATEGORIES.flatMap((cat) => cat.blocks);
 
 export function CanvasSidebar({
   isOpen,
@@ -169,7 +158,7 @@ export function CanvasSidebar({
           {canvasBlocks
             .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
             .map((block) => {
-              const blockType = BLOCK_TYPES.find((t) => t.type === block.type);
+              const blockType = ALL_BLOCK_TYPES.find((t) => t.type === block.type);
               const IconComponent = blockType?.icon || FileText;
               const isSelected = selectedBlocks.includes(block.id);
 
@@ -369,7 +358,7 @@ export function CanvasSidebar({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -16 }}
                   transition={{ duration: 0.2, ease: "easeInOut" }}
-                  className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 space-y-4"
+                  className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 space-y-3"
                 >
                   {/* Compact stats at top - full width */}
                   <div className="flex items-center justify-between w-full gap-3 text-xs text-slate-500 dark:text-slate-400">
@@ -390,63 +379,74 @@ export function CanvasSidebar({
                     </span>
                   </div>
 
-                  {/* Block Types */}
-                  <div className="space-y-2">
+                  {/* Block Types - grouped by category */}
+                  <div className="space-y-1">
                     <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
                       Add Blocks
                     </h3>
-                    <div className="grid grid-cols-1 gap-3">
-                      {BLOCK_TYPES.map((blockType) => {
-                        const IconComponent = blockType.icon;
-                        return (
-                          <div
-                            key={blockType.type}
-                            className={getLiquidGlassSurfaceClassName({
-                              variant: "panel",
-                              intensity: "md",
-                              rounded: "2xl",
-                              className:
-                                "p-3 cursor-pointer transition-all duration-200 hover:scale-105 border-l-4 hover:border-white/40 dark:hover:border-white/30",
+                    <div className="space-y-2">
+                      {BLOCK_CATEGORIES.map((category) => (
+                        <div key={category.label} className="space-y-1">
+                          <h4 className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">
+                            {category.label}
+                          </h4>
+                          <div className="grid grid-cols-1 gap-2">
+                            {category.blocks.map((blockType) => {
+                              const IconComponent = blockType.icon;
+                              return (
+                                <div
+                                  key={blockType.type}
+                                  className={getLiquidGlassSurfaceClassName({
+                                    variant: "panel",
+                                    intensity: "md",
+                                    rounded: "2xl",
+                                    className:
+                                      "p-3 cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:border-white/40 dark:hover:border-white/30",
+                                  })}
+                                  style={{
+                                    backgroundImage: `linear-gradient(to right, ${blockType.color}35, transparent)`,
+                                  }}
+                                  onClick={() => onAddBlock(blockType.type)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                      e.preventDefault();
+                                      onAddBlock(blockType.type);
+                                    }
+                                  }}
+                                  role="button"
+                                  tabIndex={0}
+                                >
+                                  <div className="flex items-center gap-3 min-w-0">
+                                    <div
+                                      className="p-2 rounded-xl flex-shrink-0"
+                                      style={{
+                                        backgroundColor: `${blockType.color}22`,
+                                      }}
+                                    >
+                                      <IconComponent
+                                        size={18}
+                                        style={{ color: blockType.color }}
+                                      />
+                                    </div>
+                                    <div className="flex-1 min-w-0 overflow-hidden">
+                                      <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+                                        {blockType.label}
+                                      </h4>
+                                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                                        {blockType.description}
+                                      </p>
+                                    </div>
+                                    <Plus
+                                      size={16}
+                                      className="text-slate-400 flex-shrink-0"
+                                    />
+                                  </div>
+                                </div>
+                              );
                             })}
-                            style={{ borderLeftColor: blockType.color }}
-                            onClick={() => onAddBlock(blockType.type)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                onAddBlock(blockType.type);
-                              }
-                            }}
-                            role="button"
-                            tabIndex={0}
-                          >
-                            <div className="flex items-center space-x-3">
-                              <div
-                                className="p-2 rounded-xl flex-shrink-0"
-                                style={{
-                                  backgroundColor: `${blockType.color}22`,
-                                }}
-                              >
-                                <IconComponent
-                                  size={18}
-                                  style={{ color: blockType.color }}
-                                />
-                              </div>
-                              <div className="flex-1 min-w-0 overflow-hidden">
-                                <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100 truncate">
-                                  {blockType.label}
-                                </h4>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 truncate">
-                                  {blockType.description}
-                                </p>
-                              </div>
-                              <Plus
-                                size={16}
-                                className="text-slate-400 flex-shrink-0"
-                              />
-                            </div>
                           </div>
-                        );
-                      })}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </motion.div>

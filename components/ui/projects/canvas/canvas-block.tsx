@@ -166,23 +166,23 @@ export function CanvasBlock({
   const getBlockIcon = () => {
     switch (block.type) {
       case "note":
-        return <FileText size={12} />;
+        return <FileText size={14} />;
       case "task-board":
-        return <Kanban size={12} />;
+        return <Kanban size={14} />;
       case "code":
-        return <Code2 size={12} />;
+        return <Code2 size={14} />;
       case "image":
-        return <Image size={12} />;
+        return <Image size={14} />;
       case "link":
-        return <Link size={12} />;
+        return <Link size={14} />;
       case "tag":
-        return <Tag size={12} />;
+        return <Tag size={14} />;
       case "text":
-        return <Type size={12} />;
+        return <Type size={14} />;
       case "shape":
-        return <Square size={12} />;
+        return <Square size={14} />;
       default:
-        return <FileText size={12} />;
+        return <FileText size={14} />;
     }
   };
 
@@ -588,16 +588,16 @@ export function CanvasBlock({
         {/* Block Header (hidden for tag, text, and shape – minimal/subtle) */}
         {block.type !== "tag" && block.type !== "text" && block.type !== "shape" && (
           <div
-            className="flex shrink-0 items-center justify-between p-3 border-b border-slate-200/50 dark:border-slate-700/50"
+            className="flex shrink-0 items-center justify-between px-2 py-1.5 border-b border-slate-200/50 dark:border-slate-700/50"
             style={{
               background: isDark
                 ? `linear-gradient(90deg, ${getBlockColor()}35 0%, ${getBlockColor()}18 50%, ${getBlockColor()}08 100%)`
                 : `linear-gradient(90deg, ${getBlockColor()}08 0%, transparent 100%)`,
             }}
           >
-            <div className="flex items-center space-x-3 min-w-0 flex-1">
+            <div className="flex items-center space-x-2 min-w-0 flex-1">
               <div
-                className="p-2 rounded-xl shadow-sm ring-1 ring-white/20 dark:ring-white/10"
+                className="p-1.5 rounded-lg shadow-sm ring-1 ring-white/20 dark:ring-white/10 shrink-0"
                 style={{
                   backgroundColor: isDark ? `${getBlockColor()}50` : `${getBlockColor()}15`,
                   boxShadow: isDark ? `0 2px 8px ${getBlockColor()}40` : `0 2px 8px ${getBlockColor()}20`,
@@ -606,7 +606,7 @@ export function CanvasBlock({
                 <div style={{ color: getBlockColor() }}>{getBlockIcon()}</div>
               </div>
               <div
-                className="flex flex-col min-w-0 flex-1"
+                className="min-w-0 flex-1 flex items-center"
                 onDoubleClick={handleTitleDoubleClick}
                 onMouseDown={handleTitleMouseDown}
                 onPointerDown={handleTitleMouseDown}
@@ -627,25 +627,22 @@ export function CanvasBlock({
                         discardTitleEdit();
                       }
                     }}
-                    className="w-full text-sm font-semibold text-slate-800 dark:text-slate-200 bg-transparent border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-primary dark:focus:ring-primary"
+                    className="w-full text-sm font-bold text-slate-800 dark:text-slate-200 bg-transparent border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-primary dark:focus:ring-primary"
                     onClick={(e) => e.stopPropagation()}
                   />
                 ) : (
-                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">
                     {getDisplayTitle()}
                   </span>
                 )}
-                <span className="text-xs text-slate-500 dark:text-slate-400 capitalize">
-                  {block.type} block
-                </span>
               </div>
             </div>
 
             <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
               {block.locked && (
-                <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                <div className="p-1 rounded-md bg-amber-50 dark:bg-amber-900/20">
                   <Lock
-                    size={12}
+                    size={10}
                     className="text-amber-600 dark:text-amber-400"
                   />
                 </div>
@@ -656,10 +653,10 @@ export function CanvasBlock({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"
+                      className="h-7 w-7 p-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md"
                       onMouseDown={(e) => e.stopPropagation()}
                     >
-                      <MoreVertical size={14} />
+                      <MoreVertical size={12} />
                     </Button>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Portal>

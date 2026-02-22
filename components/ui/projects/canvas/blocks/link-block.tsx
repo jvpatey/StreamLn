@@ -77,7 +77,9 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
   const labelInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const onUpdateRef = useRef(onUpdate);
+  const blockRef = useRef(block);
   onUpdateRef.current = onUpdate;
+  blockRef.current = block;
 
   useEffect(() => {
     const c = getLinkContent(block.content);
@@ -233,7 +235,8 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
     []
   );
 
-  // Resize block to fit content without scrolling
+  // Resize block to fit content without scrolling. Uses refs to avoid
+  // dependency on block.height which would cause an infinite update loop.
   const resizeBlockToFit = useCallback(() => {
     const el = contentRef.current;
     if (!el) return;
@@ -242,11 +245,11 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
       MIN_LINK_BLOCK_HEIGHT,
       LINK_HEADER_HEIGHT + contentHeight
     );
-    const currentHeight = block.height ?? MIN_LINK_BLOCK_HEIGHT;
+    const currentHeight = blockRef.current.height ?? MIN_LINK_BLOCK_HEIGHT;
     if (Math.abs(newHeight - currentHeight) > 2) {
       onUpdateRef.current({ height: newHeight });
     }
-  }, [block.height]);
+  }, []);
 
   useEffect(() => {
     resizeBlockToFit();
