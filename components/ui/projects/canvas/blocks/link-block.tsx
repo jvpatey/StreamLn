@@ -162,8 +162,9 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
 
     if (isValidHttpUrl(normalizedUrl)) {
       setUrlError(null);
-      // Don't persist or collapse here - user may be moving to label field
-      // Persist and collapse only on label blur or Done button
+      // Persist the valid normalized URL without collapsing; the user can still
+      // continue editing the label or press Done.
+      persistContent(normalizedUrl, label);
     } else {
       setUrlError("Please enter a valid URL");
     }
