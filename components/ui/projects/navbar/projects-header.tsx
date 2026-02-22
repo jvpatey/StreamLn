@@ -2,7 +2,12 @@
 
 // Header component for the projects page - contains logo, search, and user controls
 // Used in: app/projects/page.tsx
-import { UserButton } from "@clerk/nextjs";
+import dynamic from "next/dynamic";
+
+const UserButton = dynamic(
+  () => import("@clerk/nextjs").then((mod) => mod.UserButton),
+  { ssr: false }
+);
 import { Button } from "@/components/ui/shared/button";
 import { Badge } from "@/components/ui/shared/badge";
 import { LiquidGlassButton } from "@/components/ui/shared/liquid-glass-button";
@@ -23,7 +28,7 @@ export function ProjectsHeader({
 }: ProjectsHeaderProps) {
   return (
     <LiquidGlassSurface asChild variant="header" intensity="2xl">
-      <header>
+      <header className="animate-navbar-enter">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14">
             {/* Left section */}

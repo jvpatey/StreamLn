@@ -10,6 +10,7 @@ import { CanvasWorkspace } from "@/components/ui/projects/canvas/canvas-workspac
 import { CanvasSidebar } from "@/components/ui/projects/canvas/canvas-sidebar";
 import { CanvasFloatingToolbar } from "@/components/ui/projects/canvas/canvas-floating-toolbar";
 import { CanvasHeader } from "@/components/ui/projects/canvas/canvas-header";
+import { CanvasWorkspaceSkeleton } from "@/components/ui/projects/canvas/canvas-workspace-skeleton";
 import { ExportModal } from "@/components/ui/projects/canvas/export-modal";
 import {
   exportCanvasAsPNG,
@@ -34,6 +35,7 @@ import {
   deleteCanvas,
   reorderCanvases,
 } from "@/lib/api/canvas";
+import { addProjectToRecent } from "@/lib/recent-projects";
 import type { CanvasBlock } from "@/lib/types/canvas";
 import type { Canvas } from "@/lib/types/canvas";
 import { PanelLeftOpen, PanelTopOpen } from "lucide-react";
@@ -193,6 +195,13 @@ export default function ProjectCanvasPage() {
     loadProject();
   }, [projectId, canvasId]);
 
+  // Track project as recently opened
+  useEffect(() => {
+    if (projectId && typeof projectId === "string") {
+      addProjectToRecent(projectId);
+    }
+  }, [projectId]);
+
   // Debounced save (1.5s after last change)
   useEffect(() => {
     if (!projectId || typeof projectId !== "string" || !canvasId || typeof canvasId !== "string") return;
@@ -345,7 +354,7 @@ export default function ProjectCanvasPage() {
           : type === "task-board"
             ? 320
             : type === "link"
-              ? 180
+              ? 240
               : type === "tag"
                 ? 56
                 : type === "text"
@@ -575,20 +584,7 @@ export default function ProjectCanvasPage() {
     }
   }, [projectId, canvasId]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600 dark:text-slate-400">
-            Loading canvas...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !project || !canvas) {
+  if (!loading && (error || !project || !canvas)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
         <div className="text-center">
@@ -606,12 +602,32 @@ export default function ProjectCanvasPage() {
     );
   }
 
+  const placeholderProject: Project = {
+    id: typeof projectId === "string" ? projectId : "",
+    name: "Loading...",
+    status: "active",
+    userId: "",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  const placeholderCanvas: Canvas = {
+    id: typeof canvasId === "string" ? canvasId : "",
+    name: "Loading...",
+    order: 0,
+    projectId: typeof projectId === "string" ? projectId : "",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  const displayProject = project ?? placeholderProject;
+  const displayCanvas = canvas ?? placeholderCanvas;
+  const displayCanvases = canvases.length > 0 ? canvases : [placeholderCanvas];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden">
       <CanvasHeader
-        project={project}
-        canvas={canvas}
-        canvases={canvases}
+        project={displayProject}
+        canvas={displayCanvas}
+        canvases={displayCanvases}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onCanvasCreate={handleCreateCanvas}
@@ -620,40 +636,42 @@ export default function ProjectCanvasPage() {
         onCanvasReorder={handleReorderCanvases}
         onExportClick={() => setExportModalOpen(true)}
       />
-      <ExportModal
-        open={exportModalOpen}
-        onOpenChange={setExportModalOpen}
-        project={project}
-        canvas={{
-          id: canvas.id,
-          name: canvas.name,
-          order: canvas.order,
-          projectId: canvas.projectId,
-          createdAt: canvas.createdAt,
-          updatedAt: canvas.updatedAt,
-        }}
-        blocks={canvasBlocks}
-        onExportPNG={() =>
-          exportCanvasAsPNG(canvasRef.current, project, {
+      {!loading && project && canvas && (
+        <ExportModal
+          open={exportModalOpen}
+          onOpenChange={setExportModalOpen}
+          project={project}
+          canvas={{
             id: canvas.id,
             name: canvas.name,
             order: canvas.order,
             projectId: canvas.projectId,
             createdAt: canvas.createdAt,
             updatedAt: canvas.updatedAt,
-          })
-        }
-        onExportPDF={() =>
-          exportCanvasAsPDF(canvasRef.current, project, {
-            id: canvas.id,
-            name: canvas.name,
-            order: canvas.order,
-            projectId: canvas.projectId,
-            createdAt: canvas.createdAt,
-            updatedAt: canvas.updatedAt,
-          })
-        }
-      />
+          }}
+          blocks={canvasBlocks}
+          onExportPNG={() =>
+            exportCanvasAsPNG(canvasRef.current, project, {
+              id: canvas.id,
+              name: canvas.name,
+              order: canvas.order,
+              projectId: canvas.projectId,
+              createdAt: canvas.createdAt,
+              updatedAt: canvas.updatedAt,
+            })
+          }
+          onExportPDF={() =>
+            exportCanvasAsPDF(canvasRef.current, project, {
+              id: canvas.id,
+              name: canvas.name,
+              order: canvas.order,
+              projectId: canvas.projectId,
+              createdAt: canvas.createdAt,
+              updatedAt: canvas.updatedAt,
+            })
+          }
+        />
+      )}
       {saveConflict && (
         <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between gap-4">
           <p className="text-sm text-amber-800 dark:text-amber-200">
@@ -683,14 +701,18 @@ export default function ProjectCanvasPage() {
         <CanvasSidebar
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
-          onAddBlock={(type, position) => {
-            setIsAddingBlock(type);
-            const canvasCenter = {
-              x: (window.innerWidth / 2 - panOffset.x) / zoomLevel,
-              y: (window.innerHeight / 2 - panOffset.y) / zoomLevel,
-            };
-            addBlock(type, position || canvasCenter);
-          }}
+          onAddBlock={
+            loading
+              ? () => {}
+              : (type, position) => {
+                  setIsAddingBlock(type);
+                  const canvasCenter = {
+                    x: (window.innerWidth / 2 - panOffset.x) / zoomLevel,
+                    y: (window.innerHeight / 2 - panOffset.y) / zoomLevel,
+                  };
+                  addBlock(type, position || canvasCenter);
+                }
+          }
           selectedBlocks={selectedBlocks}
           canvasBlocks={canvasBlocks}
           onBlockUpdate={updateBlock}
@@ -735,33 +757,37 @@ export default function ProjectCanvasPage() {
               onDuplicateSelected={duplicateBlocks}
             />
           )}
-          <CanvasWorkspace
-            ref={canvasRef}
-            activeTool={activeTool}
-            blocks={canvasBlocks}
-            canvasName={canvas?.name}
-            selectedBlocks={selectedBlocks}
-            onBlockSelect={setSelectedBlocks}
-            onBlockUpdate={updateBlock}
-            onBlockDuplicate={duplicateBlock}
-            onBlockDelete={deleteBlock}
-            zoomLevel={zoomLevel}
-            panOffset={panOffset}
-            onZoomChange={setZoomLevel}
-            onPanOffsetChange={setPanOffset}
-            showGrid={showGrid}
-            isDragging={isDragging}
-            onDraggingChange={setIsDragging}
-            isResizing={isResizing}
-            onResizingChange={setIsResizing}
-            isAddingBlock={isAddingBlock}
-            onAddBlock={addBlock}
-            onFloatingToolbarShow={(position) => {
-              setFloatingToolbarPosition(position);
-              setShowFloatingToolbar(true);
-            }}
-            viewMode={viewMode}
-          />
+          {loading ? (
+            <CanvasWorkspaceSkeleton />
+          ) : (
+            <CanvasWorkspace
+              ref={canvasRef}
+              activeTool={activeTool}
+              blocks={canvasBlocks}
+              canvasName={canvas?.name}
+              selectedBlocks={selectedBlocks}
+              onBlockSelect={setSelectedBlocks}
+              onBlockUpdate={updateBlock}
+              onBlockDuplicate={duplicateBlock}
+              onBlockDelete={deleteBlock}
+              zoomLevel={zoomLevel}
+              panOffset={panOffset}
+              onZoomChange={setZoomLevel}
+              onPanOffsetChange={setPanOffset}
+              showGrid={showGrid}
+              isDragging={isDragging}
+              onDraggingChange={setIsDragging}
+              isResizing={isResizing}
+              onResizingChange={setIsResizing}
+              isAddingBlock={isAddingBlock}
+              onAddBlock={addBlock}
+              onFloatingToolbarShow={(position) => {
+                setFloatingToolbarPosition(position);
+                setShowFloatingToolbar(true);
+              }}
+              viewMode={viewMode}
+            />
+          )}
         </div>
       </div>
       {showFloatingToolbar && selectedBlocks.length > 0 && (

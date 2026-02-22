@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/shared/card";
 import { Clock, CheckCircle, Archive, Layout, SquareStack } from "lucide-react";
-import React from "react";
+import React, { useRef } from "react";
 import { motion } from "framer-motion";
 import { ProjectCardMenu } from "./project-card-menu";
 import { getIconComponent } from "./icon-picker";
@@ -19,11 +19,15 @@ interface ProjectCardProps {
   createdAt: string;
   updatedAt: string;
   userId: string;
+  index?: number;
   onClick?: () => void;
   onDelete?: () => void;
   onStatusChange?: (newStatus: string) => void;
   onExportProject?: () => void;
 }
+
+const ENTRANCE_EASE = [0.25, 0.46, 0.45, 0.94] as const;
+const STAGGER_DELAY = 0.045;
 
 export function ProjectCard({
   id,
@@ -38,6 +42,7 @@ export function ProjectCard({
   createdAt,
   updatedAt,
   userId,
+  index = 0,
   onClick,
   onDelete,
   onStatusChange,
@@ -47,18 +52,27 @@ export function ProjectCard({
   const statusColor = isArchived
     ? "text-slate-500 dark:text-slate-400"
     : "text-green-600 dark:text-green-400";
+  const hasEnteredRef = useRef(false);
 
   // Accent color (use icon color or default blue)
   const accentColor = icon === "Folder" || !icon ? "#3b82f6" : undefined;
   return (
     <motion.div
-      initial={false}
+      layout
+      initial={{ opacity: 0, y: 12 }}
       animate={{
         opacity: isArchived ? 0.65 : 1,
+        y: 0,
+      }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      onAnimationComplete={() => {
+        hasEnteredRef.current = true;
       }}
       transition={{
-        duration: 0.5,
-        ease: [0.25, 0.46, 0.45, 0.94],
+        duration: 0.3,
+        delay: hasEnteredRef.current ? 0 : index * STAGGER_DELAY,
+        ease: ENTRANCE_EASE,
+        opacity: { duration: isArchived ? 0.5 : 0.3 },
       }}
       className="h-full"
     >

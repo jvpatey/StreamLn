@@ -6,6 +6,7 @@ import { CreateProjectCard } from "./create-project/create-project-card";
 import { CreateProjectButton } from "./create-project/create-project-button";
 import { ProjectCard } from "./project-card";
 import React, { useState } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { deleteProject, updateProjectStatus } from "@/lib/api/projects";
 import {
   Popover,
@@ -44,6 +45,7 @@ interface Project {
 interface ProjectsContentProps {
   onCreateProject?: () => void;
   projects?: Project[];
+  totalProjectCount?: number;
   setProjects?: React.Dispatch<React.SetStateAction<Project[]>>;
   onProjectClick?: (project: Project) => void;
   onProjectDelete?: (projectId: string) => Promise<void>;
@@ -64,6 +66,7 @@ interface ProjectsContentProps {
 export function ProjectsContent({
   onCreateProject,
   projects = [],
+  totalProjectCount,
   setProjects,
   onProjectClick,
   onProjectDelete,
@@ -79,21 +82,49 @@ export function ProjectsContent({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [statusChangingId, setStatusChangingId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const shouldReduceMotion = useReducedMotion();
 
   const activeCount = projects.filter(
     (p) => (p.status || "active") === "active"
   ).length;
   const archivedCount = projects.filter((p) => p.status === "archived").length;
 
+  const headingText =
+    statusFilter === "active"
+      ? "Active Projects"
+      : statusFilter === "archived"
+        ? "Archived Projects"
+        : "All Projects";
+
+  const filterButtonLabel =
+    statusFilter !== "all"
+      ? `Filter · ${statusFilter === "active" ? "Active" : "Archived"}`
+      : sortBy !== "updated"
+        ? `Filter · ${sortBy === "alpha" ? "Alphabetically" : "Status"}`
+        : "Filter";
+
+  const subtitleKey =
+    statusFilter !== "all" && totalProjectCount != null
+      ? `filtered-${statusFilter}-${sortBy}-${projects.length}-${totalProjectCount}`
+      : `all-${sortBy}-${activeCount}-${archivedCount}`;
+
+  const textTransition = shouldReduceMotion
+    ? { duration: 0.01 }
+    : { duration: 0.2, ease: "easeOut" as const };
+
   const handleDelete = async (id: string) => {
     setDeletingId(id);
+    const projectToRestore = projects.find((p) => p.id === id);
+    if (setProjects) {
+      setProjects((prev) => prev.filter((p) => p.id !== id));
+    }
     try {
       await deleteProject(id);
-      if (setProjects) {
-        setProjects((prev) => prev.filter((p) => p.id !== id));
-      }
     } catch (err) {
       console.log("Failed to delete project", err);
+      if (setProjects && projectToRestore) {
+        setProjects((prev) => [...prev, projectToRestore]);
+      }
     } finally {
       setDeletingId(null);
     }
@@ -131,13 +162,79 @@ export function ProjectsContent({
 
         {/* Content Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 space-y-4 sm:space-y-0">
-          <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 sm:text-2xl">
-              All Projects
+          <div className="min-w-0">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 sm:text-2xl overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={headingText}
+                  initial={
+                    shouldReduceMotion
+                      ? { opacity: 1 }
+                      : { opacity: 0, y: 6 }
+                  }
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={
+                    shouldReduceMotion
+                      ? { opacity: 1 }
+                      : { opacity: 0, y: -6 }
+                  }
+                  transition={textTransition}
+                  className="inline-block"
+                >
+                  {headingText}
+                </motion.span>
+              </AnimatePresence>
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 sm:text-sm">
-              {activeCount} active project{activeCount === 1 ? "" : "s"}
-              {archivedCount > 0 && <> &middot; {archivedCount} archived</>}
+            <p className="text-xs mt-1 sm:text-sm overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={subtitleKey}
+                  initial={
+                    shouldReduceMotion
+                      ? { opacity: 1 }
+                      : { opacity: 0, y: 4 }
+                  }
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={
+                    shouldReduceMotion
+                      ? { opacity: 1 }
+                      : { opacity: 0, y: -4 }
+                  }
+                  transition={textTransition}
+                  className="inline-block"
+                >
+                  {statusFilter !== "all" && totalProjectCount != null ? (
+                    <span className="text-slate-600 dark:text-slate-400">
+                      Showing {projects.length} of {totalProjectCount} project
+                      {totalProjectCount === 1 ? "" : "s"}
+                      {sortBy !== "updated" && (
+                        <span className="text-slate-400 dark:text-slate-500">
+                          {" · "}Sorted by {sortBy === "alpha" ? "Alphabetically" : "Status"}
+                        </span>
+                      )}
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-emerald-600 dark:text-emerald-500">
+                        {activeCount} active project{activeCount === 1 ? "" : "s"}
+                      </span>
+                      {archivedCount > 0 && (
+                        <>
+                          <span className="text-slate-400 dark:text-slate-500"> · </span>
+                          <span className="text-slate-400 dark:text-slate-500">
+                            {archivedCount} archived project{archivedCount === 1 ? "" : "s"}
+                          </span>
+                        </>
+                      )}
+                      {sortBy !== "updated" && (
+                        <span className="text-slate-400 dark:text-slate-500">
+                          {" · "}Sorted by {sortBy === "alpha" ? "Alphabetically" : "Status"}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </motion.span>
+              </AnimatePresence>
             </p>
           </div>
           <div className="flex items-center space-x-3">
@@ -146,13 +243,42 @@ export function ProjectsContent({
               onOpenChange={setFilterPopoverOpen}
             >
               <PopoverTrigger asChild>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant={
+                    statusFilter !== "all" || sortBy !== "updated"
+                      ? "default"
+                      : "ghost"
+                  }
                   size="sm"
-                  className="backdrop-blur-md bg-white/50 dark:bg-slate-800/50 border border-white/30 dark:border-slate-700/30 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-white/40 dark:hover:border-slate-700/40 shadow-sm"
+                  className={
+                    statusFilter === "all" && sortBy === "updated"
+                      ? "backdrop-blur-md bg-white/50 dark:bg-slate-800/50 border border-white/30 dark:border-slate-700/30 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-white/40 dark:hover:border-slate-700/40 shadow-sm"
+                      : ""
+                  }
                 >
-                  <Filter size={16} className="mr-2" />
-                  Filter
+                  <Filter size={16} className="mr-2 shrink-0" />
+                  <span className="overflow-hidden inline-block min-w-[4ch]">
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={filterButtonLabel}
+                        initial={
+                          shouldReduceMotion
+                            ? { opacity: 1 }
+                            : { opacity: 0, y: 4 }
+                        }
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={
+                          shouldReduceMotion
+                            ? { opacity: 1 }
+                            : { opacity: 0, y: -4 }
+                        }
+                        transition={textTransition}
+                        className="inline-block"
+                      >
+                        {filterButtonLabel}
+                      </motion.span>
+                    </AnimatePresence>
+                  </span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-4 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-white/30 dark:border-slate-700/30">
@@ -198,10 +324,12 @@ export function ProjectsContent({
         {/* Projects Grid or List */}
         {viewMode === "grid" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-            {projects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                id={project.id}
+            <AnimatePresence mode="popLayout">
+              {projects.map((project, index) => (
+                <ProjectCard
+                  key={project.id}
+                  index={index}
+                  id={project.id}
                 name={project.name}
                 type={project.description || "Project Workspace"}
                 lastModified={formatTimeAgo(project.updatedAt)}
@@ -229,7 +357,8 @@ export function ProjectsContent({
                   onExportProject?.({ id: project.id, name: project.name })
                 }
               />
-            ))}
+              ))}
+            </AnimatePresence>
             {/* Create New Project Card - Hidden on mobile when no projects */}
             <div className="hidden lg:block">
               <CreateProjectCard onClick={onCreateProject} />
@@ -244,11 +373,29 @@ export function ProjectsContent({
               <div className="w-24 text-center">Status</div>
               <div className="w-20 text-center">Actions</div>
             </div>
-            {projects.map((project) => (
-              <div
-                key={project.id}
-                className="flex items-center px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-              >
+            <AnimatePresence mode="popLayout">
+              {projects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  layout
+                  initial={
+                    shouldReduceMotion
+                      ? { opacity: 1 }
+                      : { opacity: 0, x: -8 }
+                  }
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={
+                    shouldReduceMotion
+                      ? { opacity: 1 }
+                      : { opacity: 0, x: 8 }
+                  }
+                  transition={{
+                    duration: shouldReduceMotion ? 0.01 : 0.25,
+                    delay: shouldReduceMotion ? 0 : index * 0.04,
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                  }}
+                  className="flex items-center px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                >
                 {/* Icon */}
                 <div className="w-8 flex-shrink-0">
                   {React.createElement(
@@ -289,8 +436,9 @@ export function ProjectsContent({
                     View
                   </Button>
                 </div>
-              </div>
+              </motion.div>
             ))}
+            </AnimatePresence>
           </div>
         )}
       </div>

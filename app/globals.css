@@ -63,6 +63,35 @@
     scroll-behavior: smooth;
   }
 
+  /* Global discreet scrollbar - applies to all scrollable areas */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(148 163 184 / 0.25) transparent;
+  }
+  .dark * {
+    scrollbar-color: rgb(71 85 105 / 0.3) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgb(148 163 184 / 0.25);
+    border-radius: 3px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgb(148 163 184 / 0.45);
+  }
+  .dark *::-webkit-scrollbar-thumb {
+    background: rgb(71 85 105 / 0.3);
+  }
+  .dark *::-webkit-scrollbar-thumb:hover {
+    background: rgb(71 85 105 / 0.5);
+  }
+
   /* Reduced motion support - respect user preferences */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -159,6 +188,38 @@
   .animate-shimmer {
     animation: shimmer 2s infinite;
   }
+
+  /* Sidebar entrance - runs immediately when element is in DOM (before hydration) */
+  @keyframes sidebar-enter {
+    from {
+      opacity: 0;
+      transform: translateX(-16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-sidebar-enter {
+    animation: sidebar-enter 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  /* Navbar entrance - runs immediately when element is in DOM (before hydration) */
+  @keyframes navbar-enter {
+    from {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-navbar-enter {
+    animation: navbar-enter 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
 }
 
 /* Note block Tiptap editor (canvas) */
@@ -223,4 +284,9 @@
   padding: 0;
   border: none;
   font-size: inherit;
+}
+
+/* Code block CodeMirror - uses global scrollbar, add stable gutter for code */
+.code-block-editor .cm-scroller {
+  scrollbar-gutter: stable;
 }

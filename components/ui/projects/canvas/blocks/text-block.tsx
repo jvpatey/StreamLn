@@ -22,6 +22,7 @@ interface TextBlockProps {
 export function TextBlock({ block, onUpdate, isEditable }: TextBlockProps) {
   const content = getTextContent(block.content);
   const [localText, setLocalText] = useState(content.text);
+  const [isFocused, setIsFocused] = useState(false);
   const editRef = useRef<HTMLDivElement>(null);
   const onUpdateRef = useRef(onUpdate);
   onUpdateRef.current = onUpdate;
@@ -78,6 +79,7 @@ export function TextBlock({ block, onUpdate, isEditable }: TextBlockProps) {
   }, [localText, content.fontFamily, content.fontSize, block.width]);
 
   const handleBlur = useCallback(() => {
+    setIsFocused(false);
     persistContent(localText);
     resizeBlockToFitContent();
   }, [localText, persistContent, resizeBlockToFitContent]);
@@ -105,6 +107,13 @@ export function TextBlock({ block, onUpdate, isEditable }: TextBlockProps) {
     textAlign: content.textAlign ?? "left",
   };
 
+  const placeholderStyle: React.CSSProperties = {
+    fontFamily: content.fontFamily ?? "system-ui",
+    fontSize: `${content.fontSize ?? 14}px`,
+    textAlign: content.textAlign ?? "left",
+    color: "rgb(148 163 184 / 0.45)",
+  };
+
   const handleWrapperClick = useCallback(
     (e: React.MouseEvent) => {
       if (
@@ -120,7 +129,7 @@ export function TextBlock({ block, onUpdate, isEditable }: TextBlockProps) {
 
   return (
     <div
-      className="h-full min-h-0 overflow-auto px-4 py-3 flex items-center cursor-text"
+      className="h-full min-h-0 overflow-hidden px-4 py-3 flex items-center cursor-text"
       data-no-block-drag
       style={{
         justifyContent:
@@ -133,26 +142,47 @@ export function TextBlock({ block, onUpdate, isEditable }: TextBlockProps) {
       onClick={handleWrapperClick}
     >
       {!isEditable ? (
-        <div
-          className="min-w-0 w-full break-words outline-none empty:before:content-['Click to add text…'] empty:before:text-slate-400 dark:empty:before:text-slate-500"
-          style={textStyle}
-        >
-          {content.text || ""}
+        <div className="relative min-w-0 w-full">
+          <div
+            className="break-words outline-none"
+            style={textStyle}
+          >
+            {content.text || ""}
+          </div>
+          {!content.text?.trim() && (
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={placeholderStyle}
+            >
+              Add text…
+            </div>
+          )}
         </div>
       ) : (
-        <div
-          ref={editRef}
-          contentEditable
-          suppressContentEditableWarning
-          className="min-w-0 w-full min-h-[2.5rem] break-words outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none empty:before:content-['Add text…'] empty:before:text-slate-400 dark:empty:before:text-slate-500"
-          style={textStyle}
-          onBlur={handleBlur}
-          onInput={handleInput}
-          onKeyDown={handleKeyDown}
-          onClick={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-          data-no-block-drag
-        />
+        <div className="relative min-w-0 w-full min-h-[2.5rem]">
+          <div
+            ref={editRef}
+            contentEditable
+            suppressContentEditableWarning
+            className="min-w-0 w-full break-words outline-none focus:outline-none"
+            style={textStyle}
+            onBlur={handleBlur}
+            onFocus={() => setIsFocused(true)}
+            onInput={handleInput}
+            onKeyDown={handleKeyDown}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            data-no-block-drag
+          />
+          {!localText.trim() && !isFocused && (
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={placeholderStyle}
+            >
+              Add text…
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

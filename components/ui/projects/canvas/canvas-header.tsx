@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -120,6 +120,10 @@ export function CanvasHeader({
   const [renameValue, setRenameValue] = useState("");
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const [themeMounted, setThemeMounted] = useState(false);
+  useEffect(() => {
+    setThemeMounted(true);
+  }, []);
   const { user } = useUser();
   const { signOut } = useClerk();
 
@@ -141,7 +145,7 @@ export function CanvasHeader({
   return (
     <>
     <LiquidGlassSurface asChild variant="header" intensity="2xl">
-      <header>
+      <header className="animate-navbar-enter">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 gap-6 min-w-0">
             {/* Left section - Back | Project (prominent) | Canvas | Active */}
@@ -519,27 +523,36 @@ export function CanvasHeader({
                 </LiquidGlassButton>
               </div>
 
-              {/* Theme Toggle */}
+              {/* Theme Toggle - delay theme-dependent UI until mounted to avoid hydration mismatch */}
               <Button
                 variant="glass"
                 size="sm"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 className="rounded-xl p-0 h-11 w-11 flex items-center justify-center relative text-xs"
               >
-                <Sun
-                  className={`h-4 w-4 rotate-0 scale-100 transition-all duration-300 ${
-                    theme === "dark"
-                      ? "dark:-rotate-90 dark:scale-0 text-yellow-400/60"
-                      : "text-yellow-500"
-                  }`}
-                />
-                <Moon
-                  className={`absolute h-4 w-4 rotate-90 scale-0 transition-all duration-300 ${
-                    theme === "dark"
-                      ? "dark:rotate-0 dark:scale-100 text-blue-400"
-                      : "text-blue-400/60"
-                  }`}
-                />
+                {themeMounted ? (
+                  <>
+                    <Sun
+                      className={`h-4 w-4 rotate-0 scale-100 transition-all duration-300 ${
+                        theme === "dark"
+                          ? "dark:-rotate-90 dark:scale-0 text-yellow-400/60"
+                          : "text-yellow-500"
+                      }`}
+                    />
+                    <Moon
+                      className={`absolute h-4 w-4 rotate-90 scale-0 transition-all duration-300 ${
+                        theme === "dark"
+                          ? "dark:rotate-0 dark:scale-100 text-blue-400"
+                          : "text-blue-400/60"
+                      }`}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Sun className="h-4 w-4 rotate-0 scale-100 text-yellow-400/60" />
+                    <Moon className="absolute h-4 w-4 rotate-90 scale-0 text-blue-400/60" />
+                  </>
+                )}
               </Button>
 
               {/* User Menu (avatar trigger) */}
@@ -552,15 +565,15 @@ export function CanvasHeader({
                     title="Account & canvas options"
                     aria-label="Account & canvas options"
                   >
-                    {userImage ? (
+                    {themeMounted && userImage ? (
                       <img
                         src={userImage}
                         alt={userName}
                         className="h-11 w-11 object-cover pointer-events-none"
                       />
                     ) : (
-                        <span className="h-11 w-11 flex items-center justify-center rounded-full bg-primary/20 text-primary text-sm font-medium pointer-events-none">
-                        {userInitials}
+                      <span className="h-11 w-11 flex items-center justify-center rounded-full bg-primary/20 text-primary text-sm font-medium pointer-events-none">
+                        {themeMounted ? userInitials : "?"}
                       </span>
                     )}
                   </Button>
@@ -577,7 +590,7 @@ export function CanvasHeader({
                   {/* User info header */}
                   <div className="p-3 border-b border-slate-200 dark:border-slate-700">
                     <div className="flex items-center gap-3">
-                      {userImage ? (
+                      {themeMounted && userImage ? (
                         <img
                           src={userImage}
                           alt={userName}
@@ -585,14 +598,14 @@ export function CanvasHeader({
                         />
                       ) : (
                         <span className="h-10 w-10 flex items-center justify-center rounded-full bg-primary/20 text-primary text-sm font-medium shrink-0">
-                          {userInitials}
+                          {themeMounted ? userInitials : "?"}
                         </span>
                       )}
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
-                          {userName}
+                          {themeMounted ? userName : "User"}
                         </p>
-                        {userEmail && (
+                        {themeMounted && userEmail && (
                           <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                             {userEmail}
                           </p>

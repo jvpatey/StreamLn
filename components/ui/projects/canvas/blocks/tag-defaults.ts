@@ -24,16 +24,12 @@ export function getTagContent(value: unknown): TagBlockContent {
   return { ...DEFAULT_TAG_CONTENT };
 }
 
-const MAX_DISPLAY_LENGTH = 30;
-
 /**
- * Returns display text for the tag: trimmed label, optionally truncated.
- * Empty string if no label.
+ * Returns display text for the tag: trimmed label with # prefix.
+ * Full text is returned so it can always be visible (no truncation).
  */
 export function getTagDisplayLabel(content: TagBlockContent): string {
-  const trimmed = (content.label ?? "").trim();
-  if (!trimmed) return "";
-  return trimmed.length > MAX_DISPLAY_LENGTH
-    ? trimmed.slice(0, MAX_DISPLAY_LENGTH) + "…"
-    : trimmed;
+  const raw = (content.label ?? "").trim().replace(/^#+/, "");
+  if (!raw) return "";
+  return `#${raw}`;
 }

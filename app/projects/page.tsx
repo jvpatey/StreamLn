@@ -19,6 +19,7 @@ import {
   updateProjectStatus,
   updateProject,
 } from "@/lib/api/projects";
+import { addProjectToRecent } from "@/lib/recent-projects";
 
 export default function DashboardPage() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -79,6 +80,7 @@ export default function DashboardPage() {
 
   const handleImportSuccess = useCallback(
     (projectId: string, firstCanvasId: string | null) => {
+      addProjectToRecent(projectId);
       loadProjects();
       if (firstCanvasId) {
         router.push(`/projects/${projectId}/canvas/${firstCanvasId}`);
@@ -195,6 +197,7 @@ export default function DashboardPage() {
   };
 
   const handleOpenCanvas = (project: any, canvasId?: string) => {
+    addProjectToRecent(project.id);
     if (canvasId) {
       router.push(`/projects/${project.id}/canvas/${canvasId}`);
     } else {
@@ -203,13 +206,19 @@ export default function DashboardPage() {
   };
 
   const handleProjectDelete = async (projectId: string) => {
+    const projectToRestore = projects.find((p) => p.id === projectId);
+    setProjects((prev) => prev.filter((p) => p.id !== projectId));
+    setSidepanelOpen(false);
+    setSelectedProject(null);
     try {
       await deleteProject(projectId);
-      loadProjects();
-      setSidepanelOpen(false);
-      setSelectedProject(null);
     } catch (error) {
       console.error("Failed to delete project:", error);
+      if (projectToRestore) {
+        setProjects((prev) => [...prev, projectToRestore]);
+      } else {
+        loadProjects();
+      }
     }
   };
 
@@ -262,6 +271,7 @@ export default function DashboardPage() {
   };
 
   // Filter and sort projects before rendering
+  // Active projects always appear before archived; within each group, apply selected sort
   const filteredAndSortedProjects = projects
     .filter((project) => {
       if (statusFilter === "all") return true;
@@ -270,6 +280,16 @@ export default function DashboardPage() {
       return true;
     })
     .sort((a, b) => {
+      // Always put active before archived
+      const statusOrder = (status: string | undefined) => {
+        if (status === "active" || !status) return 0;
+        if (status === "archived") return 1;
+        return 2;
+      };
+      const statusDiff = statusOrder(a.status) - statusOrder(b.status);
+      if (statusDiff !== 0) return statusDiff;
+
+      // Within same status group, apply selected sort
       if (sortBy === "updated") {
         return (
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
@@ -277,13 +297,10 @@ export default function DashboardPage() {
       } else if (sortBy === "alpha") {
         return a.name.localeCompare(b.name);
       } else if (sortBy === "status") {
-        // Active first, then archived, then others
-        const statusOrder = (status: string | undefined) => {
-          if (status === "active") return 0;
-          if (status === "archived") return 1;
-          return 2;
-        };
-        return statusOrder(a.status) - statusOrder(b.status);
+        // Same status - use updatedAt as tiebreaker
+        return (
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
       }
       return 0;
     });
@@ -333,9 +350,13 @@ export default function DashboardPage() {
         <ProjectsSidebar
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
-          onCommandPaletteOpen={() => setCommandPaletteOpen(true)}
           onCreateProject={handleCreateProject}
           onImportProject={handleImportProject}
+          projects={projects}
+          onOpenProject={(project) => {
+            addProjectToRecent(project.id);
+            router.push(`/projects/${project.id}`);
+          }}
         />
 
         {/* Main Content Area - only this scrolls */}
@@ -358,6 +379,7 @@ export default function DashboardPage() {
           <ProjectsContent
             onCreateProject={handleCreateProject}
             projects={filteredAndSortedProjects}
+            totalProjectCount={projects.length}
             setProjects={setProjects}
             onProjectClick={handleProjectClick}
             onProjectDelete={handleProjectDelete}
