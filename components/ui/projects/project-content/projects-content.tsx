@@ -373,11 +373,29 @@ export function ProjectsContent({
               <div className="w-24 text-center">Status</div>
               <div className="w-20 text-center">Actions</div>
             </div>
-            {projects.map((project) => (
-              <div
-                key={project.id}
-                className="flex items-center px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-              >
+            <AnimatePresence mode="popLayout">
+              {projects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  layout
+                  initial={
+                    shouldReduceMotion
+                      ? { opacity: 1 }
+                      : { opacity: 0, x: -8 }
+                  }
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={
+                    shouldReduceMotion
+                      ? { opacity: 1 }
+                      : { opacity: 0, x: 8 }
+                  }
+                  transition={{
+                    duration: shouldReduceMotion ? 0.01 : 0.25,
+                    delay: shouldReduceMotion ? 0 : index * 0.04,
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                  }}
+                  className="flex items-center px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                >
                 {/* Icon */}
                 <div className="w-8 flex-shrink-0">
                   {React.createElement(
@@ -418,8 +436,9 @@ export function ProjectsContent({
                     View
                   </Button>
                 </div>
-              </div>
+              </motion.div>
             ))}
+            </AnimatePresence>
           </div>
         )}
       </div>
