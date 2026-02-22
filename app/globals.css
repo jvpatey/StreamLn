@@ -63,6 +63,35 @@
     scroll-behavior: smooth;
   }
 
+  /* Global discreet scrollbar - applies to all scrollable areas */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(148 163 184 / 0.25) transparent;
+  }
+  .dark * {
+    scrollbar-color: rgb(71 85 105 / 0.3) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgb(148 163 184 / 0.25);
+    border-radius: 3px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgb(148 163 184 / 0.45);
+  }
+  .dark *::-webkit-scrollbar-thumb {
+    background: rgb(71 85 105 / 0.3);
+  }
+  .dark *::-webkit-scrollbar-thumb:hover {
+    background: rgb(71 85 105 / 0.5);
+  }
+
   /* Reduced motion support - respect user preferences */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -257,32 +286,7 @@
   font-size: inherit;
 }
 
-/* Code block CodeMirror scrollbar styling */
+/* Code block CodeMirror - uses global scrollbar, add stable gutter for code */
 .code-block-editor .cm-scroller {
   scrollbar-gutter: stable;
-  scrollbar-width: thin;
-  scrollbar-color: rgb(148 163 184 / 0.4) transparent;
-}
-.dark .code-block-editor .cm-scroller {
-  scrollbar-color: rgb(71 85 105 / 0.5) transparent;
-}
-.code-block-editor .cm-scroller::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-.code-block-editor .cm-scroller::-webkit-scrollbar-track {
-  background: transparent;
-}
-.code-block-editor .cm-scroller::-webkit-scrollbar-thumb {
-  background: rgb(148 163 184 / 0.4);
-  border-radius: 4px;
-}
-.code-block-editor .cm-scroller::-webkit-scrollbar-thumb:hover {
-  background: rgb(148 163 184 / 0.6);
-}
-.dark .code-block-editor .cm-scroller::-webkit-scrollbar-thumb {
-  background: rgb(71 85 105 / 0.5);
-}
-.dark .code-block-editor .cm-scroller::-webkit-scrollbar-thumb:hover {
-  background: rgb(71 85 105 / 0.7);
 }
