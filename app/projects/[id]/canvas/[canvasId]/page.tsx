@@ -21,6 +21,7 @@ import { DEFAULT_LINK_CONTENT } from "@/components/ui/projects/canvas/blocks/lin
 import { DEFAULT_TAG_CONTENT } from "@/components/ui/projects/canvas/blocks/tag-defaults";
 import { getDefaultTaskBoardContent } from "@/components/ui/projects/canvas/blocks/task-board-defaults";
 import { DEFAULT_CODE_CONTENT } from "@/components/ui/projects/canvas/blocks/code-defaults";
+import { DEFAULT_IMAGE_CONTENT } from "@/components/ui/projects/canvas/blocks/image-defaults";
 import { DEFAULT_TEXT_CONTENT } from "@/components/ui/projects/canvas/blocks/text-defaults";
 import {
   DEFAULT_SHAPE_CONTENT,
@@ -466,6 +467,7 @@ export default function ProjectCanvasPage() {
     if (type === "tag") return DEFAULT_TAG_CONTENT;
     if (type === "task-board") return getDefaultTaskBoardContent();
     if (type === "code") return DEFAULT_CODE_CONTENT;
+    if (type === "image") return DEFAULT_IMAGE_CONTENT;
     if (type === "text") return DEFAULT_TEXT_CONTENT;
     if (type === "shape") return DEFAULT_SHAPE_CONTENT;
     return {};
