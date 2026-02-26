@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { Image, Loader2, Upload } from "lucide-react";
+import { Image, Loader2, Upload, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/shared/button";
 import {
   getImageContent,
@@ -12,6 +12,8 @@ interface CanvasBlock {
   id: string;
   type: string;
   content: unknown;
+  width?: number;
+  height?: number;
   color?: string;
   title?: string;
 }
@@ -46,8 +48,30 @@ export function ImageBlock({ block, onUpdate, isEditable }: ImageBlockProps) {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const lastAutoResizedUrlRef = useRef<string | null>(null);
   const onUpdateRef = useRef(onUpdate);
   onUpdateRef.current = onUpdate;
+
+  const handleImageLoad = useCallback(
+    (e: React.SyntheticEvent<HTMLImageElement>) => {
+      if (lastAutoResizedUrlRef.current === content.url) return;
+      const img = e.currentTarget;
+      const w = img.naturalWidth;
+      const h = img.naturalHeight;
+      if (!w || !h) return;
+      const IMAGE_HEADER_HEIGHT = 40;
+      const maxContentW = 600;
+      const maxContentH = 450;
+      const scale = Math.min(maxContentW / w, maxContentH / h, 1);
+      const contentW = w * scale;
+      const contentH = h * scale;
+      const newWidth = Math.max(150, Math.min(600, contentW));
+      const newHeight = Math.max(100, Math.min(500, IMAGE_HEADER_HEIGHT + contentH));
+      lastAutoResizedUrlRef.current = content.url;
+      onUpdateRef.current({ width: newWidth, height: newHeight });
+    },
+    [content.url]
+  );
 
   const handleUpload = useCallback(
     async (file: File) => {
@@ -137,6 +161,19 @@ export function ImageBlock({ block, onUpdate, isEditable }: ImageBlockProps) {
     [isEditable, isUploading]
   );
 
+  const handleRemove = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!isEditable) return;
+      lastAutoResizedUrlRef.current = null;
+      onUpdateRef.current({
+        content: { ...content, url: "" } as ImageBlockContent,
+      });
+    },
+    [content, isEditable]
+  );
+
   const handlePasteButton = useCallback(async () => {
     if (!isEditable || isUploading) return;
     try {
@@ -179,13 +216,46 @@ export function ImageBlock({ block, onUpdate, isEditable }: ImageBlockProps) {
       />
 
       {hasImage ? (
-        <div className="relative h-full w-full min-h-0 flex items-center justify-center">
-          <img
-            src={content.url}
-            alt={content.alt ?? ""}
-            title={content.title ?? undefined}
-            className="max-w-full max-h-full w-full h-full object-contain"
-          />
+        <div className="relative h-full w-full min-h-0 flex items-center justify-center group">
+          <div className="absolute inset-0 overflow-hidden rounded-xl">
+            <img
+              src={content.url}
+              alt={content.alt ?? ""}
+              title={content.title ?? undefined}
+              className="w-full h-full object-contain"
+              onLoad={handleImageLoad}
+            />
+          </div>
+          {isEditable && (
+            <div
+              className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-xl"
+              data-no-block-drag
+            >
+              <Button
+                variant="secondary"
+                size="sm"
+                type="button"
+                onClick={handleChooseFile}
+                onMouseDown={(e) => e.stopPropagation()}
+                disabled={isUploading}
+                className="gap-1.5 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200"
+              >
+                <RefreshCw size={14} />
+                Replace
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                type="button"
+                onClick={handleRemove}
+                onMouseDown={(e) => e.stopPropagation()}
+                className="gap-1.5 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+              >
+                <Trash2 size={14} />
+                Remove
+              </Button>
+            </div>
+          )}
         </div>
       ) : (
         <div
