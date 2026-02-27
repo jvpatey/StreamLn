@@ -58,8 +58,13 @@ export const reorderCanvasesSchema = z.object({
     .max(100),
 });
 
+export const createShareTokenSchema = z.object({
+  expiresIn: z.number().int().min(1).max(365).optional(),
+});
+
 export type CanvasBlockInput = z.infer<typeof canvasBlockSchema>;
 export type SaveCanvasBlocksInput = z.infer<typeof saveCanvasBlocksSchema>;
 export type CreateCanvasInput = z.infer<typeof createCanvasSchema>;
 export type UpdateCanvasInput = z.infer<typeof updateCanvasSchema>;
 export type ReorderCanvasesInput = z.infer<typeof reorderCanvasesSchema>;
+export type CreateShareTokenInput = z.infer<typeof createShareTokenSchema>;

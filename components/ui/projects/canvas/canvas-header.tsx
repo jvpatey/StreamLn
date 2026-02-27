@@ -98,6 +98,7 @@ interface CanvasHeaderProps {
   onCanvasDelete?: (canvasId: string) => void;
   onCanvasReorder?: (reordered: CanvasItem[]) => void;
   onExportClick?: () => void;
+  onShareClick?: () => void;
 }
 
 // Canvas header component used in the canvas page
@@ -112,6 +113,7 @@ export function CanvasHeader({
   onCanvasDelete,
   onCanvasReorder,
   onExportClick,
+  onShareClick,
 }: CanvasHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [canvasSwitcherOpen, setCanvasSwitcherOpen] = useState(false);
@@ -508,6 +510,7 @@ export function CanvasHeader({
                   gradient="blue"
                   size="sm"
                   className="rounded-xl h-11 px-4 text-xs font-medium flex items-center justify-center"
+                  onClick={onShareClick}
                 >
                   <Users size={14} className="mr-2" />
                   Share
@@ -672,6 +675,10 @@ export function CanvasHeader({
                     {/* Canvas actions */}
                     <button
                       type="button"
+                      onClick={() => {
+                        onShareClick?.();
+                        setMenuOpen(false);
+                      }}
                       className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                     >
                       <Share2 size={14} className="mr-2 shrink-0" />
