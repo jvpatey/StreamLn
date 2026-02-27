@@ -96,7 +96,7 @@ export function ShareCanvasModal({
   const handleCopy = async (shareToken: ShareToken) => {
     const url = getShareUrl(shareToken.token);
     try {
-      if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
+      if (navigator.share) {
         await navigator.share({
           title: `${canvasName} - ${projectName}`,
           text: `View ${canvasName} on StreamLn`,
