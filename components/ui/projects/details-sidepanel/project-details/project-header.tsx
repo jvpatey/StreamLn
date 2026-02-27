@@ -1,6 +1,7 @@
 import React from "react";
+import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
-import { SheetTitle, SheetDescription } from "@/components/ui/shared/sheet";
+import { SheetTitle } from "@/components/ui/shared/sheet";
 import { getIconComponent } from "../../project-content/icon-picker";
 import { getLiquidGlassSurfaceClassName } from "@/components/ui/shared/liquid-glass-surface";
 import { Archive, CheckCircle } from "lucide-react";
@@ -70,29 +71,22 @@ export function ProjectHeader({
         )}
       </div>
 
-      {/* Row 2: Description full width */}
-      <div className="w-full">
-        {isEditMode ? (
-          <textarea
-            value={editForm.description}
-            onChange={(e) => onInputChange("description", e.target.value)}
-            className="w-full text-sm 
-              backdrop-blur-sm bg-white/30 dark:bg-slate-800/30
-              border border-white/30 dark:border-slate-700/30
-              rounded-lg p-2 
-              focus:border-primary/50 focus:outline-none 
-              transition-colors duration-200 resize-none"
-            placeholder="Project description (optional)"
-            rows={3}
-          />
-        ) : (
-          project.description && (
-            <SheetDescription className="text-sm text-muted-foreground leading-relaxed">
-              {project.description}
-            </SheetDescription>
-          )
-        )}
-      </div>
+      {/* Row 2: Created/Updated subtext */}
+      <p className="text-xs text-muted-foreground">
+        {(() => {
+          try {
+            const created = formatDistanceToNow(new Date(project.createdAt), {
+              addSuffix: true,
+            });
+            const updated = formatDistanceToNow(new Date(project.updatedAt), {
+              addSuffix: true,
+            });
+            return `Created ${created} · Updated ${updated}`;
+          } catch {
+            return null;
+          }
+        })()}
+      </p>
 
       {/* Row 3: Toggle left-aligned */}
       <div className="flex justify-start">
