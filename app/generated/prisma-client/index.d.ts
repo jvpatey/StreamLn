@@ -24,6 +24,11 @@ export type Project = $Result.DefaultSelection<Prisma.$ProjectPayload>
  */
 export type Canvas = $Result.DefaultSelection<Prisma.$CanvasPayload>
 /**
+ * Model CanvasShareToken
+ * 
+ */
+export type CanvasShareToken = $Result.DefaultSelection<Prisma.$CanvasShareTokenPayload>
+/**
  * Model CanvasBlock
  * 
  */
@@ -173,6 +178,16 @@ export class PrismaClient<
     * ```
     */
   get canvas(): Prisma.CanvasDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.canvasShareToken`: Exposes CRUD operations for the **CanvasShareToken** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CanvasShareTokens
+    * const canvasShareTokens = await prisma.canvasShareToken.findMany()
+    * ```
+    */
+  get canvasShareToken(): Prisma.CanvasShareTokenDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.canvasBlock`: Exposes CRUD operations for the **CanvasBlock** model.
@@ -625,6 +640,7 @@ export namespace Prisma {
   export const ModelName: {
     Project: 'Project',
     Canvas: 'Canvas',
+    CanvasShareToken: 'CanvasShareToken',
     CanvasBlock: 'CanvasBlock'
   };
 
@@ -644,7 +660,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "project" | "canvas" | "canvasBlock"
+      modelProps: "project" | "canvas" | "canvasShareToken" | "canvasBlock"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -793,6 +809,80 @@ export namespace Prisma {
           count: {
             args: Prisma.CanvasCountArgs<ExtArgs>
             result: $Utils.Optional<CanvasCountAggregateOutputType> | number
+          }
+        }
+      }
+      CanvasShareToken: {
+        payload: Prisma.$CanvasShareTokenPayload<ExtArgs>
+        fields: Prisma.CanvasShareTokenFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CanvasShareTokenFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasShareTokenPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CanvasShareTokenFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasShareTokenPayload>
+          }
+          findFirst: {
+            args: Prisma.CanvasShareTokenFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasShareTokenPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CanvasShareTokenFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasShareTokenPayload>
+          }
+          findMany: {
+            args: Prisma.CanvasShareTokenFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasShareTokenPayload>[]
+          }
+          create: {
+            args: Prisma.CanvasShareTokenCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasShareTokenPayload>
+          }
+          createMany: {
+            args: Prisma.CanvasShareTokenCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CanvasShareTokenCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasShareTokenPayload>[]
+          }
+          delete: {
+            args: Prisma.CanvasShareTokenDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasShareTokenPayload>
+          }
+          update: {
+            args: Prisma.CanvasShareTokenUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasShareTokenPayload>
+          }
+          deleteMany: {
+            args: Prisma.CanvasShareTokenDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CanvasShareTokenUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CanvasShareTokenUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasShareTokenPayload>[]
+          }
+          upsert: {
+            args: Prisma.CanvasShareTokenUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CanvasShareTokenPayload>
+          }
+          aggregate: {
+            args: Prisma.CanvasShareTokenAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCanvasShareToken>
+          }
+          groupBy: {
+            args: Prisma.CanvasShareTokenGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CanvasShareTokenGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CanvasShareTokenCountArgs<ExtArgs>
+            result: $Utils.Optional<CanvasShareTokenCountAggregateOutputType> | number
           }
         }
       }
@@ -956,6 +1046,7 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     project?: ProjectOmit
     canvas?: CanvasOmit
+    canvasShareToken?: CanvasShareTokenOmit
     canvasBlock?: CanvasBlockOmit
   }
 
@@ -1083,10 +1174,12 @@ export namespace Prisma {
 
   export type CanvasCountOutputType = {
     canvasBlocks: number
+    shareTokens: number
   }
 
   export type CanvasCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     canvasBlocks?: boolean | CanvasCountOutputTypeCountCanvasBlocksArgs
+    shareTokens?: boolean | CanvasCountOutputTypeCountShareTokensArgs
   }
 
   // Custom InputTypes
@@ -1105,6 +1198,13 @@ export namespace Prisma {
    */
   export type CanvasCountOutputTypeCountCanvasBlocksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CanvasBlockWhereInput
+  }
+
+  /**
+   * CanvasCountOutputType without action
+   */
+  export type CanvasCountOutputTypeCountShareTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CanvasShareTokenWhereInput
   }
 
 
@@ -2429,6 +2529,7 @@ export namespace Prisma {
     updatedAt?: boolean
     project?: boolean | ProjectDefaultArgs<ExtArgs>
     canvasBlocks?: boolean | Canvas$canvasBlocksArgs<ExtArgs>
+    shareTokens?: boolean | Canvas$shareTokensArgs<ExtArgs>
     _count?: boolean | CanvasCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["canvas"]>
 
@@ -2465,6 +2566,7 @@ export namespace Prisma {
   export type CanvasInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
     canvasBlocks?: boolean | Canvas$canvasBlocksArgs<ExtArgs>
+    shareTokens?: boolean | Canvas$shareTokensArgs<ExtArgs>
     _count?: boolean | CanvasCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CanvasIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2479,6 +2581,7 @@ export namespace Prisma {
     objects: {
       project: Prisma.$ProjectPayload<ExtArgs>
       canvasBlocks: Prisma.$CanvasBlockPayload<ExtArgs>[]
+      shareTokens: Prisma.$CanvasShareTokenPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2883,6 +2986,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     canvasBlocks<T extends Canvas$canvasBlocksArgs<ExtArgs> = {}>(args?: Subset<T, Canvas$canvasBlocksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    shareTokens<T extends Canvas$shareTokensArgs<ExtArgs> = {}>(args?: Subset<T, Canvas$shareTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3338,6 +3442,30 @@ export namespace Prisma {
   }
 
   /**
+   * Canvas.shareTokens
+   */
+  export type Canvas$shareTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenInclude<ExtArgs> | null
+    where?: CanvasShareTokenWhereInput
+    orderBy?: CanvasShareTokenOrderByWithRelationInput | CanvasShareTokenOrderByWithRelationInput[]
+    cursor?: CanvasShareTokenWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CanvasShareTokenScalarFieldEnum | CanvasShareTokenScalarFieldEnum[]
+  }
+
+  /**
    * Canvas without action
    */
   export type CanvasDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3353,6 +3481,1064 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: CanvasInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CanvasShareToken
+   */
+
+  export type AggregateCanvasShareToken = {
+    _count: CanvasShareTokenCountAggregateOutputType | null
+    _min: CanvasShareTokenMinAggregateOutputType | null
+    _max: CanvasShareTokenMaxAggregateOutputType | null
+  }
+
+  export type CanvasShareTokenMinAggregateOutputType = {
+    id: string | null
+    token: string | null
+    canvasId: string | null
+    expiresAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type CanvasShareTokenMaxAggregateOutputType = {
+    id: string | null
+    token: string | null
+    canvasId: string | null
+    expiresAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type CanvasShareTokenCountAggregateOutputType = {
+    id: number
+    token: number
+    canvasId: number
+    expiresAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type CanvasShareTokenMinAggregateInputType = {
+    id?: true
+    token?: true
+    canvasId?: true
+    expiresAt?: true
+    createdAt?: true
+  }
+
+  export type CanvasShareTokenMaxAggregateInputType = {
+    id?: true
+    token?: true
+    canvasId?: true
+    expiresAt?: true
+    createdAt?: true
+  }
+
+  export type CanvasShareTokenCountAggregateInputType = {
+    id?: true
+    token?: true
+    canvasId?: true
+    expiresAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type CanvasShareTokenAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CanvasShareToken to aggregate.
+     */
+    where?: CanvasShareTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CanvasShareTokens to fetch.
+     */
+    orderBy?: CanvasShareTokenOrderByWithRelationInput | CanvasShareTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CanvasShareTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CanvasShareTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CanvasShareTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CanvasShareTokens
+    **/
+    _count?: true | CanvasShareTokenCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CanvasShareTokenMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CanvasShareTokenMaxAggregateInputType
+  }
+
+  export type GetCanvasShareTokenAggregateType<T extends CanvasShareTokenAggregateArgs> = {
+        [P in keyof T & keyof AggregateCanvasShareToken]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCanvasShareToken[P]>
+      : GetScalarType<T[P], AggregateCanvasShareToken[P]>
+  }
+
+
+
+
+  export type CanvasShareTokenGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CanvasShareTokenWhereInput
+    orderBy?: CanvasShareTokenOrderByWithAggregationInput | CanvasShareTokenOrderByWithAggregationInput[]
+    by: CanvasShareTokenScalarFieldEnum[] | CanvasShareTokenScalarFieldEnum
+    having?: CanvasShareTokenScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CanvasShareTokenCountAggregateInputType | true
+    _min?: CanvasShareTokenMinAggregateInputType
+    _max?: CanvasShareTokenMaxAggregateInputType
+  }
+
+  export type CanvasShareTokenGroupByOutputType = {
+    id: string
+    token: string
+    canvasId: string
+    expiresAt: Date | null
+    createdAt: Date
+    _count: CanvasShareTokenCountAggregateOutputType | null
+    _min: CanvasShareTokenMinAggregateOutputType | null
+    _max: CanvasShareTokenMaxAggregateOutputType | null
+  }
+
+  type GetCanvasShareTokenGroupByPayload<T extends CanvasShareTokenGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CanvasShareTokenGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CanvasShareTokenGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CanvasShareTokenGroupByOutputType[P]>
+            : GetScalarType<T[P], CanvasShareTokenGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CanvasShareTokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    token?: boolean
+    canvasId?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["canvasShareToken"]>
+
+  export type CanvasShareTokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    token?: boolean
+    canvasId?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["canvasShareToken"]>
+
+  export type CanvasShareTokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    token?: boolean
+    canvasId?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["canvasShareToken"]>
+
+  export type CanvasShareTokenSelectScalar = {
+    id?: boolean
+    token?: boolean
+    canvasId?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type CanvasShareTokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "token" | "canvasId" | "expiresAt" | "createdAt", ExtArgs["result"]["canvasShareToken"]>
+  export type CanvasShareTokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
+  }
+  export type CanvasShareTokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
+  }
+  export type CanvasShareTokenIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
+  }
+
+  export type $CanvasShareTokenPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CanvasShareToken"
+    objects: {
+      canvas: Prisma.$CanvasPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      token: string
+      canvasId: string
+      expiresAt: Date | null
+      createdAt: Date
+    }, ExtArgs["result"]["canvasShareToken"]>
+    composites: {}
+  }
+
+  type CanvasShareTokenGetPayload<S extends boolean | null | undefined | CanvasShareTokenDefaultArgs> = $Result.GetResult<Prisma.$CanvasShareTokenPayload, S>
+
+  type CanvasShareTokenCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CanvasShareTokenFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CanvasShareTokenCountAggregateInputType | true
+    }
+
+  export interface CanvasShareTokenDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CanvasShareToken'], meta: { name: 'CanvasShareToken' } }
+    /**
+     * Find zero or one CanvasShareToken that matches the filter.
+     * @param {CanvasShareTokenFindUniqueArgs} args - Arguments to find a CanvasShareToken
+     * @example
+     * // Get one CanvasShareToken
+     * const canvasShareToken = await prisma.canvasShareToken.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CanvasShareTokenFindUniqueArgs>(args: SelectSubset<T, CanvasShareTokenFindUniqueArgs<ExtArgs>>): Prisma__CanvasShareTokenClient<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CanvasShareToken that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CanvasShareTokenFindUniqueOrThrowArgs} args - Arguments to find a CanvasShareToken
+     * @example
+     * // Get one CanvasShareToken
+     * const canvasShareToken = await prisma.canvasShareToken.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CanvasShareTokenFindUniqueOrThrowArgs>(args: SelectSubset<T, CanvasShareTokenFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CanvasShareTokenClient<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CanvasShareToken that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasShareTokenFindFirstArgs} args - Arguments to find a CanvasShareToken
+     * @example
+     * // Get one CanvasShareToken
+     * const canvasShareToken = await prisma.canvasShareToken.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CanvasShareTokenFindFirstArgs>(args?: SelectSubset<T, CanvasShareTokenFindFirstArgs<ExtArgs>>): Prisma__CanvasShareTokenClient<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CanvasShareToken that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasShareTokenFindFirstOrThrowArgs} args - Arguments to find a CanvasShareToken
+     * @example
+     * // Get one CanvasShareToken
+     * const canvasShareToken = await prisma.canvasShareToken.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CanvasShareTokenFindFirstOrThrowArgs>(args?: SelectSubset<T, CanvasShareTokenFindFirstOrThrowArgs<ExtArgs>>): Prisma__CanvasShareTokenClient<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CanvasShareTokens that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasShareTokenFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CanvasShareTokens
+     * const canvasShareTokens = await prisma.canvasShareToken.findMany()
+     * 
+     * // Get first 10 CanvasShareTokens
+     * const canvasShareTokens = await prisma.canvasShareToken.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const canvasShareTokenWithIdOnly = await prisma.canvasShareToken.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CanvasShareTokenFindManyArgs>(args?: SelectSubset<T, CanvasShareTokenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CanvasShareToken.
+     * @param {CanvasShareTokenCreateArgs} args - Arguments to create a CanvasShareToken.
+     * @example
+     * // Create one CanvasShareToken
+     * const CanvasShareToken = await prisma.canvasShareToken.create({
+     *   data: {
+     *     // ... data to create a CanvasShareToken
+     *   }
+     * })
+     * 
+     */
+    create<T extends CanvasShareTokenCreateArgs>(args: SelectSubset<T, CanvasShareTokenCreateArgs<ExtArgs>>): Prisma__CanvasShareTokenClient<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CanvasShareTokens.
+     * @param {CanvasShareTokenCreateManyArgs} args - Arguments to create many CanvasShareTokens.
+     * @example
+     * // Create many CanvasShareTokens
+     * const canvasShareToken = await prisma.canvasShareToken.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CanvasShareTokenCreateManyArgs>(args?: SelectSubset<T, CanvasShareTokenCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CanvasShareTokens and returns the data saved in the database.
+     * @param {CanvasShareTokenCreateManyAndReturnArgs} args - Arguments to create many CanvasShareTokens.
+     * @example
+     * // Create many CanvasShareTokens
+     * const canvasShareToken = await prisma.canvasShareToken.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CanvasShareTokens and only return the `id`
+     * const canvasShareTokenWithIdOnly = await prisma.canvasShareToken.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CanvasShareTokenCreateManyAndReturnArgs>(args?: SelectSubset<T, CanvasShareTokenCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CanvasShareToken.
+     * @param {CanvasShareTokenDeleteArgs} args - Arguments to delete one CanvasShareToken.
+     * @example
+     * // Delete one CanvasShareToken
+     * const CanvasShareToken = await prisma.canvasShareToken.delete({
+     *   where: {
+     *     // ... filter to delete one CanvasShareToken
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CanvasShareTokenDeleteArgs>(args: SelectSubset<T, CanvasShareTokenDeleteArgs<ExtArgs>>): Prisma__CanvasShareTokenClient<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CanvasShareToken.
+     * @param {CanvasShareTokenUpdateArgs} args - Arguments to update one CanvasShareToken.
+     * @example
+     * // Update one CanvasShareToken
+     * const canvasShareToken = await prisma.canvasShareToken.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CanvasShareTokenUpdateArgs>(args: SelectSubset<T, CanvasShareTokenUpdateArgs<ExtArgs>>): Prisma__CanvasShareTokenClient<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CanvasShareTokens.
+     * @param {CanvasShareTokenDeleteManyArgs} args - Arguments to filter CanvasShareTokens to delete.
+     * @example
+     * // Delete a few CanvasShareTokens
+     * const { count } = await prisma.canvasShareToken.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CanvasShareTokenDeleteManyArgs>(args?: SelectSubset<T, CanvasShareTokenDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CanvasShareTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasShareTokenUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CanvasShareTokens
+     * const canvasShareToken = await prisma.canvasShareToken.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CanvasShareTokenUpdateManyArgs>(args: SelectSubset<T, CanvasShareTokenUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CanvasShareTokens and returns the data updated in the database.
+     * @param {CanvasShareTokenUpdateManyAndReturnArgs} args - Arguments to update many CanvasShareTokens.
+     * @example
+     * // Update many CanvasShareTokens
+     * const canvasShareToken = await prisma.canvasShareToken.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CanvasShareTokens and only return the `id`
+     * const canvasShareTokenWithIdOnly = await prisma.canvasShareToken.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CanvasShareTokenUpdateManyAndReturnArgs>(args: SelectSubset<T, CanvasShareTokenUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CanvasShareToken.
+     * @param {CanvasShareTokenUpsertArgs} args - Arguments to update or create a CanvasShareToken.
+     * @example
+     * // Update or create a CanvasShareToken
+     * const canvasShareToken = await prisma.canvasShareToken.upsert({
+     *   create: {
+     *     // ... data to create a CanvasShareToken
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CanvasShareToken we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CanvasShareTokenUpsertArgs>(args: SelectSubset<T, CanvasShareTokenUpsertArgs<ExtArgs>>): Prisma__CanvasShareTokenClient<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CanvasShareTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasShareTokenCountArgs} args - Arguments to filter CanvasShareTokens to count.
+     * @example
+     * // Count the number of CanvasShareTokens
+     * const count = await prisma.canvasShareToken.count({
+     *   where: {
+     *     // ... the filter for the CanvasShareTokens we want to count
+     *   }
+     * })
+    **/
+    count<T extends CanvasShareTokenCountArgs>(
+      args?: Subset<T, CanvasShareTokenCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CanvasShareTokenCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CanvasShareToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasShareTokenAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CanvasShareTokenAggregateArgs>(args: Subset<T, CanvasShareTokenAggregateArgs>): Prisma.PrismaPromise<GetCanvasShareTokenAggregateType<T>>
+
+    /**
+     * Group by CanvasShareToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CanvasShareTokenGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CanvasShareTokenGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CanvasShareTokenGroupByArgs['orderBy'] }
+        : { orderBy?: CanvasShareTokenGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CanvasShareTokenGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCanvasShareTokenGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CanvasShareToken model
+   */
+  readonly fields: CanvasShareTokenFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CanvasShareToken.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CanvasShareTokenClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    canvas<T extends CanvasDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CanvasDefaultArgs<ExtArgs>>): Prisma__CanvasClient<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CanvasShareToken model
+   */
+  interface CanvasShareTokenFieldRefs {
+    readonly id: FieldRef<"CanvasShareToken", 'String'>
+    readonly token: FieldRef<"CanvasShareToken", 'String'>
+    readonly canvasId: FieldRef<"CanvasShareToken", 'String'>
+    readonly expiresAt: FieldRef<"CanvasShareToken", 'DateTime'>
+    readonly createdAt: FieldRef<"CanvasShareToken", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CanvasShareToken findUnique
+   */
+  export type CanvasShareTokenFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which CanvasShareToken to fetch.
+     */
+    where: CanvasShareTokenWhereUniqueInput
+  }
+
+  /**
+   * CanvasShareToken findUniqueOrThrow
+   */
+  export type CanvasShareTokenFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which CanvasShareToken to fetch.
+     */
+    where: CanvasShareTokenWhereUniqueInput
+  }
+
+  /**
+   * CanvasShareToken findFirst
+   */
+  export type CanvasShareTokenFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which CanvasShareToken to fetch.
+     */
+    where?: CanvasShareTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CanvasShareTokens to fetch.
+     */
+    orderBy?: CanvasShareTokenOrderByWithRelationInput | CanvasShareTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CanvasShareTokens.
+     */
+    cursor?: CanvasShareTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CanvasShareTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CanvasShareTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CanvasShareTokens.
+     */
+    distinct?: CanvasShareTokenScalarFieldEnum | CanvasShareTokenScalarFieldEnum[]
+  }
+
+  /**
+   * CanvasShareToken findFirstOrThrow
+   */
+  export type CanvasShareTokenFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which CanvasShareToken to fetch.
+     */
+    where?: CanvasShareTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CanvasShareTokens to fetch.
+     */
+    orderBy?: CanvasShareTokenOrderByWithRelationInput | CanvasShareTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CanvasShareTokens.
+     */
+    cursor?: CanvasShareTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CanvasShareTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CanvasShareTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CanvasShareTokens.
+     */
+    distinct?: CanvasShareTokenScalarFieldEnum | CanvasShareTokenScalarFieldEnum[]
+  }
+
+  /**
+   * CanvasShareToken findMany
+   */
+  export type CanvasShareTokenFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which CanvasShareTokens to fetch.
+     */
+    where?: CanvasShareTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CanvasShareTokens to fetch.
+     */
+    orderBy?: CanvasShareTokenOrderByWithRelationInput | CanvasShareTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CanvasShareTokens.
+     */
+    cursor?: CanvasShareTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CanvasShareTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CanvasShareTokens.
+     */
+    skip?: number
+    distinct?: CanvasShareTokenScalarFieldEnum | CanvasShareTokenScalarFieldEnum[]
+  }
+
+  /**
+   * CanvasShareToken create
+   */
+  export type CanvasShareTokenCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CanvasShareToken.
+     */
+    data: XOR<CanvasShareTokenCreateInput, CanvasShareTokenUncheckedCreateInput>
+  }
+
+  /**
+   * CanvasShareToken createMany
+   */
+  export type CanvasShareTokenCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CanvasShareTokens.
+     */
+    data: CanvasShareTokenCreateManyInput | CanvasShareTokenCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CanvasShareToken createManyAndReturn
+   */
+  export type CanvasShareTokenCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * The data used to create many CanvasShareTokens.
+     */
+    data: CanvasShareTokenCreateManyInput | CanvasShareTokenCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CanvasShareToken update
+   */
+  export type CanvasShareTokenUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CanvasShareToken.
+     */
+    data: XOR<CanvasShareTokenUpdateInput, CanvasShareTokenUncheckedUpdateInput>
+    /**
+     * Choose, which CanvasShareToken to update.
+     */
+    where: CanvasShareTokenWhereUniqueInput
+  }
+
+  /**
+   * CanvasShareToken updateMany
+   */
+  export type CanvasShareTokenUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CanvasShareTokens.
+     */
+    data: XOR<CanvasShareTokenUpdateManyMutationInput, CanvasShareTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which CanvasShareTokens to update
+     */
+    where?: CanvasShareTokenWhereInput
+    /**
+     * Limit how many CanvasShareTokens to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CanvasShareToken updateManyAndReturn
+   */
+  export type CanvasShareTokenUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * The data used to update CanvasShareTokens.
+     */
+    data: XOR<CanvasShareTokenUpdateManyMutationInput, CanvasShareTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which CanvasShareTokens to update
+     */
+    where?: CanvasShareTokenWhereInput
+    /**
+     * Limit how many CanvasShareTokens to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CanvasShareToken upsert
+   */
+  export type CanvasShareTokenUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CanvasShareToken to update in case it exists.
+     */
+    where: CanvasShareTokenWhereUniqueInput
+    /**
+     * In case the CanvasShareToken found by the `where` argument doesn't exist, create a new CanvasShareToken with this data.
+     */
+    create: XOR<CanvasShareTokenCreateInput, CanvasShareTokenUncheckedCreateInput>
+    /**
+     * In case the CanvasShareToken was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CanvasShareTokenUpdateInput, CanvasShareTokenUncheckedUpdateInput>
+  }
+
+  /**
+   * CanvasShareToken delete
+   */
+  export type CanvasShareTokenDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenInclude<ExtArgs> | null
+    /**
+     * Filter which CanvasShareToken to delete.
+     */
+    where: CanvasShareTokenWhereUniqueInput
+  }
+
+  /**
+   * CanvasShareToken deleteMany
+   */
+  export type CanvasShareTokenDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CanvasShareTokens to delete
+     */
+    where?: CanvasShareTokenWhereInput
+    /**
+     * Limit how many CanvasShareTokens to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CanvasShareToken without action
+   */
+  export type CanvasShareTokenDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CanvasShareToken
+     */
+    select?: CanvasShareTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CanvasShareToken
+     */
+    omit?: CanvasShareTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CanvasShareTokenInclude<ExtArgs> | null
   }
 
 
@@ -4604,6 +5790,17 @@ export namespace Prisma {
   export type CanvasScalarFieldEnum = (typeof CanvasScalarFieldEnum)[keyof typeof CanvasScalarFieldEnum]
 
 
+  export const CanvasShareTokenScalarFieldEnum: {
+    id: 'id',
+    token: 'token',
+    canvasId: 'canvasId',
+    expiresAt: 'expiresAt',
+    createdAt: 'createdAt'
+  };
+
+  export type CanvasShareTokenScalarFieldEnum = (typeof CanvasShareTokenScalarFieldEnum)[keyof typeof CanvasShareTokenScalarFieldEnum]
+
+
   export const CanvasBlockScalarFieldEnum: {
     id: 'id',
     canvasId: 'canvasId',
@@ -4823,6 +6020,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Canvas"> | Date | string
     project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
     canvasBlocks?: CanvasBlockListRelationFilter
+    shareTokens?: CanvasShareTokenListRelationFilter
   }
 
   export type CanvasOrderByWithRelationInput = {
@@ -4834,6 +6032,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     project?: ProjectOrderByWithRelationInput
     canvasBlocks?: CanvasBlockOrderByRelationAggregateInput
+    shareTokens?: CanvasShareTokenOrderByRelationAggregateInput
   }
 
   export type CanvasWhereUniqueInput = Prisma.AtLeast<{
@@ -4848,6 +6047,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Canvas"> | Date | string
     project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
     canvasBlocks?: CanvasBlockListRelationFilter
+    shareTokens?: CanvasShareTokenListRelationFilter
   }, "id">
 
   export type CanvasOrderByWithAggregationInput = {
@@ -4874,6 +6074,61 @@ export namespace Prisma {
     order?: IntWithAggregatesFilter<"Canvas"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Canvas"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Canvas"> | Date | string
+  }
+
+  export type CanvasShareTokenWhereInput = {
+    AND?: CanvasShareTokenWhereInput | CanvasShareTokenWhereInput[]
+    OR?: CanvasShareTokenWhereInput[]
+    NOT?: CanvasShareTokenWhereInput | CanvasShareTokenWhereInput[]
+    id?: StringFilter<"CanvasShareToken"> | string
+    token?: StringFilter<"CanvasShareToken"> | string
+    canvasId?: StringFilter<"CanvasShareToken"> | string
+    expiresAt?: DateTimeNullableFilter<"CanvasShareToken"> | Date | string | null
+    createdAt?: DateTimeFilter<"CanvasShareToken"> | Date | string
+    canvas?: XOR<CanvasScalarRelationFilter, CanvasWhereInput>
+  }
+
+  export type CanvasShareTokenOrderByWithRelationInput = {
+    id?: SortOrder
+    token?: SortOrder
+    canvasId?: SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    canvas?: CanvasOrderByWithRelationInput
+  }
+
+  export type CanvasShareTokenWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    token?: string
+    AND?: CanvasShareTokenWhereInput | CanvasShareTokenWhereInput[]
+    OR?: CanvasShareTokenWhereInput[]
+    NOT?: CanvasShareTokenWhereInput | CanvasShareTokenWhereInput[]
+    canvasId?: StringFilter<"CanvasShareToken"> | string
+    expiresAt?: DateTimeNullableFilter<"CanvasShareToken"> | Date | string | null
+    createdAt?: DateTimeFilter<"CanvasShareToken"> | Date | string
+    canvas?: XOR<CanvasScalarRelationFilter, CanvasWhereInput>
+  }, "id" | "token">
+
+  export type CanvasShareTokenOrderByWithAggregationInput = {
+    id?: SortOrder
+    token?: SortOrder
+    canvasId?: SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: CanvasShareTokenCountOrderByAggregateInput
+    _max?: CanvasShareTokenMaxOrderByAggregateInput
+    _min?: CanvasShareTokenMinOrderByAggregateInput
+  }
+
+  export type CanvasShareTokenScalarWhereWithAggregatesInput = {
+    AND?: CanvasShareTokenScalarWhereWithAggregatesInput | CanvasShareTokenScalarWhereWithAggregatesInput[]
+    OR?: CanvasShareTokenScalarWhereWithAggregatesInput[]
+    NOT?: CanvasShareTokenScalarWhereWithAggregatesInput | CanvasShareTokenScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CanvasShareToken"> | string
+    token?: StringWithAggregatesFilter<"CanvasShareToken"> | string
+    canvasId?: StringWithAggregatesFilter<"CanvasShareToken"> | string
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"CanvasShareToken"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"CanvasShareToken"> | Date | string
   }
 
   export type CanvasBlockWhereInput = {
@@ -5062,6 +6317,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     project: ProjectCreateNestedOneWithoutCanvasesInput
     canvasBlocks?: CanvasBlockCreateNestedManyWithoutCanvasInput
+    shareTokens?: CanvasShareTokenCreateNestedManyWithoutCanvasInput
   }
 
   export type CanvasUncheckedCreateInput = {
@@ -5072,6 +6328,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput
+    shareTokens?: CanvasShareTokenUncheckedCreateNestedManyWithoutCanvasInput
   }
 
   export type CanvasUpdateInput = {
@@ -5082,6 +6339,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutCanvasesNestedInput
     canvasBlocks?: CanvasBlockUpdateManyWithoutCanvasNestedInput
+    shareTokens?: CanvasShareTokenUpdateManyWithoutCanvasNestedInput
   }
 
   export type CanvasUncheckedUpdateInput = {
@@ -5092,6 +6350,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput
+    shareTokens?: CanvasShareTokenUncheckedUpdateManyWithoutCanvasNestedInput
   }
 
   export type CanvasCreateManyInput = {
@@ -5118,6 +6377,61 @@ export namespace Prisma {
     order?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CanvasShareTokenCreateInput = {
+    id?: string
+    token: string
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+    canvas: CanvasCreateNestedOneWithoutShareTokensInput
+  }
+
+  export type CanvasShareTokenUncheckedCreateInput = {
+    id?: string
+    token: string
+    canvasId: string
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type CanvasShareTokenUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    canvas?: CanvasUpdateOneRequiredWithoutShareTokensNestedInput
+  }
+
+  export type CanvasShareTokenUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    canvasId?: StringFieldUpdateOperationsInput | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CanvasShareTokenCreateManyInput = {
+    id?: string
+    token: string
+    canvasId: string
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type CanvasShareTokenUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CanvasShareTokenUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    canvasId?: StringFieldUpdateOperationsInput | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type CanvasBlockCreateInput = {
@@ -5392,7 +6706,17 @@ export namespace Prisma {
     none?: CanvasBlockWhereInput
   }
 
+  export type CanvasShareTokenListRelationFilter = {
+    every?: CanvasShareTokenWhereInput
+    some?: CanvasShareTokenWhereInput
+    none?: CanvasShareTokenWhereInput
+  }
+
   export type CanvasBlockOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CanvasShareTokenOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -5447,6 +6771,60 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type CanvasScalarRelationFilter = {
+    is?: CanvasWhereInput
+    isNot?: CanvasWhereInput
+  }
+
+  export type CanvasShareTokenCountOrderByAggregateInput = {
+    id?: SortOrder
+    token?: SortOrder
+    canvasId?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type CanvasShareTokenMaxOrderByAggregateInput = {
+    id?: SortOrder
+    token?: SortOrder
+    canvasId?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type CanvasShareTokenMinOrderByAggregateInput = {
+    id?: SortOrder
+    token?: SortOrder
+    canvasId?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type FloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
     in?: number[] | ListFloatFieldRefInput<$PrismaModel>
@@ -5479,11 +6857,6 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type CanvasScalarRelationFilter = {
-    is?: CanvasWhereInput
-    isNot?: CanvasWhereInput
   }
 
   export type CanvasBlockCountOrderByAggregateInput = {
@@ -5657,11 +7030,25 @@ export namespace Prisma {
     connect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
   }
 
+  export type CanvasShareTokenCreateNestedManyWithoutCanvasInput = {
+    create?: XOR<CanvasShareTokenCreateWithoutCanvasInput, CanvasShareTokenUncheckedCreateWithoutCanvasInput> | CanvasShareTokenCreateWithoutCanvasInput[] | CanvasShareTokenUncheckedCreateWithoutCanvasInput[]
+    connectOrCreate?: CanvasShareTokenCreateOrConnectWithoutCanvasInput | CanvasShareTokenCreateOrConnectWithoutCanvasInput[]
+    createMany?: CanvasShareTokenCreateManyCanvasInputEnvelope
+    connect?: CanvasShareTokenWhereUniqueInput | CanvasShareTokenWhereUniqueInput[]
+  }
+
   export type CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput = {
     create?: XOR<CanvasBlockCreateWithoutCanvasInput, CanvasBlockUncheckedCreateWithoutCanvasInput> | CanvasBlockCreateWithoutCanvasInput[] | CanvasBlockUncheckedCreateWithoutCanvasInput[]
     connectOrCreate?: CanvasBlockCreateOrConnectWithoutCanvasInput | CanvasBlockCreateOrConnectWithoutCanvasInput[]
     createMany?: CanvasBlockCreateManyCanvasInputEnvelope
     connect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+  }
+
+  export type CanvasShareTokenUncheckedCreateNestedManyWithoutCanvasInput = {
+    create?: XOR<CanvasShareTokenCreateWithoutCanvasInput, CanvasShareTokenUncheckedCreateWithoutCanvasInput> | CanvasShareTokenCreateWithoutCanvasInput[] | CanvasShareTokenUncheckedCreateWithoutCanvasInput[]
+    connectOrCreate?: CanvasShareTokenCreateOrConnectWithoutCanvasInput | CanvasShareTokenCreateOrConnectWithoutCanvasInput[]
+    createMany?: CanvasShareTokenCreateManyCanvasInputEnvelope
+    connect?: CanvasShareTokenWhereUniqueInput | CanvasShareTokenWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -5694,6 +7081,20 @@ export namespace Prisma {
     deleteMany?: CanvasBlockScalarWhereInput | CanvasBlockScalarWhereInput[]
   }
 
+  export type CanvasShareTokenUpdateManyWithoutCanvasNestedInput = {
+    create?: XOR<CanvasShareTokenCreateWithoutCanvasInput, CanvasShareTokenUncheckedCreateWithoutCanvasInput> | CanvasShareTokenCreateWithoutCanvasInput[] | CanvasShareTokenUncheckedCreateWithoutCanvasInput[]
+    connectOrCreate?: CanvasShareTokenCreateOrConnectWithoutCanvasInput | CanvasShareTokenCreateOrConnectWithoutCanvasInput[]
+    upsert?: CanvasShareTokenUpsertWithWhereUniqueWithoutCanvasInput | CanvasShareTokenUpsertWithWhereUniqueWithoutCanvasInput[]
+    createMany?: CanvasShareTokenCreateManyCanvasInputEnvelope
+    set?: CanvasShareTokenWhereUniqueInput | CanvasShareTokenWhereUniqueInput[]
+    disconnect?: CanvasShareTokenWhereUniqueInput | CanvasShareTokenWhereUniqueInput[]
+    delete?: CanvasShareTokenWhereUniqueInput | CanvasShareTokenWhereUniqueInput[]
+    connect?: CanvasShareTokenWhereUniqueInput | CanvasShareTokenWhereUniqueInput[]
+    update?: CanvasShareTokenUpdateWithWhereUniqueWithoutCanvasInput | CanvasShareTokenUpdateWithWhereUniqueWithoutCanvasInput[]
+    updateMany?: CanvasShareTokenUpdateManyWithWhereWithoutCanvasInput | CanvasShareTokenUpdateManyWithWhereWithoutCanvasInput[]
+    deleteMany?: CanvasShareTokenScalarWhereInput | CanvasShareTokenScalarWhereInput[]
+  }
+
   export type CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput = {
     create?: XOR<CanvasBlockCreateWithoutCanvasInput, CanvasBlockUncheckedCreateWithoutCanvasInput> | CanvasBlockCreateWithoutCanvasInput[] | CanvasBlockUncheckedCreateWithoutCanvasInput[]
     connectOrCreate?: CanvasBlockCreateOrConnectWithoutCanvasInput | CanvasBlockCreateOrConnectWithoutCanvasInput[]
@@ -5706,6 +7107,38 @@ export namespace Prisma {
     update?: CanvasBlockUpdateWithWhereUniqueWithoutCanvasInput | CanvasBlockUpdateWithWhereUniqueWithoutCanvasInput[]
     updateMany?: CanvasBlockUpdateManyWithWhereWithoutCanvasInput | CanvasBlockUpdateManyWithWhereWithoutCanvasInput[]
     deleteMany?: CanvasBlockScalarWhereInput | CanvasBlockScalarWhereInput[]
+  }
+
+  export type CanvasShareTokenUncheckedUpdateManyWithoutCanvasNestedInput = {
+    create?: XOR<CanvasShareTokenCreateWithoutCanvasInput, CanvasShareTokenUncheckedCreateWithoutCanvasInput> | CanvasShareTokenCreateWithoutCanvasInput[] | CanvasShareTokenUncheckedCreateWithoutCanvasInput[]
+    connectOrCreate?: CanvasShareTokenCreateOrConnectWithoutCanvasInput | CanvasShareTokenCreateOrConnectWithoutCanvasInput[]
+    upsert?: CanvasShareTokenUpsertWithWhereUniqueWithoutCanvasInput | CanvasShareTokenUpsertWithWhereUniqueWithoutCanvasInput[]
+    createMany?: CanvasShareTokenCreateManyCanvasInputEnvelope
+    set?: CanvasShareTokenWhereUniqueInput | CanvasShareTokenWhereUniqueInput[]
+    disconnect?: CanvasShareTokenWhereUniqueInput | CanvasShareTokenWhereUniqueInput[]
+    delete?: CanvasShareTokenWhereUniqueInput | CanvasShareTokenWhereUniqueInput[]
+    connect?: CanvasShareTokenWhereUniqueInput | CanvasShareTokenWhereUniqueInput[]
+    update?: CanvasShareTokenUpdateWithWhereUniqueWithoutCanvasInput | CanvasShareTokenUpdateWithWhereUniqueWithoutCanvasInput[]
+    updateMany?: CanvasShareTokenUpdateManyWithWhereWithoutCanvasInput | CanvasShareTokenUpdateManyWithWhereWithoutCanvasInput[]
+    deleteMany?: CanvasShareTokenScalarWhereInput | CanvasShareTokenScalarWhereInput[]
+  }
+
+  export type CanvasCreateNestedOneWithoutShareTokensInput = {
+    create?: XOR<CanvasCreateWithoutShareTokensInput, CanvasUncheckedCreateWithoutShareTokensInput>
+    connectOrCreate?: CanvasCreateOrConnectWithoutShareTokensInput
+    connect?: CanvasWhereUniqueInput
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type CanvasUpdateOneRequiredWithoutShareTokensNestedInput = {
+    create?: XOR<CanvasCreateWithoutShareTokensInput, CanvasUncheckedCreateWithoutShareTokensInput>
+    connectOrCreate?: CanvasCreateOrConnectWithoutShareTokensInput
+    upsert?: CanvasUpsertWithoutShareTokensInput
+    connect?: CanvasWhereUniqueInput
+    update?: XOR<XOR<CanvasUpdateToOneWithWhereWithoutShareTokensInput, CanvasUpdateWithoutShareTokensInput>, CanvasUncheckedUpdateWithoutShareTokensInput>
   }
 
   export type CanvasCreateNestedOneWithoutCanvasBlocksInput = {
@@ -5866,6 +7299,31 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
     in?: number[] | ListFloatFieldRefInput<$PrismaModel>
@@ -5912,6 +7370,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     canvasBlocks?: CanvasBlockCreateNestedManyWithoutCanvasInput
+    shareTokens?: CanvasShareTokenCreateNestedManyWithoutCanvasInput
   }
 
   export type CanvasUncheckedCreateWithoutProjectInput = {
@@ -5921,6 +7380,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput
+    shareTokens?: CanvasShareTokenUncheckedCreateNestedManyWithoutCanvasInput
   }
 
   export type CanvasCreateOrConnectWithoutProjectInput = {
@@ -6028,6 +7488,30 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type CanvasShareTokenCreateWithoutCanvasInput = {
+    id?: string
+    token: string
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type CanvasShareTokenUncheckedCreateWithoutCanvasInput = {
+    id?: string
+    token: string
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type CanvasShareTokenCreateOrConnectWithoutCanvasInput = {
+    where: CanvasShareTokenWhereUniqueInput
+    create: XOR<CanvasShareTokenCreateWithoutCanvasInput, CanvasShareTokenUncheckedCreateWithoutCanvasInput>
+  }
+
+  export type CanvasShareTokenCreateManyCanvasInputEnvelope = {
+    data: CanvasShareTokenCreateManyCanvasInput | CanvasShareTokenCreateManyCanvasInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ProjectUpsertWithoutCanvasesInput = {
     update: XOR<ProjectUpdateWithoutCanvasesInput, ProjectUncheckedUpdateWithoutCanvasesInput>
     create: XOR<ProjectCreateWithoutCanvasesInput, ProjectUncheckedCreateWithoutCanvasesInput>
@@ -6096,6 +7580,89 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"CanvasBlock"> | Date | string
   }
 
+  export type CanvasShareTokenUpsertWithWhereUniqueWithoutCanvasInput = {
+    where: CanvasShareTokenWhereUniqueInput
+    update: XOR<CanvasShareTokenUpdateWithoutCanvasInput, CanvasShareTokenUncheckedUpdateWithoutCanvasInput>
+    create: XOR<CanvasShareTokenCreateWithoutCanvasInput, CanvasShareTokenUncheckedCreateWithoutCanvasInput>
+  }
+
+  export type CanvasShareTokenUpdateWithWhereUniqueWithoutCanvasInput = {
+    where: CanvasShareTokenWhereUniqueInput
+    data: XOR<CanvasShareTokenUpdateWithoutCanvasInput, CanvasShareTokenUncheckedUpdateWithoutCanvasInput>
+  }
+
+  export type CanvasShareTokenUpdateManyWithWhereWithoutCanvasInput = {
+    where: CanvasShareTokenScalarWhereInput
+    data: XOR<CanvasShareTokenUpdateManyMutationInput, CanvasShareTokenUncheckedUpdateManyWithoutCanvasInput>
+  }
+
+  export type CanvasShareTokenScalarWhereInput = {
+    AND?: CanvasShareTokenScalarWhereInput | CanvasShareTokenScalarWhereInput[]
+    OR?: CanvasShareTokenScalarWhereInput[]
+    NOT?: CanvasShareTokenScalarWhereInput | CanvasShareTokenScalarWhereInput[]
+    id?: StringFilter<"CanvasShareToken"> | string
+    token?: StringFilter<"CanvasShareToken"> | string
+    canvasId?: StringFilter<"CanvasShareToken"> | string
+    expiresAt?: DateTimeNullableFilter<"CanvasShareToken"> | Date | string | null
+    createdAt?: DateTimeFilter<"CanvasShareToken"> | Date | string
+  }
+
+  export type CanvasCreateWithoutShareTokensInput = {
+    id?: string
+    name?: string
+    order?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutCanvasesInput
+    canvasBlocks?: CanvasBlockCreateNestedManyWithoutCanvasInput
+  }
+
+  export type CanvasUncheckedCreateWithoutShareTokensInput = {
+    id?: string
+    projectId: string
+    name?: string
+    order?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput
+  }
+
+  export type CanvasCreateOrConnectWithoutShareTokensInput = {
+    where: CanvasWhereUniqueInput
+    create: XOR<CanvasCreateWithoutShareTokensInput, CanvasUncheckedCreateWithoutShareTokensInput>
+  }
+
+  export type CanvasUpsertWithoutShareTokensInput = {
+    update: XOR<CanvasUpdateWithoutShareTokensInput, CanvasUncheckedUpdateWithoutShareTokensInput>
+    create: XOR<CanvasCreateWithoutShareTokensInput, CanvasUncheckedCreateWithoutShareTokensInput>
+    where?: CanvasWhereInput
+  }
+
+  export type CanvasUpdateToOneWithWhereWithoutShareTokensInput = {
+    where?: CanvasWhereInput
+    data: XOR<CanvasUpdateWithoutShareTokensInput, CanvasUncheckedUpdateWithoutShareTokensInput>
+  }
+
+  export type CanvasUpdateWithoutShareTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutCanvasesNestedInput
+    canvasBlocks?: CanvasBlockUpdateManyWithoutCanvasNestedInput
+  }
+
+  export type CanvasUncheckedUpdateWithoutShareTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput
+  }
+
   export type CanvasCreateWithoutCanvasBlocksInput = {
     id?: string
     name?: string
@@ -6103,6 +7670,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     project: ProjectCreateNestedOneWithoutCanvasesInput
+    shareTokens?: CanvasShareTokenCreateNestedManyWithoutCanvasInput
   }
 
   export type CanvasUncheckedCreateWithoutCanvasBlocksInput = {
@@ -6112,6 +7680,7 @@ export namespace Prisma {
     order?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    shareTokens?: CanvasShareTokenUncheckedCreateNestedManyWithoutCanvasInput
   }
 
   export type CanvasCreateOrConnectWithoutCanvasBlocksInput = {
@@ -6137,6 +7706,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutCanvasesNestedInput
+    shareTokens?: CanvasShareTokenUpdateManyWithoutCanvasNestedInput
   }
 
   export type CanvasUncheckedUpdateWithoutCanvasBlocksInput = {
@@ -6146,6 +7716,7 @@ export namespace Prisma {
     order?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shareTokens?: CanvasShareTokenUncheckedUpdateManyWithoutCanvasNestedInput
   }
 
   export type CanvasCreateManyProjectInput = {
@@ -6163,6 +7734,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvasBlocks?: CanvasBlockUpdateManyWithoutCanvasNestedInput
+    shareTokens?: CanvasShareTokenUpdateManyWithoutCanvasNestedInput
   }
 
   export type CanvasUncheckedUpdateWithoutProjectInput = {
@@ -6172,6 +7744,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput
+    shareTokens?: CanvasShareTokenUncheckedUpdateManyWithoutCanvasNestedInput
   }
 
   export type CanvasUncheckedUpdateManyWithoutProjectInput = {
@@ -6195,6 +7768,13 @@ export namespace Prisma {
     title?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type CanvasShareTokenCreateManyCanvasInput = {
+    id?: string
+    token: string
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
   }
 
   export type CanvasBlockUpdateWithoutCanvasInput = {
@@ -6240,6 +7820,27 @@ export namespace Prisma {
     title?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CanvasShareTokenUpdateWithoutCanvasInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CanvasShareTokenUncheckedUpdateWithoutCanvasInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CanvasShareTokenUncheckedUpdateManyWithoutCanvasInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

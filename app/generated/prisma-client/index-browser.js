@@ -140,6 +140,14 @@ exports.Prisma.CanvasScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.CanvasShareTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  canvasId: 'canvasId',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.CanvasBlockScalarFieldEnum = {
   id: 'id',
   canvasId: 'canvasId',
@@ -185,6 +193,7 @@ exports.Prisma.JsonNullValueFilter = {
 exports.Prisma.ModelName = {
   Project: 'Project',
   Canvas: 'Canvas',
+  CanvasShareToken: 'CanvasShareToken',
   CanvasBlock: 'CanvasBlock'
 };
 

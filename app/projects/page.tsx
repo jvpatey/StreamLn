@@ -138,6 +138,14 @@ export default function DashboardPage() {
       if (
         (e.metaKey || e.ctrlKey) &&
         e.shiftKey &&
+        e.key.toLowerCase() === "i"
+      ) {
+        e.preventDefault();
+        handleImportProject();
+      }
+      if (
+        (e.metaKey || e.ctrlKey) &&
+        e.shiftKey &&
         e.key.toLowerCase() === "b"
       ) {
         e.preventDefault();
@@ -162,7 +170,7 @@ export default function DashboardPage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [sidebarOpen, commandPaletteOpen, handleCreateProject]);
+  }, [sidebarOpen, commandPaletteOpen, handleCreateProject, handleImportProject]);
 
   // API integration for creating a project
   const handleCreateProjectApi = async ({

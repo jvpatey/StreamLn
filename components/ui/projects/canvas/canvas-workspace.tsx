@@ -56,6 +56,8 @@ interface CanvasWorkspaceProps {
   onAddBlock: (type: string, position: { x: number; y: number }) => void;
   onFloatingToolbarShow: (position: { x: number; y: number }) => void;
   viewMode: "edit" | "present";
+  /** When false, hides the "Press E to edit" badge (e.g. for shared read-only links) */
+  showPresentModeBadge?: boolean;
 }
 
 export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
@@ -82,6 +84,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
       onAddBlock,
       onFloatingToolbarShow,
       viewMode,
+      showPresentModeBadge = true,
     },
     ref,
   ) => {
@@ -456,7 +459,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         )}
 
         {/* Present Mode Overlay */}
-        {viewMode === "present" && (
+        {viewMode === "present" && showPresentModeBadge && (
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-full text-sm">
             Presentation Mode • Press E to edit
           </div>

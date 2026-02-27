@@ -12,6 +12,7 @@ import { CanvasFloatingToolbar } from "@/components/ui/projects/canvas/canvas-fl
 import { CanvasHeader } from "@/components/ui/projects/canvas/canvas-header";
 import { CanvasWorkspaceSkeleton } from "@/components/ui/projects/canvas/canvas-workspace-skeleton";
 import { ExportModal } from "@/components/ui/projects/canvas/export-modal";
+import { ShareCanvasModal } from "@/components/ui/projects/canvas/share-canvas-modal";
 import {
   exportCanvasAsPNG,
   exportCanvasAsPDF,
@@ -103,6 +104,7 @@ export default function ProjectCanvasPage() {
   const [isToolbarExiting, setIsToolbarExiting] = useState(false);
   const [viewMode, setViewMode] = useState<"edit" | "present">("edit");
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   // Canvas tool state (select vs pan)
   const [activeTool, setActiveTool] = useState<CanvasTool>("select");
@@ -637,13 +639,23 @@ export default function ProjectCanvasPage() {
         onCanvasDelete={handleDeleteCanvas}
         onCanvasReorder={handleReorderCanvases}
         onExportClick={() => setExportModalOpen(true)}
+        onShareClick={() => setShareModalOpen(true)}
       />
       {!loading && project && canvas && (
-        <ExportModal
-          open={exportModalOpen}
-          onOpenChange={setExportModalOpen}
-          project={project}
-          canvas={{
+        <>
+          <ShareCanvasModal
+            open={shareModalOpen}
+            onOpenChange={setShareModalOpen}
+            projectId={project.id}
+            canvasId={canvas.id}
+            projectName={project.name}
+            canvasName={canvas.name}
+          />
+          <ExportModal
+            open={exportModalOpen}
+            onOpenChange={setExportModalOpen}
+            project={project}
+            canvas={{
             id: canvas.id,
             name: canvas.name,
             order: canvas.order,
@@ -673,6 +685,7 @@ export default function ProjectCanvasPage() {
             })
           }
         />
+        </>
       )}
       {saveConflict && (
         <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between gap-4">

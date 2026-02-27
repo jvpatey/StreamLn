@@ -15,7 +15,6 @@ import { IconPicker } from "../project-content/icon-picker";
 import {
   ProjectHeader,
   ProjectStats,
-  ProjectDetails,
   ActionButtons,
   CanvasesList,
   DeleteConfirmationDialog,
@@ -221,12 +220,16 @@ export function ProjectDetailsSidepanel({
           </SheetHeader>
 
           <div className="flex-1 min-h-0 overflow-y-auto space-y-3 py-3">
-            <ProjectStats project={project} />
+            <ProjectStats
+              project={project}
+              isEditMode={isEditMode}
+              editForm={editForm}
+              onInputChange={handleInputChange}
+            />
             <CanvasesList
               project={project}
               onOpenCanvas={(p, canvasId) => onOpenCanvas?.(p, canvasId)}
             />
-            <ProjectDetails project={project} />
           </div>
 
           {/* Action Buttons */}

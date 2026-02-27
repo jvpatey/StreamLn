@@ -164,7 +164,7 @@ const ProjectCommandPalette: React.FC<ProjectCommandPaletteProps> = ({
             searchInputRef={searchInputRef}
           />
 
-          <ul className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
+          <ul className="max-h-[min(24rem,70vh)] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
             {currentData.length === 0 ? (
               <li className="p-6 text-center text-slate-500 dark:text-slate-400 text-sm">
                 {browseMode || searchMode

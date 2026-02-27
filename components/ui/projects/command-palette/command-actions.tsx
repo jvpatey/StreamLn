@@ -28,7 +28,7 @@ export const createCommandActions = (
     title: "Import Project",
     description: "Restore from JSON backup",
     icon: <Upload size={16} />,
-    shortcut: "",
+    shortcut: getKeyboardShortcut("⌘⇧I"),
     category: "Create",
     onSelect: () => {
       onImportProject?.();
