@@ -5,6 +5,10 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { CanvasWorkspace } from "@/components/ui/projects/canvas/canvas-workspace";
 import { fetchSharedCanvas } from "@/lib/api/share";
+import {
+  exportCanvasAsPNG,
+  exportCanvasAsPDF,
+} from "@/lib/export/canvas-export";
 import type { CanvasBlock } from "@/lib/types/canvas";
 
 interface SharedBlock {
@@ -43,6 +47,7 @@ export default function SharedCanvasPage() {
   const token = params?.token ?? null;
   const [projectName, setProjectName] = useState<string>("");
   const [canvasName, setCanvasName] = useState<string>("");
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [blocks, setBlocks] = useState<CanvasBlock[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +67,7 @@ export default function SharedCanvasPage() {
         if (cancelled) return;
         setProjectName(data.projectName);
         setCanvasName(data.canvasName);
+        setExpiresAt(data.expiresAt ?? null);
         setBlocks(data.blocks.map(toCanvasBlock));
       })
       .catch((err) => {
@@ -85,6 +91,11 @@ export default function SharedCanvasPage() {
     }
     const viewportWidth = rect.width;
     const viewportHeight = rect.height;
+    if (viewportWidth <= 0 || viewportHeight <= 0) {
+      setZoomLevel(1);
+      setPanOffset({ x: 0, y: 0 });
+      return;
+    }
     const bounds = blocks.reduce(
       (acc, block) => ({
         left: Math.min(acc.left, block.x),
@@ -97,9 +108,19 @@ export default function SharedCanvasPage() {
     const padding = 100;
     const contentWidth = bounds.right - bounds.left + padding * 2;
     const contentHeight = bounds.bottom - bounds.top + padding * 2;
+    if (contentWidth <= 0 || contentHeight <= 0 || !Number.isFinite(contentWidth) || !Number.isFinite(contentHeight)) {
+      setZoomLevel(1);
+      setPanOffset({ x: 0, y: 0 });
+      return;
+    }
     const scaleX = viewportWidth / contentWidth;
     const scaleY = viewportHeight / contentHeight;
     const newZoom = Math.min(scaleX, scaleY, 1);
+    if (!Number.isFinite(newZoom) || newZoom <= 0) {
+      setZoomLevel(1);
+      setPanOffset({ x: 0, y: 0 });
+      return;
+    }
     const centerX = (bounds.left + bounds.right) / 2;
     const centerY = (bounds.top + bounds.bottom) / 2;
     setZoomLevel(newZoom);
@@ -111,7 +132,11 @@ export default function SharedCanvasPage() {
 
   useEffect(() => {
     if (!loading && blocks.length > 0) {
-      handleFitToView();
+      const runFit = () => handleFitToView();
+      requestAnimationFrame(() => requestAnimationFrame(runFit));
+      // Fallback: retry after layout settles (e.g. when container gets real dimensions)
+      const t = setTimeout(runFit, 150);
+      return () => clearTimeout(t);
     }
   }, [loading, blocks.length, handleFitToView]);
 
@@ -146,8 +171,45 @@ export default function SharedCanvasPage() {
     );
   }
 
+  const sharedProject = {
+    id: "shared",
+    name: projectName,
+    status: "active",
+  };
+  const sharedCanvas = {
+    id: "shared",
+    name: canvasName,
+    order: 0,
+    projectId: "shared",
+  };
+
+  const handleExportPNG = () => {
+    exportCanvasAsPNG(canvasRef.current, sharedProject, sharedCanvas);
+  };
+  const handleExportPDF = () => {
+    exportCanvasAsPDF(canvasRef.current, sharedProject, sharedCanvas);
+  };
+
+  const expiryDate = expiresAt ? new Date(expiresAt) : null;
+  const expiryLabel =
+    expiryDate &&
+    expiryDate.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden">
+      {/* Expiry notice */}
+      {expiresAt && (
+        <div className="shrink-0 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800/50">
+          <p className="text-xs text-amber-800 dark:text-amber-200 text-center">
+            This link expires on {expiryLabel}
+          </p>
+        </div>
+      )}
+
       {/* Minimal header */}
       <header className="h-14 shrink-0 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
         <div className="flex items-center gap-3 min-w-0">
@@ -162,12 +224,35 @@ export default function SharedCanvasPage() {
             {projectName} · {canvasName}
           </span>
         </div>
-        <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0">
-          View only
-        </span>
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={handleExportPNG}
+              className="px-2 py-1.5 text-xs font-medium rounded-lg border border-slate-200 dark:border-slate-600 bg-white/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300 transition-colors"
+            >
+              PNG
+            </button>
+            <button
+              type="button"
+              onClick={handleExportPDF}
+              className="px-2 py-1.5 text-xs font-medium rounded-lg border border-slate-200 dark:border-slate-600 bg-white/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300 transition-colors"
+            >
+              PDF
+            </button>
+          </div>
+          <span className="text-xs text-slate-500 dark:text-slate-400">
+            View only
+          </span>
+        </div>
       </header>
 
-      <div className="h-[calc(100vh-56px)] relative">
+      <div
+        className="relative w-full overflow-hidden"
+        style={{
+          height: expiresAt ? "calc(100vh - 56px - 40px)" : "calc(100vh - 56px)",
+        }}
+      >
         <CanvasWorkspace
           ref={canvasRef}
           activeTool="pan"

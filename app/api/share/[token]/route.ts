@@ -53,6 +53,7 @@ export async function GET(
       projectName: canvas.project.name,
       canvasName: canvas.name,
       blocks,
+      expiresAt: shareToken.expiresAt?.toISOString() ?? null,
     });
   } catch (error) {
     return handleUnexpectedError(error, "GET /api/share/[token]");

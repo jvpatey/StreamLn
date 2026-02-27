@@ -8,6 +8,7 @@ export interface ShareToken {
 export interface SharedCanvasData {
   projectName: string;
   canvasName: string;
+  expiresAt: string | null;
   blocks: Array<{
     id: string;
     type: string;
