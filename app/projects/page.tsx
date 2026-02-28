@@ -12,6 +12,7 @@ import { ProjectSkeletonGrid } from "@/components/ui/projects/project-content/pr
 import { ProjectDetailsSidepanel } from "@/components/ui/projects/details-sidepanel";
 import { ProjectExportModal } from "@/components/ui/projects/canvas/project-export-modal";
 import { ImportModal } from "@/components/ui/projects/import-modal";
+import { ProjectsGuideModal } from "@/components/ui/projects/project-content/projects-guide-modal";
 import {
   fetchProjects,
   createProject,
@@ -37,6 +38,8 @@ export default function DashboardPage() {
     name: string;
   } | null>(null);
   const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { user } = useUser();
   const router = useRouter();
 
@@ -186,10 +189,16 @@ export default function DashboardPage() {
   }) => {
     if (!user?.id)
       throw new Error("You must be signed in to create a project.");
-    await createProject({ name, description, icon, canvasName });
+    const created = await createProject({ name, description, icon, canvasName });
     setCreateModalOpen(false);
-    // Refetch projects after creating
-    loadProjects();
+    // Add new project to list optimistically (avoids loading flash, new project animates in)
+    const projectForList = {
+      ...created,
+      blocks: 0,
+      canvasCount: 1,
+      status: created.status ?? "active",
+    };
+    setProjects((prev) => [...prev, projectForList]);
   };
 
   // Sidepanel handlers
@@ -349,6 +358,7 @@ export default function DashboardPage() {
         <ProjectsHeader
           onCommandPaletteOpen={() => setCommandPaletteOpen(true)}
           onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
+          onGuideOpen={() => setGuideOpen(true)}
         />
       </div>
 
@@ -399,10 +409,14 @@ export default function DashboardPage() {
             setStatusFilter={setStatusFilter}
             filterPopoverOpen={filterPopoverOpen}
             setFilterPopoverOpen={setFilterPopoverOpen}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
           </div>
         )}
       </div>
+
+      <ProjectsGuideModal open={guideOpen} onOpenChange={setGuideOpen} />
 
       {/* Command Palette */}
       <ProjectCommandPalette

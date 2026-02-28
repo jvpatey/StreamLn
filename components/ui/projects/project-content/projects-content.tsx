@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/shared/button";
-import { Filter, Grid3x3, List as ListIcon } from "lucide-react";
+import { Filter, Grid3x3, List as ListIcon, Plus } from "lucide-react";
 import { CreateProjectCard } from "./create-project/create-project-card";
 import { CreateProjectButton } from "./create-project/create-project-button";
 import { ProjectCard } from "./project-card";
@@ -16,6 +16,7 @@ import {
 import { FilterBar } from "@/components/ui/projects/navbar";
 import { getIconComponent } from "./icon-picker";
 import { ProjectStatusText } from "@/components/ui/projects/shared";
+import { getKeyboardShortcut } from "@/lib/utils";
 
 function formatTimeAgo(dateString?: string) {
   if (!dateString) return "—";
@@ -60,6 +61,8 @@ interface ProjectsContentProps {
   setStatusFilter: (val: "all" | "active" | "archived") => void;
   filterPopoverOpen: boolean;
   setFilterPopoverOpen: (open: boolean) => void;
+  viewMode?: "grid" | "list";
+  onViewModeChange?: (mode: "grid" | "list") => void;
 }
 
 // Projects Content component, used in projects-page.tsx
@@ -78,10 +81,14 @@ export function ProjectsContent({
   setStatusFilter,
   filterPopoverOpen,
   setFilterPopoverOpen,
+  viewMode: viewModeProp,
+  onViewModeChange,
 }: ProjectsContentProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [statusChangingId, setStatusChangingId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewModeLocal, setViewModeLocal] = useState<"grid" | "list">("grid");
+  const viewMode = viewModeProp ?? viewModeLocal;
+  const setViewMode = onViewModeChange ?? setViewModeLocal;
   const shouldReduceMotion = useReducedMotion();
 
   const activeCount = projects.filter(
@@ -324,6 +331,71 @@ export function ProjectsContent({
         {/* Projects Grid or List */}
         {viewMode === "grid" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+            <AnimatePresence mode="wait">
+            {projects.length === 0 ? (
+              <motion.div
+                key="empty-state"
+                initial={
+                  shouldReduceMotion
+                    ? { opacity: 1 }
+                    : { opacity: 0, y: 16, scale: 0.98 }
+                }
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                }}
+                exit={
+                  shouldReduceMotion
+                    ? { opacity: 1 }
+                    : { opacity: 0, y: -12, scale: 0.98 }
+                }
+                transition={{
+                  duration: shouldReduceMotion ? 0.01 : 0.35,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                }}
+                className="col-span-full flex flex-col items-center gap-6"
+              >
+                <div className="hidden lg:block w-full max-w-md">
+                  <CreateProjectCard onClick={onCreateProject} />
+                </div>
+                <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl px-8 py-6 shadow-lg max-w-md w-full">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                    Welcome to StreamLn
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                    Get started by creating your first project or importing from a backup.
+                  </p>
+                  <div className="space-y-2 text-xs text-slate-500 dark:text-slate-500">
+                    <p>• Create Project — sidebar or card above</p>
+                    <p>• Import from JSON — sidebar</p>
+                    <p>• Press {getKeyboardShortcut("⌘K")} to search and create</p>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+            <motion.div
+              key="projects-grid"
+              initial={
+                shouldReduceMotion
+                  ? { opacity: 1 }
+                  : { opacity: 0, y: 16 }
+              }
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              exit={
+                shouldReduceMotion
+                  ? { opacity: 1 }
+                  : { opacity: 0, y: -12 }
+              }
+              transition={{
+                duration: shouldReduceMotion ? 0.01 : 0.35,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+              className="col-span-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6"
+            >
             <AnimatePresence mode="popLayout">
               {projects.map((project, index) => (
                 <ProjectCard
@@ -363,6 +435,9 @@ export function ProjectsContent({
             <div className="hidden lg:block">
               <CreateProjectCard onClick={onCreateProject} />
             </div>
+            </motion.div>
+            )}
+            </AnimatePresence>
           </div>
         ) : (
           <div className="divide-y divide-slate-200 dark:divide-slate-700">
@@ -373,6 +448,60 @@ export function ProjectsContent({
               <div className="w-24 text-center">Status</div>
               <div className="w-20 text-center">Actions</div>
             </div>
+            {projects.length === 0 ? (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key="list-empty-state"
+                  initial={
+                    shouldReduceMotion
+                      ? { opacity: 1 }
+                      : { opacity: 0, y: 12 }
+                  }
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={
+                    shouldReduceMotion
+                      ? { opacity: 1 }
+                      : { opacity: 0, y: -8 }
+                  }
+                  transition={{
+                    duration: shouldReduceMotion ? 0.01 : 0.3,
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                  }}
+                  className="flex flex-col items-center gap-6 py-12"
+                >
+                  <button
+                    type="button"
+                    onClick={onCreateProject}
+                    className="flex items-center gap-4 w-full max-w-md px-6 py-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-primary-400 dark:hover:border-primary-500 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-all duration-200 cursor-pointer group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                      <Plus size={20} className="text-primary-600 dark:text-primary-400" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-medium text-slate-700 dark:text-slate-200">
+                        Create Project
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Click to create a project workspace
+                      </p>
+                    </div>
+                  </button>
+                  <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl px-8 py-6 shadow-lg max-w-md w-full">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                      Welcome to StreamLn
+                    </h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                      Get started by creating your first project or importing from a backup.
+                    </p>
+                    <div className="space-y-2 text-xs text-slate-500 dark:text-slate-500">
+                      <p>• Create Project — button above or sidebar</p>
+                      <p>• Import from JSON — sidebar</p>
+                      <p>• Press {getKeyboardShortcut("⌘K")} to search and create</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            ) : (
             <AnimatePresence mode="popLayout">
               {projects.map((project, index) => (
                 <motion.div
@@ -439,6 +568,7 @@ export function ProjectsContent({
               </motion.div>
             ))}
             </AnimatePresence>
+            )}
           </div>
         )}
       </div>
