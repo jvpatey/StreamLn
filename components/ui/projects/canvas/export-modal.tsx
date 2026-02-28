@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/shared/button";
 import { Tooltip } from "@/components/ui/shared/tooltip";
 import { Download, FileJson, FileText, Image, FileSpreadsheet } from "lucide-react";
@@ -92,20 +93,28 @@ export function ExportModal({
 
   const hasTaskBoards = blocks.some((b) => b.type === "task-board");
 
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center py-8 px-4 sm:py-20 sm:px-8"
-      onClick={() => onOpenChange(false)}
-      aria-modal="true"
-      role="dialog"
-    >
-      <div
-        className="w-full max-w-lg"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center py-8 px-4 sm:py-20 sm:px-8"
+          onClick={() => onOpenChange(false)}
+          aria-modal="true"
+          role="dialog"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="w-full max-w-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl">
           {/* Header */}
           <div className="flex items-center border-b border-slate-200 dark:border-slate-700 p-4">
             <div className="flex items-center space-x-3 flex-1">
@@ -166,7 +175,9 @@ export function ExportModal({
             </Button>
           </div>
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

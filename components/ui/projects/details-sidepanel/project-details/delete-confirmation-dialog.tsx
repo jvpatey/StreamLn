@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/shared/button";
 import { getIconComponent } from "../../project-content/icon-picker";
@@ -17,18 +20,26 @@ export function DeleteConfirmationDialog({
   onCancelDelete,
   onConfirmDelete,
 }: DeleteConfirmationDialogProps) {
-  if (!confirmDelete) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm"
-      style={{ pointerEvents: "auto" }}
-      onClick={onCancelDelete}
-    >
-      <div
-        className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4 border border-border/50 pointer-events-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <AnimatePresence>
+      {confirmDelete && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm"
+          style={{ pointerEvents: "auto" }}
+          onClick={onCancelDelete}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4 border border-border/50 pointer-events-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
         <div className="flex items-center space-x-3 mb-4">
           <div className="p-2 rounded-xl bg-destructive/10 border border-destructive/20">
             <Trash2 className="h-5 w-5 text-destructive" />
@@ -80,7 +91,9 @@ export function DeleteConfirmationDialog({
             </button>
           </Button>
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

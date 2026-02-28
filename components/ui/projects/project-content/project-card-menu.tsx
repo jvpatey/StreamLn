@@ -1,5 +1,8 @@
+"use client";
+
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { MoreHorizontal, Archive, Trash2, CheckCircle, Download } from "lucide-react";
 
 interface ProjectCardMenuProps {
@@ -90,18 +93,28 @@ export function ProjectCardMenu({
         </div>
       )}
       {/* Confirmation Dialog - portaled to body to escape overflow clipping */}
-      {confirmOpen &&
-        createPortal(
-          <div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm"
-            onClick={() => setConfirmOpen(false)}
-            aria-modal="true"
-            role="dialog"
-          >
-            <div
-              className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4 border border-slate-200 dark:border-slate-700"
-              onClick={(e) => e.stopPropagation()}
+      {createPortal(
+          <AnimatePresence>
+            {confirmOpen && (
+            <motion.div
+              key="delete-confirm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm"
+              onClick={() => setConfirmOpen(false)}
+              aria-modal="true"
+              role="dialog"
             >
+              <motion.div
+                initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4 border border-slate-200 dark:border-slate-700"
+                onClick={(e) => e.stopPropagation()}
+              >
               <h3 className="text-lg font-bold mb-2 text-slate-900 dark:text-slate-100">
                 Delete Project?
               </h3>
@@ -126,8 +139,10 @@ export function ProjectCardMenu({
                   Delete
                 </button>
               </div>
-            </div>
-          </div>,
+              </motion.div>
+            </motion.div>
+            )}
+          </AnimatePresence>,
           document.body
         )}
     </div>
