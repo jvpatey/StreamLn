@@ -62,6 +62,7 @@ const SHORTCUTS = [
   { keys: "⌘A", action: "Select all" },
   { keys: "Delete", action: "Remove selected" },
   { keys: "Escape", action: "Deselect" },
+  { keys: "E", action: "Edit (from Present mode)" },
   { keys: "H", action: "Pan tool" },
   { keys: "V", action: "Select tool" },
 ] as const;
@@ -132,6 +133,16 @@ export function CanvasGuideModal({ open, onOpenChange }: CanvasGuideModalProps) 
               </p>
             </section>
 
+            {/* Projects & Canvases */}
+            <section>
+              <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-2">
+                Projects & Canvases
+              </h4>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                Projects contain multiple canvases. Click the project/canvas name in the header to switch canvases, create new ones, or reorder them.
+              </p>
+            </section>
+
             {/* Adding Blocks */}
             <section>
               <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-3">
@@ -141,6 +152,8 @@ export function CanvasGuideModal({ open, onOpenChange }: CanvasGuideModalProps) 
                 <li>• Open the sidebar (left) and pick from Blocks</li>
                 <li>• Double-click on the canvas to add a note</li>
                 <li>• Drag blocks to rearrange them</li>
+                <li>• Drag block corners to resize</li>
+                <li>• <Kbd>{getKeyboardShortcut("⇧")}</Kbd>+click or drag to select multiple blocks</li>
               </ul>
               <div className="space-y-3">
                 {BLOCK_CATEGORIES.map((category) => (
@@ -184,6 +197,10 @@ export function CanvasGuideModal({ open, onOpenChange }: CanvasGuideModalProps) 
               <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-3">
                 Tools
               </h4>
+              <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400 mb-3">
+                <li>• Scroll to zoom in and out (or use toolbar buttons)</li>
+                <li>• Use Fit to View (toolbar) to frame all blocks</li>
+              </ul>
               <div className="space-y-2">
                 <div className="flex items-center gap-3 text-sm">
                   <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
@@ -195,7 +212,7 @@ export function CanvasGuideModal({ open, onOpenChange }: CanvasGuideModalProps) 
                     </span>
                     <span className="text-slate-500 dark:text-slate-500"> — </span>
                     <span className="text-slate-600 dark:text-slate-400">
-                      Move, resize, edit blocks. Press <Kbd>{getKeyboardShortcut("V")}</Kbd>
+                      Move, resize (drag corners), edit blocks. Press <Kbd>{getKeyboardShortcut("V")}</Kbd>
                     </span>
                   </div>
                 </div>
@@ -268,6 +285,30 @@ export function CanvasGuideModal({ open, onOpenChange }: CanvasGuideModalProps) 
               </div>
             </section>
 
+            {/* Export & Share */}
+            <section>
+              <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-2">
+                Export & Share
+              </h4>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                Share or Export from the navbar or profile menu.
+              </p>
+              <div className="space-y-2 mb-3">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">
+                  Export formats
+                </p>
+                <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
+                  <li>• <strong>JSON</strong> — Full backup, re-import, data portability</li>
+                  <li>• <strong>Markdown</strong> — Developer docs, version control</li>
+                  <li>• <strong>PNG / PDF</strong> — Visual snapshot, print, share</li>
+                  <li>• <strong>CSV</strong> — Task board data for spreadsheets</li>
+                </ul>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Share links can be set to expire (Never, 7 days, or 30 days). Recipients get read-only access.
+              </p>
+            </section>
+
             {/* Tips */}
             <section>
               <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-2">
@@ -276,13 +317,13 @@ export function CanvasGuideModal({ open, onOpenChange }: CanvasGuideModalProps) 
               <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
                 <li>• Use the Layers tab in the sidebar to hide or lock blocks</li>
                 <li>• Switch to View Mode for presentations</li>
-                <li>• Share or Export from the navbar or profile menu</li>
+                <li>• Use the block menu (⋮) for duplicate, delete, lock, and layer order</li>
               </ul>
             </section>
           </div>
 
           <div className="flex items-center justify-end p-4 pt-2 border-t border-slate-200 dark:border-slate-700">
-            <Button onClick={() => onOpenChange(false)}>
+            <Button variant="gradient" onClick={() => onOpenChange(false)}>
               Got it
             </Button>
           </div>
