@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { MoreHorizontal, Archive, Trash2, CheckCircle, Download } from "lucide-react";
 
 interface ProjectCardMenuProps {
@@ -88,43 +89,47 @@ export function ProjectCardMenu({
           </button>
         </div>
       )}
-      {/* Confirmation Dialog */}
-      {confirmOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm"
-          onClick={() => setConfirmOpen(false)}
-        >
+      {/* Confirmation Dialog - portaled to body to escape overflow clipping */}
+      {confirmOpen &&
+        createPortal(
           <div
-            className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm"
+            onClick={() => setConfirmOpen(false)}
+            aria-modal="true"
+            role="dialog"
           >
-            <h3 className="text-lg font-bold mb-2 text-slate-900 dark:text-slate-100">
-              Delete Project?
-            </h3>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">
-              Are you sure you want to delete this project? This action cannot
-              be undone.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                className="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700"
-                onClick={() => setConfirmOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 rounded-lg bg-destructive-600 text-white hover:bg-destructive-700"
-                onClick={() => {
-                  setConfirmOpen(false);
-                  onDelete();
-                }}
-              >
-                Delete
-              </button>
+            <div
+              className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4 border border-slate-200 dark:border-slate-700"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-lg font-bold mb-2 text-slate-900 dark:text-slate-100">
+                Delete Project?
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-6">
+                Are you sure you want to delete this project? This action cannot
+                be undone.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  onClick={() => setConfirmOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 rounded-xl bg-destructive text-white hover:bg-destructive/90 transition-colors"
+                  onClick={() => {
+                    setConfirmOpen(false);
+                    onDelete();
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
