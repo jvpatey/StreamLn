@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { MoreHorizontal, Archive, Trash2, CheckCircle, Download } from "lucide-react";
+import { Button } from "@/components/ui/shared/button";
 
 interface ProjectCardMenuProps {
   isArchived: boolean;
@@ -11,6 +12,8 @@ interface ProjectCardMenuProps {
   onUnarchive: () => void;
   onDelete: () => void;
   onExport?: () => void;
+  /** Use "outline" in list view to match adjacent View button */
+  triggerVariant?: "default" | "outline";
 }
 
 // Project Card Menu component, used in project-card.tsx
@@ -20,6 +23,7 @@ export function ProjectCardMenu({
   onUnarchive,
   onDelete,
   onExport,
+  triggerVariant = "default",
 }: ProjectCardMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -37,18 +41,33 @@ export function ProjectCardMenu({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [menuOpen]);
 
+  const triggerProps = {
+    onClick: (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setMenuOpen((v) => !v);
+    },
+    "aria-label": "Project actions",
+  };
+
   return (
     <div className="relative" ref={menuRef}>
-      <button
-        className="p-1.5 rounded-full hover:bg-slate-800/60 focus:outline-none focus:ring-2 focus:ring-primary-400"
-        onClick={(e) => {
-          e.stopPropagation();
-          setMenuOpen((v) => !v);
-        }}
-        aria-label="Project actions"
-      >
-        <MoreHorizontal size={18} className="text-slate-400" />
-      </button>
+      {triggerVariant === "outline" ? (
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 w-8 p-0 shrink-0 hover:bg-primary-100 dark:hover:bg-primary-900/30"
+          {...triggerProps}
+        >
+          <MoreHorizontal size={18} className="text-slate-600 dark:text-slate-400" />
+        </Button>
+      ) : (
+        <button
+          className="p-1.5 rounded-full hover:bg-slate-800/60 focus:outline-none focus:ring-2 focus:ring-primary-400"
+          {...triggerProps}
+        >
+          <MoreHorizontal size={18} className="text-slate-400" />
+        </button>
+      )}
       {menuOpen && (
         <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg z-20 animate-in fade-in slide-in-from-top-2">
           {onExport && (

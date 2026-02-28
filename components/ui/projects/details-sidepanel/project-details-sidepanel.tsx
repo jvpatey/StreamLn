@@ -17,7 +17,6 @@ import {
   ProjectStats,
   ActionButtons,
   CanvasesList,
-  DeleteConfirmationDialog,
   Project,
 } from "./project-details";
 
@@ -27,6 +26,7 @@ interface ProjectDetailsSidepanelProps {
   onClose: () => void;
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
+  onRequestDelete?: (project: Project) => void;
   onStatusChange?: (projectId: string, newStatus: string) => void;
   onOpenCanvas?: (project: Project, canvasId?: string) => void;
   onExportProject?: (project: Project) => void;
@@ -38,11 +38,11 @@ export function ProjectDetailsSidepanel({
   onClose,
   onEdit,
   onDelete,
+  onRequestDelete,
   onStatusChange,
   onOpenCanvas,
   onExportProject,
 }: ProjectDetailsSidepanelProps) {
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const [projectMenuOpen, setProjectMenuOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -51,10 +51,9 @@ export function ProjectDetailsSidepanel({
     icon: "",
   });
 
-  // Reset confirmation state when sidepanel closes
+  // Reset state when sidepanel closes
   React.useEffect(() => {
     if (!isOpen) {
-      setConfirmDelete(false);
       setProjectMenuOpen(false);
       setIsEditMode(false);
     }
@@ -74,16 +73,7 @@ export function ProjectDetailsSidepanel({
   if (!project) return null;
 
   const handleDelete = () => {
-    setConfirmDelete(true);
-  };
-
-  const confirmDeleteAction = () => {
-    onDelete?.(project.id);
-    setConfirmDelete(false);
-  };
-
-  const cancelDelete = () => {
-    setConfirmDelete(false);
+    onRequestDelete?.(project);
   };
 
   const handleEditClick = () => {
@@ -185,6 +175,7 @@ export function ProjectDetailsSidepanel({
                           setProjectMenuOpen(false);
                         }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                        disabled={!onRequestDelete}
                       >
                         <Trash2 size={16} />
                         Delete
@@ -244,13 +235,6 @@ export function ProjectDetailsSidepanel({
           </div>
         </SheetContent>
       </Sheet>
-
-      <DeleteConfirmationDialog
-        confirmDelete={confirmDelete}
-        project={project}
-        onCancelDelete={cancelDelete}
-        onConfirmDelete={confirmDeleteAction}
-      />
     </>
   );
 }

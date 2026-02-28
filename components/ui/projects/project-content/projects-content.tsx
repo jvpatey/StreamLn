@@ -5,6 +5,7 @@ import { Filter, Grid3x3, List as ListIcon, Plus } from "lucide-react";
 import { CreateProjectCard } from "./create-project/create-project-card";
 import { CreateProjectButton } from "./create-project/create-project-button";
 import { ProjectCard } from "./project-card";
+import { ProjectCardMenu } from "./project-card-menu";
 import React, { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { deleteProject, updateProjectStatus } from "@/lib/api/projects";
@@ -446,7 +447,7 @@ export function ProjectsContent({
               <div className="w-8" /> {/* Icon column */}
               <div className="flex-1 min-w-0">Name</div>
               <div className="w-24 text-center">Status</div>
-              <div className="w-20 text-center">Actions</div>
+              <div className="w-36 text-center">Actions</div>
             </div>
             {projects.length === 0 ? (
               <AnimatePresence mode="wait">
@@ -555,15 +556,36 @@ export function ProjectsContent({
                   />
                 </div>
                 {/* Actions */}
-                <div className="w-20 text-center">
+                <div
+                  className="w-36 flex items-center justify-center gap-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Button
                     size="sm"
                     variant="outline"
-                    className="font-semibold hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
+                    className="font-semibold hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors shrink-0"
                     onClick={() => onProjectClick?.(project)}
                   >
                     View
                   </Button>
+                  <ProjectCardMenu
+                    triggerVariant="outline"
+                    isArchived={project.status === "archived"}
+                    onArchive={() =>
+                      onProjectStatusChange?.(project.id, "archived") ||
+                      handleStatusChange(project.id, "archived")
+                    }
+                    onUnarchive={() =>
+                      onProjectStatusChange?.(project.id, "active") ||
+                      handleStatusChange(project.id, "active")
+                    }
+                    onDelete={() =>
+                      onProjectDelete?.(project.id) || handleDelete(project.id)
+                    }
+                    onExport={() =>
+                      onExportProject?.({ id: project.id, name: project.name })
+                    }
+                  />
                 </div>
               </motion.div>
             ))}

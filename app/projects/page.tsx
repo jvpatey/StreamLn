@@ -10,6 +10,7 @@ import { ProjectsContent } from "@/components/ui/projects/project-content";
 import { CreateProjectModal } from "@/components/ui/projects/project-content";
 import { ProjectSkeletonGrid } from "@/components/ui/projects/project-content/project-skeleton";
 import { ProjectDetailsSidepanel } from "@/components/ui/projects/details-sidepanel";
+import { DeleteConfirmationDialog } from "@/components/ui/projects/details-sidepanel/project-details";
 import { ProjectExportModal } from "@/components/ui/projects/canvas/project-export-modal";
 import { ImportModal } from "@/components/ui/projects/import-modal";
 import { ProjectsGuideModal } from "@/components/ui/projects/project-content/projects-guide-modal";
@@ -36,6 +37,16 @@ export default function DashboardPage() {
   const [exportModalProject, setExportModalProject] = useState<{
     id: string;
     name: string;
+  } | null>(null);
+  const [projectToDelete, setProjectToDelete] = useState<{
+    id: string;
+    name: string;
+    description?: string;
+    icon?: string;
+    status?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    userId?: string;
   } | null>(null);
   const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
@@ -338,10 +349,33 @@ export default function DashboardPage() {
         }}
         onEdit={handleProjectEdit}
         onDelete={handleProjectDelete}
+        onRequestDelete={(p) => {
+          setSidepanelOpen(false);
+          setSelectedProject(null);
+          // Delay dialog until sidebar close animation completes (~300ms)
+          setTimeout(() => setProjectToDelete(p), 350);
+        }}
         onStatusChange={handleProjectStatusChange}
         onOpenCanvas={handleOpenCanvas}
         onExportProject={(p) => setExportModalProject({ id: p.id, name: p.name })}
       />
+
+      {projectToDelete && (
+        <DeleteConfirmationDialog
+          confirmDelete
+          project={projectToDelete}
+          onCancelDelete={() => {
+            setProjectToDelete(null);
+            // Reopen sidebar so user can return to project details
+            setSelectedProject(projects.find((p) => p.id === projectToDelete.id) ?? null);
+            setSidepanelOpen(true);
+          }}
+          onConfirmDelete={() => {
+            handleProjectDelete(projectToDelete.id);
+            setProjectToDelete(null);
+          }}
+        />
+      )}
 
       <ProjectExportModal
         open={!!exportModalProject}
