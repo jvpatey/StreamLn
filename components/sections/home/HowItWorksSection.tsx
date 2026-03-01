@@ -32,15 +32,15 @@ export default function HowItWorksSection() {
       hoverBorderColor: "group-hover:border-cosmos-cosmic-light/50",
     },
     {
-      title: "Rich Content Blocks",
-      subtitle: "Rich Text Editor",
+      title: "Notes & Documents",
+      subtitle: "Rich Text & Full-Screen Editor",
       description:
-        "Create rich notes with formatting and code blocks directly on the canvas. Each block is movable and supports lists, formatting, and inline code.",
+        "Create rich notes with formatting and code blocks on the canvas. Each canvas also has full-screen documents for long-form writing—format with headings, task lists, and export to Markdown or PDF.",
       icon: <FileText className="w-6 h-6" />,
       features: [
         "Rich text editor",
-        "Code blocks",
-        "Lists and formatting",
+        "Full-screen document editor",
+        "Markdown & PDF export",
       ],
       color: "text-nebula-500",
       bgColor: "from-nebula-500/10 via-nebula-600/5 to-nebula-500/5",

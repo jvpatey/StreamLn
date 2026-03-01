@@ -380,6 +380,7 @@ export function ProjectsContent({
                     <div className="space-y-2 text-xs text-slate-500 dark:text-slate-500">
                       <p>• Create Project — sidebar or card above</p>
                       <p>• Import from JSON — sidebar</p>
+                      <p>• Create documents in any canvas — sidebar</p>
                       <p>
                         • Press {getKeyboardShortcut("⌘K")} to search and create
                       </p>
@@ -524,6 +525,7 @@ export function ProjectsContent({
                     <div className="space-y-2 text-xs text-slate-500 dark:text-slate-500">
                       <p>• Create Project — button above or sidebar</p>
                       <p>• Import from JSON — sidebar</p>
+                      <p>• Create documents in any canvas — sidebar</p>
                       <p>
                         • Press {getKeyboardShortcut("⌘K")} to search and create
                       </p>

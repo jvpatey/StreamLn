@@ -1347,15 +1347,26 @@ export default function ProjectCanvasPage() {
                 primaryMode === "document" &&
                 !currentDocument &&
                 documents.length === 0 && (
-                  <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-500 dark:text-slate-400">
-                    <p className="text-sm">No documents yet</p>
-                    <button
-                      type="button"
-                      onClick={() => handleDocumentCreate()}
-                      className="px-4 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-medium transition-colors"
-                    >
-                      Create first document
-                    </button>
+                  <div className="flex flex-col items-center justify-center h-full p-8">
+                    <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl px-8 py-6 shadow-lg max-w-md w-full text-center">
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                        No documents yet
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                        Documents are full-screen editors for long-form writing.
+                        Add headings, task lists, and export to Markdown or PDF.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => handleDocumentCreate()}
+                        className="px-4 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-medium transition-colors"
+                      >
+                        Create first document
+                      </button>
+                      <p className="text-xs text-slate-500 dark:text-slate-500 mt-4">
+                        Or switch to canvas to add blocks
+                      </p>
+                    </div>
                   </div>
                 )}
             </div>

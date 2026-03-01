@@ -2,12 +2,14 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface AnimatedGridItemProps {
   children: ReactNode;
   index: number;
   staggerDelay?: number;
   threshold?: number;
+  className?: string;
 }
 
 /**
@@ -20,11 +22,13 @@ export default function AnimatedGridItem({
   index,
   staggerDelay = 0.1,
   threshold = 0.2,
+  className,
 }: AnimatedGridItemProps) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
     <motion.div
+      className={cn(className)}
       initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: threshold }}
