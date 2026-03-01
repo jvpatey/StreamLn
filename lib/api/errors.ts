@@ -25,15 +25,14 @@ export function apiError(
 
 /**
  * Handles unexpected errors (e.g. from Prisma, JSON parse).
- * Logs in development and returns a generic 500 response.
+ * Logs in development and production (Vercel captures console.error in function logs).
  */
 export function handleUnexpectedError(
   error: unknown,
   context: string
 ): NextResponse {
-  if (process.env.NODE_ENV === "development") {
-    console.error(`[API Error] ${context}:`, error);
-  }
+  // Always log so Vercel function logs show the real error for debugging
+  console.error(`[API Error] ${context}:`, error);
   return apiError(500, {
     message: "An unexpected error occurred.",
   });
