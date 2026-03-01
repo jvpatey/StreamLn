@@ -281,7 +281,16 @@ export function CanvasSettingsModal({
                         Default zoom
                       </span>
                       <select
-                        value={zoomLevel}
+                        value={
+                          ZOOM_OPTIONS.reduce(
+                            (closest, opt) =>
+                              Math.abs(opt.value - zoomLevel) <
+                              Math.abs(closest.value - zoomLevel)
+                                ? opt
+                                : closest,
+                            ZOOM_OPTIONS[0]
+                          ).value
+                        }
                         onChange={(e) =>
                           handleZoomChange(parseFloat(e.target.value))
                         }
