@@ -122,18 +122,19 @@ export async function PATCH(
       return apiError(400, { message: "Validation failed", details: message });
     }
 
-    await Promise.all(
-      parsed.data.updates.map(({ id, order }) =>
-        prisma.document.updateMany({
-          where: { id, canvasId, projectId },
-          data: { order, updatedAt: new Date() },
-        })
-      )
-    );
-
-    const documents = await prisma.document.findMany({
-      where: { canvasId },
-      orderBy: { order: "asc" },
+    const documents = await prisma.$transaction(async (tx) => {
+      await Promise.all(
+        parsed.data.updates.map(({ id, order }) =>
+          tx.document.updateMany({
+            where: { id, canvasId, projectId },
+            data: { order, updatedAt: new Date() },
+          })
+        )
+      );
+      return tx.document.findMany({
+        where: { canvasId },
+        orderBy: { order: "asc" },
+      });
     });
 
     return NextResponse.json({ documents });
