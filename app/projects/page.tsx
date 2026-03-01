@@ -206,6 +206,7 @@ export default function DashboardPage() {
     const projectForList = {
       ...created,
       blocks: 0,
+      documents: 0,
       canvasCount: 1,
       status: created.status ?? "active",
     };
@@ -224,10 +225,15 @@ export default function DashboardPage() {
     setSidepanelOpen(true);
   };
 
-  const handleOpenCanvas = (project: any, canvasId?: string) => {
+  const handleOpenCanvas = (
+    project: any,
+    canvasId?: string,
+    documentId?: string
+  ) => {
     addProjectToRecent(project.id);
     if (canvasId) {
-      router.push(`/projects/${project.id}/canvas/${canvasId}`);
+      const base = `/projects/${project.id}/canvas/${canvasId}`;
+      router.push(documentId ? `${base}?doc=${documentId}` : base);
     } else {
       router.push(`/projects/${project.id}`);
     }

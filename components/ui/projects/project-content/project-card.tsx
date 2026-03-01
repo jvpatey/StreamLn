@@ -1,5 +1,12 @@
 import { Card } from "@/components/ui/shared/card";
-import { Clock, CheckCircle, Archive, Layout, SquareStack } from "lucide-react";
+import {
+  Clock,
+  CheckCircle,
+  Archive,
+  Layout,
+  SquareStack,
+  FileText,
+} from "lucide-react";
 import React, { useRef } from "react";
 import { motion } from "framer-motion";
 import { ProjectCardMenu } from "./project-card-menu";
@@ -12,6 +19,7 @@ interface ProjectCardProps {
   type: string;
   lastModified: string;
   blocks: number;
+  documents?: number;
   canvasCount: number;
   status: string;
   description?: string;
@@ -35,6 +43,7 @@ export function ProjectCard({
   type,
   lastModified,
   blocks,
+  documents = 0,
   canvasCount,
   status,
   description,
@@ -136,6 +145,10 @@ export function ProjectCard({
           <span className="flex items-center gap-1">
             <Layout size={12} />
             {canvasCount} canvas{canvasCount !== 1 ? "es" : ""}
+          </span>
+          <span className="flex items-center gap-1">
+            <FileText size={12} />
+            {documents} doc{documents !== 1 ? "s" : ""}
           </span>
           <span className="flex items-center gap-1">
             <SquareStack size={12} />

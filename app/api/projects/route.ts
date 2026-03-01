@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
       include: {
         canvases: {
           include: {
-            _count: { select: { canvasBlocks: true } },
+            _count: { select: { canvasBlocks: true, documents: true } },
           },
         },
       },
@@ -28,9 +28,13 @@ export async function GET(req: NextRequest) {
         (sum, c) => sum + c._count.canvasBlocks,
         0
       );
+      const documents = project.canvases.reduce(
+        (sum, c) => sum + c._count.documents,
+        0
+      );
       const canvasCount = project.canvases.length;
       const { canvases, ...rest } = project;
-      return { ...rest, blocks, canvasCount };
+      return { ...rest, blocks, documents, canvasCount };
     });
 
     return NextResponse.json(projectsWithBlocks);

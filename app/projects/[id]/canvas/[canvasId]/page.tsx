@@ -285,6 +285,13 @@ export default function ProjectCanvasPage() {
     loadProject();
   }, [projectId, canvasId]);
 
+  // When landing with ?doc= param, switch to document mode so we show the document editor
+  useEffect(() => {
+    if (docParam && projectId && canvasId) {
+      setPrimaryMode("document");
+    }
+  }, [docParam, projectId, canvasId]);
+
   // Fetch documents when in document mode (for current canvas)
   useEffect(() => {
     if (

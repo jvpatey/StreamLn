@@ -40,6 +40,7 @@ interface Project {
   updatedAt?: string;
   createdAt?: string;
   blocks?: number;
+  documents?: number;
   canvasCount?: number;
   userId?: string;
   icon?: string;
@@ -418,6 +419,11 @@ export function ProjectsContent({
                             ? project.blocks
                             : 0
                         }
+                        documents={
+                          typeof project.documents === "number"
+                            ? project.documents
+                            : 0
+                        }
                         canvasCount={
                           typeof project.canvasCount === "number"
                             ? project.canvasCount
@@ -546,7 +552,8 @@ export function ProjectsContent({
                         delay: shouldReduceMotion ? 0 : index * 0.04,
                         ease: [0.25, 0.46, 0.45, 0.94],
                       }}
-                      className="flex items-center px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                      className="flex items-center px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                      onClick={() => onProjectClick?.(project)}
                     >
                       {/* Icon */}
                       <div className="w-8 flex-shrink-0">
