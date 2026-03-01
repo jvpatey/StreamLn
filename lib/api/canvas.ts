@@ -195,6 +195,24 @@ export async function saveCanvasDocument(
   return { ok: true, updatedAt: data.updatedAt ?? new Date().toISOString() };
 }
 
+export interface ProjectDocumentTree {
+  canvases: Array<{
+    id: string;
+    name: string;
+    order: number;
+    documents: Array<{ id: string; name: string; order: number }>;
+  }>;
+}
+
+export async function fetchProjectDocuments(
+  projectId: string
+): Promise<ProjectDocumentTree> {
+  const res = await fetch(`/api/projects/${projectId}/project-documents`);
+  if (!res.ok) throw new Error("Failed to fetch project documents");
+  const data = await res.json();
+  return { canvases: data.canvases ?? [] };
+}
+
 export async function fetchDocuments(
   projectId: string,
   canvasId: string
