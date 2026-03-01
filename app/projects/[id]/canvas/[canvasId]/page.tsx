@@ -342,6 +342,19 @@ export default function ProjectCanvasPage() {
     );
   }, [primaryMode, docParam, documents, projectId, canvasId, router]);
 
+  // Sync lastSavedAt from current document when in document mode (avoids 409 on save)
+  useEffect(() => {
+    if (primaryMode !== "document") return;
+    const current =
+      docParam && documents.length > 0
+        ? documents.find((d) => d.id === docParam) ?? documents[0]
+        : null;
+    if (current?.updatedAt) {
+      lastSavedAtRef.current = current.updatedAt;
+      setLastSavedAt(current.updatedAt);
+    }
+  }, [primaryMode, docParam, documents]);
+
   // Initialize view state from preferences (client-only)
   useEffect(() => {
     setShowGrid(getDefaultShowGrid());
@@ -377,13 +390,14 @@ export default function ProjectCanvasPage() {
     }
   }, [primaryMode, projectId, canvasId, docParam, canvas?.name, documents]);
 
-  // Debounced save (1.5s after last change)
+  // Debounced save for canvas blocks (only when in canvas mode)
   useEffect(() => {
     if (
       !projectId ||
       typeof projectId !== "string" ||
       !canvasId ||
-      typeof canvasId !== "string"
+      typeof canvasId !== "string" ||
+      primaryMode !== "canvas"
     )
       return;
     if (skipNextSaveRef.current) return;
@@ -407,7 +421,7 @@ export default function ProjectCanvasPage() {
     }, 1500);
 
     return () => clearTimeout(timeout);
-  }, [projectId, canvasId, canvasBlocks]);
+  }, [projectId, canvasId, canvasBlocks, primaryMode]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -856,6 +870,10 @@ export default function ProjectCanvasPage() {
           setDocuments((prev) =>
             prev.map((d) => (d.id === documentId ? updated : d)),
           );
+          if (documentId === docParam && updated.updatedAt) {
+            lastSavedAtRef.current = updated.updatedAt;
+            setLastSavedAt(updated.updatedAt);
+          }
         }
         setProjectDocuments((prev) =>
           prev.map((c) =>
@@ -931,12 +949,21 @@ export default function ProjectCanvasPage() {
           cid,
           reordered.map((d, i) => ({ id: d.id, order: i })),
         );
-        if (updated.length) setDocuments(updated);
+        if (updated.length) {
+          setDocuments(updated);
+          const currentDoc = docParam
+            ? updated.find((d) => d.id === docParam)
+            : null;
+          if (currentDoc?.updatedAt) {
+            lastSavedAtRef.current = currentDoc.updatedAt;
+            setLastSavedAt(currentDoc.updatedAt);
+          }
+        }
       } catch {
         setError("Failed to reorder documents");
       }
     },
-    [projectId, canvasId],
+    [projectId, canvasId, docParam],
   );
 
   const handleDocumentReorderForSidebar = useCallback(
@@ -992,12 +1019,19 @@ export default function ProjectCanvasPage() {
         );
         if (targetCanvasId === canvasId && updated.length) {
           setDocuments(updated);
+          const currentDoc = docParam
+            ? updated.find((d) => d.id === docParam)
+            : null;
+          if (currentDoc?.updatedAt) {
+            lastSavedAtRef.current = currentDoc.updatedAt;
+            setLastSavedAt(currentDoc.updatedAt);
+          }
         }
       } catch {
         setError("Failed to reorder documents");
       }
     },
-    [projectId, canvasId],
+    [projectId, canvasId, docParam],
   );
 
   const handleReloadFromConflict = useCallback(async () => {
