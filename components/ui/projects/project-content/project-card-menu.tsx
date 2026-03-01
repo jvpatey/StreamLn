@@ -1,5 +1,10 @@
+"use client";
+
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { MoreHorizontal, Archive, Trash2, CheckCircle, Download } from "lucide-react";
+import { Button } from "@/components/ui/shared/button";
 
 interface ProjectCardMenuProps {
   isArchived: boolean;
@@ -7,6 +12,8 @@ interface ProjectCardMenuProps {
   onUnarchive: () => void;
   onDelete: () => void;
   onExport?: () => void;
+  /** Use "outline" in list view to match adjacent View button */
+  triggerVariant?: "default" | "outline";
 }
 
 // Project Card Menu component, used in project-card.tsx
@@ -16,10 +23,16 @@ export function ProjectCardMenu({
   onUnarchive,
   onDelete,
   onExport,
+  triggerVariant = "default",
 }: ProjectCardMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Click-away logic for menu
   useEffect(() => {
@@ -33,18 +46,33 @@ export function ProjectCardMenu({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [menuOpen]);
 
+  const triggerProps = {
+    onClick: (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setMenuOpen((v) => !v);
+    },
+    "aria-label": "Project actions",
+  };
+
   return (
     <div className="relative" ref={menuRef}>
-      <button
-        className="p-1.5 rounded-full hover:bg-slate-800/60 focus:outline-none focus:ring-2 focus:ring-primary-400"
-        onClick={(e) => {
-          e.stopPropagation();
-          setMenuOpen((v) => !v);
-        }}
-        aria-label="Project actions"
-      >
-        <MoreHorizontal size={18} className="text-slate-400" />
-      </button>
+      {triggerVariant === "outline" ? (
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 w-8 p-0 shrink-0 hover:bg-primary-100 dark:hover:bg-primary-900/30"
+          {...triggerProps}
+        >
+          <MoreHorizontal size={18} className="text-slate-600 dark:text-slate-400" />
+        </Button>
+      ) : (
+        <button
+          className="p-1.5 rounded-full hover:bg-slate-800/60 focus:outline-none focus:ring-2 focus:ring-primary-400"
+          {...triggerProps}
+        >
+          <MoreHorizontal size={18} className="text-slate-400" />
+        </button>
+      )}
       {menuOpen && (
         <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg z-20 animate-in fade-in slide-in-from-top-2">
           {onExport && (
@@ -88,43 +116,61 @@ export function ProjectCardMenu({
           </button>
         </div>
       )}
-      {/* Confirmation Dialog */}
-      {confirmOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm"
-          onClick={() => setConfirmOpen(false)}
-        >
-          <div
-            className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-lg font-bold mb-2 text-slate-900 dark:text-slate-100">
-              Delete Project?
-            </h3>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">
-              Are you sure you want to delete this project? This action cannot
-              be undone.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                className="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700"
-                onClick={() => setConfirmOpen(false)}
+      {/* Confirmation Dialog - portaled to body to escape overflow clipping */}
+      {mounted &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {confirmOpen && (
+            <motion.div
+              key="delete-confirm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm"
+              onClick={() => setConfirmOpen(false)}
+              aria-modal="true"
+              role="dialog"
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4 border border-slate-200 dark:border-slate-700"
+                onClick={(e) => e.stopPropagation()}
               >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 rounded-lg bg-destructive-600 text-white hover:bg-destructive-700"
-                onClick={() => {
-                  setConfirmOpen(false);
-                  onDelete();
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              <h3 className="text-lg font-bold mb-2 text-slate-900 dark:text-slate-100">
+                Delete Project?
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-6">
+                Are you sure you want to delete this project? This action cannot
+                be undone.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  onClick={() => setConfirmOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 rounded-xl bg-destructive text-white hover:bg-destructive/90 transition-colors"
+                  onClick={() => {
+                    setConfirmOpen(false);
+                    onDelete();
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+              </motion.div>
+            </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
     </div>
   );
 }

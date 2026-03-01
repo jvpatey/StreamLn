@@ -14,17 +14,19 @@ import { LiquidGlassButton } from "@/components/ui/shared/liquid-glass-button";
 import { LiquidGlassSurface } from "@/components/ui/shared/liquid-glass-surface";
 import { getKeyboardShortcut } from "@/lib/utils";
 import { SimpleThemeToggle } from "@/components/ui/shared/theme-toggle";
-import { Search, Layers } from "lucide-react";
+import { Search, Layers, BookOpen } from "lucide-react";
 import Link from "next/link";
 
 interface ProjectsHeaderProps {
   onCommandPaletteOpen: () => void;
   onSidebarToggle: () => void;
+  onGuideOpen?: () => void;
 }
 
 export function ProjectsHeader({
   onCommandPaletteOpen,
   onSidebarToggle,
+  onGuideOpen,
 }: ProjectsHeaderProps) {
   return (
     <LiquidGlassSurface asChild variant="header" intensity="2xl">
@@ -73,6 +75,18 @@ export function ProjectsHeader({
               >
                 <Search size={16} />
               </Button>
+              {onGuideOpen && (
+                <Button
+                  variant="glass"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={onGuideOpen}
+                  aria-label="Projects guide"
+                  title="Projects guide"
+                >
+                  <BookOpen size={16} />
+                </Button>
+              )}
               <SimpleThemeToggle />
               <UserButton />
             </div>

@@ -40,6 +40,7 @@ import React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { cn } from "@/lib/utils";
 import { CreateCanvasModal } from "./create-canvas-modal";
+import { CanvasGuideModal } from "./canvas-guide-modal";
 import {
   SortableCanvasList,
   SortableCanvasItem,
@@ -118,6 +119,7 @@ export function CanvasHeader({
   const [menuOpen, setMenuOpen] = useState(false);
   const [canvasSwitcherOpen, setCanvasSwitcherOpen] = useState(false);
   const [createCanvasModalOpen, setCreateCanvasModalOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
   const [renameCanvasId, setRenameCanvasId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const router = useRouter();
@@ -697,6 +699,10 @@ export function CanvasHeader({
                     </button>
                     <button
                       type="button"
+                      onClick={() => {
+                        setGuideOpen(true);
+                        setMenuOpen(false);
+                      }}
                       className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                     >
                       <BookOpen size={14} className="mr-2 shrink-0" />
@@ -739,6 +745,7 @@ export function CanvasHeader({
         onCreate={onCanvasCreate}
       />
     )}
+    <CanvasGuideModal open={guideOpen} onOpenChange={setGuideOpen} />
     </>
   );
 }

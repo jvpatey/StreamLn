@@ -58,8 +58,7 @@ export function ProjectsSidebar({
               Project Hub
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-sm leading-snug">
-              Your central hub for creating, organizing, and managing all your
-              projects with speed and efficiency.
+              Create and manage your projects in one place.
             </p>
           </div>
 

@@ -10,8 +10,10 @@ import { ProjectsContent } from "@/components/ui/projects/project-content";
 import { CreateProjectModal } from "@/components/ui/projects/project-content";
 import { ProjectSkeletonGrid } from "@/components/ui/projects/project-content/project-skeleton";
 import { ProjectDetailsSidepanel } from "@/components/ui/projects/details-sidepanel";
+import { DeleteConfirmationDialog } from "@/components/ui/projects/details-sidepanel/project-details";
 import { ProjectExportModal } from "@/components/ui/projects/canvas/project-export-modal";
 import { ImportModal } from "@/components/ui/projects/import-modal";
+import { ProjectsGuideModal } from "@/components/ui/projects/project-content/projects-guide-modal";
 import {
   fetchProjects,
   createProject,
@@ -36,7 +38,19 @@ export default function DashboardPage() {
     id: string;
     name: string;
   } | null>(null);
+  const [projectToDelete, setProjectToDelete] = useState<{
+    id: string;
+    name: string;
+    description?: string;
+    icon?: string;
+    status?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    userId?: string;
+  } | null>(null);
   const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { user } = useUser();
   const router = useRouter();
 
@@ -186,10 +200,16 @@ export default function DashboardPage() {
   }) => {
     if (!user?.id)
       throw new Error("You must be signed in to create a project.");
-    await createProject({ name, description, icon, canvasName });
+    const created = await createProject({ name, description, icon, canvasName });
     setCreateModalOpen(false);
-    // Refetch projects after creating
-    loadProjects();
+    // Add new project to list optimistically (avoids loading flash, new project animates in)
+    const projectForList = {
+      ...created,
+      blocks: 0,
+      canvasCount: 1,
+      status: created.status ?? "active",
+    };
+    setProjects((prev) => [...prev, projectForList]);
   };
 
   // Sidepanel handlers
@@ -328,11 +348,33 @@ export default function DashboardPage() {
           setSelectedProject(null);
         }}
         onEdit={handleProjectEdit}
-        onDelete={handleProjectDelete}
+        onRequestDelete={(p) => {
+          setSidepanelOpen(false);
+          setSelectedProject(null);
+          // Delay dialog until sidebar close animation completes (~300ms)
+          setTimeout(() => setProjectToDelete(p), 350);
+        }}
         onStatusChange={handleProjectStatusChange}
         onOpenCanvas={handleOpenCanvas}
         onExportProject={(p) => setExportModalProject({ id: p.id, name: p.name })}
       />
+
+      {projectToDelete && (
+        <DeleteConfirmationDialog
+          confirmDelete
+          project={projectToDelete}
+          onCancelDelete={() => {
+            setProjectToDelete(null);
+            // Reopen sidebar so user can return to project details
+            setSelectedProject(projects.find((p) => p.id === projectToDelete.id) ?? null);
+            setSidepanelOpen(true);
+          }}
+          onConfirmDelete={() => {
+            handleProjectDelete(projectToDelete.id);
+            setProjectToDelete(null);
+          }}
+        />
+      )}
 
       <ProjectExportModal
         open={!!exportModalProject}
@@ -349,6 +391,7 @@ export default function DashboardPage() {
         <ProjectsHeader
           onCommandPaletteOpen={() => setCommandPaletteOpen(true)}
           onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
+          onGuideOpen={() => setGuideOpen(true)}
         />
       </div>
 
@@ -399,10 +442,14 @@ export default function DashboardPage() {
             setStatusFilter={setStatusFilter}
             filterPopoverOpen={filterPopoverOpen}
             setFilterPopoverOpen={setFilterPopoverOpen}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
           </div>
         )}
       </div>
+
+      <ProjectsGuideModal open={guideOpen} onOpenChange={setGuideOpen} />
 
       {/* Command Palette */}
       <ProjectCommandPalette
