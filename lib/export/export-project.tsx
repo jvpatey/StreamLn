@@ -228,10 +228,21 @@ export async function exportProjectAsZip(data: ExportProjectData): Promise<void>
     if (documentsFolder && documents.length > 0) {
       const canvasDocsFolder = documentsFolder.folder(canvasBase);
       if (canvasDocsFolder) {
+        const usedNames = new Set<string>();
         for (const doc of documents) {
           const docMd = documentToMarkdown(doc.content);
-          const docBase = sanitizeFilename(doc.name);
-          canvasDocsFolder.file(`${docBase}.md`, docMd.trim() || `*Empty document: ${doc.name}*`);
+          let docBase = sanitizeFilename(doc.name);
+          let candidate = docBase;
+          let suffix = 1;
+          while (usedNames.has(candidate)) {
+            suffix += 1;
+            candidate = `${docBase}-${suffix}`;
+          }
+          usedNames.add(candidate);
+          canvasDocsFolder.file(
+            `${candidate}.md`,
+            docMd.trim() || `*Empty document: ${doc.name}*`
+          );
         }
       }
     }
