@@ -6,23 +6,27 @@ import prisma from "@/lib/db";
 export async function getSharedCanvasMetadata(token: string) {
   if (!token || token.length < 10) return null;
 
-  const shareToken = await prisma.canvasShareToken.findUnique({
-    where: { token },
-    include: {
-      canvas: {
-        include: {
-          project: { select: { name: true } },
+  try {
+    const shareToken = await prisma.canvasShareToken.findUnique({
+      where: { token },
+      include: {
+        canvas: {
+          include: {
+            project: { select: { name: true } },
+          },
         },
       },
-    },
-  });
+    });
 
-  if (!shareToken) return null;
-  if (shareToken.expiresAt && shareToken.expiresAt < new Date()) return null;
+    if (!shareToken) return null;
+    if (shareToken.expiresAt && shareToken.expiresAt < new Date()) return null;
 
-  return {
-    projectName: shareToken.canvas.project.name,
-    canvasName: shareToken.canvas.name,
-    expiresAt: shareToken.expiresAt?.toISOString() ?? null,
-  };
+    return {
+      projectName: shareToken.canvas.project.name,
+      canvasName: shareToken.canvas.name,
+      expiresAt: shareToken.expiresAt?.toISOString() ?? null,
+    };
+  } catch {
+    return null;
+  }
 }
