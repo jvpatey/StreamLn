@@ -89,8 +89,9 @@ export function ProjectsContent({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [statusChangingId, setStatusChangingId] = useState<string | null>(null);
   const [viewModeLocal, setViewModeLocal] = useState<"grid" | "list">("grid");
-  const viewMode = viewModeProp ?? viewModeLocal;
-  const setViewMode = onViewModeChange ?? setViewModeLocal;
+  const isControlled = viewModeProp !== undefined && onViewModeChange !== undefined;
+  const viewMode = isControlled ? viewModeProp : viewModeLocal;
+  const setViewMode = isControlled ? onViewModeChange : setViewModeLocal;
   const shouldReduceMotion = useReducedMotion();
 
   const activeCount = projects.filter(
@@ -164,8 +165,7 @@ export function ProjectsContent({
             Project Hub
           </h2>
           <p className="text-sm text-slate-400 dark:text-slate-400 mb-4">
-            Your central hub for creating, organizing, and managing all your
-            projects with speed and efficiency.
+            Create and manage your projects in one place.
           </p>
         </div>
 
