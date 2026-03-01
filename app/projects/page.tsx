@@ -325,16 +325,16 @@ export default function DashboardPage() {
 
       // Within same status group, apply selected sort
       if (sortBy === "updated") {
-        return (
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-        );
+        const aTime = new Date(a.lastUpdatedAt ?? a.updatedAt).getTime();
+        const bTime = new Date(b.lastUpdatedAt ?? b.updatedAt).getTime();
+        return bTime - aTime;
       } else if (sortBy === "alpha") {
         return a.name.localeCompare(b.name);
       } else if (sortBy === "status") {
-        // Same status - use updatedAt as tiebreaker
-        return (
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-        );
+        // Same status - use lastUpdatedAt as tiebreaker
+        const aTime = new Date(a.lastUpdatedAt ?? a.updatedAt).getTime();
+        const bTime = new Date(b.lastUpdatedAt ?? b.updatedAt).getTime();
+        return bTime - aTime;
       }
       return 0;
     });

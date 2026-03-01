@@ -18,6 +18,8 @@ export async function GET(req: NextRequest) {
         canvases: {
           include: {
             _count: { select: { canvasBlocks: true, documents: true } },
+            documents: { select: { updatedAt: true } },
+            canvasBlocks: { select: { updatedAt: true } },
           },
         },
       },
@@ -33,8 +35,31 @@ export async function GET(req: NextRequest) {
         0
       );
       const canvasCount = project.canvases.length;
+
+      // Compute lastUpdatedAt: max of project, canvases, documents, and blocks
+      const allDates: Date[] = [project.updatedAt];
+      for (const canvas of project.canvases) {
+        allDates.push(canvas.updatedAt);
+        for (const doc of canvas.documents) {
+          if (doc.updatedAt) allDates.push(doc.updatedAt);
+        }
+        for (const block of canvas.canvasBlocks) {
+          if (block.updatedAt) allDates.push(block.updatedAt);
+        }
+      }
+      const lastUpdatedAt =
+        allDates.length > 0
+          ? new Date(Math.max(...allDates.map((d) => d.getTime()))).toISOString()
+          : project.updatedAt.toISOString();
+
       const { canvases, ...rest } = project;
-      return { ...rest, blocks, documents, canvasCount };
+      return {
+        ...rest,
+        blocks,
+        documents,
+        canvasCount,
+        lastUpdatedAt,
+      };
     });
 
     return NextResponse.json(projectsWithBlocks);

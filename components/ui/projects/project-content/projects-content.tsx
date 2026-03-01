@@ -413,7 +413,9 @@ export function ProjectsContent({
                         id={project.id}
                         name={project.name}
                         type={project.description || "Project Workspace"}
-                        lastModified={formatTimeAgo(project.updatedAt)}
+                        lastModified={formatTimeAgo(
+                          project.lastUpdatedAt ?? project.updatedAt
+                        )}
                         blocks={
                           typeof project.blocks === "number"
                             ? project.blocks

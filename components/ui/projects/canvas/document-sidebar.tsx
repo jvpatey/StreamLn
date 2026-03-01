@@ -204,18 +204,10 @@ export function DocumentSidebar({
 
             {/* File tree */}
             <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4">
-              <div className="flex items-center justify-between mb-2">
+              <div className="mb-2">
                 <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                   {projectName}
                 </h3>
-                <button
-                  type="button"
-                  onClick={onCanvasCreate}
-                  className="p-1 rounded text-slate-400 hover:text-primary hover:bg-primary/10"
-                  title="New canvas"
-                >
-                  <Plus size={14} />
-                </button>
               </div>
 
               {onCanvasReorder && canvases.length > 1 && !searchQuery.trim() ? (
