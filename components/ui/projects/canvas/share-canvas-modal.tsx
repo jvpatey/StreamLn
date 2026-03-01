@@ -19,6 +19,10 @@ import {
   revokeShareToken,
   type ShareToken,
 } from "@/lib/api/share";
+import {
+  getDefaultShareExpiry,
+  setDefaultShareExpiry,
+} from "@/lib/canvas-preferences";
 
 interface ShareCanvasModalProps {
   open: boolean;
@@ -48,7 +52,9 @@ export function ShareCanvasModal({
   const [creating, setCreating] = useState(false);
   const [revoking, setRevoking] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [expiresIn, setExpiresIn] = useState<number | undefined>(undefined);
+  const [expiresIn, setExpiresIn] = useState<number | undefined>(
+    () => getDefaultShareExpiry()
+  );
   const [error, setError] = useState<string | null>(null);
 
   const loadTokens = useCallback(async () => {
@@ -68,6 +74,12 @@ export function ShareCanvasModal({
   useEffect(() => {
     loadTokens();
   }, [loadTokens]);
+
+  useEffect(() => {
+    if (open) {
+      setExpiresIn(getDefaultShareExpiry());
+    }
+  }, [open]);
 
   const getShareUrl = (token: string) => {
     const base =
@@ -191,11 +203,13 @@ export function ShareCanvasModal({
                       <div className="flex gap-2">
                         <select
                           value={expiresIn ?? ""}
-                          onChange={(e) =>
-                            setExpiresIn(
-                              e.target.value ? Number(e.target.value) : undefined
-                            )
-                          }
+                          onChange={(e) => {
+                            const val = e.target.value
+                              ? Number(e.target.value)
+                              : undefined;
+                            setExpiresIn(val);
+                            setDefaultShareExpiry(val);
+                          }}
                           className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 px-3 py-2"
                         >
                           {EXPIRY_OPTIONS.map((opt) => (

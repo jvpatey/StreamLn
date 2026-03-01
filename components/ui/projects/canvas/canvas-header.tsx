@@ -41,6 +41,7 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { cn } from "@/lib/utils";
 import { CreateCanvasModal } from "./create-canvas-modal";
 import { CanvasGuideModal } from "./canvas-guide-modal";
+import { CanvasSettingsModal } from "./canvas-settings-modal";
 import {
   SortableCanvasList,
   SortableCanvasItem,
@@ -85,6 +86,7 @@ interface CanvasItem {
   id: string;
   name: string;
   order: number;
+  createdAt?: string;
   updatedAt?: string;
 }
 
@@ -100,6 +102,15 @@ interface CanvasHeaderProps {
   onCanvasReorder?: (reordered: CanvasItem[]) => void;
   onExportClick?: () => void;
   onShareClick?: () => void;
+  showGrid?: boolean;
+  onGridToggle?: () => void;
+  zoomLevel?: number;
+  onZoomChange?: (zoom: number) => void;
+  sidebarOpen?: boolean;
+  onSidebarOpenChange?: (open: boolean) => void;
+  toolbarOpen?: boolean;
+  onToolbarOpenChange?: (open: boolean) => void;
+  lastSavedAt?: string | null;
 }
 
 // Canvas header component used in the canvas page
@@ -115,11 +126,21 @@ export function CanvasHeader({
   onCanvasReorder,
   onExportClick,
   onShareClick,
+  showGrid = true,
+  onGridToggle,
+  zoomLevel = 1,
+  onZoomChange,
+  sidebarOpen = true,
+  onSidebarOpenChange,
+  toolbarOpen = true,
+  onToolbarOpenChange,
+  lastSavedAt = null,
 }: CanvasHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [canvasSwitcherOpen, setCanvasSwitcherOpen] = useState(false);
   const [createCanvasModalOpen, setCreateCanvasModalOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [renameCanvasId, setRenameCanvasId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const router = useRouter();
@@ -710,6 +731,10 @@ export function CanvasHeader({
                     </button>
                     <button
                       type="button"
+                      onClick={() => {
+                        setSettingsOpen(true);
+                        setMenuOpen(false);
+                      }}
                       className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                     >
                       <Settings size={14} className="mr-2 shrink-0" />
@@ -746,6 +771,24 @@ export function CanvasHeader({
       />
     )}
     <CanvasGuideModal open={guideOpen} onOpenChange={setGuideOpen} />
+    <CanvasSettingsModal
+      open={settingsOpen}
+      onOpenChange={setSettingsOpen}
+      canvas={canvas}
+      onCanvasRename={onCanvasRename}
+      showGrid={showGrid}
+      onGridToggle={onGridToggle ?? (() => {})}
+      zoomLevel={zoomLevel}
+      onZoomChange={onZoomChange ?? (() => {})}
+      sidebarOpen={sidebarOpen}
+      onSidebarOpenChange={onSidebarOpenChange ?? (() => {})}
+      toolbarOpen={toolbarOpen}
+      onToolbarOpenChange={onToolbarOpenChange ?? (() => {})}
+      lastSavedAt={lastSavedAt ?? null}
+      onOpenGuide={() => setGuideOpen(true)}
+      onShareClick={onShareClick}
+      onExportClick={onExportClick}
+    />
     </>
   );
 }
