@@ -348,7 +348,6 @@ export default function DashboardPage() {
           setSelectedProject(null);
         }}
         onEdit={handleProjectEdit}
-        onDelete={handleProjectDelete}
         onRequestDelete={(p) => {
           setSidepanelOpen(false);
           setSelectedProject(null);

@@ -25,7 +25,6 @@ interface ProjectDetailsSidepanelProps {
   isOpen: boolean;
   onClose: () => void;
   onEdit?: (project: Project) => void;
-  onDelete?: (projectId: string) => void;
   onRequestDelete?: (project: Project) => void;
   onStatusChange?: (projectId: string, newStatus: string) => void;
   onOpenCanvas?: (project: Project, canvasId?: string) => void;
@@ -37,7 +36,6 @@ export function ProjectDetailsSidepanel({
   isOpen,
   onClose,
   onEdit,
-  onDelete,
   onRequestDelete,
   onStatusChange,
   onOpenCanvas,
