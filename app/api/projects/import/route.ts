@@ -68,12 +68,14 @@ export async function POST(req: NextRequest) {
       });
 
       // Create documents for each canvas (requires projectId and canvasId from created records)
-      for (let i = 0; i < canvases.length; i++) {
-        const canvasData = canvases[i];
+      // created.canvases is ordered by order:asc; match by (order, name) since array indices may not align
+      for (const canvasData of canvases) {
         const docs = canvasData.documents ?? [];
         if (docs.length === 0) continue;
 
-        const createdCanvas = created.canvases[i];
+        const createdCanvas = created.canvases.find(
+          (c) => c.order === canvasData.order && c.name === canvasData.name
+        );
         if (!createdCanvas) continue;
 
         await tx.document.createMany({
