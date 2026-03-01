@@ -36,6 +36,9 @@ export function DeleteConfirmationDialog({
           className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm"
           style={{ pointerEvents: "auto" }}
           onClick={onCancelDelete}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-dialog-title"
         >
           <motion.div
             initial={{ opacity: 0, y: 16, scale: 0.98 }}
@@ -50,7 +53,7 @@ export function DeleteConfirmationDialog({
             <Trash2 className="h-5 w-5 text-destructive" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+            <h3 id="delete-dialog-title" className="text-lg font-bold text-slate-900 dark:text-slate-100">
               Delete Project?
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400">
