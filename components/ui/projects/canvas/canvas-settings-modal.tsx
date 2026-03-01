@@ -71,18 +71,15 @@ const EXPIRY_OPTIONS = [
 
 function formatDate(dateString: string | null | undefined): string {
   if (!dateString) return "Never";
-  try {
-    const d = new Date(dateString);
-    return d.toLocaleString(undefined, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  } catch {
-    return "Never";
-  }
+  const d = new Date(dateString);
+  if (Number.isNaN(d.getTime())) return "Never";
+  return d.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 export function CanvasSettingsModal({
