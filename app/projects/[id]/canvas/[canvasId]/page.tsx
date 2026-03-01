@@ -47,23 +47,66 @@ import {
 } from "@/lib/canvas-preferences";
 import type { CanvasBlock } from "@/lib/types/canvas";
 import type { Canvas } from "@/lib/types/canvas";
-import { PanelLeftOpen, PanelTopOpen } from "lucide-react";
+import { PanelLeftOpen, PanelTopOpen, Edit3, Eye } from "lucide-react";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
-function CanvasToolbarShowTab({ onShow }: { onShow: () => void }) {
+function CanvasToolbarShowTab({
+  onShow,
+  viewMode,
+  onViewModeChange,
+}: {
+  onShow: () => void;
+  viewMode: "edit" | "present";
+  onViewModeChange: (mode: "edit" | "present") => void;
+}) {
   return (
-    <motion.button
-      type="button"
-      onClick={onShow}
-      title="Show toolbar"
-      aria-label="Show toolbar"
-      className="absolute top-0 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center p-2 rounded-b-xl border border-t-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-colors text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+    <motion.div
+      className="absolute top-0 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1"
       initial={{ opacity: 0, scale: 0.8, y: -8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
-      <PanelTopOpen size={18} aria-hidden />
-    </motion.button>
+      <div className="flex items-center rounded-b-xl border border-t-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md overflow-hidden">
+        <button
+          type="button"
+          onClick={() => onViewModeChange("edit")}
+          title="Edit mode"
+          className={cn(
+            "flex items-center gap-1.5 px-2.5 py-2 text-xs font-medium transition-colors",
+            viewMode === "edit"
+              ? "bg-primary/20 text-primary dark:bg-primary/30"
+              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-slate-100"
+          )}
+        >
+          <Edit3 size={14} />
+          Edit
+        </button>
+        <button
+          type="button"
+          onClick={() => onViewModeChange("present")}
+          title="View mode"
+          className={cn(
+            "flex items-center gap-1.5 px-2.5 py-2 text-xs font-medium transition-colors border-l border-slate-200/80 dark:border-slate-600/80",
+            viewMode === "present"
+              ? "bg-primary/20 text-primary dark:bg-primary/30"
+              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-slate-100"
+          )}
+        >
+          <Eye size={14} />
+          View
+        </button>
+      </div>
+      <button
+        type="button"
+        onClick={onShow}
+        title="Show toolbar"
+        aria-label="Show toolbar"
+        className="flex items-center justify-center p-2 rounded-b-xl border border-t-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-colors text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+      >
+        <PanelTopOpen size={18} aria-hidden />
+      </button>
+    </motion.div>
   );
 }
 
@@ -656,8 +699,6 @@ export default function ProjectCanvasPage() {
         canvases={displayCanvases}
         primaryMode={primaryMode}
         onPrimaryModeChange={setPrimaryMode}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
         onCanvasCreate={handleCreateCanvas}
         onCanvasRename={handleRenameCanvas}
         onCanvasDelete={handleDeleteCanvas}
@@ -786,7 +827,11 @@ export default function ProjectCanvasPage() {
             />
             <div className="flex-1 relative overflow-hidden">
               {!toolbarOpen && !isToolbarExiting && (
-                <CanvasToolbarShowTab onShow={() => setToolbarOpen(true)} />
+                <CanvasToolbarShowTab
+                  onShow={() => setToolbarOpen(true)}
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
+                />
               )}
               {(toolbarOpen || isToolbarExiting) && (
                 <CanvasToolbar
@@ -821,6 +866,8 @@ export default function ProjectCanvasPage() {
                   selectedBlocks={selectedBlocks}
                   onDeleteSelected={deleteSelectedBlocks}
                   onDuplicateSelected={duplicateBlocks}
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
                 />
               )}
               {loading ? (

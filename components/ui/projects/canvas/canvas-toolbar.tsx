@@ -31,6 +31,8 @@ import {
   Send,
   ArrowUp,
   ArrowDown,
+  Edit3,
+  Eye,
 } from "lucide-react";
 import {
   Popover,
@@ -72,6 +74,8 @@ interface CanvasToolbarProps {
   selectedBlocks: string[];
   onDeleteSelected: () => void;
   onDuplicateSelected: () => void;
+  viewMode: "edit" | "present";
+  onViewModeChange: (mode: "edit" | "present") => void;
 }
 
 const SHAPE_OPTIONS: { kind: ShapeKind; label: string; icon: React.ReactNode }[] = [
@@ -98,6 +102,8 @@ export function CanvasToolbar({
   selectedBlocks,
   onDeleteSelected,
   onDuplicateSelected,
+  viewMode,
+  onViewModeChange,
 }: CanvasToolbarProps) {
   const [alignMenuOpen, setAlignMenuOpen] = useState(false);
   const [layerMenuOpen, setLayerMenuOpen] = useState(false);
@@ -154,6 +160,38 @@ export function CanvasToolbar({
             className: "flex items-center flex-nowrap gap-2 px-3 py-2 min-w-0 overflow-hidden",
           })}
         >
+        {/* Edit/View toggle */}
+        <div className="flex items-center gap-0.5 pr-3 border-r border-slate-200 dark:border-slate-700 shrink-0">
+          <Button
+            variant={viewMode === "edit" ? "default" : "ghost"}
+            size="sm"
+            onClick={() => onViewModeChange("edit")}
+            title="Edit mode"
+            className={`h-8 px-2 gap-1 ${
+              viewMode === "edit"
+                ? "bg-primary-600 hover:bg-primary-700 text-white"
+                : ""
+            }`}
+          >
+            <Edit3 size={14} className={viewMode === "edit" ? "text-white" : undefined} />
+            <span className="text-xs font-medium">Edit</span>
+          </Button>
+          <Button
+            variant={viewMode === "present" ? "default" : "ghost"}
+            size="sm"
+            onClick={() => onViewModeChange("present")}
+            title="View mode"
+            className={`h-8 px-2 gap-1 ${
+              viewMode === "present"
+                ? "bg-primary-600 hover:bg-primary-700 text-white"
+                : ""
+            }`}
+          >
+            <Eye size={14} className={viewMode === "present" ? "text-white" : undefined} />
+            <span className="text-xs font-medium">View</span>
+          </Button>
+        </div>
+
         {/* Tools Section */}
         <div className="flex items-center gap-1 pr-3 border-r border-slate-200 dark:border-slate-700 shrink-0">
           <Button
