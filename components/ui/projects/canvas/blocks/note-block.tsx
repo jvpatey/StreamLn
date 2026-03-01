@@ -19,8 +19,6 @@ const MAX_NOTE_HEIGHT = 560;
 /** Header (icon, title, padding, border) height for note blocks. */
 const NOTE_HEADER_HEIGHT = 56;
 
-} from "./note-defaults";
-
 interface CanvasBlock {
   id: string;
   type: string;
