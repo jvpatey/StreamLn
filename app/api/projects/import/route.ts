@@ -63,10 +63,29 @@ export async function POST(req: NextRequest) {
         include: {
           canvases: {
             orderBy: { order: "asc" },
-            take: 1,
           },
         },
       });
+
+      // Create documents for each canvas (requires projectId and canvasId from created records)
+      for (let i = 0; i < canvases.length; i++) {
+        const canvasData = canvases[i];
+        const docs = canvasData.documents ?? [];
+        if (docs.length === 0) continue;
+
+        const createdCanvas = created.canvases[i];
+        if (!createdCanvas) continue;
+
+        await tx.document.createMany({
+          data: docs.map((doc, docOrder) => ({
+            canvasId: createdCanvas.id,
+            projectId: created.id,
+            name: doc.name,
+            order: doc.order ?? docOrder,
+            content: (doc.content ?? null) as Prisma.InputJsonValue,
+          })),
+        });
+      }
 
       return created;
     });

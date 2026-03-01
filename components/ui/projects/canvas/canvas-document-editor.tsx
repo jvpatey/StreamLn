@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { useEditor, EditorContent, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ParagraphWithIndent } from "@/lib/tiptap-extensions/paragraph-indent";
@@ -37,6 +44,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/shared/popover";
+import {
+  exportDocumentAsMarkdown,
+  exportDocumentAsPDF,
+} from "@/lib/export/document-export";
 import { saveDocument as saveDocumentApi } from "@/lib/api/canvas";
 import { getLiquidGlassSurfaceClassName } from "@/components/ui/shared/liquid-glass-surface";
 import { cn } from "@/lib/utils";
@@ -431,6 +442,11 @@ function DocumentFormattingToolbar({
   );
 }
 
+export interface CanvasDocumentEditorHandle {
+  exportAsMarkdown: () => void;
+  exportAsPDF: () => Promise<void>;
+}
+
 interface CanvasDocumentEditorProps {
   documentId: string;
   documentContent: unknown;
@@ -444,7 +460,10 @@ interface CanvasDocumentEditorProps {
   onSidebarToggle?: () => void;
 }
 
-export function CanvasDocumentEditor({
+export const CanvasDocumentEditor = forwardRef<
+  CanvasDocumentEditorHandle,
+  CanvasDocumentEditorProps
+>(function CanvasDocumentEditor({
   documentId,
   documentContent,
   documentName,
@@ -455,7 +474,7 @@ export function CanvasDocumentEditor({
   onSaveConflict,
   sidebarOpen,
   onSidebarToggle,
-}: CanvasDocumentEditorProps) {
+}, ref) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedAtRef = useRef(lastSavedAt);
   lastSavedAtRef.current = lastSavedAt;
@@ -546,6 +565,28 @@ export function CanvasDocumentEditor({
     };
   }, [editor, saveDocument]);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      exportAsMarkdown: () => {
+        if (editor?.isDestroyed) return;
+        const content = editor!.getJSON();
+        exportDocumentAsMarkdown(documentName ?? "Untitled Document", content);
+      },
+      exportAsPDF: async () => {
+        if (containerRef.current) {
+          await exportDocumentAsPDF(
+            containerRef.current,
+            documentName ?? "Untitled Document"
+          );
+        }
+      },
+    }),
+    [editor, documentName]
+  );
+
   if (!editor) {
     return (
       <div className="h-full flex items-center justify-center p-8 text-slate-400 dark:text-slate-500 text-sm">
@@ -556,6 +597,7 @@ export function CanvasDocumentEditor({
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         "h-full overflow-auto",
         getLiquidGlassSurfaceClassName({
@@ -575,4 +617,4 @@ export function CanvasDocumentEditor({
       <EditorContent editor={editor} />
     </div>
   );
-}
+});

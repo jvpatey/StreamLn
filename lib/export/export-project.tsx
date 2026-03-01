@@ -5,6 +5,7 @@
 import JSZip from "jszip";
 import {
   blockToMarkdown,
+  documentToMarkdown,
   sortBlocksForExport,
 } from "./markdown-serializers";
 import {
@@ -17,7 +18,7 @@ import {
 } from "./export-utils";
 
 /**
- * Export entire project as a single JSON file (all canvases + blocks)
+ * Export entire project as a single JSON file (all canvases + blocks + documents)
  */
 export function exportProjectAsJSON(data: ExportProjectData): void {
   const payload = {
@@ -40,6 +41,12 @@ export function exportProjectAsJSON(data: ExportProjectData): void {
       createdAt: c.createdAt,
       updatedAt: c.updatedAt,
       blocks: c.blocks.map((b) => serializeBlock(toCanvasBlock(b))),
+      documents: (c.documents ?? []).map((d) => ({
+        id: d.id,
+        name: d.name,
+        order: d.order,
+        content: d.content,
+      })),
     })),
   };
 
@@ -63,9 +70,27 @@ export function getProjectMarkdown(data: ExportProjectData): string {
       .map((block) => blockToMarkdown(block))
       .filter((s) => s.trim());
 
-    if (blockSections.length > 0) {
+    const documents = canvas.documents ?? [];
+    const documentSections = documents
+      .map((d) => {
+        const md = documentToMarkdown(d.content);
+        if (!md.trim()) return "";
+        return `### ${d.name}\n\n${md}`;
+      })
+      .filter((s) => s.trim());
+
+    const hasBlocks = blockSections.length > 0;
+    const hasDocuments = documentSections.length > 0;
+
+    if (hasBlocks || hasDocuments) {
       sections.push(`## ${canvas.name}\n\n`);
-      sections.push(blockSections.join("\n\n---\n\n"));
+      if (hasBlocks) {
+        sections.push(blockSections.join("\n\n---\n\n"));
+        if (hasDocuments) sections.push("\n\n");
+      }
+      if (hasDocuments) {
+        sections.push(documentSections.join("\n\n---\n\n"));
+      }
       sections.push("\n\n");
     }
   }
@@ -125,6 +150,12 @@ export async function exportProjectAsZip(data: ExportProjectData): Promise<void>
       createdAt: c.createdAt,
       updatedAt: c.updatedAt,
       blocks: c.blocks.map((b) => serializeBlock(toCanvasBlock(b))),
+      documents: (c.documents ?? []).map((d) => ({
+        id: d.id,
+        name: d.name,
+        order: d.order,
+        content: d.content,
+      })),
     })),
   };
   projectFolder.file(
@@ -135,7 +166,9 @@ export async function exportProjectAsZip(data: ExportProjectData): Promise<void>
   // Add combined project Markdown
   projectFolder.file(`${base}-project.md`, getProjectMarkdown(data));
 
-  // Add per-canvas JSON and Markdown
+  // Add per-canvas JSON, Markdown, and documents folder
+  const documentsFolder = projectFolder.folder("documents");
+
   for (const canvas of data.canvases) {
     const canvasBase = sanitizeFilename(canvas.name);
     const canvasPayload = {
@@ -159,6 +192,12 @@ export async function exportProjectAsZip(data: ExportProjectData): Promise<void>
         updatedAt: canvas.updatedAt,
       },
       blocks: canvas.blocks.map((b) => serializeBlock(toCanvasBlock(b))),
+      documents: (canvas.documents ?? []).map((d) => ({
+        id: d.id,
+        name: d.name,
+        order: d.order,
+        content: d.content,
+      })),
     };
     projectFolder.file(`${canvasBase}.json`, JSON.stringify(canvasPayload, null, 2));
 
@@ -167,9 +206,35 @@ export async function exportProjectAsZip(data: ExportProjectData): Promise<void>
     const blockSections = sorted
       .map((block) => blockToMarkdown(block))
       .filter((s) => s.trim());
+
+    const documents = canvas.documents ?? [];
+    const documentSections = documents
+      .map((d) => {
+        const md = documentToMarkdown(d.content);
+        if (!md.trim()) return "";
+        return `### ${d.name}\n\n${md}`;
+      })
+      .filter((s) => s.trim());
+
     const canvasHeader = `# ${canvas.name}\n\n*Exported from ${data.project.name} • ${new Date().toISOString().slice(0, 10)}*\n\n---\n\n`;
-    const canvasMd = canvasHeader + blockSections.join("\n\n---\n\n");
+    const canvasMd =
+      canvasHeader +
+      (blockSections.length > 0 ? blockSections.join("\n\n---\n\n") : "") +
+      (blockSections.length > 0 && documentSections.length > 0 ? "\n\n" : "") +
+      (documentSections.length > 0 ? documentSections.join("\n\n---\n\n") : "");
     projectFolder.file(`${canvasBase}.md`, canvasMd);
+
+    // Per-document Markdown in documents/{canvasName}/
+    if (documentsFolder && documents.length > 0) {
+      const canvasDocsFolder = documentsFolder.folder(canvasBase);
+      if (canvasDocsFolder) {
+        for (const doc of documents) {
+          const docMd = documentToMarkdown(doc.content);
+          const docBase = sanitizeFilename(doc.name);
+          canvasDocsFolder.file(`${docBase}.md`, docMd.trim() || `*Empty document: ${doc.name}*`);
+        }
+      }
+    }
   }
 
   const blob = await zip.generateAsync({ type: "blob" });

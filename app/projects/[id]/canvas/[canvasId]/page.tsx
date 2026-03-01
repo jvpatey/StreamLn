@@ -7,13 +7,15 @@ import {
   type CanvasTool,
 } from "@/components/ui/projects/canvas/canvas-toolbar";
 import { CanvasWorkspace } from "@/components/ui/projects/canvas/canvas-workspace";
-import { CanvasDocumentEditor } from "@/components/ui/projects/canvas/canvas-document-editor";
+import {
+  CanvasDocumentEditor,
+  type CanvasDocumentEditorHandle,
+} from "@/components/ui/projects/canvas/canvas-document-editor";
 import { CanvasSidebar } from "@/components/ui/projects/canvas/canvas-sidebar";
 import { DocumentSidebar } from "@/components/ui/projects/canvas/document-sidebar";
 import { CanvasFloatingToolbar } from "@/components/ui/projects/canvas/canvas-floating-toolbar";
 import { CanvasHeader } from "@/components/ui/projects/canvas/canvas-header";
 import { CanvasWorkspaceSkeleton } from "@/components/ui/projects/canvas/canvas-workspace-skeleton";
-import { ExportModal } from "@/components/ui/projects/canvas/export-modal";
 import { ShareCanvasModal } from "@/components/ui/projects/canvas/share-canvas-modal";
 import {
   exportCanvasAsPNG,
@@ -179,7 +181,8 @@ export default function ProjectCanvasPage() {
     "canvas",
   );
   const [viewMode, setViewMode] = useState<"edit" | "present">("edit");
-  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
+  const documentEditorRef = useRef<CanvasDocumentEditorHandle | null>(null);
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
   // Canvas tool state (select vs pan)
@@ -1179,7 +1182,31 @@ export default function ProjectCanvasPage() {
         onDocumentRename={handleDocumentRename}
         onDocumentDelete={handleDocumentDelete}
         onDocumentReorder={handleDocumentReorder}
-        onExportClick={() => setExportModalOpen(true)}
+        onExportClick={() => setExportDropdownOpen(true)}
+        blocks={canvasBlocks}
+        onExportPNG={() =>
+          exportCanvasAsPNG(canvasRef.current, project, {
+            id: canvas.id,
+            name: canvas.name,
+            order: canvas.order,
+            projectId: canvas.projectId,
+            createdAt: canvas.createdAt,
+            updatedAt: canvas.updatedAt,
+          })
+        }
+        onExportPDF={() =>
+          exportCanvasAsPDF(canvasRef.current, project, {
+            id: canvas.id,
+            name: canvas.name,
+            order: canvas.order,
+            projectId: canvas.projectId,
+            createdAt: canvas.createdAt,
+            updatedAt: canvas.updatedAt,
+          })
+        }
+        documentEditorRef={documentEditorRef}
+        exportDropdownOpen={exportDropdownOpen}
+        onExportDropdownOpenChange={setExportDropdownOpen}
         onShareClick={() => setShareModalOpen(true)}
         showGrid={showGrid}
         onGridToggle={() => setShowGrid((prev) => !prev)}
@@ -1200,40 +1227,6 @@ export default function ProjectCanvasPage() {
             canvasId={canvas.id}
             projectName={project.name}
             canvasName={canvas.name}
-          />
-          <ExportModal
-            open={exportModalOpen}
-            onOpenChange={setExportModalOpen}
-            project={project}
-            canvas={{
-              id: canvas.id,
-              name: canvas.name,
-              order: canvas.order,
-              projectId: canvas.projectId,
-              createdAt: canvas.createdAt,
-              updatedAt: canvas.updatedAt,
-            }}
-            blocks={canvasBlocks}
-            onExportPNG={() =>
-              exportCanvasAsPNG(canvasRef.current, project, {
-                id: canvas.id,
-                name: canvas.name,
-                order: canvas.order,
-                projectId: canvas.projectId,
-                createdAt: canvas.createdAt,
-                updatedAt: canvas.updatedAt,
-              })
-            }
-            onExportPDF={() =>
-              exportCanvasAsPDF(canvasRef.current, project, {
-                id: canvas.id,
-                name: canvas.name,
-                order: canvas.order,
-                projectId: canvas.projectId,
-                createdAt: canvas.createdAt,
-                updatedAt: canvas.updatedAt,
-              })
-            }
           />
         </>
       )}
@@ -1324,6 +1317,7 @@ export default function ProjectCanvasPage() {
                     className="h-full"
                   >
                 <CanvasDocumentEditor
+                  ref={documentEditorRef}
                   key={currentDocument.id}
                   documentId={currentDocument.id}
                   documentContent={currentDocument.content}

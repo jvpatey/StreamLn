@@ -43,6 +43,11 @@ import { CreateCanvasModal } from "./create-canvas-modal";
 import { CanvasGuideModal } from "./canvas-guide-modal";
 import { CanvasSettingsModal } from "./canvas-settings-modal";
 import { SortableCanvasList, SortableCanvasItem } from "./sortable-canvas-list";
+import {
+  ExportDropdown,
+  type DocumentEditorExportHandle,
+} from "./export-dropdown";
+import type { CanvasBlock } from "@/lib/types/canvas";
 
 function Tooltip({
   children,
@@ -83,6 +88,7 @@ interface CanvasItem {
   id: string;
   name: string;
   order: number;
+  projectId?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -116,7 +122,14 @@ interface CanvasHeaderProps {
   ) => void;
   onDocumentDelete?: (canvasId: string, documentId: string) => void;
   onDocumentReorder?: (reordered: DocumentItem[]) => void;
+  /** Opens export dropdown (e.g. from settings modal) */
   onExportClick?: () => void;
+  blocks?: CanvasBlock[];
+  onExportPNG?: () => void;
+  onExportPDF?: () => void;
+  documentEditorRef?: React.RefObject<DocumentEditorExportHandle | null>;
+  exportDropdownOpen?: boolean;
+  onExportDropdownOpenChange?: (open: boolean) => void;
   onShareClick?: () => void;
   showGrid?: boolean;
   onGridToggle?: () => void;
@@ -148,6 +161,12 @@ export function CanvasHeader({
   onDocumentDelete,
   onDocumentReorder,
   onExportClick,
+  blocks = [],
+  onExportPNG,
+  onExportPDF,
+  documentEditorRef,
+  exportDropdownOpen,
+  onExportDropdownOpenChange,
   onShareClick,
   showGrid = true,
   onGridToggle,
@@ -656,15 +675,35 @@ export function CanvasHeader({
                     <Users size={14} className="mr-2" />
                     Share
                   </LiquidGlassButton>
-                  <LiquidGlassButton
-                    gradient="blue"
-                    size="sm"
-                    className="rounded-xl h-11 px-4 text-xs font-medium flex items-center justify-center"
-                    onClick={onExportClick}
-                  >
-                    <Download size={14} className="mr-2" />
-                    Export
-                  </LiquidGlassButton>
+                  <ExportDropdown
+                    primaryMode={primaryMode}
+                    currentDocument={currentDocument ?? null}
+                    project={project}
+                    canvas={{
+                      id: canvas?.id ?? "",
+                      name: canvas?.name ?? "",
+                      order: canvas?.order ?? 0,
+                      projectId: canvas?.projectId ?? project.id,
+                      createdAt: canvas?.createdAt,
+                      updatedAt: canvas?.updatedAt,
+                    }}
+                    blocks={blocks}
+                    onExportPNG={onExportPNG}
+                    onExportPDF={onExportPDF}
+                    documentEditorRef={documentEditorRef}
+                    open={exportDropdownOpen}
+                    onOpenChange={onExportDropdownOpenChange}
+                    trigger={
+                      <LiquidGlassButton
+                        gradient="blue"
+                        size="sm"
+                        className="rounded-xl h-11 px-4 text-xs font-medium flex items-center justify-center"
+                      >
+                        <Download size={14} className="mr-2" />
+                        Export
+                      </LiquidGlassButton>
+                    }
+                  />
                 </div>
 
                 {/* Theme Toggle - delay theme-dependent UI until mounted to avoid hydration mismatch */}
@@ -836,7 +875,7 @@ export function CanvasHeader({
                         className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                       >
                         <Download size={14} className="mr-2 shrink-0" />
-                        Export Canvas
+                        Export
                       </button>
                       <button
                         type="button"
@@ -907,7 +946,10 @@ export function CanvasHeader({
         lastSavedAt={lastSavedAt ?? null}
         onOpenGuide={() => setGuideOpen(true)}
         onShareClick={onShareClick}
-        onExportClick={onExportClick}
+        onExportClick={() => {
+          setSettingsOpen(false);
+          onExportClick?.();
+        }}
       />
     </>
   );

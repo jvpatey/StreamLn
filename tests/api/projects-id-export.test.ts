@@ -113,6 +113,7 @@ describe("GET /api/projects/[id]/export", () => {
             updatedAt: new Date("2025-01-15T10:02:00.000Z"),
           },
         ],
+        documents: [],
       },
       {
         id: "canvas-2",
@@ -122,6 +123,7 @@ describe("GET /api/projects/[id]/export", () => {
         createdAt: new Date("2025-01-15T10:03:00.000Z"),
         updatedAt: new Date("2025-01-15T10:03:00.000Z"),
         canvasBlocks: [],
+        documents: [],
       },
     ];
 
@@ -169,12 +171,17 @@ describe("GET /api/projects/[id]/export", () => {
     expect(json.canvases[1].name).toBe("Details");
     expect(json.canvases[1].order).toBe(1);
     expect(json.canvases[1].blocks).toEqual([]);
+    expect(json.canvases[0].documents).toEqual([]);
+    expect(json.canvases[1].documents).toEqual([]);
 
     expect(prisma.canvas.findMany).toHaveBeenCalledWith({
       where: { projectId: "proj-1" },
       orderBy: { order: "asc" },
       include: {
         canvasBlocks: {
+          orderBy: { order: "asc" },
+        },
+        documents: {
           orderBy: { order: "asc" },
         },
       },

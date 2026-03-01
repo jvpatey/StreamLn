@@ -42,12 +42,20 @@ const importProjectSchema = z.object({
   status: z.string().default("active"),
 });
 
+const importDocumentSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1).max(200).default("Untitled Document"),
+  order: z.number().int().min(0).default(0),
+  content: z.unknown().optional().nullable(),
+});
+
 const importCanvasSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1).max(200).default("Untitled Canvas"),
   order: z.number().int().min(0).default(0),
   projectId: z.string().optional(),
   blocks: z.array(importBlockSchema).max(500).default([]),
+  documents: z.array(importDocumentSchema).max(100).default([]),
 });
 
 /** Single-canvas export format */
@@ -61,6 +69,7 @@ const singleCanvasPayloadSchema = z.object({
     projectId: z.string().optional(),
   }),
   blocks: z.array(importBlockSchema).max(500).default([]),
+  documents: z.array(importDocumentSchema).max(100).default([]),
   exportedAt: z.string().optional(),
 });
 
@@ -84,10 +93,17 @@ export interface ImportBlock {
   order?: number;
 }
 
+export interface ImportDocument {
+  name: string;
+  order: number;
+  content?: unknown;
+}
+
 export interface ImportCanvas {
   name: string;
   order: number;
   blocks: ImportBlock[];
+  documents?: ImportDocument[];
 }
 
 export interface ImportProjectData {
@@ -161,6 +177,11 @@ export function parseImportPayload(json: string | object): ParseImportResult {
             title: b.title ?? null,
             order: i,
           })),
+          documents: (c.documents ?? []).map((d, i) => ({
+            name: d.name,
+            order: d.order ?? i,
+            content: d.content ?? null,
+          })),
         })),
       },
     };
@@ -196,6 +217,11 @@ export function parseImportPayload(json: string | object): ParseImportResult {
               color: b.color ?? null,
               title: b.title ?? null,
               order: i,
+            })),
+            documents: (result.data.documents ?? []).map((d, i) => ({
+              name: d.name,
+              order: d.order ?? i,
+              content: d.content ?? null,
             })),
           },
         ],

@@ -136,6 +136,9 @@ describe("POST /api/projects/import", () => {
         project: {
           create: vi.fn().mockResolvedValue(createdProject),
         },
+        document: {
+          createMany: vi.fn().mockResolvedValue({ count: 0 }),
+        },
       };
       return fn(tx as any);
     });
@@ -191,6 +194,9 @@ describe("POST /api/projects/import", () => {
       const tx = {
         project: {
           create: vi.fn().mockResolvedValue(createdProject),
+        },
+        document: {
+          createMany: vi.fn().mockResolvedValue({ count: 0 }),
         },
       };
       return fn(tx as any);
