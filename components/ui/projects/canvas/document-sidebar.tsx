@@ -6,10 +6,7 @@ import {
   LiquidGlassSurface,
   getLiquidGlassSurfaceClassName,
 } from "@/components/ui/shared/liquid-glass-surface";
-import {
-  SortableCanvasList,
-  SortableCanvasItem,
-} from "./sortable-canvas-list";
+import { SortableCanvasList, SortableCanvasItem } from "./sortable-canvas-list";
 import { cn } from "@/lib/utils";
 import {
   ChevronRight,
@@ -17,7 +14,6 @@ import {
   FileText,
   LayoutGrid,
   Plus,
-  PanelLeftClose,
   Pencil,
   Trash2,
   Search,
@@ -42,13 +38,20 @@ interface DocumentSidebarProps {
   currentDocumentId: string | null;
   onDocumentSelect: (canvasId: string, documentId: string) => void;
   onDocumentCreate: (canvasId: string) => void;
-  onDocumentRename: (canvasId: string, documentId: string, name: string) => void;
+  onDocumentRename: (
+    canvasId: string,
+    documentId: string,
+    name: string,
+  ) => void;
   onDocumentDelete: (canvasId: string, documentId: string) => void;
   onCanvasCreate: () => void;
   onCanvasRename: (canvasId: string, name: string) => void;
   onCanvasDelete: (canvasId: string) => void;
   onCanvasReorder: (reordered: CanvasWithDocs[]) => void;
-  onDocumentReorder?: (canvasId: string, reordered: Array<{ id: string; name: string; order: number }>) => void;
+  onDocumentReorder?: (
+    canvasId: string,
+    reordered: Array<{ id: string; name: string; order: number }>,
+  ) => void;
   onPrimaryModeChange: (mode: "canvas" | "document") => void;
   recentDocuments: RecentDocument[];
 }
@@ -76,13 +79,15 @@ export function DocumentSidebar({
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCanvases, setExpandedCanvases] = useState<Set<string>>(
-    () => new Set([currentCanvasId])
+    () => new Set([currentCanvasId]),
   );
   const [renameCanvasId, setRenameCanvasId] = useState<string | null>(null);
   const [renameCanvasValue, setRenameCanvasValue] = useState("");
   const [renameDocId, setRenameDocId] = useState<string | null>(null);
   const [renameDocValue, setRenameDocValue] = useState("");
-  const [renameDocCanvasId, setRenameDocCanvasId] = useState<string | null>(null);
+  const [renameDocCanvasId, setRenameDocCanvasId] = useState<string | null>(
+    null,
+  );
 
   const toggleCanvas = (canvasId: string) => {
     setExpandedCanvases((prev) => {
@@ -99,7 +104,7 @@ export function DocumentSidebar({
     return canvases
       .map((c) => {
         const matchingDocs = c.documents.filter((d) =>
-          d.name.toLowerCase().includes(q)
+          d.name.toLowerCase().includes(q),
         );
         const canvasMatches = c.name.toLowerCase().includes(q);
         if (canvasMatches || matchingDocs.length > 0) {
@@ -123,32 +128,34 @@ export function DocumentSidebar({
   const handleDocumentClick = (canvasId: string, documentId: string) => {
     onDocumentSelect(canvasId, documentId);
     if (canvasId !== currentCanvasId) {
-      router.push(`/projects/${projectId}/canvas/${canvasId}?doc=${documentId}`);
+      router.push(
+        `/projects/${projectId}/canvas/${canvasId}?doc=${documentId}`,
+      );
     }
   };
 
   const handleRecentClick = (doc: RecentDocument) => {
     if (doc.projectId !== projectId) {
       router.push(
-        `/projects/${doc.projectId}/canvas/${doc.canvasId}?doc=${doc.documentId}`
+        `/projects/${doc.projectId}/canvas/${doc.canvasId}?doc=${doc.documentId}`,
       );
     } else {
       onDocumentSelect(doc.canvasId, doc.documentId);
       router.push(
-        `/projects/${projectId}/canvas/${doc.canvasId}?doc=${doc.documentId}`
+        `/projects/${projectId}/canvas/${doc.canvasId}?doc=${doc.documentId}`,
       );
     }
   };
 
   const filteredRecent = recentDocuments.filter(
-    (d) => d.projectId === projectId
+    (d) => d.projectId === projectId,
   );
 
   return (
     <div
       className={cn(
         "flex-shrink-0 transition-[width] duration-300 ease-in-out relative",
-        isOpen ? "w-80 overflow-visible z-20" : "w-0 overflow-hidden"
+        isOpen ? "w-80 overflow-visible z-20" : "w-0 overflow-hidden",
       )}
     >
       <div className="w-80 h-full animate-sidebar-enter">
@@ -157,16 +164,6 @@ export function DocumentSidebar({
           intensity="xl"
           className="relative w-80 h-full flex flex-col border-r border-white/30 dark:border-white/15"
         >
-          <button
-            type="button"
-            onClick={onClose}
-            title="Hide sidebar"
-            aria-label="Hide sidebar"
-            className="absolute right-0 top-4 translate-x-full z-[60] cursor-pointer flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 pointer-events-auto"
-          >
-            <PanelLeftClose size={18} aria-hidden />
-          </button>
-
           <div className="flex flex-col h-full overflow-hidden">
             {/* Search */}
             <div className="p-4 pb-2 shrink-0">
@@ -184,7 +181,7 @@ export function DocumentSidebar({
                     "w-full pl-9 pr-8 py-2 text-sm rounded-lg",
                     "bg-white/50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-600/80",
                     "text-slate-700 dark:text-slate-300 placeholder:text-slate-400",
-                    "focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                    "focus:outline-none focus:ring-2 focus:ring-primary-500/50",
                   )}
                 />
                 {searchQuery && (
@@ -232,7 +229,7 @@ export function DocumentSidebar({
                               "rounded-lg px-2 py-1.5 group",
                               isCurrentCanvas
                                 ? "bg-primary/10"
-                                : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
+                                : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
                             )}
                             dragHandleClassName="shrink-0 cursor-grab active:cursor-grabbing p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 opacity-60 hover:opacity-100"
                           >
@@ -256,14 +253,21 @@ export function DocumentSidebar({
                                 }
                                 onKeyDown={(e) => {
                                   if (e.key === "Enter") {
-                                    onCanvasRename(canvas.id, renameCanvasValue.trim() || canvas.name);
+                                    onCanvasRename(
+                                      canvas.id,
+                                      renameCanvasValue.trim() || canvas.name,
+                                    );
                                     setRenameCanvasId(null);
                                   }
-                                  if (e.key === "Escape") setRenameCanvasId(null);
+                                  if (e.key === "Escape")
+                                    setRenameCanvasId(null);
                                 }}
                                 onBlur={() => {
                                   if (renameCanvasValue.trim())
-                                    onCanvasRename(canvas.id, renameCanvasValue.trim());
+                                    onCanvasRename(
+                                      canvas.id,
+                                      renameCanvasValue.trim(),
+                                    );
                                   setRenameCanvasId(null);
                                 }}
                                 autoFocus
@@ -276,7 +280,10 @@ export function DocumentSidebar({
                                   onClick={() => handleCanvasClick(canvas.id)}
                                   className="flex-1 text-left text-sm truncate min-w-0 flex items-center gap-1.5"
                                 >
-                                  <LayoutGrid size={14} className="shrink-0 text-slate-500" />
+                                  <LayoutGrid
+                                    size={14}
+                                    className="shrink-0 text-slate-500"
+                                  />
                                   {canvas.name}
                                 </button>
                                 {onCanvasRename && (
@@ -306,7 +313,8 @@ export function DocumentSidebar({
                           </SortableCanvasItem>
                           {isExpanded && (
                             <div className="ml-6 mt-0.5 space-y-0.5 border-l border-slate-200/50 dark:border-slate-600/50 pl-2">
-                              {onDocumentReorder && canvas.documents.length > 1 ? (
+                              {onDocumentReorder &&
+                              canvas.documents.length > 1 ? (
                                 <SortableCanvasList
                                   canvases={canvas.documents}
                                   onReorder={(reordered) =>
@@ -316,7 +324,8 @@ export function DocumentSidebar({
                                   <div className="space-y-0.5">
                                     {canvas.documents.map((doc) => {
                                       const isCurrent =
-                                        isCurrentCanvas && doc.id === currentDocumentId;
+                                        isCurrentCanvas &&
+                                        doc.id === currentDocumentId;
                                       const isRenaming =
                                         renameDocId === doc.id &&
                                         renameDocCanvasId === canvas.id;
@@ -328,24 +337,30 @@ export function DocumentSidebar({
                                             "rounded-lg px-2 py-1.5 group",
                                             isCurrent
                                               ? "bg-primary/10 text-primary"
-                                              : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
+                                              : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
                                           )}
                                           dragHandleClassName="shrink-0 cursor-grab active:cursor-grabbing p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 opacity-60 hover:opacity-100"
                                         >
-                                          <FileText size={14} className="shrink-0 text-slate-500" />
+                                          <FileText
+                                            size={14}
+                                            className="shrink-0 text-slate-500"
+                                          />
                                           {isRenaming ? (
                                             <input
                                               type="text"
                                               value={renameDocValue}
                                               onChange={(e) =>
-                                                setRenameDocValue(e.target.value)
+                                                setRenameDocValue(
+                                                  e.target.value,
+                                                )
                                               }
                                               onKeyDown={(e) => {
                                                 if (e.key === "Enter") {
                                                   onDocumentRename(
                                                     canvas.id,
                                                     doc.id,
-                                                    renameDocValue.trim() || doc.name
+                                                    renameDocValue.trim() ||
+                                                      doc.name,
                                                   );
                                                   setRenameDocId(null);
                                                   setRenameDocCanvasId(null);
@@ -360,7 +375,7 @@ export function DocumentSidebar({
                                                   onDocumentRename(
                                                     canvas.id,
                                                     doc.id,
-                                                    renameDocValue.trim()
+                                                    renameDocValue.trim(),
                                                   );
                                                 setRenameDocId(null);
                                                 setRenameDocCanvasId(null);
@@ -373,7 +388,10 @@ export function DocumentSidebar({
                                               <button
                                                 type="button"
                                                 onClick={() =>
-                                                  handleDocumentClick(canvas.id, doc.id)
+                                                  handleDocumentClick(
+                                                    canvas.id,
+                                                    doc.id,
+                                                  )
                                                 }
                                                 className="flex-1 text-left text-sm truncate min-w-0"
                                               >
@@ -385,7 +403,9 @@ export function DocumentSidebar({
                                                   onClick={(e) => {
                                                     e.stopPropagation();
                                                     setRenameDocId(doc.id);
-                                                    setRenameDocCanvasId(canvas.id);
+                                                    setRenameDocCanvasId(
+                                                      canvas.id,
+                                                    );
                                                     setRenameDocValue(doc.name);
                                                   }}
                                                   className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
@@ -399,7 +419,10 @@ export function DocumentSidebar({
                                                     type="button"
                                                     onClick={(e) => {
                                                       e.stopPropagation();
-                                                      onDocumentDelete(canvas.id, doc.id);
+                                                      onDocumentDelete(
+                                                        canvas.id,
+                                                        doc.id,
+                                                      );
                                                     }}
                                                     className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
                                                   >
@@ -417,7 +440,8 @@ export function DocumentSidebar({
                                 <>
                                   {canvas.documents.map((doc) => {
                                     const isCurrent =
-                                      isCurrentCanvas && doc.id === currentDocumentId;
+                                      isCurrentCanvas &&
+                                      doc.id === currentDocumentId;
                                     const isRenaming =
                                       renameDocId === doc.id &&
                                       renameDocCanvasId === canvas.id;
@@ -428,10 +452,13 @@ export function DocumentSidebar({
                                           "flex items-center gap-2 rounded-lg px-2 py-1.5 group",
                                           isCurrent
                                             ? "bg-primary/10 text-primary"
-                                            : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
+                                            : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
                                         )}
                                       >
-                                        <FileText size={14} className="shrink-0 text-slate-500" />
+                                        <FileText
+                                          size={14}
+                                          className="shrink-0 text-slate-500"
+                                        />
                                         {isRenaming ? (
                                           <input
                                             type="text"
@@ -444,7 +471,8 @@ export function DocumentSidebar({
                                                 onDocumentRename(
                                                   canvas.id,
                                                   doc.id,
-                                                  renameDocValue.trim() || doc.name
+                                                  renameDocValue.trim() ||
+                                                    doc.name,
                                                 );
                                                 setRenameDocId(null);
                                                 setRenameDocCanvasId(null);
@@ -459,7 +487,7 @@ export function DocumentSidebar({
                                                 onDocumentRename(
                                                   canvas.id,
                                                   doc.id,
-                                                  renameDocValue.trim()
+                                                  renameDocValue.trim(),
                                                 );
                                               setRenameDocId(null);
                                               setRenameDocCanvasId(null);
@@ -472,7 +500,10 @@ export function DocumentSidebar({
                                             <button
                                               type="button"
                                               onClick={() =>
-                                                handleDocumentClick(canvas.id, doc.id)
+                                                handleDocumentClick(
+                                                  canvas.id,
+                                                  doc.id,
+                                                )
                                               }
                                               className="flex-1 text-left text-sm truncate min-w-0"
                                             >
@@ -484,7 +515,9 @@ export function DocumentSidebar({
                                                 onClick={(e) => {
                                                   e.stopPropagation();
                                                   setRenameDocId(doc.id);
-                                                  setRenameDocCanvasId(canvas.id);
+                                                  setRenameDocCanvasId(
+                                                    canvas.id,
+                                                  );
                                                   setRenameDocValue(doc.name);
                                                 }}
                                                 className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
@@ -498,15 +531,18 @@ export function DocumentSidebar({
                                                   type="button"
                                                   onClick={(e) => {
                                                     e.stopPropagation();
-                                                    onDocumentDelete(canvas.id, doc.id);
+                                                    onDocumentDelete(
+                                                      canvas.id,
+                                                      doc.id,
+                                                    );
                                                   }}
                                                   className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
                                                 >
                                                   <Trash2 size={12} />
                                                 </button>
                                               )}
-                                            </>
-                                          )}
+                                          </>
+                                        )}
                                       </div>
                                     );
                                   })}
@@ -539,7 +575,7 @@ export function DocumentSidebar({
                             "flex items-center gap-2 rounded-lg px-2 py-1.5 group",
                             isCurrentCanvas
                               ? "bg-primary/10"
-                              : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
+                              : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
                           )}
                         >
                           <button
@@ -558,7 +594,10 @@ export function DocumentSidebar({
                             onClick={() => handleCanvasClick(canvas.id)}
                             className="flex-1 text-left text-sm truncate min-w-0 flex items-center gap-1.5"
                           >
-                            <LayoutGrid size={14} className="shrink-0 text-slate-500" />
+                            <LayoutGrid
+                              size={14}
+                              className="shrink-0 text-slate-500"
+                            />
                             {canvas.name}
                           </button>
                         </div>
@@ -577,10 +616,13 @@ export function DocumentSidebar({
                                     "flex items-center gap-2 rounded-lg px-2 py-1.5 group",
                                     isCurrent
                                       ? "bg-primary/10 text-primary"
-                                      : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
+                                      : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
                                   )}
                                 >
-                                  <FileText size={14} className="shrink-0 text-slate-500" />
+                                  <FileText
+                                    size={14}
+                                    className="shrink-0 text-slate-500"
+                                  />
                                   {isRenaming ? (
                                     <input
                                       type="text"
@@ -593,7 +635,7 @@ export function DocumentSidebar({
                                           onDocumentRename(
                                             canvas.id,
                                             doc.id,
-                                            renameDocValue.trim() || doc.name
+                                            renameDocValue.trim() || doc.name,
                                           );
                                           setRenameDocId(null);
                                           setRenameDocCanvasId(null);
@@ -608,7 +650,7 @@ export function DocumentSidebar({
                                           onDocumentRename(
                                             canvas.id,
                                             doc.id,
-                                            renameDocValue.trim()
+                                            renameDocValue.trim(),
                                           );
                                         setRenameDocId(null);
                                         setRenameDocCanvasId(null);
@@ -647,7 +689,10 @@ export function DocumentSidebar({
                                             type="button"
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              onDocumentDelete(canvas.id, doc.id);
+                                              onDocumentDelete(
+                                                canvas.id,
+                                                doc.id,
+                                              );
                                             }}
                                             className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
                                           >

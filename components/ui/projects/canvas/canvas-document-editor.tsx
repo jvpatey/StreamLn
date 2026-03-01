@@ -28,6 +28,9 @@ import {
   AlignJustify,
   CheckSquare,
   ChevronDown,
+  PanelLeftClose,
+  PanelLeftOpen,
+  FileText,
 } from "lucide-react";
 import {
   Popover,
@@ -79,16 +82,25 @@ function getInitialContent(documentContent: unknown): DocContent | undefined {
 }
 
 const buttonClass =
-  "p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100 transition-colors flex items-center justify-center";
+  "p-1.5 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100 transition-colors flex items-center justify-center";
 const activeClass =
   "bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-slate-100";
+
+const iconSize = 14;
 
 function FormattingControls({
   editor,
   compact = false,
+  sidebarOpen,
+  onSidebarToggle,
+  sidebarInParent = false,
 }: {
   editor: Editor;
   compact?: boolean;
+  sidebarOpen?: boolean;
+  onSidebarToggle?: () => void;
+  /** When true, parent renders sidebar toggle; these controls are centered */
+  sidebarInParent?: boolean;
 }) {
   const {
     isBold,
@@ -127,20 +139,38 @@ function FormattingControls({
 
   return (
     <div
-      className="flex items-center gap-3 flex-wrap"
+      className="flex items-center gap-1.5 flex-wrap"
       onMouseDown={(e) => e.preventDefault()}
     >
+      {onSidebarToggle != null && !sidebarInParent && (
+        <>
+          <button
+            type="button"
+            onClick={onSidebarToggle}
+            title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+            aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+            className={buttonClass}
+          >
+            {sidebarOpen ? (
+              <PanelLeftClose size={iconSize} aria-hidden />
+            ) : (
+              <PanelLeftOpen size={iconSize} aria-hidden />
+            )}
+          </button>
+          <div className="w-px h-4 bg-slate-200 dark:bg-slate-600 mx-0.5" />
+        </>
+      )}
       {!compact && (
         <>
           <Popover>
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className={cn(buttonClass, "gap-2 min-w-[90px] justify-between px-3")}
+                className={cn(buttonClass, "gap-1.5 min-w-[72px] justify-between px-2 text-xs")}
                 title="Font"
               >
-                <span className="text-sm truncate leading-none">Font</span>
-                <ChevronDown size={20} className="shrink-0 self-center" />
+                <span className="truncate leading-none">Font</span>
+                <ChevronDown size={iconSize} className="shrink-0 self-center" />
               </button>
             </PopoverTrigger>
             <PopoverContent
@@ -169,11 +199,11 @@ function FormattingControls({
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className={cn(buttonClass, "gap-2 min-w-[70px] justify-between px-3")}
+                className={cn(buttonClass, "gap-1.5 min-w-[56px] justify-between px-2 text-xs")}
                 title="Size"
               >
-                <span className="text-sm leading-none">Size</span>
-                <ChevronDown size={20} className="shrink-0 self-center" />
+                <span className="leading-none">Size</span>
+                <ChevronDown size={iconSize} className="shrink-0 self-center" />
               </button>
             </PopoverTrigger>
             <PopoverContent
@@ -197,7 +227,7 @@ function FormattingControls({
               </div>
             </PopoverContent>
           </Popover>
-          <div className="w-px h-5 bg-slate-200 dark:bg-slate-600 mx-1" />
+          <div className="w-px h-4 bg-slate-200 dark:bg-slate-600 mx-0.5" />
       <button
         type="button"
         onClick={() => editor.chain().focus().setTextAlign("left").run()}
@@ -205,7 +235,7 @@ function FormattingControls({
         title="Align left"
         aria-pressed={alignLeft}
       >
-        <AlignLeft size={20} />
+        <AlignLeft size={iconSize} />
       </button>
       <button
         type="button"
@@ -214,7 +244,7 @@ function FormattingControls({
         title="Align center"
         aria-pressed={alignCenter}
       >
-        <AlignCenter size={20} />
+        <AlignCenter size={iconSize} />
       </button>
       <button
         type="button"
@@ -223,7 +253,7 @@ function FormattingControls({
         title="Align right"
         aria-pressed={alignRight}
       >
-        <AlignRight size={20} />
+        <AlignRight size={iconSize} />
       </button>
       <button
         type="button"
@@ -232,9 +262,9 @@ function FormattingControls({
         title="Justify"
         aria-pressed={alignJustify}
       >
-        <AlignJustify size={20} />
+        <AlignJustify size={iconSize} />
           </button>
-          <div className="w-px h-5 bg-slate-200 dark:bg-slate-600 mx-1" />
+          <div className="w-px h-4 bg-slate-200 dark:bg-slate-600 mx-0.5" />
         </>
       )}
       <button
@@ -244,7 +274,7 @@ function FormattingControls({
         title="Heading 1"
         aria-pressed={isHeading1}
       >
-        <Heading1 size={20} />
+        <Heading1 size={iconSize} />
       </button>
       <button
         type="button"
@@ -253,7 +283,7 @@ function FormattingControls({
         title="Heading 2"
         aria-pressed={isHeading2}
       >
-        <Heading2 size={20} />
+        <Heading2 size={iconSize} />
       </button>
       <button
         type="button"
@@ -262,9 +292,9 @@ function FormattingControls({
         title="Heading 3"
         aria-pressed={isHeading3}
       >
-        <Heading3 size={20} />
+        <Heading3 size={iconSize} />
       </button>
-      <div className="w-px h-5 bg-slate-200 dark:bg-slate-600 mx-1" />
+      <div className="w-px h-4 bg-slate-200 dark:bg-slate-600 mx-0.5" />
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleBold().run()}
@@ -272,7 +302,7 @@ function FormattingControls({
         title="Bold"
         aria-pressed={isBold}
       >
-        <Bold size={20} />
+        <Bold size={iconSize} />
       </button>
       <button
         type="button"
@@ -281,7 +311,7 @@ function FormattingControls({
         title="Italic"
         aria-pressed={isItalic}
       >
-        <Italic size={20} />
+        <Italic size={iconSize} />
       </button>
       <button
         type="button"
@@ -290,7 +320,7 @@ function FormattingControls({
         title="Strikethrough"
         aria-pressed={isStrike}
       >
-        <Strikethrough size={20} />
+        <Strikethrough size={iconSize} />
       </button>
       <button
         type="button"
@@ -299,9 +329,9 @@ function FormattingControls({
         title="Code"
         aria-pressed={isCode}
       >
-        <Code size={20} />
+        <Code size={iconSize} />
       </button>
-      <div className="w-px h-5 bg-slate-200 dark:bg-slate-600 mx-1" />
+      <div className="w-px h-4 bg-slate-200 dark:bg-slate-600 mx-0.5" />
       <button
         type="button"
         onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -309,7 +339,7 @@ function FormattingControls({
         title="Bullet list"
         aria-pressed={isBulletList}
       >
-        <List size={20} />
+        <List size={iconSize} />
       </button>
       <button
         type="button"
@@ -318,7 +348,7 @@ function FormattingControls({
         title="Numbered list"
         aria-pressed={isOrderedList}
       >
-        <ListOrdered size={20} />
+        <ListOrdered size={iconSize} />
       </button>
       <button
         type="button"
@@ -327,7 +357,7 @@ function FormattingControls({
         title="Task list"
         aria-pressed={isTaskList}
       >
-        <CheckSquare size={20} />
+        <CheckSquare size={iconSize} />
       </button>
     </div>
   );
@@ -337,11 +367,21 @@ function DocumentFloatingToolbar({ editor }: { editor: Editor }) {
   return <FormattingControls editor={editor} compact />;
 }
 
-function DocumentFormattingToolbar({ editor }: { editor: Editor }) {
+function DocumentFormattingToolbar({
+  editor,
+  documentName,
+  sidebarOpen,
+  onSidebarToggle,
+}: {
+  editor: Editor;
+  documentName?: string;
+  sidebarOpen?: boolean;
+  onSidebarToggle?: () => void;
+}) {
   return (
     <div
       className={cn(
-        "sticky top-0 z-10 flex items-center gap-2 px-6 py-3 min-h-[52px]",
+        "sticky top-0 z-10 flex items-center gap-2 px-4 py-2 min-h-[40px]",
         "border-b border-slate-200 dark:border-slate-700",
         getLiquidGlassSurfaceClassName({
           variant: "toolbar",
@@ -353,8 +393,43 @@ function DocumentFormattingToolbar({ editor }: { editor: Editor }) {
         })
       )}
     >
-      <div className="w-full max-w-5xl mx-auto">
-        <FormattingControls editor={editor} />
+      <div className="w-full max-w-5xl mx-auto flex items-center gap-3">
+        {onSidebarToggle != null && (
+          <>
+            <button
+              type="button"
+              onClick={onSidebarToggle}
+              title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+              aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+              className={buttonClass}
+            >
+              {sidebarOpen ? (
+                <PanelLeftClose size={iconSize} aria-hidden />
+              ) : (
+                <PanelLeftOpen size={iconSize} aria-hidden />
+              )}
+            </button>
+            <div className="w-px h-4 bg-slate-200 dark:bg-slate-600 shrink-0" />
+          </>
+        )}
+        {documentName != null && (
+          <div className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0 min-w-0">
+            <div className="p-1 rounded-md bg-primary/20 dark:bg-primary/30 shrink-0">
+              <FileText size={iconSize} className="text-primary" />
+            </div>
+            <span className="text-sm font-medium text-primary truncate max-w-[160px]">
+              {documentName}
+            </span>
+          </div>
+        )}
+        <div className="flex-1 flex justify-center min-w-0">
+          <FormattingControls
+            editor={editor}
+            sidebarOpen={sidebarOpen}
+            onSidebarToggle={onSidebarToggle}
+            sidebarInParent
+          />
+        </div>
       </div>
     </div>
   );
@@ -363,21 +438,27 @@ function DocumentFormattingToolbar({ editor }: { editor: Editor }) {
 interface CanvasDocumentEditorProps {
   documentId: string;
   documentContent: unknown;
+  documentName?: string;
   projectId: string;
   canvasId: string;
   lastSavedAt: string | null;
   onDocumentSaved: (updatedAt: string) => void;
   onSaveConflict?: () => void;
+  sidebarOpen?: boolean;
+  onSidebarToggle?: () => void;
 }
 
 export function CanvasDocumentEditor({
   documentId,
   documentContent,
+  documentName,
   projectId,
   canvasId,
   lastSavedAt,
   onDocumentSaved,
   onSaveConflict,
+  sidebarOpen,
+  onSidebarToggle,
 }: CanvasDocumentEditorProps) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedAtRef = useRef(lastSavedAt);
@@ -493,7 +574,12 @@ export function CanvasDocumentEditor({
         })
       )}
     >
-      <DocumentFormattingToolbar editor={editor} />
+      <DocumentFormattingToolbar
+        editor={editor}
+        documentName={documentName}
+        sidebarOpen={sidebarOpen}
+        onSidebarToggle={onSidebarToggle}
+      />
       <FloatingMenu
         editor={editor}
         updateDelay={400}

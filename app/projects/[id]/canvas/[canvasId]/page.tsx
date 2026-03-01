@@ -86,7 +86,7 @@ function CanvasToolbarShowTab({
             "flex items-center gap-1.5 px-2.5 py-2 text-xs font-medium transition-colors",
             viewMode === "edit"
               ? "bg-primary/20 text-primary dark:bg-primary/30"
-              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-slate-100"
+              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-slate-100",
           )}
         >
           <Edit3 size={14} />
@@ -100,7 +100,7 @@ function CanvasToolbarShowTab({
             "flex items-center gap-1.5 px-2.5 py-2 text-xs font-medium transition-colors border-l border-slate-200/80 dark:border-slate-600/80",
             viewMode === "present"
               ? "bg-primary/20 text-primary dark:bg-primary/30"
-              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-slate-100"
+              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-slate-100",
           )}
         >
           <Eye size={14} />
@@ -149,7 +149,12 @@ export default function ProjectCanvasPage() {
   const [canvases, setCanvases] = useState<Canvas[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [projectDocuments, setProjectDocuments] = useState<
-    Array<{ id: string; name: string; order: number; documents: Array<{ id: string; name: string; order: number }> }>
+    Array<{
+      id: string;
+      name: string;
+      order: number;
+      documents: Array<{ id: string; name: string; order: number }>;
+    }>
   >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -169,7 +174,9 @@ export default function ProjectCanvasPage() {
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const docParam = searchParams.get("doc");
   const [isToolbarExiting, setIsToolbarExiting] = useState(false);
-  const [primaryMode, setPrimaryMode] = useState<"canvas" | "document">("canvas");
+  const [primaryMode, setPrimaryMode] = useState<"canvas" | "document">(
+    "canvas",
+  );
   const [viewMode, setViewMode] = useState<"edit" | "present">("edit");
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -179,7 +186,8 @@ export default function ProjectCanvasPage() {
 
   // Canvas interaction state
   const [isAddingBlock, setIsAddingBlock] = useState<string | null>(null);
-  const [addingShapeKind, setAddingShapeKind] = useState<ShapeKind>("rectangle");
+  const [addingShapeKind, setAddingShapeKind] =
+    useState<ShapeKind>("rectangle");
   const [showFloatingToolbar, setShowFloatingToolbar] = useState(false);
   const [floatingToolbarPosition, setFloatingToolbarPosition] = useState({
     x: 0,
@@ -227,7 +235,13 @@ export default function ProjectCanvasPage() {
   // Load project, canvas, and blocks
   useEffect(() => {
     const loadProject = async () => {
-      if (!projectId || typeof projectId !== "string" || !canvasId || typeof canvasId !== "string") return;
+      if (
+        !projectId ||
+        typeof projectId !== "string" ||
+        !canvasId ||
+        typeof canvasId !== "string"
+      )
+        return;
 
       setLoading(true);
       setError(null);
@@ -244,7 +258,9 @@ export default function ProjectCanvasPage() {
 
         setCanvases(canvasesList);
 
-        const currentCanvas = canvasesList.find((c: Canvas) => c.id === canvasId);
+        const currentCanvas = canvasesList.find(
+          (c: Canvas) => c.id === canvasId,
+        );
         if (!currentCanvas) throw new Error("Canvas not found");
         setCanvas(currentCanvas);
         const updated = currentCanvas.updatedAt ?? null;
@@ -321,7 +337,7 @@ export default function ProjectCanvasPage() {
     const first = documents[0];
     router.replace(
       `/projects/${projectId}/canvas/${canvasId}?doc=${first.id}`,
-      { scroll: false }
+      { scroll: false },
     );
   }, [primaryMode, docParam, documents, projectId, canvasId, router]);
 
@@ -362,7 +378,13 @@ export default function ProjectCanvasPage() {
 
   // Debounced save (1.5s after last change)
   useEffect(() => {
-    if (!projectId || typeof projectId !== "string" || !canvasId || typeof canvasId !== "string") return;
+    if (
+      !projectId ||
+      typeof projectId !== "string" ||
+      !canvasId ||
+      typeof canvasId !== "string"
+    )
+      return;
     if (skipNextSaveRef.current) return;
 
     const timeout = setTimeout(async () => {
@@ -370,7 +392,7 @@ export default function ProjectCanvasPage() {
         projectId,
         canvasId,
         canvasBlocks,
-        lastSavedAtRef.current ?? undefined
+        lastSavedAtRef.current ?? undefined,
       );
       if (result.ok) {
         lastSavedAtRef.current = result.updatedAt;
@@ -495,8 +517,7 @@ export default function ProjectCanvasPage() {
   const addBlock = (type: string, position: { x: number; y: number }) => {
     const shapeKind = type === "shape" ? addingShapeKind : "rectangle";
     const isLineOrArrow =
-      type === "shape" &&
-      (shapeKind === "line" || shapeKind === "arrow");
+      type === "shape" && (shapeKind === "line" || shapeKind === "arrow");
 
     const newBlock: CanvasBlock = {
       id: generateBlockId(type),
@@ -666,16 +687,23 @@ export default function ProjectCanvasPage() {
     }
   };
 
-  const handleCreateCanvas = useCallback(async (name: string) => {
-    if (!projectId || typeof projectId !== "string") return;
-    try {
-      const newCanvas = await createCanvas(projectId, name.trim() || "Untitled Canvas", canvases.length);
-      setCanvases((prev) => [...prev, newCanvas]);
-      router.push(`/projects/${projectId}/canvas/${newCanvas.id}`);
-    } catch {
-      setError("Failed to create canvas");
-    }
-  }, [projectId, canvases.length, router]);
+  const handleCreateCanvas = useCallback(
+    async (name: string) => {
+      if (!projectId || typeof projectId !== "string") return;
+      try {
+        const newCanvas = await createCanvas(
+          projectId,
+          name.trim() || "Untitled Canvas",
+          canvases.length,
+        );
+        setCanvases((prev) => [...prev, newCanvas]);
+        router.push(`/projects/${projectId}/canvas/${newCanvas.id}`);
+      } catch {
+        setError("Failed to create canvas");
+      }
+    },
+    [projectId, canvases.length, router],
+  );
 
   const handleReorderCanvases = useCallback(
     async (reordered: Canvas[]) => {
@@ -685,14 +713,14 @@ export default function ProjectCanvasPage() {
       try {
         const updated = await reorderCanvases(
           pid,
-          reordered.map((c, i) => ({ id: c.id, order: i }))
+          reordered.map((c, i) => ({ id: c.id, order: i })),
         );
         if (updated.length) setCanvases(updated);
       } catch {
         setError("Failed to reorder canvases");
       }
     },
-    [projectId]
+    [projectId],
   );
 
   const handleRenameCanvas = useCallback(
@@ -701,14 +729,14 @@ export default function ProjectCanvasPage() {
       try {
         const updated = await updateCanvas(projectId, targetCanvasId, { name });
         setCanvases((prev) =>
-          prev.map((c) => (c.id === targetCanvasId ? updated : c))
+          prev.map((c) => (c.id === targetCanvasId ? updated : c)),
         );
         if (canvas?.id === targetCanvasId) setCanvas(updated);
       } catch {
         setError("Failed to rename canvas");
       }
     },
-    [projectId, canvas?.id]
+    [projectId, canvas?.id],
   );
 
   const handleDeleteCanvas = useCallback(
@@ -727,18 +755,19 @@ export default function ProjectCanvasPage() {
         setError("Failed to delete canvas");
       }
     },
-    [projectId, canvas?.id, canvases, router]
+    [projectId, canvas?.id, canvases, router],
   );
 
   const handleDocumentSelect = useCallback(
     (targetCanvasId: string, documentId: string) => {
       if (!projectId || typeof projectId !== "string") return;
       const targetCanvas = canvases.find((c) => c.id === targetCanvasId);
-      const targetDoc = targetCanvasId === canvasId
-        ? documents.find((d) => d.id === documentId)
-        : projectDocuments
-            .find((c) => c.id === targetCanvasId)
-            ?.documents.find((d) => d.id === documentId);
+      const targetDoc =
+        targetCanvasId === canvasId
+          ? documents.find((d) => d.id === documentId)
+          : projectDocuments
+              .find((c) => c.id === targetCanvasId)
+              ?.documents.find((d) => d.id === documentId);
       const docName = targetDoc?.name ?? "Untitled Document";
       const canvasName = targetCanvas?.name ?? "Canvas";
       addDocumentToRecent(
@@ -746,26 +775,31 @@ export default function ProjectCanvasPage() {
         targetCanvasId,
         documentId,
         docName,
-        canvasName
+        canvasName,
       );
       if (targetCanvasId !== canvasId) {
         router.push(
-          `/projects/${projectId}/canvas/${targetCanvasId}?doc=${documentId}`
+          `/projects/${projectId}/canvas/${targetCanvasId}?doc=${documentId}`,
         );
       } else {
         router.replace(
           `/projects/${projectId}/canvas/${canvasId}?doc=${documentId}`,
-          { scroll: false }
+          { scroll: false },
         );
       }
     },
-    [projectId, canvasId, canvases, documents, projectDocuments, router]
+    [projectId, canvasId, canvases, documents, projectDocuments, router],
   );
 
   const handleDocumentCreate = useCallback(
     async (targetCanvasId?: string) => {
       const cid = targetCanvasId ?? canvasId;
-      if (!projectId || typeof projectId !== "string" || !cid || typeof cid !== "string")
+      if (
+        !projectId ||
+        typeof projectId !== "string" ||
+        !cid ||
+        typeof cid !== "string"
+      )
         return;
       try {
         const newDoc = await createDocument(projectId, cid);
@@ -777,19 +811,20 @@ export default function ProjectCanvasPage() {
             c.id === cid
               ? {
                   ...c,
-                  documents: [...c.documents, { id: newDoc.id, name: newDoc.name, order: newDoc.order }],
+                  documents: [
+                    ...c.documents,
+                    { id: newDoc.id, name: newDoc.name, order: newDoc.order },
+                  ],
                 }
-              : c
-          )
+              : c,
+          ),
         );
         if (cid !== canvasId) {
-          router.push(
-            `/projects/${projectId}/canvas/${cid}?doc=${newDoc.id}`
-          );
+          router.push(`/projects/${projectId}/canvas/${cid}?doc=${newDoc.id}`);
         } else {
           router.replace(
             `/projects/${projectId}/canvas/${canvasId}?doc=${newDoc.id}`,
-            { scroll: false }
+            { scroll: false },
           );
         }
         addDocumentToRecent(
@@ -797,13 +832,13 @@ export default function ProjectCanvasPage() {
           cid,
           newDoc.id,
           newDoc.name,
-          canvases.find((c) => c.id === cid)?.name ?? "Canvas"
+          canvases.find((c) => c.id === cid)?.name ?? "Canvas",
         );
       } catch {
         setError("Failed to create document");
       }
     },
-    [projectId, canvasId, canvases, router]
+    [projectId, canvasId, canvases, router],
   );
 
   const handleDocumentRename = useCallback(
@@ -814,11 +849,11 @@ export default function ProjectCanvasPage() {
           projectId,
           targetCanvasId,
           documentId,
-          { name }
+          { name },
         );
         if (targetCanvasId === canvasId) {
           setDocuments((prev) =>
-            prev.map((d) => (d.id === documentId ? updated : d))
+            prev.map((d) => (d.id === documentId ? updated : d)),
           );
         }
         setProjectDocuments((prev) =>
@@ -827,17 +862,17 @@ export default function ProjectCanvasPage() {
               ? {
                   ...c,
                   documents: c.documents.map((d) =>
-                    d.id === documentId ? { ...d, name } : d
+                    d.id === documentId ? { ...d, name } : d,
                   ),
                 }
-              : c
-          )
+              : c,
+          ),
         );
       } catch {
         setError("Failed to rename document");
       }
     },
-    [projectId, canvasId]
+    [projectId, canvasId],
   );
 
   const handleDocumentDelete = useCallback(
@@ -855,18 +890,19 @@ export default function ProjectCanvasPage() {
                   ...c,
                   documents: c.documents.filter((d) => d.id !== documentId),
                 }
-              : c
-          )
+              : c,
+          ),
         );
         if (targetCanvasId === canvasId && docParam === documentId) {
-          const remaining = projectDocuments
-            .find((c) => c.id === targetCanvasId)
-            ?.documents.filter((d) => d.id !== documentId) ?? [];
+          const remaining =
+            projectDocuments
+              .find((c) => c.id === targetCanvasId)
+              ?.documents.filter((d) => d.id !== documentId) ?? [];
           const next = remaining[0];
           if (next) {
             router.replace(
               `/projects/${projectId}/canvas/${canvasId}?doc=${next.id}`,
-              { scroll: false }
+              { scroll: false },
             );
           } else {
             router.replace(`/projects/${projectId}/canvas/${canvasId}`, {
@@ -878,7 +914,7 @@ export default function ProjectCanvasPage() {
         setError("Failed to delete document");
       }
     },
-    [projectId, canvasId, docParam, projectDocuments, router]
+    [projectId, canvasId, docParam, projectDocuments, router],
   );
 
   const handleDocumentReorder = useCallback(
@@ -891,32 +927,44 @@ export default function ProjectCanvasPage() {
         const updated = await reorderDocuments(
           pid,
           cid,
-          reordered.map((d, i) => ({ id: d.id, order: i }))
+          reordered.map((d, i) => ({ id: d.id, order: i })),
         );
         if (updated.length) setDocuments(updated);
       } catch {
         setError("Failed to reorder documents");
       }
     },
-    [projectId, canvasId]
+    [projectId, canvasId],
   );
 
   const handleDocumentReorderForSidebar = useCallback(
-    async (targetCanvasId: string, reordered: Array<{ id: string; name: string; order: number }>) => {
+    async (
+      targetCanvasId: string,
+      reordered: Array<{ id: string; name: string; order: number }>,
+    ) => {
       const pid = typeof projectId === "string" ? projectId : null;
       if (!pid) return;
       const withOrder = reordered.map((d, i) => ({ ...d, order: i }));
       setProjectDocuments((prev) =>
         prev.map((c) =>
-          c.id === targetCanvasId ? { ...c, documents: withOrder } : c
-        )
+          c.id === targetCanvasId ? { ...c, documents: withOrder } : c,
+        ),
       );
       if (targetCanvasId === canvasId) {
         setDocuments((prev) => {
           const byId = new Map(prev.map((d) => [d.id, d]));
           return withOrder.map((d) => {
             const existing = byId.get(d.id);
-            return existing ? { ...existing, order: d.order } : { ...d, canvasId: targetCanvasId, projectId: pid, content: null, createdAt: "", updatedAt: "" } as Document;
+            return existing
+              ? { ...existing, order: d.order }
+              : ({
+                  ...d,
+                  canvasId: targetCanvasId,
+                  projectId: pid,
+                  content: null,
+                  createdAt: "",
+                  updatedAt: "",
+                } as Document);
           });
         });
       }
@@ -924,14 +972,21 @@ export default function ProjectCanvasPage() {
         const updated = await reorderDocuments(
           pid,
           targetCanvasId,
-          withOrder.map((d) => ({ id: d.id, order: d.order }))
+          withOrder.map((d) => ({ id: d.id, order: d.order })),
         );
         setProjectDocuments((prev) =>
           prev.map((c) =>
             c.id === targetCanvasId
-              ? { ...c, documents: updated.map((d, i) => ({ id: d.id, name: d.name, order: i })) }
-              : c
-          )
+              ? {
+                  ...c,
+                  documents: updated.map((d, i) => ({
+                    id: d.id,
+                    name: d.name,
+                    order: i,
+                  })),
+                }
+              : c,
+          ),
         );
         if (targetCanvasId === canvasId && updated.length) {
           setDocuments(updated);
@@ -940,11 +995,17 @@ export default function ProjectCanvasPage() {
         setError("Failed to reorder documents");
       }
     },
-    [projectId, canvasId]
+    [projectId, canvasId],
   );
 
   const handleReloadFromConflict = useCallback(async () => {
-    if (!projectId || typeof projectId !== "string" || !canvasId || typeof canvasId !== "string") return;
+    if (
+      !projectId ||
+      typeof projectId !== "string" ||
+      !canvasId ||
+      typeof canvasId !== "string"
+    )
+      return;
     try {
       const [projectRes, canvasesList, blocks, docs] = await Promise.all([
         fetch(`/api/projects/${projectId}`),
@@ -968,9 +1029,7 @@ export default function ProjectCanvasPage() {
           setLastSavedAt(currentDoc.updatedAt);
         }
       }
-      const currentCanvas = canvasesList.find(
-        (c: Canvas) => c.id === canvasId
-      );
+      const currentCanvas = canvasesList.find((c: Canvas) => c.id === canvasId);
       if (currentCanvas) {
         setCanvas(currentCanvas);
         if (primaryMode !== "document") {
@@ -1025,7 +1084,7 @@ export default function ProjectCanvasPage() {
   const displayCanvases = canvases.length > 0 ? canvases : [placeholderCanvas];
   const currentDocument =
     docParam && documents.length > 0
-      ? documents.find((d) => d.id === docParam) ?? null
+      ? (documents.find((d) => d.id === docParam) ?? null)
       : null;
 
   return (
@@ -1042,9 +1101,7 @@ export default function ProjectCanvasPage() {
         onCanvasReorder={handleReorderCanvases}
         documents={documents}
         currentDocument={currentDocument}
-        onDocumentSelect={(id) =>
-          handleDocumentSelect(canvas?.id ?? "", id)
-        }
+        onDocumentSelect={(id) => handleDocumentSelect(canvas?.id ?? "", id)}
         onDocumentCreate={() => handleDocumentCreate()}
         onDocumentRename={handleDocumentRename}
         onDocumentDelete={handleDocumentDelete}
@@ -1076,35 +1133,35 @@ export default function ProjectCanvasPage() {
             onOpenChange={setExportModalOpen}
             project={project}
             canvas={{
-            id: canvas.id,
-            name: canvas.name,
-            order: canvas.order,
-            projectId: canvas.projectId,
-            createdAt: canvas.createdAt,
-            updatedAt: canvas.updatedAt,
-          }}
-          blocks={canvasBlocks}
-          onExportPNG={() =>
-            exportCanvasAsPNG(canvasRef.current, project, {
               id: canvas.id,
               name: canvas.name,
               order: canvas.order,
               projectId: canvas.projectId,
               createdAt: canvas.createdAt,
               updatedAt: canvas.updatedAt,
-            })
-          }
-          onExportPDF={() =>
-            exportCanvasAsPDF(canvasRef.current, project, {
-              id: canvas.id,
-              name: canvas.name,
-              order: canvas.order,
-              projectId: canvas.projectId,
-              createdAt: canvas.createdAt,
-              updatedAt: canvas.updatedAt,
-            })
-          }
-        />
+            }}
+            blocks={canvasBlocks}
+            onExportPNG={() =>
+              exportCanvasAsPNG(canvasRef.current, project, {
+                id: canvas.id,
+                name: canvas.name,
+                order: canvas.order,
+                projectId: canvas.projectId,
+                createdAt: canvas.createdAt,
+                updatedAt: canvas.updatedAt,
+              })
+            }
+            onExportPDF={() =>
+              exportCanvasAsPDF(canvasRef.current, project, {
+                id: canvas.id,
+                name: canvas.name,
+                order: canvas.order,
+                projectId: canvas.projectId,
+                createdAt: canvas.createdAt,
+                updatedAt: canvas.updatedAt,
+              })
+            }
+          />
         </>
       )}
       {saveConflict && (
@@ -1124,17 +1181,6 @@ export default function ProjectCanvasPage() {
       <div className="flex h-[calc(100vh-64px)] relative">
         {primaryMode === "document" ? (
           <>
-            {!sidebarOpen && (
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(true)}
-                title="Show sidebar"
-                aria-label="Show sidebar"
-                className="absolute left-0 top-4 z-30 flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
-              >
-                <PanelLeftOpen size={18} aria-hidden />
-              </button>
-            )}
             <DocumentSidebar
               isOpen={sidebarOpen}
               onClose={() => setSidebarOpen(false)}
@@ -1156,7 +1202,7 @@ export default function ProjectCanvasPage() {
                 try {
                   const updated = await reorderCanvases(
                     projectId as string,
-                    reordered.map((c, i) => ({ id: c.id, order: i }))
+                    reordered.map((c, i) => ({ id: c.id, order: i })),
                   );
                   if (updated.length) {
                     setCanvases(updated);
@@ -1165,7 +1211,7 @@ export default function ProjectCanvasPage() {
                         ...c,
                         ...updated.find((u) => u.id === c.id),
                         order: i,
-                      }))
+                      })),
                     );
                   }
                 } catch {
@@ -1173,42 +1219,54 @@ export default function ProjectCanvasPage() {
                 }
               }}
               onPrimaryModeChange={setPrimaryMode}
-              recentDocuments={typeof window !== "undefined" ? getRecentDocuments(projectId as string) : []}
+              recentDocuments={
+                typeof window !== "undefined"
+                  ? getRecentDocuments(projectId as string)
+                  : []
+              }
             />
-          <div className="flex-1 relative overflow-hidden">
-            {!loading && project && canvas && currentDocument && (
-              <CanvasDocumentEditor
-                key={currentDocument.id}
-                documentId={currentDocument.id}
-                documentContent={currentDocument.content}
-                projectId={project.id}
-                canvasId={canvas.id}
-                lastSavedAt={lastSavedAt}
-                onDocumentSaved={(updatedAt) => {
-                  lastSavedAtRef.current = updatedAt;
-                  setLastSavedAt(updatedAt);
-                  setDocuments((prev) =>
-                    prev.map((d) =>
-                      d.id === currentDocument.id ? { ...d, updatedAt } : d
-                    )
-                  );
-                }}
-                onSaveConflict={() => setSaveConflict(true)}
-              />
-            )}
-            {!loading && project && canvas && primaryMode === "document" && !currentDocument && documents.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-500 dark:text-slate-400">
-                <p className="text-sm">No documents yet</p>
-                <button
-                  type="button"
-                  onClick={() => handleDocumentCreate()}
-                  className="px-4 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-medium transition-colors"
-                >
-                  Create first document
-                </button>
-              </div>
-            )}
-          </div>
+            <div className="flex-1 relative overflow-hidden">
+              {!loading && project && canvas && currentDocument && (
+                <CanvasDocumentEditor
+                  key={currentDocument.id}
+                  documentId={currentDocument.id}
+                  documentContent={currentDocument.content}
+                  documentName={currentDocument.name}
+                  projectId={project.id}
+                  canvasId={canvas.id}
+                  lastSavedAt={lastSavedAt}
+                  sidebarOpen={sidebarOpen}
+                  onSidebarToggle={() => setSidebarOpen((prev) => !prev)}
+                  onDocumentSaved={(updatedAt) => {
+                    lastSavedAtRef.current = updatedAt;
+                    setLastSavedAt(updatedAt);
+                    setDocuments((prev) =>
+                      prev.map((d) =>
+                        d.id === currentDocument.id ? { ...d, updatedAt } : d,
+                      ),
+                    );
+                  }}
+                  onSaveConflict={() => setSaveConflict(true)}
+                />
+              )}
+              {!loading &&
+                project &&
+                canvas &&
+                primaryMode === "document" &&
+                !currentDocument &&
+                documents.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-500 dark:text-slate-400">
+                    <p className="text-sm">No documents yet</p>
+                    <button
+                      type="button"
+                      onClick={() => handleDocumentCreate()}
+                      className="px-4 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-medium transition-colors"
+                    >
+                      Create first document
+                    </button>
+                  </div>
+                )}
+            </div>
           </>
         ) : (
           <>
@@ -1323,26 +1381,28 @@ export default function ProjectCanvasPage() {
           </>
         )}
       </div>
-      {primaryMode === "canvas" && showFloatingToolbar && selectedBlocks.length > 0 && (
-        <CanvasFloatingToolbar
-          position={floatingToolbarPosition}
-          selectedBlocks={selectedBlocks}
-          canvasBlocks={canvasBlocks}
-          onBlockUpdate={updateBlock}
-          onDelete={(blockIds) => {
-            setCanvasBlocks((prev) =>
-              prev.filter((block) => !blockIds.includes(block.id)),
-            );
-            setSelectedBlocks((prev) =>
-              prev.filter((id) => !blockIds.includes(id)),
-            );
-            setShowFloatingToolbar(false);
-          }}
-          onClose={() => setShowFloatingToolbar(false)}
-          zoomLevel={zoomLevel}
-          panOffset={panOffset}
-        />
-      )}
+      {primaryMode === "canvas" &&
+        showFloatingToolbar &&
+        selectedBlocks.length > 0 && (
+          <CanvasFloatingToolbar
+            position={floatingToolbarPosition}
+            selectedBlocks={selectedBlocks}
+            canvasBlocks={canvasBlocks}
+            onBlockUpdate={updateBlock}
+            onDelete={(blockIds) => {
+              setCanvasBlocks((prev) =>
+                prev.filter((block) => !blockIds.includes(block.id)),
+              );
+              setSelectedBlocks((prev) =>
+                prev.filter((id) => !blockIds.includes(id)),
+              );
+              setShowFloatingToolbar(false);
+            }}
+            onClose={() => setShowFloatingToolbar(false)}
+            zoomLevel={zoomLevel}
+            panOffset={panOffset}
+          />
+        )}
     </div>
   );
 }

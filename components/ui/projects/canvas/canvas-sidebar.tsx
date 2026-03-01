@@ -65,28 +65,70 @@ const BLOCK_CATEGORIES = [
   {
     label: "Content",
     blocks: [
-      { type: "note", label: "Note", description: "Rich text notes with formatting", icon: FileText, color: "#3b82f6" },
-      { type: "text", label: "Text", description: "Short labels and comments", icon: Type, color: "#64748b" },
+      {
+        type: "note",
+        label: "Note",
+        description: "Rich text notes with formatting",
+        icon: FileText,
+        color: "#3b82f6",
+      },
+      {
+        type: "text",
+        label: "Text",
+        description: "Short labels and comments",
+        icon: Type,
+        color: "#64748b",
+      },
     ],
   },
   {
     label: "Organization",
     blocks: [
-      { type: "task-board", label: "Task Board", description: "Kanban-style task management", icon: Kanban, color: "#10b981" },
-      { type: "tag", label: "Tag", description: "Labels and categories", icon: Tag, color: "#ef4444" },
+      {
+        type: "task-board",
+        label: "Task Board",
+        description: "Kanban-style task management",
+        icon: Kanban,
+        color: "#10b981",
+      },
+      {
+        type: "tag",
+        label: "Tag",
+        description: "Labels and categories",
+        icon: Tag,
+        color: "#ef4444",
+      },
     ],
   },
   {
     label: "Media & References",
     blocks: [
-      { type: "image", label: "Image", description: "Images and visual content", icon: Image, color: "#f59e0b" },
-      { type: "link", label: "Link", description: "Web links and references", icon: Link, color: "#06b6d4" },
+      {
+        type: "image",
+        label: "Image",
+        description: "Images and visual content",
+        icon: Image,
+        color: "#f59e0b",
+      },
+      {
+        type: "link",
+        label: "Link",
+        description: "Web links and references",
+        icon: Link,
+        color: "#06b6d4",
+      },
     ],
   },
   {
     label: "Technical",
     blocks: [
-      { type: "code", label: "Code", description: "Code snippets with syntax highlighting", icon: Code2, color: "#8b5cf6" },
+      {
+        type: "code",
+        label: "Code",
+        description: "Code snippets with syntax highlighting",
+        icon: Code2,
+        color: "#8b5cf6",
+      },
     ],
   },
 ] as const;
@@ -94,8 +136,8 @@ const BLOCK_CATEGORIES = [
 type BlockTypeInfo = (typeof BLOCK_CATEGORIES)[number]["blocks"][number];
 
 /** Flattened list for Layers tab lookup (icon, color, label) */
-const ALL_BLOCK_TYPES: BlockTypeInfo[] = BLOCK_CATEGORIES.flatMap((cat) =>
-  [...cat.blocks] as BlockTypeInfo[],
+const ALL_BLOCK_TYPES: BlockTypeInfo[] = BLOCK_CATEGORIES.flatMap(
+  (cat) => [...cat.blocks] as BlockTypeInfo[],
 );
 
 export function CanvasSidebar({
@@ -162,7 +204,9 @@ export function CanvasSidebar({
           {canvasBlocks
             .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
             .map((block) => {
-              const blockType = ALL_BLOCK_TYPES.find((t) => t.type === block.type);
+              const blockType = ALL_BLOCK_TYPES.find(
+                (t) => t.type === block.type,
+              );
               const IconComponent = blockType?.icon || FileText;
               const isSelected = selectedBlocks.includes(block.id);
 
