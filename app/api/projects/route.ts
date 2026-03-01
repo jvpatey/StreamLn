@@ -18,8 +18,16 @@ export async function GET(req: NextRequest) {
         canvases: {
           include: {
             _count: { select: { canvasBlocks: true, documents: true } },
-            documents: { select: { updatedAt: true } },
-            canvasBlocks: { select: { updatedAt: true } },
+            documents: {
+              orderBy: { updatedAt: "desc" },
+              take: 1,
+              select: { updatedAt: true },
+            },
+            canvasBlocks: {
+              orderBy: { updatedAt: "desc" },
+              take: 1,
+              select: { updatedAt: true },
+            },
           },
         },
       },
