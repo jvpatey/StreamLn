@@ -27,7 +27,12 @@ export function ProjectCardMenu({
 }: ProjectCardMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Click-away logic for menu
   useEffect(() => {
@@ -112,7 +117,9 @@ export function ProjectCardMenu({
         </div>
       )}
       {/* Confirmation Dialog - portaled to body to escape overflow clipping */}
-      {createPortal(
+      {mounted &&
+        typeof document !== "undefined" &&
+        createPortal(
           <AnimatePresence>
             {confirmOpen && (
             <motion.div
