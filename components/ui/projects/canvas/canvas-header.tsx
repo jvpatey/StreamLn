@@ -90,6 +90,14 @@ interface CanvasItem {
   updatedAt?: string;
 }
 
+interface DocumentItem {
+  id: string;
+  name: string;
+  order: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface CanvasHeaderProps {
   project: Project;
   canvas?: CanvasItem;
@@ -100,6 +108,13 @@ interface CanvasHeaderProps {
   onCanvasRename?: (canvasId: string, name: string) => void;
   onCanvasDelete?: (canvasId: string) => void;
   onCanvasReorder?: (reordered: CanvasItem[]) => void;
+  documents?: DocumentItem[];
+  currentDocument?: DocumentItem | null;
+  onDocumentSelect?: (documentId: string) => void;
+  onDocumentCreate?: () => void;
+  onDocumentRename?: (documentId: string, name: string) => void;
+  onDocumentDelete?: (documentId: string) => void;
+  onDocumentReorder?: (reordered: DocumentItem[]) => void;
   onExportClick?: () => void;
   onShareClick?: () => void;
   showGrid?: boolean;
@@ -124,6 +139,13 @@ export function CanvasHeader({
   onCanvasRename,
   onCanvasDelete,
   onCanvasReorder,
+  documents = [],
+  currentDocument = null,
+  onDocumentSelect,
+  onDocumentCreate,
+  onDocumentRename,
+  onDocumentDelete,
+  onDocumentReorder,
   onExportClick,
   onShareClick,
   showGrid = true,
@@ -143,6 +165,8 @@ export function CanvasHeader({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [renameCanvasId, setRenameCanvasId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
+  const [renameDocumentId, setRenameDocumentId] = useState<string | null>(null);
+  const [renameDocumentValue, setRenameDocumentValue] = useState("");
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [themeMounted, setThemeMounted] = useState(false);
@@ -196,7 +220,10 @@ export function CanvasHeader({
                 open={canvasSwitcherOpen}
                 onOpenChange={(open) => {
                   setCanvasSwitcherOpen(open);
-                  if (!open) setRenameCanvasId(null);
+                  if (!open) {
+                    setRenameCanvasId(null);
+                    setRenameDocumentId(null);
+                  }
                 }}
               >
                 <PopoverTrigger asChild>
@@ -223,6 +250,14 @@ export function CanvasHeader({
                       <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">
                         {canvas?.name ?? "Canvas"}
                       </span>
+                      {primaryMode === "document" && (
+                        <>
+                          <span className="text-slate-400 dark:text-slate-500 text-xs">/</span>
+                          <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">
+                            {currentDocument?.name ?? "Document"}
+                          </span>
+                        </>
+                      )}
                     </div>
                     <ChevronDown
                       size={14}
@@ -438,6 +473,209 @@ export function CanvasHeader({
                       ))
                     )}
                   </div>
+                  {primaryMode === "document" && (
+                    <div className="p-2 border-t border-slate-200/50 dark:border-slate-700/50">
+                      <p className="px-2 py-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                        Documents
+                      </p>
+                      <div className="space-y-1 max-h-48 overflow-y-auto">
+                        {onDocumentReorder && documents.length > 1 ? (
+                          <SortableCanvasList
+                            canvases={documents}
+                            onReorder={onDocumentReorder}
+                          >
+                            <div className="space-y-1">
+                              {documents.map((d) => (
+                                <SortableCanvasItem
+                                  key={d.id}
+                                  id={d.id}
+                                  className={cn(
+                                    "rounded-lg px-3 py-2 group",
+                                    d.id === currentDocument?.id
+                                      ? "bg-primary/10 text-primary"
+                                      : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                                  )}
+                                  dragHandleClassName="shrink-0 cursor-grab active:cursor-grabbing p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-300 dark:hover:bg-slate-700 touch-none opacity-60 hover:opacity-100"
+                                >
+                                  {renameDocumentId === d.id ? (
+                                    <input
+                                      type="text"
+                                      value={renameDocumentValue}
+                                      onChange={(e) =>
+                                        setRenameDocumentValue(e.target.value)
+                                      }
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                          onDocumentRename?.(
+                                            d.id,
+                                            renameDocumentValue.trim() || d.name
+                                          );
+                                          setRenameDocumentId(null);
+                                        }
+                                        if (e.key === "Escape") {
+                                          setRenameDocumentId(null);
+                                          setRenameDocumentValue(d.name);
+                                        }
+                                      }}
+                                      onBlur={() => {
+                                        if (renameDocumentValue.trim()) {
+                                          onDocumentRename?.(
+                                            d.id,
+                                            renameDocumentValue.trim()
+                                          );
+                                        }
+                                        setRenameDocumentId(null);
+                                      }}
+                                      autoFocus
+                                      className="flex-1 bg-transparent border-none outline-none text-sm min-w-0"
+                                    />
+                                  ) : (
+                                    <>
+                                      <button
+                                        type="button"
+                                        className="flex-1 text-left text-sm truncate min-w-0"
+                                        onClick={() => {
+                                          if (d.id !== currentDocument?.id) {
+                                            onDocumentSelect?.(d.id);
+                                          }
+                                        }}
+                                      >
+                                        {d.name}
+                                      </button>
+                                      {onDocumentRename && (
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setRenameDocumentId(d.id);
+                                            setRenameDocumentValue(d.name);
+                                          }}
+                                          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
+                                          aria-label="Rename document"
+                                        >
+                                          <Pencil size={12} />
+                                        </button>
+                                      )}
+                                      {onDocumentDelete && documents.length > 1 && (
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            onDocumentDelete(d.id);
+                                            setCanvasSwitcherOpen(false);
+                                          }}
+                                          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 dark:text-red-400 shrink-0"
+                                          aria-label="Delete document"
+                                        >
+                                          <Trash2 size={12} />
+                                        </button>
+                                      )}
+                                    </>
+                                  )}
+                                </SortableCanvasItem>
+                              ))}
+                            </div>
+                          </SortableCanvasList>
+                        ) : (
+                          documents.map((d) => (
+                            <div
+                              key={d.id}
+                              className={cn(
+                                "flex items-center gap-2 rounded-lg px-3 py-2 group",
+                                d.id === currentDocument?.id
+                                  ? "bg-primary/10 text-primary"
+                                  : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                              )}
+                            >
+                              {renameDocumentId === d.id ? (
+                                <input
+                                  type="text"
+                                  value={renameDocumentValue}
+                                  onChange={(e) =>
+                                    setRenameDocumentValue(e.target.value)
+                                  }
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      onDocumentRename?.(
+                                        d.id,
+                                        renameDocumentValue.trim() || d.name
+                                      );
+                                      setRenameDocumentId(null);
+                                    }
+                                    if (e.key === "Escape") {
+                                      setRenameDocumentId(null);
+                                      setRenameDocumentValue(d.name);
+                                    }
+                                  }}
+                                  onBlur={() => {
+                                    if (renameDocumentValue.trim()) {
+                                      onDocumentRename?.(
+                                        d.id,
+                                        renameDocumentValue.trim()
+                                      );
+                                    }
+                                    setRenameDocumentId(null);
+                                  }}
+                                  autoFocus
+                                  className="flex-1 bg-transparent border-none outline-none text-sm"
+                                />
+                              ) : (
+                                <>
+                                  <button
+                                    type="button"
+                                    className="flex-1 text-left text-sm truncate"
+                                    onClick={() => {
+                                      if (d.id !== currentDocument?.id) {
+                                        onDocumentSelect?.(d.id);
+                                      }
+                                    }}
+                                  >
+                                    {d.name}
+                                  </button>
+                                  {onDocumentRename && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setRenameDocumentId(d.id);
+                                        setRenameDocumentValue(d.name);
+                                      }}
+                                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700"
+                                      aria-label="Rename document"
+                                    >
+                                      <Pencil size={12} />
+                                    </button>
+                                  )}
+                                  {onDocumentDelete && documents.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        onDocumentDelete(d.id);
+                                        setCanvasSwitcherOpen(false);
+                                      }}
+                                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 dark:text-red-400"
+                                      aria-label="Delete document"
+                                    >
+                                      <Trash2 size={12} />
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                      {onDocumentCreate && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onDocumentCreate();
+                          }}
+                          className="w-full mt-2 flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                        >
+                          <Plus size={14} />
+                          New document
+                        </button>
+                      )}
+                    </div>
+                  )}
                   {onCanvasCreate && (
                     <div className="p-2 border-t border-slate-200/50 dark:border-slate-700/50">
                       <button

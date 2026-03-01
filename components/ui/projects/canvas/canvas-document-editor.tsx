@@ -34,7 +34,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/shared/popover";
-import { saveCanvasDocument } from "@/lib/api/canvas";
+import { saveDocument as saveDocumentApi } from "@/lib/api/canvas";
 import { getLiquidGlassSurfaceClassName } from "@/components/ui/shared/liquid-glass-surface";
 import { cn } from "@/lib/utils";
 
@@ -361,6 +361,7 @@ function DocumentFormattingToolbar({ editor }: { editor: Editor }) {
 }
 
 interface CanvasDocumentEditorProps {
+  documentId: string;
   documentContent: unknown;
   projectId: string;
   canvasId: string;
@@ -370,6 +371,7 @@ interface CanvasDocumentEditorProps {
 }
 
 export function CanvasDocumentEditor({
+  documentId,
   documentContent,
   projectId,
   canvasId,
@@ -428,9 +430,10 @@ export function CanvasDocumentEditor({
   const saveDocument = useCallback(() => {
     if (!editor?.isDestroyed) {
       const json = editor.getJSON();
-      saveCanvasDocument(
+      saveDocumentApi(
         projectId,
         canvasId,
+        documentId,
         json,
         lastSavedAtRef.current ?? undefined
       ).then((result) => {
@@ -442,7 +445,7 @@ export function CanvasDocumentEditor({
         }
       });
     }
-  }, [editor, projectId, canvasId, onDocumentSaved, onSaveConflict]);
+  }, [editor, projectId, canvasId, documentId, onDocumentSaved, onSaveConflict]);
 
   useEffect(() => {
     if (!editor) return;

@@ -9,6 +9,17 @@ export interface Canvas {
   blocksCount?: number;
 }
 
+export interface Document {
+  id: string;
+  canvasId: string;
+  projectId: string;
+  name: string;
+  order: number;
+  content?: unknown | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type CanvasBlockType =
   | "note"
   | "task-board"

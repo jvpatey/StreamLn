@@ -74,6 +74,39 @@ export const createShareTokenSchema = z.object({
   expiresIn: z.number().int().min(1).max(365).optional(),
 });
 
+export const createDocumentSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  order: z.number().int().min(0).optional(),
+});
+
+export const updateDocumentSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  order: z.number().int().min(0).optional(),
+});
+
+export const saveDocumentSchema = z.object({
+  content: z.unknown(),
+  lastSavedAt: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || Number.isFinite(new Date(val).getTime()),
+      { message: "lastSavedAt must be a valid ISO datetime string" }
+    ),
+});
+
+export const reorderDocumentsSchema = z.object({
+  updates: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        order: z.number().int().min(0),
+      })
+    )
+    .min(1)
+    .max(100),
+});
+
 export type CanvasBlockInput = z.infer<typeof canvasBlockSchema>;
 export type SaveCanvasBlocksInput = z.infer<typeof saveCanvasBlocksSchema>;
 export type SaveCanvasDocumentInput = z.infer<typeof saveCanvasDocumentSchema>;
@@ -81,3 +114,7 @@ export type CreateCanvasInput = z.infer<typeof createCanvasSchema>;
 export type UpdateCanvasInput = z.infer<typeof updateCanvasSchema>;
 export type ReorderCanvasesInput = z.infer<typeof reorderCanvasesSchema>;
 export type CreateShareTokenInput = z.infer<typeof createShareTokenSchema>;
+export type CreateDocumentInput = z.infer<typeof createDocumentSchema>;
+export type UpdateDocumentInput = z.infer<typeof updateDocumentSchema>;
+export type SaveDocumentInput = z.infer<typeof saveDocumentSchema>;
+export type ReorderDocumentsInput = z.infer<typeof reorderDocumentsSchema>;
