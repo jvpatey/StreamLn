@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LiquidGlassSurface,
   getLiquidGlassSurfaceClassName,
@@ -20,6 +21,8 @@ import {
   X,
 } from "lucide-react";
 import type { RecentDocument } from "@/lib/recent-documents";
+
+const treeTransition = { duration: 0.2, ease: "easeOut" as const };
 
 interface CanvasWithDocs {
   id: string;
@@ -217,7 +220,7 @@ export function DocumentSidebar({
                   canvases={canvases}
                   onReorder={onCanvasReorder}
                 >
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {canvases.map((canvas) => {
                       const isExpanded = expandedCanvases.has(canvas.id);
                       const isCurrentCanvas = canvas.id === currentCanvasId;
@@ -226,7 +229,7 @@ export function DocumentSidebar({
                           <SortableCanvasItem
                             id={canvas.id}
                             className={cn(
-                              "rounded-lg px-2 py-1.5 group",
+                              "rounded-lg px-2.5 py-2 group transition-colors duration-200",
                               isCurrentCanvas
                                 ? "bg-primary/10"
                                 : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
@@ -236,7 +239,7 @@ export function DocumentSidebar({
                             <button
                               type="button"
                               onClick={() => toggleCanvas(canvas.id)}
-                              className="p-0.5 shrink-0"
+                              className="p-0.5 shrink-0 -ml-0.5"
                             >
                               {isExpanded ? (
                                 <ChevronDown size={14} />
@@ -311,8 +314,15 @@ export function DocumentSidebar({
                               </>
                             )}
                           </SortableCanvasItem>
-                          {isExpanded && (
-                            <div className="ml-6 mt-0.5 space-y-0.5 border-l border-slate-200/50 dark:border-slate-600/50 pl-2">
+                          <AnimatePresence initial={false}>
+                            {isExpanded && (
+                              <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={treeTransition}
+                              >
+                            <div className="ml-6 mt-1 space-y-1 border-l border-slate-200/50 dark:border-slate-600/50 pl-2 overflow-hidden">
                               {onDocumentReorder &&
                               canvas.documents.length > 1 ? (
                                 <SortableCanvasList
@@ -321,7 +331,8 @@ export function DocumentSidebar({
                                     onDocumentReorder(canvas.id, reordered)
                                   }
                                 >
-                                  <div className="space-y-0.5">
+                                  <div className="space-y-1">
+                                    <AnimatePresence>
                                     {canvas.documents.map((doc) => {
                                       const isCurrent =
                                         isCurrentCanvas &&
@@ -330,17 +341,32 @@ export function DocumentSidebar({
                                         renameDocId === doc.id &&
                                         renameDocCanvasId === canvas.id;
                                       return (
+                                        <motion.div
+                                          key={doc.id}
+                                          layout
+                                          initial={{ opacity: 1 }}
+                                          exit={{ opacity: 0, x: -12 }}
+                                          transition={treeTransition}
+                                          className="rounded-lg"
+                                        >
                                         <SortableCanvasItem
                                           key={doc.id}
                                           id={doc.id}
                                           className={cn(
-                                            "rounded-lg px-2 py-1.5 group",
+                                            "relative rounded-lg px-2.5 py-2 group",
                                             isCurrent
-                                              ? "bg-primary/10 text-primary"
+                                              ? "text-primary"
                                               : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
                                           )}
                                           dragHandleClassName="shrink-0 cursor-grab active:cursor-grabbing p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 opacity-60 hover:opacity-100"
                                         >
+                                          {isCurrent && (
+                                            <motion.div
+                                              layoutId={`doc-selection-${canvas.id}`}
+                                              className="absolute inset-0 rounded-lg bg-primary/10 -z-10"
+                                              transition={treeTransition}
+                                            />
+                                          )}
                                           <FileText
                                             size={14}
                                             className="shrink-0 text-slate-500"
@@ -432,12 +458,15 @@ export function DocumentSidebar({
                                             </>
                                           )}
                                         </SortableCanvasItem>
+                                        </motion.div>
                                       );
                                     })}
+                                    </AnimatePresence>
                                   </div>
                                 </SortableCanvasList>
                               ) : (
                                 <>
+                                  <AnimatePresence>
                                   {canvas.documents.map((doc) => {
                                     const isCurrent =
                                       isCurrentCanvas &&
@@ -446,15 +475,26 @@ export function DocumentSidebar({
                                       renameDocId === doc.id &&
                                       renameDocCanvasId === canvas.id;
                                     return (
-                                      <div
+                                      <motion.div
                                         key={doc.id}
+                                        layout
+                                        initial={{ opacity: 1 }}
+                                        exit={{ opacity: 0, x: -12 }}
+                                        transition={treeTransition}
                                         className={cn(
-                                          "flex items-center gap-2 rounded-lg px-2 py-1.5 group",
+                                          "relative flex items-center gap-2 rounded-lg px-2.5 py-2 group",
                                           isCurrent
-                                            ? "bg-primary/10 text-primary"
+                                            ? "text-primary"
                                             : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
                                         )}
                                       >
+                                        {isCurrent && (
+                                          <motion.div
+                                            layoutId={`doc-selection-${canvas.id}`}
+                                            className="absolute inset-0 rounded-lg bg-primary/10 -z-10"
+                                            transition={treeTransition}
+                                          />
+                                        )}
                                         <FileText
                                           size={14}
                                           className="shrink-0 text-slate-500"
@@ -543,28 +583,31 @@ export function DocumentSidebar({
                                               )}
                                           </>
                                         )}
-                                      </div>
+                                      </motion.div>
                                     );
                                   })}
+                            </AnimatePresence>
                                 </>
                               )}
                               <button
                                 type="button"
                                 onClick={() => onDocumentCreate(canvas.id)}
-                                className="w-full flex items-center gap-2 px-2 py-1.5 text-xs text-primary hover:bg-primary/10 rounded-lg"
+                                className="w-full flex items-center gap-2 px-2.5 py-2 mt-2 text-xs text-primary hover:bg-primary/10 rounded-lg"
                               >
                                 <Plus size={12} />
                                 New document
                               </button>
                             </div>
-                          )}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                       );
                     })}
                   </div>
                 </SortableCanvasList>
               ) : (
-                <div className="space-y-0.5">
+                <div className="space-y-1">
                   {filteredCanvases.map((canvas) => {
                     const isExpanded = expandedCanvases.has(canvas.id);
                     const isCurrentCanvas = canvas.id === currentCanvasId;
@@ -572,7 +615,7 @@ export function DocumentSidebar({
                       <div key={canvas.id}>
                         <div
                           className={cn(
-                            "flex items-center gap-2 rounded-lg px-2 py-1.5 group",
+                            "flex items-center gap-2 rounded-lg px-2.5 py-2 group transition-colors duration-200",
                             isCurrentCanvas
                               ? "bg-primary/10"
                               : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
@@ -581,7 +624,7 @@ export function DocumentSidebar({
                           <button
                             type="button"
                             onClick={() => toggleCanvas(canvas.id)}
-                            className="p-0.5 shrink-0"
+                            className="p-0.5 shrink-0 -ml-0.5"
                           >
                             {isExpanded ? (
                               <ChevronDown size={14} />
@@ -601,8 +644,16 @@ export function DocumentSidebar({
                             {canvas.name}
                           </button>
                         </div>
-                        {isExpanded && (
-                          <div className="ml-6 mt-0.5 space-y-0.5 border-l border-slate-200/50 dark:border-slate-600/50 pl-2">
+                        <AnimatePresence initial={false}>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={treeTransition}
+                            >
+                          <div className="ml-6 mt-1 space-y-1 border-l border-slate-200/50 dark:border-slate-600/50 pl-2 overflow-hidden">
+                            <AnimatePresence>
                             {canvas.documents.map((doc) => {
                               const isCurrent =
                                 isCurrentCanvas && doc.id === currentDocumentId;
@@ -610,15 +661,26 @@ export function DocumentSidebar({
                                 renameDocId === doc.id &&
                                 renameDocCanvasId === canvas.id;
                               return (
-                                <div
+                                <motion.div
                                   key={doc.id}
+                                  layout
+                                  initial={{ opacity: 1 }}
+                                  exit={{ opacity: 0, x: -12 }}
+                                  transition={treeTransition}
                                   className={cn(
-                                    "flex items-center gap-2 rounded-lg px-2 py-1.5 group",
+                                    "relative flex items-center gap-2 rounded-lg px-2.5 py-2 group",
                                     isCurrent
-                                      ? "bg-primary/10 text-primary"
+                                      ? "text-primary"
                                       : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
                                   )}
                                 >
+                                  {isCurrent && (
+                                    <motion.div
+                                      layoutId={`doc-selection-${canvas.id}`}
+                                      className="absolute inset-0 rounded-lg bg-primary/10 -z-10"
+                                      transition={treeTransition}
+                                    />
+                                  )}
                                   <FileText
                                     size={14}
                                     className="shrink-0 text-slate-500"
@@ -701,19 +763,22 @@ export function DocumentSidebar({
                                         )}
                                     </>
                                   )}
-                                </div>
+                                </motion.div>
                               );
                             })}
+                            </AnimatePresence>
                             <button
                               type="button"
                               onClick={() => onDocumentCreate(canvas.id)}
-                              className="w-full flex items-center gap-2 px-2 py-1.5 text-xs text-primary hover:bg-primary/10 rounded-lg"
+                              className="w-full flex items-center gap-2 px-2.5 py-2 mt-2 text-xs text-primary hover:bg-primary/10 rounded-lg"
                             >
                               <Plus size={12} />
                               New document
                             </button>
                           </div>
-                        )}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     );
                   })}
@@ -727,13 +792,13 @@ export function DocumentSidebar({
                 <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2">
                   Recent
                 </h3>
-                <div className="space-y-0.5">
+                <div className="space-y-1">
                   {filteredRecent.map((doc) => (
                     <button
                       key={`${doc.canvasId}-${doc.documentId}`}
                       type="button"
                       onClick={() => handleRecentClick(doc)}
-                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-sm hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
+                      className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-sm hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
                     >
                       <FileText size={14} className="shrink-0 text-slate-500" />
                       <span className="truncate">

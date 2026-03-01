@@ -58,7 +58,7 @@ import {
 } from "@/lib/canvas-preferences";
 import type { CanvasBlock, Canvas, Document } from "@/lib/types/canvas";
 import { PanelLeftOpen, PanelTopOpen, Edit3, Eye } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 function CanvasToolbarShowTab({
@@ -1178,10 +1178,21 @@ export default function ProjectCanvasPage() {
           </button>
         </div>
       )}
-      <div className="flex h-[calc(100vh-64px)] relative">
-        {primaryMode === "document" ? (
-          <>
-            <DocumentSidebar
+      <div className="flex h-[calc(100vh-64px)] relative overflow-hidden">
+        <AnimatePresence mode="wait">
+          {primaryMode === "document" ? (
+            <motion.div
+              key="document"
+              className="flex flex-1 h-full min-w-0"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{
+                duration: 0.25,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+            >
+              <DocumentSidebar
               isOpen={sidebarOpen}
               onClose={() => setSidebarOpen(false)}
               projectId={project?.id ?? ""}
@@ -1227,6 +1238,18 @@ export default function ProjectCanvasPage() {
             />
             <div className="flex-1 relative overflow-hidden">
               {!loading && project && canvas && currentDocument && (
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentDocument.id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{
+                      duration: 0.35,
+                      ease: "easeInOut",
+                    }}
+                    className="h-full"
+                  >
                 <CanvasDocumentEditor
                   key={currentDocument.id}
                   documentId={currentDocument.id}
@@ -1248,6 +1271,8 @@ export default function ProjectCanvasPage() {
                   }}
                   onSaveConflict={() => setSaveConflict(true)}
                 />
+                  </motion.div>
+                </AnimatePresence>
               )}
               {!loading &&
                 project &&
@@ -1267,9 +1292,19 @@ export default function ProjectCanvasPage() {
                   </div>
                 )}
             </div>
-          </>
-        ) : (
-          <>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="canvas"
+              className="flex flex-1 h-full min-w-0"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{
+                duration: 0.25,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+            >
             {!sidebarOpen && (
               <button
                 type="button"
@@ -1378,8 +1413,9 @@ export default function ProjectCanvasPage() {
                 />
               )}
             </div>
-          </>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       {primaryMode === "canvas" &&
         showFloatingToolbar &&

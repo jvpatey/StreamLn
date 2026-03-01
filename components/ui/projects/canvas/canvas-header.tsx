@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/shared/button";
 import { LiquidGlassButton } from "@/components/ui/shared/liquid-glass-button";
@@ -200,9 +200,9 @@ export function CanvasHeader({
       <LiquidGlassSurface asChild variant="header" intensity="2xl">
         <header className="animate-navbar-enter">
           <div className="px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16 gap-6 min-w-0">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 gap-4 min-w-0">
               {/* Left section - Back | Project (prominent) | Canvas | Active */}
-              <div className="flex items-center gap-4 min-w-0 shrink">
+              <div className="flex items-center gap-4 min-w-0">
                 <Tooltip content="Back to Projects">
                   <Link href="/projects">
                     <Button
@@ -220,7 +220,16 @@ export function CanvasHeader({
                 <div className="h-11 w-px bg-slate-200 dark:bg-slate-700 shrink-0" />
 
                 {/* Document mode: simplified (Back + project name only) */}
+                <AnimatePresence mode="wait">
                 {primaryMode === "document" ? (
+                  <motion.div
+                    key="document"
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 8 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="flex items-center min-w-0"
+                  >
                   <Link
                     href={`/projects/${project.id}`}
                     className="flex items-center gap-3 h-11 rounded-xl px-4 min-w-0
@@ -243,8 +252,17 @@ export function CanvasHeader({
                     </span>
                     <ProjectStatusBadge status={project.status} size="sm" />
                   </Link>
+                  </motion.div>
                 ) : (
                   /* Canvas mode: full breadcrumb dropdown */
+                  <motion.div
+                    key="canvas"
+                    initial={{ opacity: 0, x: 8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -8 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="flex items-center min-w-0"
+                  >
                   <Popover
                     open={canvasSwitcherOpen}
                     onOpenChange={(open) => {
@@ -553,11 +571,13 @@ export function CanvasHeader({
                       )}
                     </PopoverContent>
                   </Popover>
+                  </motion.div>
                 )}
+                </AnimatePresence>
               </div>
 
-              {/* Center section - Primary mode (Canvas/Document) */}
-              <div className="flex items-center gap-3 shrink-0">
+              {/* Center section - Primary mode (Canvas/Document) - fixed center position */}
+              <div className="flex items-center justify-center">
                 <div
                   role="radiogroup"
                   aria-label="Primary mode"
@@ -581,12 +601,13 @@ export function CanvasHeader({
                       "dark:shadow-[0_8px_32px_rgba(59,130,246,0.15),0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]",
                     )}
                     animate={{
-                      x: primaryMode === "document" ? "calc(100% + 4px)" : 0,
+                      x: primaryMode === "document" ? "calc(100% + 2px)" : 0,
                     }}
                     transition={{
                       type: "spring",
-                      stiffness: 400,
-                      damping: 30,
+                      stiffness: 500,
+                      damping: 35,
+                      mass: 0.8,
                     }}
                   />
                   <button
@@ -595,13 +616,13 @@ export function CanvasHeader({
                     aria-checked={primaryMode === "canvas"}
                     onClick={() => onPrimaryModeChange("canvas")}
                     className={cn(
-                      "relative z-10 text-xs rounded-xl h-9 w-28 flex items-center justify-center font-medium transition-colors duration-200",
+                      "relative z-10 text-xs rounded-xl h-9 w-28 flex items-center justify-center gap-2 font-medium transition-colors duration-200 px-4",
                       primaryMode === "canvas"
                         ? "text-slate-900 dark:text-white"
                         : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100",
                     )}
                   >
-                    <LayoutGrid size={16} className="mr-2" />
+                    <LayoutGrid size={16} className="shrink-0" />
                     Canvas
                   </button>
                   <button
@@ -610,20 +631,20 @@ export function CanvasHeader({
                     aria-checked={primaryMode === "document"}
                     onClick={() => onPrimaryModeChange("document")}
                     className={cn(
-                      "relative z-10 text-xs rounded-xl h-9 w-28 flex items-center justify-center font-medium transition-colors duration-200",
+                      "relative z-10 text-xs rounded-xl h-9 w-28 flex items-center justify-center gap-2 font-medium transition-colors duration-200 px-4",
                       primaryMode === "document"
                         ? "text-slate-900 dark:text-white"
                         : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100",
                     )}
                   >
-                    <FileText size={16} className="mr-2" />
+                    <FileText size={16} className="shrink-0" />
                     Document
                   </button>
                 </div>
               </div>
 
               {/* Right section */}
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2 justify-end">
                 {/* Quick Actions */}
                 <div className="hidden sm:flex items-center gap-2">
                   <LiquidGlassButton
