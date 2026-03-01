@@ -359,6 +359,32 @@ export default function ProjectCanvasPage() {
     }
   }, [primaryMode, docParam, documents, canvas?.updatedAt]);
 
+  // Re-fetch canvas when switching to canvas mode so lastSavedAt is fresh before any save
+  useEffect(() => {
+    if (
+      primaryMode !== "canvas" ||
+      !projectId ||
+      typeof projectId !== "string" ||
+      !canvasId ||
+      typeof canvasId !== "string"
+    )
+      return;
+
+    let cancelled = false;
+    fetchCanvases(projectId).then((canvases) => {
+      if (cancelled) return;
+      const current = canvases.find((c: Canvas) => c.id === canvasId);
+      if (current?.updatedAt) {
+        lastSavedAtRef.current = current.updatedAt;
+        setLastSavedAt(current.updatedAt);
+        setCanvas(current);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [primaryMode, projectId, canvasId]);
+
   // Initialize view state from preferences (client-only)
   useEffect(() => {
     setShowGrid(getDefaultShowGrid());
