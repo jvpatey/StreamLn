@@ -31,6 +31,17 @@ StreamLn combines smart technical notes, visual task boards, and lightweight AI 
 | **Export & Backup** | Export projects as JSON, Markdown, or PDF. Import from backup to restore. |
 | **Presentation Mode** | Share your canvas without editing UI. Focus on your work or walk through plans. |
 
+### Screenshots
+
+![StreamLn screenshot 1](screenshots/streamln1.png)
+![StreamLn screenshot 2](screenshots/streamln2.png)
+![StreamLn screenshot 3](screenshots/streamln3.png)
+![StreamLn screenshot 4](screenshots/streamln4.png)
+![StreamLn screenshot 5](screenshots/streamln5.png)
+![StreamLn screenshot 6](screenshots/streamln6.png)
+![StreamLn screenshot 7](screenshots/streamln7.png)
+![StreamLn screenshot 8](screenshots/streamln8.png)
+
 ---
 
 ## Tech Stack
