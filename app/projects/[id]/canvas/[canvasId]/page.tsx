@@ -38,6 +38,12 @@ import {
   reorderCanvases,
 } from "@/lib/api/canvas";
 import { addProjectToRecent } from "@/lib/recent-projects";
+import {
+  getDefaultShowGrid,
+  getDefaultZoom,
+  getDefaultSidebarOpen,
+  getDefaultToolbarOpen,
+} from "@/lib/canvas-preferences";
 import type { CanvasBlock } from "@/lib/types/canvas";
 import type { Canvas } from "@/lib/types/canvas";
 import { PanelLeftOpen, PanelTopOpen } from "lucide-react";
@@ -95,12 +101,13 @@ export default function ProjectCanvasPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
 
-  // Canvas view state
+  // Canvas view state (initialized from preferences in useEffect)
   const [zoomLevel, setZoomLevel] = useState(1);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [showGrid, setShowGrid] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [toolbarOpen, setToolbarOpen] = useState(true);
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const [isToolbarExiting, setIsToolbarExiting] = useState(false);
   const [viewMode, setViewMode] = useState<"edit" | "present">("edit");
   const [exportModalOpen, setExportModalOpen] = useState(false);
@@ -179,7 +186,9 @@ export default function ProjectCanvasPage() {
         const currentCanvas = canvasesList.find((c: Canvas) => c.id === canvasId);
         if (!currentCanvas) throw new Error("Canvas not found");
         setCanvas(currentCanvas);
-        lastSavedAtRef.current = currentCanvas.updatedAt ?? null;
+        const updated = currentCanvas.updatedAt ?? null;
+        lastSavedAtRef.current = updated;
+        setLastSavedAt(updated);
         setSaveConflict(false);
 
         const blocks = await fetchCanvasBlocks(projectId, canvasId);
@@ -197,6 +206,14 @@ export default function ProjectCanvasPage() {
 
     loadProject();
   }, [projectId, canvasId]);
+
+  // Initialize view state from preferences (client-only)
+  useEffect(() => {
+    setShowGrid(getDefaultShowGrid());
+    setZoomLevel(getDefaultZoom());
+    setSidebarOpen(getDefaultSidebarOpen());
+    setToolbarOpen(getDefaultToolbarOpen());
+  }, []);
 
   // Track project as recently opened
   useEffect(() => {
@@ -219,6 +236,7 @@ export default function ProjectCanvasPage() {
       );
       if (result.ok) {
         lastSavedAtRef.current = result.updatedAt;
+        setLastSavedAt(result.updatedAt);
         setSaveConflict(false);
       } else if ("conflict" in result && result.conflict) {
         setSaveConflict(true);
@@ -579,7 +597,9 @@ export default function ProjectCanvasPage() {
       );
       if (currentCanvas) {
         setCanvas(currentCanvas);
-        lastSavedAtRef.current = currentCanvas.updatedAt ?? null;
+        const updated = currentCanvas.updatedAt ?? null;
+        lastSavedAtRef.current = updated;
+        setLastSavedAt(updated);
       }
       setCanvasBlocks(blocks);
       setSaveConflict(false);
@@ -640,6 +660,15 @@ export default function ProjectCanvasPage() {
         onCanvasReorder={handleReorderCanvases}
         onExportClick={() => setExportModalOpen(true)}
         onShareClick={() => setShareModalOpen(true)}
+        showGrid={showGrid}
+        onGridToggle={() => setShowGrid((prev) => !prev)}
+        zoomLevel={zoomLevel}
+        onZoomChange={setZoomLevel}
+        sidebarOpen={sidebarOpen}
+        onSidebarOpenChange={setSidebarOpen}
+        toolbarOpen={toolbarOpen}
+        onToolbarOpenChange={setToolbarOpen}
+        lastSavedAt={lastSavedAt}
       />
       {!loading && project && canvas && (
         <>
