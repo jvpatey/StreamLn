@@ -150,9 +150,12 @@ export function DocumentSidebar({
     }
   };
 
-  const filteredRecent = recentDocuments.filter(
-    (d) => d.projectId === projectId,
-  );
+  const filteredRecent = recentDocuments.filter((d) => {
+    if (d.projectId !== projectId) return false;
+    const canvas = canvases.find((c) => c.id === d.canvasId);
+    if (!canvas) return false;
+    return canvas.documents.some((doc) => doc.id === d.documentId);
+  });
 
   return (
     <div

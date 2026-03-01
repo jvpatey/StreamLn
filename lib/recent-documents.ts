@@ -57,3 +57,25 @@ export function addDocumentToRecent(
   ].slice(0, MAX_RECENT);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
 }
+
+export function removeDocumentFromRecent(
+  projectId: string,
+  canvasId: string,
+  documentId: string
+): void {
+  if (typeof window === "undefined") return;
+  try {
+    const list = getRecentDocuments();
+    const next = list.filter(
+      (d) =>
+        !(
+          d.projectId === projectId &&
+          d.canvasId === canvasId &&
+          d.documentId === documentId
+        )
+    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    // ignore
+  }
+}

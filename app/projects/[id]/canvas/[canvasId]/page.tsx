@@ -49,6 +49,7 @@ import { addProjectToRecent } from "@/lib/recent-projects";
 import {
   getRecentDocuments,
   addDocumentToRecent,
+  removeDocumentFromRecent,
 } from "@/lib/recent-documents";
 import {
   getDefaultShowGrid,
@@ -880,6 +881,7 @@ export default function ProjectCanvasPage() {
       if (!projectId || typeof projectId !== "string") return;
       try {
         await deleteDocument(projectId, targetCanvasId, documentId);
+        removeDocumentFromRecent(projectId, targetCanvasId, documentId);
         if (targetCanvasId === canvasId) {
           setDocuments((prev) => prev.filter((d) => d.id !== documentId));
         }

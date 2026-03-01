@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { useEditor, EditorContent, useEditorState } from "@tiptap/react";
-import { FloatingMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
+import { ParagraphWithIndent } from "@/lib/tiptap-extensions/paragraph-indent";
 import Placeholder from "@tiptap/extension-placeholder";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-text-style";
@@ -363,10 +363,6 @@ function FormattingControls({
   );
 }
 
-function DocumentFloatingToolbar({ editor }: { editor: Editor }) {
-  return <FormattingControls editor={editor} compact />;
-}
-
 function DocumentFormattingToolbar({
   editor,
   documentName,
@@ -468,7 +464,8 @@ export function CanvasDocumentEditor({
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({ paragraph: false }),
+      ParagraphWithIndent,
       Placeholder.configure({
         placeholder: "Start writing…",
       }),
@@ -494,7 +491,7 @@ export function CanvasDocumentEditor({
           "[&_h1]:text-2xl [&_h1]:font-semibold [&_h1]:text-slate-900 dark:[&_h1]:text-slate-100 [&_h1]:mt-8 [&_h1]:mb-4 [&_h1]:first:mt-0",
           "[&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-slate-900 dark:[&_h2]:text-slate-100 [&_h2]:mt-6 [&_h2]:mb-3",
           "[&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-slate-900 dark:[&_h3]:text-slate-100 [&_h3]:mt-4 [&_h3]:mb-2",
-          "[&_p]:leading-relaxed [&_p]:mb-4",
+          "[&_p]:leading-[1.15] [&_p]:mb-1.5",
           "[&_ul]:my-4 [&_ul]:pl-6 [&_ul]:list-disc [&_li]:my-0.5",
           "[&_ol]:my-4 [&_ol]:pl-6 [&_ol]:list-decimal [&_ol_li]:my-0.5",
           "[&_ul[data-type=taskList]]:list-none [&_ul[data-type=taskList]]:pl-0 [&_ul[data-type=taskList]_li]:flex [&_ul[data-type=taskList]_li]:items-start [&_ul[data-type=taskList]_li]:gap-2 [&_ul[data-type=taskList]_li]:my-1",
@@ -549,11 +546,6 @@ export function CanvasDocumentEditor({
     };
   }, [editor, saveDocument]);
 
-  const handleMenuMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
-
   if (!editor) {
     return (
       <div className="h-full flex items-center justify-center p-8 text-slate-400 dark:text-slate-500 text-sm">
@@ -580,20 +572,6 @@ export function CanvasDocumentEditor({
         sidebarOpen={sidebarOpen}
         onSidebarToggle={onSidebarToggle}
       />
-      <FloatingMenu
-        editor={editor}
-        updateDelay={400}
-        shouldShow={({ editor: ed }) => !ed.isDestroyed}
-        options={{ placement: "top", offset: 8 }}
-        className={cn(
-          "flex items-center rounded-lg border border-slate-200 dark:border-slate-700",
-          "bg-white dark:bg-slate-800 shadow-lg px-1 py-0.5 transition-opacity duration-200"
-        )}
-        onMouseDown={handleMenuMouseDown}
-        onPointerDown={handleMenuMouseDown}
-      >
-        <DocumentFloatingToolbar editor={editor} />
-      </FloatingMenu>
       <EditorContent editor={editor} />
     </div>
   );
