@@ -1,3 +1,6 @@
+-- Enable pgcrypto for gen_random_uuid()
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Migrate existing canvas documentContent to Document rows
 INSERT INTO "Document" (id, "canvasId", "projectId", name, "order", content, "createdAt", "updatedAt")
 SELECT
