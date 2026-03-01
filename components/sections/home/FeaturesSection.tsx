@@ -38,7 +38,7 @@ export default function FeaturesSection() {
       icon: Layers,
       highlight: "Unlimited Space",
       variant: "accent",
-      colSpan: 2,
+      colSpan: 4,
     },
     {
       title: "Document Editor",
@@ -47,7 +47,7 @@ export default function FeaturesSection() {
       icon: FileEdit,
       highlight: "Markdown & PDF",
       variant: "accent",
-      colSpan: 1,
+      colSpan: 4,
     },
     {
       title: "Drag & Drop Everything",
