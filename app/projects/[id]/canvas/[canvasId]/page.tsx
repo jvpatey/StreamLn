@@ -1,17 +1,21 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   CanvasToolbar,
   type CanvasTool,
 } from "@/components/ui/projects/canvas/canvas-toolbar";
 import { CanvasWorkspace } from "@/components/ui/projects/canvas/canvas-workspace";
+import {
+  CanvasDocumentEditor,
+  type CanvasDocumentEditorHandle,
+} from "@/components/ui/projects/canvas/canvas-document-editor";
 import { CanvasSidebar } from "@/components/ui/projects/canvas/canvas-sidebar";
+import { DocumentSidebar } from "@/components/ui/projects/canvas/document-sidebar";
 import { CanvasFloatingToolbar } from "@/components/ui/projects/canvas/canvas-floating-toolbar";
 import { CanvasHeader } from "@/components/ui/projects/canvas/canvas-header";
 import { CanvasWorkspaceSkeleton } from "@/components/ui/projects/canvas/canvas-workspace-skeleton";
-import { ExportModal } from "@/components/ui/projects/canvas/export-modal";
 import { ShareCanvasModal } from "@/components/ui/projects/canvas/share-canvas-modal";
 import {
   exportCanvasAsPNG,
@@ -36,33 +40,86 @@ import {
   updateCanvas,
   deleteCanvas,
   reorderCanvases,
+  fetchDocuments,
+  fetchProjectDocuments,
+  createDocument,
+  updateDocument,
+  deleteDocument,
+  reorderDocuments,
 } from "@/lib/api/canvas";
 import { addProjectToRecent } from "@/lib/recent-projects";
+import {
+  getRecentDocuments,
+  addDocumentToRecent,
+  removeDocumentFromRecent,
+} from "@/lib/recent-documents";
 import {
   getDefaultShowGrid,
   getDefaultZoom,
   getDefaultSidebarOpen,
   getDefaultToolbarOpen,
 } from "@/lib/canvas-preferences";
-import type { CanvasBlock } from "@/lib/types/canvas";
-import type { Canvas } from "@/lib/types/canvas";
-import { PanelLeftOpen, PanelTopOpen } from "lucide-react";
-import { motion } from "framer-motion";
+import type { CanvasBlock, Canvas, Document } from "@/lib/types/canvas";
+import { PanelLeftOpen, PanelTopOpen, Edit3, Eye } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
-function CanvasToolbarShowTab({ onShow }: { onShow: () => void }) {
+function CanvasToolbarShowTab({
+  onShow,
+  viewMode,
+  onViewModeChange,
+}: {
+  onShow: () => void;
+  viewMode: "edit" | "present";
+  onViewModeChange: (mode: "edit" | "present") => void;
+}) {
   return (
-    <motion.button
-      type="button"
-      onClick={onShow}
-      title="Show toolbar"
-      aria-label="Show toolbar"
-      className="absolute top-0 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center p-2 rounded-b-xl border border-t-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-colors text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+    <motion.div
+      className="absolute top-0 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1"
       initial={{ opacity: 0, scale: 0.8, y: -8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
-      <PanelTopOpen size={18} aria-hidden />
-    </motion.button>
+      <div className="flex items-center rounded-b-xl border border-t-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md overflow-hidden">
+        <button
+          type="button"
+          onClick={() => onViewModeChange("edit")}
+          title="Edit mode"
+          className={cn(
+            "flex items-center gap-1.5 px-2.5 py-2 text-xs font-medium transition-colors",
+            viewMode === "edit"
+              ? "bg-primary/20 text-primary dark:bg-primary/30"
+              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-slate-100",
+          )}
+        >
+          <Edit3 size={14} />
+          Edit
+        </button>
+        <button
+          type="button"
+          onClick={() => onViewModeChange("present")}
+          title="View mode"
+          className={cn(
+            "flex items-center gap-1.5 px-2.5 py-2 text-xs font-medium transition-colors border-l border-slate-200/80 dark:border-slate-600/80",
+            viewMode === "present"
+              ? "bg-primary/20 text-primary dark:bg-primary/30"
+              : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-slate-100",
+          )}
+        >
+          <Eye size={14} />
+          View
+        </button>
+      </div>
+      <button
+        type="button"
+        onClick={onShow}
+        title="Show toolbar"
+        aria-label="Show toolbar"
+        className="flex items-center justify-center p-2 rounded-b-xl border border-t-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-colors text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+      >
+        <PanelTopOpen size={18} aria-hidden />
+      </button>
+    </motion.div>
   );
 }
 
@@ -87,11 +144,21 @@ function generateBlockId(type: string): string {
 export default function ProjectCanvasPage() {
   const { id: projectId, canvasId } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Project state
   const [project, setProject] = useState<Project | null>(null);
   const [canvas, setCanvas] = useState<Canvas | null>(null);
   const [canvases, setCanvases] = useState<Canvas[]>([]);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [projectDocuments, setProjectDocuments] = useState<
+    Array<{
+      id: string;
+      name: string;
+      order: number;
+      documents: Array<{ id: string; name: string; order: number }>;
+    }>
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -108,9 +175,14 @@ export default function ProjectCanvasPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [toolbarOpen, setToolbarOpen] = useState(true);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
+  const docParam = searchParams.get("doc");
   const [isToolbarExiting, setIsToolbarExiting] = useState(false);
+  const [primaryMode, setPrimaryMode] = useState<"canvas" | "document">(
+    "canvas",
+  );
   const [viewMode, setViewMode] = useState<"edit" | "present">("edit");
-  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
+  const documentEditorRef = useRef<CanvasDocumentEditorHandle | null>(null);
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
   // Canvas tool state (select vs pan)
@@ -118,7 +190,8 @@ export default function ProjectCanvasPage() {
 
   // Canvas interaction state
   const [isAddingBlock, setIsAddingBlock] = useState<string | null>(null);
-  const [addingShapeKind, setAddingShapeKind] = useState<ShapeKind>("rectangle");
+  const [addingShapeKind, setAddingShapeKind] =
+    useState<ShapeKind>("rectangle");
   const [showFloatingToolbar, setShowFloatingToolbar] = useState(false);
   const [floatingToolbarPosition, setFloatingToolbarPosition] = useState({
     x: 0,
@@ -166,7 +239,13 @@ export default function ProjectCanvasPage() {
   // Load project, canvas, and blocks
   useEffect(() => {
     const loadProject = async () => {
-      if (!projectId || typeof projectId !== "string" || !canvasId || typeof canvasId !== "string") return;
+      if (
+        !projectId ||
+        typeof projectId !== "string" ||
+        !canvasId ||
+        typeof canvasId !== "string"
+      )
+        return;
 
       setLoading(true);
       setError(null);
@@ -183,7 +262,9 @@ export default function ProjectCanvasPage() {
 
         setCanvases(canvasesList);
 
-        const currentCanvas = canvasesList.find((c: Canvas) => c.id === canvasId);
+        const currentCanvas = canvasesList.find(
+          (c: Canvas) => c.id === canvasId,
+        );
         if (!currentCanvas) throw new Error("Canvas not found");
         setCanvas(currentCanvas);
         const updated = currentCanvas.updatedAt ?? null;
@@ -207,6 +288,113 @@ export default function ProjectCanvasPage() {
     loadProject();
   }, [projectId, canvasId]);
 
+  // When landing with ?doc= param, switch to document mode so we show the document editor
+  useEffect(() => {
+    if (docParam && projectId && canvasId) {
+      setPrimaryMode("document");
+    }
+  }, [docParam, projectId, canvasId]);
+
+  // Fetch documents when in document mode (for current canvas)
+  useEffect(() => {
+    if (
+      !projectId ||
+      typeof projectId !== "string" ||
+      !canvasId ||
+      typeof canvasId !== "string" ||
+      primaryMode !== "document"
+    )
+      return;
+
+    const loadDocuments = async () => {
+      try {
+        const docs = await fetchDocuments(projectId, canvasId);
+        setDocuments(docs);
+      } catch {
+        setDocuments([]);
+      }
+    };
+
+    loadDocuments();
+  }, [projectId, canvasId, primaryMode]);
+
+  // Fetch project documents tree when in document mode (for sidebar)
+  useEffect(() => {
+    if (
+      !projectId ||
+      typeof projectId !== "string" ||
+      primaryMode !== "document"
+    )
+      return;
+
+    const loadProjectDocuments = async () => {
+      try {
+        const tree = await fetchProjectDocuments(projectId);
+        setProjectDocuments(tree.canvases);
+      } catch {
+        setProjectDocuments([]);
+      }
+    };
+
+    loadProjectDocuments();
+  }, [projectId, primaryMode]);
+
+  // When switching to document mode: if no doc param and documents exist, select first
+  useEffect(() => {
+    if (primaryMode !== "document" || !projectId || !canvasId) return;
+    if (docParam) return; // Already have a doc selected
+    if (documents.length === 0) return; // No documents yet
+
+    const first = documents[0];
+    router.replace(
+      `/projects/${projectId}/canvas/${canvasId}?doc=${first.id}`,
+      { scroll: false },
+    );
+  }, [primaryMode, docParam, documents, projectId, canvasId, router]);
+
+  // Sync lastSavedAt based on mode (avoids 409 on save)
+  useEffect(() => {
+    if (primaryMode === "document") {
+      const current =
+        docParam && documents.length > 0
+          ? documents.find((d) => d.id === docParam) ?? documents[0]
+          : null;
+      if (current?.updatedAt) {
+        lastSavedAtRef.current = current.updatedAt;
+        setLastSavedAt(current.updatedAt);
+      }
+    } else if (primaryMode === "canvas" && canvas?.updatedAt) {
+      lastSavedAtRef.current = canvas.updatedAt;
+      setLastSavedAt(canvas.updatedAt);
+    }
+  }, [primaryMode, docParam, documents, canvas?.updatedAt]);
+
+  // Re-fetch canvas when switching to canvas mode so lastSavedAt is fresh before any save
+  useEffect(() => {
+    if (
+      primaryMode !== "canvas" ||
+      !projectId ||
+      typeof projectId !== "string" ||
+      !canvasId ||
+      typeof canvasId !== "string"
+    )
+      return;
+
+    let cancelled = false;
+    fetchCanvases(projectId).then((canvases) => {
+      if (cancelled) return;
+      const current = canvases.find((c: Canvas) => c.id === canvasId);
+      if (current?.updatedAt) {
+        lastSavedAtRef.current = current.updatedAt;
+        setLastSavedAt(current.updatedAt);
+        setCanvas(current);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [primaryMode, projectId, canvasId]);
+
   // Initialize view state from preferences (client-only)
   useEffect(() => {
     setShowGrid(getDefaultShowGrid());
@@ -222,9 +410,36 @@ export default function ProjectCanvasPage() {
     }
   }, [projectId]);
 
-  // Debounced save (1.5s after last change)
+  // Track document as recently opened when viewing
   useEffect(() => {
-    if (!projectId || typeof projectId !== "string" || !canvasId || typeof canvasId !== "string") return;
+    const pid = typeof projectId === "string" ? projectId : undefined;
+    const cid = typeof canvasId === "string" ? canvasId : undefined;
+    const docId = typeof docParam === "string" ? docParam : undefined;
+    if (
+      primaryMode === "document" &&
+      pid &&
+      cid &&
+      docId &&
+      canvas &&
+      documents.length > 0
+    ) {
+      const doc = documents.find((d) => d.id === docId);
+      if (doc) {
+        addDocumentToRecent(pid, cid, doc.id, doc.name, canvas.name);
+      }
+    }
+  }, [primaryMode, projectId, canvasId, docParam, canvas?.name, documents]);
+
+  // Debounced save for canvas blocks (only when in canvas mode)
+  useEffect(() => {
+    if (
+      !projectId ||
+      typeof projectId !== "string" ||
+      !canvasId ||
+      typeof canvasId !== "string" ||
+      primaryMode !== "canvas"
+    )
+      return;
     if (skipNextSaveRef.current) return;
 
     const timeout = setTimeout(async () => {
@@ -232,7 +447,7 @@ export default function ProjectCanvasPage() {
         projectId,
         canvasId,
         canvasBlocks,
-        lastSavedAtRef.current ?? undefined
+        lastSavedAtRef.current ?? undefined,
       );
       if (result.ok) {
         lastSavedAtRef.current = result.updatedAt;
@@ -246,11 +461,23 @@ export default function ProjectCanvasPage() {
     }, 1500);
 
     return () => clearTimeout(timeout);
-  }, [projectId, canvasId, canvasBlocks]);
+  }, [projectId, canvasId, canvasBlocks, primaryMode]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "j") {
+        e.preventDefault();
+        const target = e.target as HTMLElement;
+        if (
+          !target.closest("input") &&
+          !target.closest("textarea") &&
+          !target.closest("[contenteditable]")
+        ) {
+          setSidebarOpen((prev) => !prev);
+        }
+        return;
+      }
       if (e.metaKey || e.ctrlKey) {
         switch (e.key) {
           case "=":
@@ -345,8 +572,7 @@ export default function ProjectCanvasPage() {
   const addBlock = (type: string, position: { x: number; y: number }) => {
     const shapeKind = type === "shape" ? addingShapeKind : "rectangle";
     const isLineOrArrow =
-      type === "shape" &&
-      (shapeKind === "line" || shapeKind === "arrow");
+      type === "shape" && (shapeKind === "line" || shapeKind === "arrow");
 
     const newBlock: CanvasBlock = {
       id: generateBlockId(type),
@@ -516,16 +742,23 @@ export default function ProjectCanvasPage() {
     }
   };
 
-  const handleCreateCanvas = useCallback(async (name: string) => {
-    if (!projectId || typeof projectId !== "string") return;
-    try {
-      const newCanvas = await createCanvas(projectId, name.trim() || "Untitled Canvas", canvases.length);
-      setCanvases((prev) => [...prev, newCanvas]);
-      router.push(`/projects/${projectId}/canvas/${newCanvas.id}`);
-    } catch {
-      setError("Failed to create canvas");
-    }
-  }, [projectId, canvases.length, router]);
+  const handleCreateCanvas = useCallback(
+    async (name: string) => {
+      if (!projectId || typeof projectId !== "string") return;
+      try {
+        const newCanvas = await createCanvas(
+          projectId,
+          name.trim() || "Untitled Canvas",
+          canvases.length,
+        );
+        setCanvases((prev) => [...prev, newCanvas]);
+        router.push(`/projects/${projectId}/canvas/${newCanvas.id}`);
+      } catch {
+        setError("Failed to create canvas");
+      }
+    },
+    [projectId, canvases.length, router],
+  );
 
   const handleReorderCanvases = useCallback(
     async (reordered: Canvas[]) => {
@@ -535,14 +768,14 @@ export default function ProjectCanvasPage() {
       try {
         const updated = await reorderCanvases(
           pid,
-          reordered.map((c, i) => ({ id: c.id, order: i }))
+          reordered.map((c, i) => ({ id: c.id, order: i })),
         );
         if (updated.length) setCanvases(updated);
       } catch {
         setError("Failed to reorder canvases");
       }
     },
-    [projectId]
+    [projectId],
   );
 
   const handleRenameCanvas = useCallback(
@@ -551,14 +784,14 @@ export default function ProjectCanvasPage() {
       try {
         const updated = await updateCanvas(projectId, targetCanvasId, { name });
         setCanvases((prev) =>
-          prev.map((c) => (c.id === targetCanvasId ? updated : c))
+          prev.map((c) => (c.id === targetCanvasId ? updated : c)),
         );
         if (canvas?.id === targetCanvasId) setCanvas(updated);
       } catch {
         setError("Failed to rename canvas");
       }
     },
-    [projectId, canvas?.id]
+    [projectId, canvas?.id],
   );
 
   const handleDeleteCanvas = useCallback(
@@ -577,36 +810,316 @@ export default function ProjectCanvasPage() {
         setError("Failed to delete canvas");
       }
     },
-    [projectId, canvas?.id, canvases, router]
+    [projectId, canvas?.id, canvases, router],
+  );
+
+  const handleDocumentSelect = useCallback(
+    (targetCanvasId: string, documentId: string) => {
+      if (!projectId || typeof projectId !== "string") return;
+      const targetCanvas = canvases.find((c) => c.id === targetCanvasId);
+      const targetDoc =
+        targetCanvasId === canvasId
+          ? documents.find((d) => d.id === documentId)
+          : projectDocuments
+              .find((c) => c.id === targetCanvasId)
+              ?.documents.find((d) => d.id === documentId);
+      const docName = targetDoc?.name ?? "Untitled Document";
+      const canvasName = targetCanvas?.name ?? "Canvas";
+      addDocumentToRecent(
+        projectId,
+        targetCanvasId,
+        documentId,
+        docName,
+        canvasName,
+      );
+      if (targetCanvasId !== canvasId) {
+        router.push(
+          `/projects/${projectId}/canvas/${targetCanvasId}?doc=${documentId}`,
+        );
+      } else {
+        router.replace(
+          `/projects/${projectId}/canvas/${canvasId}?doc=${documentId}`,
+          { scroll: false },
+        );
+      }
+    },
+    [projectId, canvasId, canvases, documents, projectDocuments, router],
+  );
+
+  const handleDocumentCreate = useCallback(
+    async (targetCanvasId?: string) => {
+      const cid = targetCanvasId ?? canvasId;
+      if (
+        !projectId ||
+        typeof projectId !== "string" ||
+        !cid ||
+        typeof cid !== "string"
+      )
+        return;
+      try {
+        const newDoc = await createDocument(projectId, cid);
+        if (cid === canvasId) {
+          setDocuments((prev) => [...prev, newDoc]);
+        }
+        setProjectDocuments((prev) =>
+          prev.map((c) =>
+            c.id === cid
+              ? {
+                  ...c,
+                  documents: [
+                    ...c.documents,
+                    { id: newDoc.id, name: newDoc.name, order: newDoc.order },
+                  ],
+                }
+              : c,
+          ),
+        );
+        if (cid !== canvasId) {
+          router.push(`/projects/${projectId}/canvas/${cid}?doc=${newDoc.id}`);
+        } else {
+          router.replace(
+            `/projects/${projectId}/canvas/${canvasId}?doc=${newDoc.id}`,
+            { scroll: false },
+          );
+        }
+        addDocumentToRecent(
+          projectId,
+          cid,
+          newDoc.id,
+          newDoc.name,
+          canvases.find((c) => c.id === cid)?.name ?? "Canvas",
+        );
+      } catch {
+        setError("Failed to create document");
+      }
+    },
+    [projectId, canvasId, canvases, router],
+  );
+
+  const handleDocumentRename = useCallback(
+    async (targetCanvasId: string, documentId: string, name: string) => {
+      if (!projectId || typeof projectId !== "string") return;
+      try {
+        const updated = await updateDocument(
+          projectId,
+          targetCanvasId,
+          documentId,
+          { name },
+        );
+        if (targetCanvasId === canvasId) {
+          setDocuments((prev) =>
+            prev.map((d) => (d.id === documentId ? updated : d)),
+          );
+          if (documentId === docParam && updated.updatedAt) {
+            lastSavedAtRef.current = updated.updatedAt;
+            setLastSavedAt(updated.updatedAt);
+          }
+        }
+        setProjectDocuments((prev) =>
+          prev.map((c) =>
+            c.id === targetCanvasId
+              ? {
+                  ...c,
+                  documents: c.documents.map((d) =>
+                    d.id === documentId ? { ...d, name } : d,
+                  ),
+                }
+              : c,
+          ),
+        );
+      } catch {
+        setError("Failed to rename document");
+      }
+    },
+    [projectId, canvasId],
+  );
+
+  const handleDocumentDelete = useCallback(
+    async (targetCanvasId: string, documentId: string) => {
+      if (!projectId || typeof projectId !== "string") return;
+      try {
+        await deleteDocument(projectId, targetCanvasId, documentId);
+        removeDocumentFromRecent(projectId, targetCanvasId, documentId);
+        if (targetCanvasId === canvasId) {
+          setDocuments((prev) => prev.filter((d) => d.id !== documentId));
+        }
+        setProjectDocuments((prev) =>
+          prev.map((c) =>
+            c.id === targetCanvasId
+              ? {
+                  ...c,
+                  documents: c.documents.filter((d) => d.id !== documentId),
+                }
+              : c,
+          ),
+        );
+        if (targetCanvasId === canvasId && docParam === documentId) {
+          const remaining =
+            projectDocuments
+              .find((c) => c.id === targetCanvasId)
+              ?.documents.filter((d) => d.id !== documentId) ?? [];
+          const next = remaining[0];
+          if (next) {
+            router.replace(
+              `/projects/${projectId}/canvas/${canvasId}?doc=${next.id}`,
+              { scroll: false },
+            );
+          } else {
+            router.replace(`/projects/${projectId}/canvas/${canvasId}`, {
+              scroll: false,
+            });
+          }
+        }
+      } catch {
+        setError("Failed to delete document");
+      }
+    },
+    [projectId, canvasId, docParam, projectDocuments, router],
+  );
+
+  const handleDocumentReorder = useCallback(
+    async (reordered: Document[]) => {
+      const pid = typeof projectId === "string" ? projectId : null;
+      const cid = typeof canvasId === "string" ? canvasId : null;
+      if (!pid || !cid) return;
+      setDocuments(reordered);
+      try {
+        const updated = await reorderDocuments(
+          pid,
+          cid,
+          reordered.map((d, i) => ({ id: d.id, order: i })),
+        );
+        if (updated.length) {
+          setDocuments(updated);
+          const currentDoc = docParam
+            ? updated.find((d) => d.id === docParam)
+            : null;
+          if (currentDoc?.updatedAt) {
+            lastSavedAtRef.current = currentDoc.updatedAt;
+            setLastSavedAt(currentDoc.updatedAt);
+          }
+        }
+      } catch {
+        setError("Failed to reorder documents");
+      }
+    },
+    [projectId, canvasId, docParam],
+  );
+
+  const handleDocumentReorderForSidebar = useCallback(
+    async (
+      targetCanvasId: string,
+      reordered: Array<{ id: string; name: string; order: number }>,
+    ) => {
+      const pid = typeof projectId === "string" ? projectId : null;
+      if (!pid) return;
+      const withOrder = reordered.map((d, i) => ({ ...d, order: i }));
+      setProjectDocuments((prev) =>
+        prev.map((c) =>
+          c.id === targetCanvasId ? { ...c, documents: withOrder } : c,
+        ),
+      );
+      if (targetCanvasId === canvasId) {
+        setDocuments((prev) => {
+          const byId = new Map(prev.map((d) => [d.id, d]));
+          return withOrder.map((d) => {
+            const existing = byId.get(d.id);
+            return existing
+              ? { ...existing, order: d.order }
+              : ({
+                  ...d,
+                  canvasId: targetCanvasId,
+                  projectId: pid,
+                  content: null,
+                  createdAt: "",
+                  updatedAt: "",
+                } as Document);
+          });
+        });
+      }
+      try {
+        const updated = await reorderDocuments(
+          pid,
+          targetCanvasId,
+          withOrder.map((d) => ({ id: d.id, order: d.order })),
+        );
+        setProjectDocuments((prev) =>
+          prev.map((c) =>
+            c.id === targetCanvasId
+              ? {
+                  ...c,
+                  documents: updated.map((d, i) => ({
+                    id: d.id,
+                    name: d.name,
+                    order: i,
+                  })),
+                }
+              : c,
+          ),
+        );
+        if (targetCanvasId === canvasId && updated.length) {
+          setDocuments(updated);
+          const currentDoc = docParam
+            ? updated.find((d) => d.id === docParam)
+            : null;
+          if (currentDoc?.updatedAt) {
+            lastSavedAtRef.current = currentDoc.updatedAt;
+            setLastSavedAt(currentDoc.updatedAt);
+          }
+        }
+      } catch {
+        setError("Failed to reorder documents");
+      }
+    },
+    [projectId, canvasId, docParam],
   );
 
   const handleReloadFromConflict = useCallback(async () => {
-    if (!projectId || typeof projectId !== "string" || !canvasId || typeof canvasId !== "string") return;
+    if (
+      !projectId ||
+      typeof projectId !== "string" ||
+      !canvasId ||
+      typeof canvasId !== "string"
+    )
+      return;
     try {
-      const [projectRes, canvasesList, blocks] = await Promise.all([
+      const [projectRes, canvasesList, blocks, docs] = await Promise.all([
         fetch(`/api/projects/${projectId}`),
         fetchCanvases(projectId),
         fetchCanvasBlocks(projectId, canvasId),
+        primaryMode === "document"
+          ? fetchDocuments(projectId, canvasId)
+          : Promise.resolve([]),
       ]);
       if (!projectRes.ok) throw new Error("Failed to reload");
       const projectData = await projectRes.json();
       setProject(projectData);
       setCanvases(canvasesList);
-      const currentCanvas = canvasesList.find(
-        (c: Canvas) => c.id === canvasId
-      );
+      if (primaryMode === "document") {
+        setDocuments(docs);
+        const currentDoc = docParam
+          ? docs.find((d: Document) => d.id === docParam)
+          : docs[0];
+        if (currentDoc) {
+          lastSavedAtRef.current = currentDoc.updatedAt;
+          setLastSavedAt(currentDoc.updatedAt);
+        }
+      }
+      const currentCanvas = canvasesList.find((c: Canvas) => c.id === canvasId);
       if (currentCanvas) {
         setCanvas(currentCanvas);
-        const updated = currentCanvas.updatedAt ?? null;
-        lastSavedAtRef.current = updated;
-        setLastSavedAt(updated);
+        if (primaryMode !== "document") {
+          const updated = currentCanvas.updatedAt ?? null;
+          lastSavedAtRef.current = updated;
+          setLastSavedAt(updated);
+        }
       }
       setCanvasBlocks(blocks);
       setSaveConflict(false);
     } catch {
       setError("Failed to reload canvas");
     }
-  }, [projectId, canvasId]);
+  }, [projectId, canvasId, primaryMode, docParam]);
 
   if (!loading && (error || !project || !canvas)) {
     return (
@@ -645,6 +1158,10 @@ export default function ProjectCanvasPage() {
   const displayProject = project ?? placeholderProject;
   const displayCanvas = canvas ?? placeholderCanvas;
   const displayCanvases = canvases.length > 0 ? canvases : [placeholderCanvas];
+  const currentDocument =
+    docParam && documents.length > 0
+      ? (documents.find((d) => d.id === docParam) ?? null)
+      : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden">
@@ -652,13 +1169,44 @@ export default function ProjectCanvasPage() {
         project={displayProject}
         canvas={displayCanvas}
         canvases={displayCanvases}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
+        primaryMode={primaryMode}
+        onPrimaryModeChange={setPrimaryMode}
         onCanvasCreate={handleCreateCanvas}
         onCanvasRename={handleRenameCanvas}
         onCanvasDelete={handleDeleteCanvas}
         onCanvasReorder={handleReorderCanvases}
-        onExportClick={() => setExportModalOpen(true)}
+        documents={documents}
+        currentDocument={currentDocument}
+        onDocumentSelect={(id) => handleDocumentSelect(canvas?.id ?? "", id)}
+        onDocumentCreate={() => handleDocumentCreate()}
+        onDocumentRename={handleDocumentRename}
+        onDocumentDelete={handleDocumentDelete}
+        onDocumentReorder={handleDocumentReorder}
+        onExportClick={() => setExportDropdownOpen(true)}
+        blocks={canvasBlocks}
+        onExportPNG={() =>
+          exportCanvasAsPNG(canvasRef.current, project, {
+            id: canvas.id,
+            name: canvas.name,
+            order: canvas.order,
+            projectId: canvas.projectId,
+            createdAt: canvas.createdAt,
+            updatedAt: canvas.updatedAt,
+          })
+        }
+        onExportPDF={() =>
+          exportCanvasAsPDF(canvasRef.current, project, {
+            id: canvas.id,
+            name: canvas.name,
+            order: canvas.order,
+            projectId: canvas.projectId,
+            createdAt: canvas.createdAt,
+            updatedAt: canvas.updatedAt,
+          })
+        }
+        documentEditorRef={documentEditorRef}
+        exportDropdownOpen={exportDropdownOpen}
+        onExportDropdownOpenChange={setExportDropdownOpen}
         onShareClick={() => setShareModalOpen(true)}
         showGrid={showGrid}
         onGridToggle={() => setShowGrid((prev) => !prev)}
@@ -680,40 +1228,6 @@ export default function ProjectCanvasPage() {
             projectName={project.name}
             canvasName={canvas.name}
           />
-          <ExportModal
-            open={exportModalOpen}
-            onOpenChange={setExportModalOpen}
-            project={project}
-            canvas={{
-            id: canvas.id,
-            name: canvas.name,
-            order: canvas.order,
-            projectId: canvas.projectId,
-            createdAt: canvas.createdAt,
-            updatedAt: canvas.updatedAt,
-          }}
-          blocks={canvasBlocks}
-          onExportPNG={() =>
-            exportCanvasAsPNG(canvasRef.current, project, {
-              id: canvas.id,
-              name: canvas.name,
-              order: canvas.order,
-              projectId: canvas.projectId,
-              createdAt: canvas.createdAt,
-              updatedAt: canvas.updatedAt,
-            })
-          }
-          onExportPDF={() =>
-            exportCanvasAsPDF(canvasRef.current, project, {
-              id: canvas.id,
-              name: canvas.name,
-              order: canvas.order,
-              projectId: canvas.projectId,
-              createdAt: canvas.createdAt,
-              updatedAt: canvas.updatedAt,
-            })
-          }
-        />
         </>
       )}
       {saveConflict && (
@@ -730,130 +1244,279 @@ export default function ProjectCanvasPage() {
           </button>
         </div>
       )}
-      <div className="flex h-[calc(100vh-64px)] relative">
-        {!sidebarOpen && (
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(true)}
-            title="Show sidebar"
-            aria-label="Show sidebar"
-            className="absolute left-0 top-4 z-30 flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
-          >
-            <PanelLeftOpen size={18} aria-hidden />
-          </button>
-        )}
-        <CanvasSidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onAddBlock={
-            loading
-              ? () => {}
-              : (type, position) => {
-                  setIsAddingBlock(type);
-                  const canvasCenter = {
-                    x: (window.innerWidth / 2 - panOffset.x) / zoomLevel,
-                    y: (window.innerHeight / 2 - panOffset.y) / zoomLevel,
-                  };
-                  addBlock(type, position || canvasCenter);
+      <div className="flex h-[calc(100vh-64px)] relative overflow-hidden">
+        <AnimatePresence mode="wait">
+          {primaryMode === "document" ? (
+            <motion.div
+              key="document"
+              className="flex flex-1 h-full min-w-0"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{
+                duration: 0.25,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+            >
+              <DocumentSidebar
+              isOpen={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              projectId={project?.id ?? ""}
+              projectName={project?.name ?? ""}
+              canvases={projectDocuments}
+              currentCanvasId={canvas?.id ?? ""}
+              currentDocumentId={docParam}
+              onDocumentSelect={handleDocumentSelect}
+              onDocumentCreate={handleDocumentCreate}
+              onDocumentRename={handleDocumentRename}
+              onDocumentDelete={handleDocumentDelete}
+              onDocumentReorder={handleDocumentReorderForSidebar}
+              onCanvasCreate={() => handleCreateCanvas("Untitled Canvas")}
+              onCanvasRename={handleRenameCanvas}
+              onCanvasDelete={handleDeleteCanvas}
+              onCanvasReorder={async (reordered) => {
+                setProjectDocuments(reordered);
+                try {
+                  const updated = await reorderCanvases(
+                    projectId as string,
+                    reordered.map((c, i) => ({ id: c.id, order: i })),
+                  );
+                  if (updated.length) {
+                    setCanvases(updated);
+                    setProjectDocuments(
+                      reordered.map((c, i) => ({
+                        ...c,
+                        ...updated.find((u) => u.id === c.id),
+                        order: i,
+                      })),
+                    );
+                  }
+                } catch {
+                  setError("Failed to reorder canvases");
                 }
-          }
-          selectedBlocks={selectedBlocks}
-          canvasBlocks={canvasBlocks}
-          onBlockUpdate={updateBlock}
-          onBlockSelect={setSelectedBlocks}
-        />
-        <div className="flex-1 relative overflow-hidden">
-          {!toolbarOpen && !isToolbarExiting && (
-            <CanvasToolbarShowTab onShow={() => setToolbarOpen(true)} />
-          )}
-          {(toolbarOpen || isToolbarExiting) && (
-            <CanvasToolbar
-              tool={activeTool}
-              onToolChange={(newTool) => {
-                setActiveTool(newTool);
-                if (newTool === "text") setIsAddingBlock("text");
-                else if (newTool === "shape") setIsAddingBlock("shape");
-                else setIsAddingBlock(null);
               }}
-              onAddShape={(shapeKind) => {
-                setAddingShapeKind(shapeKind);
-                setActiveTool("shape");
-                setIsAddingBlock("shape");
-              }}
-              zoomLevel={zoomLevel}
-              onZoomChange={setZoomLevel}
-              showGrid={showGrid}
-              onGridToggle={() => setShowGrid(!showGrid)}
-              onResetView={() => {
-                setZoomLevel(1);
-                setPanOffset({ x: 0, y: 0 });
-              }}
-              onFitToView={handleFitToView}
-              onToolbarToggle={() => setIsToolbarExiting(true)}
-              onToolbarExitComplete={() => {
-                setToolbarOpen(false);
-                setIsToolbarExiting(false);
-              }}
-              isExiting={isToolbarExiting}
-              canvasBlocks={canvasBlocks}
-              selectedBlocks={selectedBlocks}
-              onDeleteSelected={deleteSelectedBlocks}
-              onDuplicateSelected={duplicateBlocks}
+              onPrimaryModeChange={setPrimaryMode}
+              recentDocuments={
+                typeof window !== "undefined"
+                  ? getRecentDocuments(projectId as string)
+                  : []
+              }
             />
-          )}
-          {loading ? (
-            <CanvasWorkspaceSkeleton />
+            <div className="flex-1 relative overflow-hidden">
+              {!loading && project && canvas && currentDocument && (
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentDocument.id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{
+                      duration: 0.35,
+                      ease: "easeInOut",
+                    }}
+                    className="h-full"
+                  >
+                <CanvasDocumentEditor
+                  ref={documentEditorRef}
+                  key={currentDocument.id}
+                  documentId={currentDocument.id}
+                  documentContent={currentDocument.content}
+                  documentName={currentDocument.name}
+                  projectId={project.id}
+                  canvasId={canvas.id}
+                  lastSavedAt={lastSavedAt}
+                  sidebarOpen={sidebarOpen}
+                  onSidebarToggle={() => setSidebarOpen((prev) => !prev)}
+                  onDocumentSaved={(updatedAt) => {
+                    lastSavedAtRef.current = updatedAt;
+                    setLastSavedAt(updatedAt);
+                    setDocuments((prev) =>
+                      prev.map((d) =>
+                        d.id === currentDocument.id ? { ...d, updatedAt } : d,
+                      ),
+                    );
+                  }}
+                  onSaveConflict={() => setSaveConflict(true)}
+                />
+                  </motion.div>
+                </AnimatePresence>
+              )}
+              {!loading &&
+                project &&
+                canvas &&
+                primaryMode === "document" &&
+                !currentDocument &&
+                documents.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-full p-8">
+                    <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl px-8 py-6 shadow-lg max-w-md w-full text-center">
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                        No documents yet
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                        Documents are full-screen editors for long-form writing.
+                        Add headings, task lists, and export to Markdown or PDF.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => handleDocumentCreate()}
+                        className="px-4 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-medium transition-colors"
+                      >
+                        Create first document
+                      </button>
+                      <p className="text-xs text-slate-500 dark:text-slate-500 mt-4">
+                        Or switch to canvas to add blocks
+                      </p>
+                    </div>
+                  </div>
+                )}
+            </div>
+            </motion.div>
           ) : (
-            <CanvasWorkspace
-              ref={canvasRef}
-              activeTool={activeTool}
-              blocks={canvasBlocks}
-              canvasName={canvas?.name}
-              selectedBlocks={selectedBlocks}
-              onBlockSelect={setSelectedBlocks}
-              onBlockUpdate={updateBlock}
-              onBlockDuplicate={duplicateBlock}
-              onBlockDelete={deleteBlock}
-              zoomLevel={zoomLevel}
-              panOffset={panOffset}
-              onZoomChange={setZoomLevel}
-              onPanOffsetChange={setPanOffset}
-              showGrid={showGrid}
-              isDragging={isDragging}
-              onDraggingChange={setIsDragging}
-              isResizing={isResizing}
-              onResizingChange={setIsResizing}
-              isAddingBlock={isAddingBlock}
-              onAddBlock={addBlock}
-              onFloatingToolbarShow={(position) => {
-                setFloatingToolbarPosition(position);
-                setShowFloatingToolbar(true);
+            <motion.div
+              key="canvas"
+              className="flex flex-1 h-full min-w-0"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{
+                duration: 0.25,
+                ease: [0.25, 0.46, 0.45, 0.94],
               }}
-              viewMode={viewMode}
+            >
+            {!sidebarOpen && (
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                title="Show sidebar"
+                aria-label="Show sidebar"
+                className="absolute left-0 top-4 z-30 flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                <PanelLeftOpen size={18} aria-hidden />
+              </button>
+            )}
+            <CanvasSidebar
+              isOpen={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              onAddBlock={
+                loading
+                  ? () => {}
+                  : (type, position) => {
+                      setIsAddingBlock(type);
+                      const canvasCenter = {
+                        x: (window.innerWidth / 2 - panOffset.x) / zoomLevel,
+                        y: (window.innerHeight / 2 - panOffset.y) / zoomLevel,
+                      };
+                      addBlock(type, position || canvasCenter);
+                    }
+              }
+              selectedBlocks={selectedBlocks}
+              canvasBlocks={canvasBlocks}
+              onBlockUpdate={updateBlock}
+              onBlockSelect={setSelectedBlocks}
             />
+            <div className="flex-1 relative overflow-hidden">
+              {!toolbarOpen && !isToolbarExiting && (
+                <CanvasToolbarShowTab
+                  onShow={() => setToolbarOpen(true)}
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
+                />
+              )}
+              {(toolbarOpen || isToolbarExiting) && (
+                <CanvasToolbar
+                  tool={activeTool}
+                  onToolChange={(newTool) => {
+                    setActiveTool(newTool);
+                    if (newTool === "text") setIsAddingBlock("text");
+                    else if (newTool === "shape") setIsAddingBlock("shape");
+                    else setIsAddingBlock(null);
+                  }}
+                  onAddShape={(shapeKind) => {
+                    setAddingShapeKind(shapeKind);
+                    setActiveTool("shape");
+                    setIsAddingBlock("shape");
+                  }}
+                  zoomLevel={zoomLevel}
+                  onZoomChange={setZoomLevel}
+                  showGrid={showGrid}
+                  onGridToggle={() => setShowGrid(!showGrid)}
+                  onResetView={() => {
+                    setZoomLevel(1);
+                    setPanOffset({ x: 0, y: 0 });
+                  }}
+                  onFitToView={handleFitToView}
+                  onToolbarToggle={() => setIsToolbarExiting(true)}
+                  onToolbarExitComplete={() => {
+                    setToolbarOpen(false);
+                    setIsToolbarExiting(false);
+                  }}
+                  isExiting={isToolbarExiting}
+                  canvasBlocks={canvasBlocks}
+                  selectedBlocks={selectedBlocks}
+                  onDeleteSelected={deleteSelectedBlocks}
+                  onDuplicateSelected={duplicateBlocks}
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
+                />
+              )}
+              {loading ? (
+                <CanvasWorkspaceSkeleton />
+              ) : (
+                <CanvasWorkspace
+                  ref={canvasRef}
+                  activeTool={activeTool}
+                  blocks={canvasBlocks}
+                  canvasName={canvas?.name}
+                  selectedBlocks={selectedBlocks}
+                  onBlockSelect={setSelectedBlocks}
+                  onBlockUpdate={updateBlock}
+                  onBlockDuplicate={duplicateBlock}
+                  onBlockDelete={deleteBlock}
+                  zoomLevel={zoomLevel}
+                  panOffset={panOffset}
+                  onZoomChange={setZoomLevel}
+                  onPanOffsetChange={setPanOffset}
+                  showGrid={showGrid}
+                  isDragging={isDragging}
+                  onDraggingChange={setIsDragging}
+                  isResizing={isResizing}
+                  onResizingChange={setIsResizing}
+                  isAddingBlock={isAddingBlock}
+                  onAddBlock={addBlock}
+                  onFloatingToolbarShow={(position) => {
+                    setFloatingToolbarPosition(position);
+                    setShowFloatingToolbar(true);
+                  }}
+                  viewMode={viewMode}
+                />
+              )}
+            </div>
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
       </div>
-      {showFloatingToolbar && selectedBlocks.length > 0 && (
-        <CanvasFloatingToolbar
-          position={floatingToolbarPosition}
-          selectedBlocks={selectedBlocks}
-          canvasBlocks={canvasBlocks}
-          onBlockUpdate={updateBlock}
-          onDelete={(blockIds) => {
-            setCanvasBlocks((prev) =>
-              prev.filter((block) => !blockIds.includes(block.id)),
-            );
-            setSelectedBlocks((prev) =>
-              prev.filter((id) => !blockIds.includes(id)),
-            );
-            setShowFloatingToolbar(false);
-          }}
-          onClose={() => setShowFloatingToolbar(false)}
-          zoomLevel={zoomLevel}
-          panOffset={panOffset}
-        />
-      )}
+      {primaryMode === "canvas" &&
+        showFloatingToolbar &&
+        selectedBlocks.length > 0 && (
+          <CanvasFloatingToolbar
+            position={floatingToolbarPosition}
+            selectedBlocks={selectedBlocks}
+            canvasBlocks={canvasBlocks}
+            onBlockUpdate={updateBlock}
+            onDelete={(blockIds) => {
+              setCanvasBlocks((prev) =>
+                prev.filter((block) => !blockIds.includes(block.id)),
+              );
+              setSelectedBlocks((prev) =>
+                prev.filter((id) => !blockIds.includes(id)),
+              );
+              setShowFloatingToolbar(false);
+            }}
+            onClose={() => setShowFloatingToolbar(false)}
+            zoomLevel={zoomLevel}
+            panOffset={panOffset}
+          />
+        )}
     </div>
   );
 }

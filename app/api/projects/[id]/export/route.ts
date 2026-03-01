@@ -44,27 +44,38 @@ export async function GET(
         canvasBlocks: {
           orderBy: { order: "asc" },
         },
+        documents: {
+          orderBy: { order: "asc" },
+        },
       },
     });
 
     const project = result.project;
-    const canvasesWithBlocks = canvases.map(({ canvasBlocks, ...canvas }) => ({
-      ...canvas,
-      blocks: canvasBlocks.map((b) => ({
-        id: b.id,
-        type: b.type,
-        x: b.x,
-        y: b.y,
-        width: b.width,
-        height: b.height,
-        content: b.content,
-        color: b.color,
-        title: b.title,
-        order: b.order,
-        createdAt: b.createdAt.toISOString(),
-        updatedAt: b.updatedAt.toISOString(),
-      })),
-    }));
+    const canvasesWithBlocks = canvases.map(
+      ({ canvasBlocks, documents, ...canvas }) => ({
+        ...canvas,
+        blocks: canvasBlocks.map((b) => ({
+          id: b.id,
+          type: b.type,
+          x: b.x,
+          y: b.y,
+          width: b.width,
+          height: b.height,
+          content: b.content,
+          color: b.color,
+          title: b.title,
+          order: b.order,
+          createdAt: b.createdAt.toISOString(),
+          updatedAt: b.updatedAt.toISOString(),
+        })),
+        documents: documents.map((d) => ({
+          id: d.id,
+          name: d.name,
+          order: d.order,
+          content: d.content,
+        })),
+      })
+    );
 
     return NextResponse.json({
       project: {
@@ -84,6 +95,7 @@ export async function GET(
         createdAt: c.createdAt.toISOString(),
         updatedAt: c.updatedAt.toISOString(),
         blocks: c.blocks,
+        documents: c.documents,
       })),
     });
   } catch (error) {

@@ -10,31 +10,50 @@ generator client {
 }
 
 model Project {
-  id        String   @id @default(cuid())
-  userId    String
-  name      String
+  id          String     @id @default(cuid())
+  userId      String
+  name        String
   description String?
-  icon      String?
-  status    String   @default("active")
-  canvases  Canvas[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  icon        String?
+  status      String     @default("active")
+  canvases    Canvas[]
+  documents   Document[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   @@index([userId])
 }
 
 model Canvas {
-  id           String             @id @default(cuid())
-  projectId    String
-  project      Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  name         String             @default("Untitled Canvas")
-  order        Int                @default(0)
-  canvasBlocks CanvasBlock[]
-  shareTokens  CanvasShareToken[]
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  id              String             @id @default(cuid())
+  projectId       String
+  project         Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name            String             @default("Untitled Canvas")
+  order           Int                @default(0)
+  documentContent Json?
+  canvasBlocks    CanvasBlock[]
+  documents       Document[]
+  shareTokens     CanvasShareToken[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
 
   @@index([projectId, order])
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  canvasId  String
+  projectId String
+  canvas    Canvas   @relation(fields: [canvasId], references: [id], onDelete: Cascade)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name      String   @default("Untitled Document")
+  order     Int      @default(0)
+  content   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([canvasId, order])
+  @@index([projectId])
 }
 
 model CanvasShareToken {

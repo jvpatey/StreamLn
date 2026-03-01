@@ -136,6 +136,18 @@ exports.Prisma.CanvasScalarFieldEnum = {
   projectId: 'projectId',
   name: 'name',
   order: 'order',
+  documentContent: 'documentContent',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DocumentScalarFieldEnum = {
+  id: 'id',
+  canvasId: 'canvasId',
+  projectId: 'projectId',
+  name: 'name',
+  order: 'order',
+  content: 'content',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -169,6 +181,11 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
@@ -193,6 +210,7 @@ exports.Prisma.JsonNullValueFilter = {
 exports.Prisma.ModelName = {
   Project: 'Project',
   Canvas: 'Canvas',
+  Document: 'Document',
   CanvasShareToken: 'CanvasShareToken',
   CanvasBlock: 'CanvasBlock'
 };

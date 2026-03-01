@@ -27,7 +27,11 @@ interface ProjectDetailsSidepanelProps {
   onEdit?: (project: Project) => void;
   onRequestDelete?: (project: Project) => void;
   onStatusChange?: (projectId: string, newStatus: string) => void;
-  onOpenCanvas?: (project: Project, canvasId?: string) => void;
+  onOpenCanvas?: (
+    project: Project,
+    canvasId?: string,
+    documentId?: string
+  ) => void;
   onExportProject?: (project: Project) => void;
 }
 
@@ -217,7 +221,9 @@ export function ProjectDetailsSidepanel({
             />
             <CanvasesList
               project={project}
-              onOpenCanvas={(p, canvasId) => onOpenCanvas?.(p, canvasId)}
+              onOpenCanvas={(p, canvasId, documentId) =>
+                onOpenCanvas?.(p, canvasId, documentId)
+              }
             />
           </div>
 

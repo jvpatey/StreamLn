@@ -4,6 +4,7 @@
 
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
+import { TaskList, TaskItem } from "@tiptap/extension-list";
 import { renderToMarkdown } from "@tiptap/static-renderer/pm/markdown";
 import type { CanvasBlock } from "@/lib/types/canvas";
 import { getNoteContent } from "@/components/ui/projects/canvas/blocks/note-defaults";
@@ -14,6 +15,37 @@ import { getLinkContent } from "@/components/ui/projects/canvas/blocks/link-defa
 import { getTagContent } from "@/components/ui/projects/canvas/blocks/tag-defaults";
 
 const TIPTAP_EXTENSIONS = [StarterKit, Placeholder];
+
+const DOCUMENT_EXTENSIONS = [
+  StarterKit,
+  Placeholder,
+  TaskList,
+  TaskItem.configure({ nested: true }),
+];
+
+function isValidDocContent(content: unknown): content is { type?: string; content?: unknown[] } {
+  if (content === null || content === undefined) return false;
+  if (typeof content !== "object") return false;
+  const obj = content as Record<string, unknown>;
+  return obj.type === "doc" || Array.isArray((obj as { content?: unknown[] }).content);
+}
+
+/** Convert document (Tiptap) content to Markdown. Used for document editor export. */
+export function documentToMarkdown(content: unknown): string {
+  if (!content || !isValidDocContent(content)) return "";
+  const doc = content as { type: string; content?: unknown[] };
+  if (!doc.content || doc.content.length === 0) return "";
+
+  try {
+    const md = renderToMarkdown({
+      extensions: DOCUMENT_EXTENSIONS,
+      content: doc,
+    });
+    return (md ?? "").trim();
+  } catch {
+    return "";
+  }
+}
 
 /** Convert Tiptap/ProseMirror JSON to Markdown */
 function noteToMarkdown(content: unknown): string {

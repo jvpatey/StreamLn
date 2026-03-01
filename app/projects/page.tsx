@@ -206,6 +206,7 @@ export default function DashboardPage() {
     const projectForList = {
       ...created,
       blocks: 0,
+      documents: 0,
       canvasCount: 1,
       status: created.status ?? "active",
     };
@@ -224,10 +225,15 @@ export default function DashboardPage() {
     setSidepanelOpen(true);
   };
 
-  const handleOpenCanvas = (project: any, canvasId?: string) => {
+  const handleOpenCanvas = (
+    project: any,
+    canvasId?: string,
+    documentId?: string
+  ) => {
     addProjectToRecent(project.id);
     if (canvasId) {
-      router.push(`/projects/${project.id}/canvas/${canvasId}`);
+      const base = `/projects/${project.id}/canvas/${canvasId}`;
+      router.push(documentId ? `${base}?doc=${documentId}` : base);
     } else {
       router.push(`/projects/${project.id}`);
     }
@@ -319,16 +325,16 @@ export default function DashboardPage() {
 
       // Within same status group, apply selected sort
       if (sortBy === "updated") {
-        return (
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-        );
+        const aTime = new Date(a.lastUpdatedAt ?? a.updatedAt).getTime();
+        const bTime = new Date(b.lastUpdatedAt ?? b.updatedAt).getTime();
+        return bTime - aTime;
       } else if (sortBy === "alpha") {
         return a.name.localeCompare(b.name);
       } else if (sortBy === "status") {
-        // Same status - use updatedAt as tiebreaker
-        return (
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-        );
+        // Same status - use lastUpdatedAt as tiebreaker
+        const aTime = new Date(a.lastUpdatedAt ?? a.updatedAt).getTime();
+        const bTime = new Date(b.lastUpdatedAt ?? b.updatedAt).getTime();
+        return bTime - aTime;
       }
       return 0;
     });

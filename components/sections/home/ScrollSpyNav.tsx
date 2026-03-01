@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 import { SimpleThemeToggle } from "@/components/ui/shared/theme-toggle";
 
 const SECTIONS = [
-  { id: "hero", label: "Home", number: "01" },
-  { id: "features", label: "Features", number: "02" },
-  { id: "how-it-works", label: "How it works", number: "03" },
+  { id: "hero", label: "StreamLn" },
+  { id: "features", label: "Features" },
+  { id: "how-it-works", label: "How it works" },
 ] as const;
 
 export function ScrollSpyNav() {
@@ -55,7 +55,7 @@ export function ScrollSpyNav() {
         className="absolute left-1/2 -translate-x-1/2 flex items-center gap-0.5 sm:gap-1 rounded-full border border-slate-200/80 dark:border-slate-700/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-1.5 py-1.5 sm:px-2 sm:py-2 shadow-lg"
         aria-label="Page sections"
       >
-        {SECTIONS.map(({ id, label, number }) => {
+        {SECTIONS.map(({ id, label }) => {
           const isActive = activeId === id;
           return (
             <button
@@ -76,9 +76,7 @@ export function ScrollSpyNav() {
                   aria-hidden
                 />
               )}
-              <span className="relative z-10">
-                {number}. {label}
-              </span>
+              <span className="relative z-10">{label}</span>
             </button>
           );
         })}

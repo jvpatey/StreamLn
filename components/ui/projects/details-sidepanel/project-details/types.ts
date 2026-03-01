@@ -6,5 +6,7 @@ export interface Project {
   status: string;
   createdAt: string;
   updatedAt: string;
+  /** Most recent update across project, canvases, documents, and blocks */
+  lastUpdatedAt?: string;
   userId: string;
 }

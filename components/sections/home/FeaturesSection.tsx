@@ -4,71 +4,105 @@ import FeatureCard from "@/components/ui/home/FeatureCard";
 import AnimatedSection from "@/components/ui/shared/animated-section";
 import AnimatedGridItem from "@/components/ui/shared/animated-grid-item";
 import { getKeyboardShortcut } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import type { LucideIcon } from "lucide-react";
 import {
   Move,
   Layers,
   FileText,
+  FileEdit,
   Kanban,
   Folder,
   Command,
   Presentation,
+  Download,
 } from "lucide-react";
 
-// Features section component showcasing specific canvas capabilities
+interface BentoFeature {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  highlight: string;
+  variant?: "default" | "accent";
+  colSpan?: 1 | 2 | 3 | 4; // 1=1/3, 2=2/3, 3=full, 4=half (for row 4)
+}
+
+// Features section component - bento grid layout
 export default function FeaturesSection() {
-  // Primary features displayed in 3-column grid
-  const mainFeatures = [
+  // Bento layout: Row 1 as is, Row 2 = former Row 3 (3 small), Row 3 = former Row 2 (large + small), Row 4 = full width
+  const bentoFeatures: BentoFeature[] = [
     {
       title: "Infinite Canvas",
       description:
         "Unlimited 2D workspace where you can place, move, and organize content anywhere. Zoom from overview to detail seamlessly.",
-      icon: <Layers size={24} />,
+      icon: Layers,
       highlight: "Unlimited Space",
+      variant: "accent",
+      colSpan: 2,
+    },
+    {
+      title: "Document Editor",
+      description:
+        "Full-screen rich text documents within each canvas. Format with headings, task lists, and fonts. Export to Markdown or PDF for docs and version control.",
+      icon: FileEdit,
+      highlight: "Markdown & PDF",
+      variant: "accent",
+      colSpan: 1,
     },
     {
       title: "Drag & Drop Everything",
       description:
         "Move notes, tasks, and content blocks freely across your canvas. Resize and arrange with intuitive gestures.",
-      icon: <Move size={24} />,
+      icon: Move,
       highlight: "Visual Organization",
+      colSpan: 1,
     },
-    {
-      title: "Rich Content Blocks",
-      description:
-        "Create notes with rich formatting and code blocks. Each block is movable and supports lists, formatting, and inline code.",
-      icon: <FileText size={24} />,
-      highlight: "Tiptap Powered",
-    },
-  ];
-
-  // Secondary features displayed in 2-column grid
-  const additionalFeatures = [
     {
       title: "Visual Task Management",
       description:
         "Create task boards directly on your canvas. Drag tasks between columns and organize work visually with Kanban-style boards.",
-      icon: <Kanban size={24} />,
+      icon: Kanban,
       highlight: "Canvas Native",
+      colSpan: 1,
+    },
+    {
+      title: "Quick Command Palette",
+      description: `Press ${getKeyboardShortcut("⌘K")} to create projects, search by name, filter by status, or browse all. Navigate your workspace without leaving the keyboard.`,
+      icon: Command,
+      highlight: getKeyboardShortcut("⌘K"),
+      colSpan: 1,
     },
     {
       title: "Project Hub",
       description:
         "Create and manage projects with status filtering. Keep active work front and center, archive completed projects.",
-      icon: <Folder size={24} />,
+      icon: Folder,
       highlight: "Organized",
+      colSpan: 1,
     },
     {
-      title: "Quick Command Palette",
-      description: `Press ${getKeyboardShortcut("⌘K")} to create projects, search by name, filter by status, or browse all. Navigate your workspace without leaving the keyboard.`,
-      icon: <Command size={24} />,
-      highlight: getKeyboardShortcut("⌘K"),
+      title: "Rich Content Blocks",
+      description:
+        "Create notes with rich formatting and code blocks. Each block is movable and supports lists, formatting, and inline code.",
+      icon: FileText,
+      highlight: "Tiptap Powered",
+      colSpan: 2,
     },
     {
       title: "Presentation Mode",
       description:
         "Switch to present view to share your canvas without editing UI. Focus on your work or walk through plans with others.",
-      icon: <Presentation size={24} />,
+      icon: Presentation,
       highlight: "Share",
+      colSpan: 4,
+    },
+    {
+      title: "Export & Backup",
+      description:
+        "Export projects as JSON for full backup, Markdown for docs, or PDF for sharing. Import from backup to restore your workspace.",
+      icon: Download,
+      highlight: "Data Portability",
+      colSpan: 4,
     },
   ];
 
@@ -101,36 +135,34 @@ export default function FeaturesSection() {
                 </span>
               </span>
             </h2>
-            <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-300">
+            <p className="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
               Everything you need to think, plan, and execute on a flexible
               visual workspace designed specifically for developers.
             </p>
           </div>
         </AnimatedSection>
 
-        {/* Main features grid - 3 columns on large screens */}
-        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-8">
-          {mainFeatures.map((feature, index) => (
-            <AnimatedGridItem key={index} index={index} staggerDelay={0.1}>
+        {/* Bento features grid - 6 cols on lg for even row 4 tiles */}
+        <div className="mx-auto mt-16 grid w-full grid-cols-1 items-stretch gap-6 sm:mt-20 sm:gap-8 lg:grid-cols-6 lg:gap-8">
+          {bentoFeatures.map((feature, index) => (
+            <AnimatedGridItem
+              key={index}
+              index={index}
+              staggerDelay={0.08}
+              className={cn(
+                "h-full min-h-0",
+                feature.colSpan === 1 && "lg:col-span-2",
+                feature.colSpan === 2 && "lg:col-span-4",
+                feature.colSpan === 3 && "lg:col-span-6",
+                feature.colSpan === 4 && "lg:col-span-3"
+              )}
+            >
               <FeatureCard
                 title={feature.title}
                 description={feature.description}
                 icon={feature.icon}
                 highlight={feature.highlight}
-              />
-            </AnimatedGridItem>
-          ))}
-        </div>
-
-        {/* Additional features grid - 2 columns on large screens, 4 items wrap */}
-        <div className="mx-auto mt-8 grid max-w-2xl grid-cols-1 gap-6 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:gap-8">
-          {additionalFeatures.map((feature, index) => (
-            <AnimatedGridItem key={index} index={index} staggerDelay={0.1}>
-              <FeatureCard
-                title={feature.title}
-                description={feature.description}
-                icon={feature.icon}
-                highlight={feature.highlight}
+                variant={feature.variant}
               />
             </AnimatedGridItem>
           ))}

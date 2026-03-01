@@ -152,6 +152,21 @@ export function CanvasGuideModal({ open, onOpenChange }: CanvasGuideModalProps) 
               </p>
             </section>
 
+            {/* Documents */}
+            <section>
+              <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-2">
+                Documents
+              </h4>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                Each canvas contains both blocks and documents. Documents are full-screen editors for long-form writing—format with headings, task lists, and fonts.
+              </p>
+              <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
+                <li>• Create documents via the sidebar (Documents tab)</li>
+                <li>• Switch between canvas and document mode in the sidebar</li>
+                <li>• Export documents as Markdown or PDF from the navbar</li>
+              </ul>
+            </section>
+
             {/* Adding Blocks */}
             <section>
               <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-3">

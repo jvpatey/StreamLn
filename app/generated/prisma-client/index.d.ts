@@ -24,6 +24,11 @@ export type Project = $Result.DefaultSelection<Prisma.$ProjectPayload>
  */
 export type Canvas = $Result.DefaultSelection<Prisma.$CanvasPayload>
 /**
+ * Model Document
+ * 
+ */
+export type Document = $Result.DefaultSelection<Prisma.$DocumentPayload>
+/**
  * Model CanvasShareToken
  * 
  */
@@ -178,6 +183,16 @@ export class PrismaClient<
     * ```
     */
   get canvas(): Prisma.CanvasDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.document`: Exposes CRUD operations for the **Document** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Documents
+    * const documents = await prisma.document.findMany()
+    * ```
+    */
+  get document(): Prisma.DocumentDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.canvasShareToken`: Exposes CRUD operations for the **CanvasShareToken** model.
@@ -640,6 +655,7 @@ export namespace Prisma {
   export const ModelName: {
     Project: 'Project',
     Canvas: 'Canvas',
+    Document: 'Document',
     CanvasShareToken: 'CanvasShareToken',
     CanvasBlock: 'CanvasBlock'
   };
@@ -660,7 +676,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "project" | "canvas" | "canvasShareToken" | "canvasBlock"
+      modelProps: "project" | "canvas" | "document" | "canvasShareToken" | "canvasBlock"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -809,6 +825,80 @@ export namespace Prisma {
           count: {
             args: Prisma.CanvasCountArgs<ExtArgs>
             result: $Utils.Optional<CanvasCountAggregateOutputType> | number
+          }
+        }
+      }
+      Document: {
+        payload: Prisma.$DocumentPayload<ExtArgs>
+        fields: Prisma.DocumentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DocumentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DocumentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>
+          }
+          findFirst: {
+            args: Prisma.DocumentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DocumentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>
+          }
+          findMany: {
+            args: Prisma.DocumentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>[]
+          }
+          create: {
+            args: Prisma.DocumentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>
+          }
+          createMany: {
+            args: Prisma.DocumentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DocumentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>[]
+          }
+          delete: {
+            args: Prisma.DocumentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>
+          }
+          update: {
+            args: Prisma.DocumentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>
+          }
+          deleteMany: {
+            args: Prisma.DocumentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DocumentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DocumentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>[]
+          }
+          upsert: {
+            args: Prisma.DocumentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentPayload>
+          }
+          aggregate: {
+            args: Prisma.DocumentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDocument>
+          }
+          groupBy: {
+            args: Prisma.DocumentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DocumentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DocumentCountArgs<ExtArgs>
+            result: $Utils.Optional<DocumentCountAggregateOutputType> | number
           }
         }
       }
@@ -1046,6 +1136,7 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     project?: ProjectOmit
     canvas?: CanvasOmit
+    document?: DocumentOmit
     canvasShareToken?: CanvasShareTokenOmit
     canvasBlock?: CanvasBlockOmit
   }
@@ -1143,10 +1234,12 @@ export namespace Prisma {
 
   export type ProjectCountOutputType = {
     canvases: number
+    documents: number
   }
 
   export type ProjectCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     canvases?: boolean | ProjectCountOutputTypeCountCanvasesArgs
+    documents?: boolean | ProjectCountOutputTypeCountDocumentsArgs
   }
 
   // Custom InputTypes
@@ -1167,6 +1260,13 @@ export namespace Prisma {
     where?: CanvasWhereInput
   }
 
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeCountDocumentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DocumentWhereInput
+  }
+
 
   /**
    * Count Type CanvasCountOutputType
@@ -1174,11 +1274,13 @@ export namespace Prisma {
 
   export type CanvasCountOutputType = {
     canvasBlocks: number
+    documents: number
     shareTokens: number
   }
 
   export type CanvasCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     canvasBlocks?: boolean | CanvasCountOutputTypeCountCanvasBlocksArgs
+    documents?: boolean | CanvasCountOutputTypeCountDocumentsArgs
     shareTokens?: boolean | CanvasCountOutputTypeCountShareTokensArgs
   }
 
@@ -1198,6 +1300,13 @@ export namespace Prisma {
    */
   export type CanvasCountOutputTypeCountCanvasBlocksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CanvasBlockWhereInput
+  }
+
+  /**
+   * CanvasCountOutputType without action
+   */
+  export type CanvasCountOutputTypeCountDocumentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DocumentWhereInput
   }
 
   /**
@@ -1401,6 +1510,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     canvases?: boolean | Project$canvasesArgs<ExtArgs>
+    documents?: boolean | Project$documentsArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
@@ -1440,6 +1550,7 @@ export namespace Prisma {
   export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "description" | "icon" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     canvases?: boolean | Project$canvasesArgs<ExtArgs>
+    documents?: boolean | Project$documentsArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProjectIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1449,6 +1560,7 @@ export namespace Prisma {
     name: "Project"
     objects: {
       canvases: Prisma.$CanvasPayload<ExtArgs>[]
+      documents: Prisma.$DocumentPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -1854,6 +1966,7 @@ export namespace Prisma {
   export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     canvases<T extends Project$canvasesArgs<ExtArgs> = {}>(args?: Subset<T, Project$canvasesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    documents<T extends Project$documentsArgs<ExtArgs> = {}>(args?: Subset<T, Project$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2303,6 +2416,30 @@ export namespace Prisma {
   }
 
   /**
+   * Project.documents
+   */
+  export type Project$documentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    where?: DocumentWhereInput
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    cursor?: DocumentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
    * Project without action
    */
   export type ProjectDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2364,6 +2501,7 @@ export namespace Prisma {
     projectId: number
     name: number
     order: number
+    documentContent: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2401,6 +2539,7 @@ export namespace Prisma {
     projectId?: true
     name?: true
     order?: true
+    documentContent?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2497,6 +2636,7 @@ export namespace Prisma {
     projectId: string
     name: string
     order: number
+    documentContent: JsonValue | null
     createdAt: Date
     updatedAt: Date
     _count: CanvasCountAggregateOutputType | null
@@ -2525,10 +2665,12 @@ export namespace Prisma {
     projectId?: boolean
     name?: boolean
     order?: boolean
+    documentContent?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     project?: boolean | ProjectDefaultArgs<ExtArgs>
     canvasBlocks?: boolean | Canvas$canvasBlocksArgs<ExtArgs>
+    documents?: boolean | Canvas$documentsArgs<ExtArgs>
     shareTokens?: boolean | Canvas$shareTokensArgs<ExtArgs>
     _count?: boolean | CanvasCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["canvas"]>
@@ -2538,6 +2680,7 @@ export namespace Prisma {
     projectId?: boolean
     name?: boolean
     order?: boolean
+    documentContent?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     project?: boolean | ProjectDefaultArgs<ExtArgs>
@@ -2548,6 +2691,7 @@ export namespace Prisma {
     projectId?: boolean
     name?: boolean
     order?: boolean
+    documentContent?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     project?: boolean | ProjectDefaultArgs<ExtArgs>
@@ -2558,14 +2702,16 @@ export namespace Prisma {
     projectId?: boolean
     name?: boolean
     order?: boolean
+    documentContent?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type CanvasOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "name" | "order" | "createdAt" | "updatedAt", ExtArgs["result"]["canvas"]>
+  export type CanvasOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "name" | "order" | "documentContent" | "createdAt" | "updatedAt", ExtArgs["result"]["canvas"]>
   export type CanvasInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
     canvasBlocks?: boolean | Canvas$canvasBlocksArgs<ExtArgs>
+    documents?: boolean | Canvas$documentsArgs<ExtArgs>
     shareTokens?: boolean | Canvas$shareTokensArgs<ExtArgs>
     _count?: boolean | CanvasCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -2581,6 +2727,7 @@ export namespace Prisma {
     objects: {
       project: Prisma.$ProjectPayload<ExtArgs>
       canvasBlocks: Prisma.$CanvasBlockPayload<ExtArgs>[]
+      documents: Prisma.$DocumentPayload<ExtArgs>[]
       shareTokens: Prisma.$CanvasShareTokenPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -2588,6 +2735,7 @@ export namespace Prisma {
       projectId: string
       name: string
       order: number
+      documentContent: Prisma.JsonValue | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["canvas"]>
@@ -2986,6 +3134,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     canvasBlocks<T extends Canvas$canvasBlocksArgs<ExtArgs> = {}>(args?: Subset<T, Canvas$canvasBlocksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    documents<T extends Canvas$documentsArgs<ExtArgs> = {}>(args?: Subset<T, Canvas$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     shareTokens<T extends Canvas$shareTokensArgs<ExtArgs> = {}>(args?: Subset<T, Canvas$shareTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CanvasShareTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3020,6 +3169,7 @@ export namespace Prisma {
     readonly projectId: FieldRef<"Canvas", 'String'>
     readonly name: FieldRef<"Canvas", 'String'>
     readonly order: FieldRef<"Canvas", 'Int'>
+    readonly documentContent: FieldRef<"Canvas", 'Json'>
     readonly createdAt: FieldRef<"Canvas", 'DateTime'>
     readonly updatedAt: FieldRef<"Canvas", 'DateTime'>
   }
@@ -3442,6 +3592,30 @@ export namespace Prisma {
   }
 
   /**
+   * Canvas.documents
+   */
+  export type Canvas$documentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    where?: DocumentWhereInput
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    cursor?: DocumentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
    * Canvas.shareTokens
    */
   export type Canvas$shareTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3481,6 +3655,1141 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: CanvasInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Document
+   */
+
+  export type AggregateDocument = {
+    _count: DocumentCountAggregateOutputType | null
+    _avg: DocumentAvgAggregateOutputType | null
+    _sum: DocumentSumAggregateOutputType | null
+    _min: DocumentMinAggregateOutputType | null
+    _max: DocumentMaxAggregateOutputType | null
+  }
+
+  export type DocumentAvgAggregateOutputType = {
+    order: number | null
+  }
+
+  export type DocumentSumAggregateOutputType = {
+    order: number | null
+  }
+
+  export type DocumentMinAggregateOutputType = {
+    id: string | null
+    canvasId: string | null
+    projectId: string | null
+    name: string | null
+    order: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DocumentMaxAggregateOutputType = {
+    id: string | null
+    canvasId: string | null
+    projectId: string | null
+    name: string | null
+    order: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DocumentCountAggregateOutputType = {
+    id: number
+    canvasId: number
+    projectId: number
+    name: number
+    order: number
+    content: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DocumentAvgAggregateInputType = {
+    order?: true
+  }
+
+  export type DocumentSumAggregateInputType = {
+    order?: true
+  }
+
+  export type DocumentMinAggregateInputType = {
+    id?: true
+    canvasId?: true
+    projectId?: true
+    name?: true
+    order?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DocumentMaxAggregateInputType = {
+    id?: true
+    canvasId?: true
+    projectId?: true
+    name?: true
+    order?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DocumentCountAggregateInputType = {
+    id?: true
+    canvasId?: true
+    projectId?: true
+    name?: true
+    order?: true
+    content?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DocumentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Document to aggregate.
+     */
+    where?: DocumentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Documents to fetch.
+     */
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DocumentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Documents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Documents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Documents
+    **/
+    _count?: true | DocumentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DocumentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DocumentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DocumentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DocumentMaxAggregateInputType
+  }
+
+  export type GetDocumentAggregateType<T extends DocumentAggregateArgs> = {
+        [P in keyof T & keyof AggregateDocument]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDocument[P]>
+      : GetScalarType<T[P], AggregateDocument[P]>
+  }
+
+
+
+
+  export type DocumentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DocumentWhereInput
+    orderBy?: DocumentOrderByWithAggregationInput | DocumentOrderByWithAggregationInput[]
+    by: DocumentScalarFieldEnum[] | DocumentScalarFieldEnum
+    having?: DocumentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DocumentCountAggregateInputType | true
+    _avg?: DocumentAvgAggregateInputType
+    _sum?: DocumentSumAggregateInputType
+    _min?: DocumentMinAggregateInputType
+    _max?: DocumentMaxAggregateInputType
+  }
+
+  export type DocumentGroupByOutputType = {
+    id: string
+    canvasId: string
+    projectId: string
+    name: string
+    order: number
+    content: JsonValue | null
+    createdAt: Date
+    updatedAt: Date
+    _count: DocumentCountAggregateOutputType | null
+    _avg: DocumentAvgAggregateOutputType | null
+    _sum: DocumentSumAggregateOutputType | null
+    _min: DocumentMinAggregateOutputType | null
+    _max: DocumentMaxAggregateOutputType | null
+  }
+
+  type GetDocumentGroupByPayload<T extends DocumentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DocumentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DocumentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DocumentGroupByOutputType[P]>
+            : GetScalarType<T[P], DocumentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DocumentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    canvasId?: boolean
+    projectId?: boolean
+    name?: boolean
+    order?: boolean
+    content?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["document"]>
+
+  export type DocumentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    canvasId?: boolean
+    projectId?: boolean
+    name?: boolean
+    order?: boolean
+    content?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["document"]>
+
+  export type DocumentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    canvasId?: boolean
+    projectId?: boolean
+    name?: boolean
+    order?: boolean
+    content?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["document"]>
+
+  export type DocumentSelectScalar = {
+    id?: boolean
+    canvasId?: boolean
+    projectId?: boolean
+    name?: boolean
+    order?: boolean
+    content?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "canvasId" | "projectId" | "name" | "order" | "content" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
+  export type DocumentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }
+  export type DocumentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }
+  export type DocumentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    canvas?: boolean | CanvasDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+  }
+
+  export type $DocumentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Document"
+    objects: {
+      canvas: Prisma.$CanvasPayload<ExtArgs>
+      project: Prisma.$ProjectPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      canvasId: string
+      projectId: string
+      name: string
+      order: number
+      content: Prisma.JsonValue | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["document"]>
+    composites: {}
+  }
+
+  type DocumentGetPayload<S extends boolean | null | undefined | DocumentDefaultArgs> = $Result.GetResult<Prisma.$DocumentPayload, S>
+
+  type DocumentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DocumentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DocumentCountAggregateInputType | true
+    }
+
+  export interface DocumentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Document'], meta: { name: 'Document' } }
+    /**
+     * Find zero or one Document that matches the filter.
+     * @param {DocumentFindUniqueArgs} args - Arguments to find a Document
+     * @example
+     * // Get one Document
+     * const document = await prisma.document.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DocumentFindUniqueArgs>(args: SelectSubset<T, DocumentFindUniqueArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Document that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DocumentFindUniqueOrThrowArgs} args - Arguments to find a Document
+     * @example
+     * // Get one Document
+     * const document = await prisma.document.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DocumentFindUniqueOrThrowArgs>(args: SelectSubset<T, DocumentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Document that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentFindFirstArgs} args - Arguments to find a Document
+     * @example
+     * // Get one Document
+     * const document = await prisma.document.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DocumentFindFirstArgs>(args?: SelectSubset<T, DocumentFindFirstArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Document that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentFindFirstOrThrowArgs} args - Arguments to find a Document
+     * @example
+     * // Get one Document
+     * const document = await prisma.document.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DocumentFindFirstOrThrowArgs>(args?: SelectSubset<T, DocumentFindFirstOrThrowArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Documents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Documents
+     * const documents = await prisma.document.findMany()
+     * 
+     * // Get first 10 Documents
+     * const documents = await prisma.document.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const documentWithIdOnly = await prisma.document.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DocumentFindManyArgs>(args?: SelectSubset<T, DocumentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Document.
+     * @param {DocumentCreateArgs} args - Arguments to create a Document.
+     * @example
+     * // Create one Document
+     * const Document = await prisma.document.create({
+     *   data: {
+     *     // ... data to create a Document
+     *   }
+     * })
+     * 
+     */
+    create<T extends DocumentCreateArgs>(args: SelectSubset<T, DocumentCreateArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Documents.
+     * @param {DocumentCreateManyArgs} args - Arguments to create many Documents.
+     * @example
+     * // Create many Documents
+     * const document = await prisma.document.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DocumentCreateManyArgs>(args?: SelectSubset<T, DocumentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Documents and returns the data saved in the database.
+     * @param {DocumentCreateManyAndReturnArgs} args - Arguments to create many Documents.
+     * @example
+     * // Create many Documents
+     * const document = await prisma.document.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Documents and only return the `id`
+     * const documentWithIdOnly = await prisma.document.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DocumentCreateManyAndReturnArgs>(args?: SelectSubset<T, DocumentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Document.
+     * @param {DocumentDeleteArgs} args - Arguments to delete one Document.
+     * @example
+     * // Delete one Document
+     * const Document = await prisma.document.delete({
+     *   where: {
+     *     // ... filter to delete one Document
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DocumentDeleteArgs>(args: SelectSubset<T, DocumentDeleteArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Document.
+     * @param {DocumentUpdateArgs} args - Arguments to update one Document.
+     * @example
+     * // Update one Document
+     * const document = await prisma.document.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DocumentUpdateArgs>(args: SelectSubset<T, DocumentUpdateArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Documents.
+     * @param {DocumentDeleteManyArgs} args - Arguments to filter Documents to delete.
+     * @example
+     * // Delete a few Documents
+     * const { count } = await prisma.document.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DocumentDeleteManyArgs>(args?: SelectSubset<T, DocumentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Documents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Documents
+     * const document = await prisma.document.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DocumentUpdateManyArgs>(args: SelectSubset<T, DocumentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Documents and returns the data updated in the database.
+     * @param {DocumentUpdateManyAndReturnArgs} args - Arguments to update many Documents.
+     * @example
+     * // Update many Documents
+     * const document = await prisma.document.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Documents and only return the `id`
+     * const documentWithIdOnly = await prisma.document.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DocumentUpdateManyAndReturnArgs>(args: SelectSubset<T, DocumentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Document.
+     * @param {DocumentUpsertArgs} args - Arguments to update or create a Document.
+     * @example
+     * // Update or create a Document
+     * const document = await prisma.document.upsert({
+     *   create: {
+     *     // ... data to create a Document
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Document we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DocumentUpsertArgs>(args: SelectSubset<T, DocumentUpsertArgs<ExtArgs>>): Prisma__DocumentClient<$Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Documents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentCountArgs} args - Arguments to filter Documents to count.
+     * @example
+     * // Count the number of Documents
+     * const count = await prisma.document.count({
+     *   where: {
+     *     // ... the filter for the Documents we want to count
+     *   }
+     * })
+    **/
+    count<T extends DocumentCountArgs>(
+      args?: Subset<T, DocumentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DocumentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Document.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DocumentAggregateArgs>(args: Subset<T, DocumentAggregateArgs>): Prisma.PrismaPromise<GetDocumentAggregateType<T>>
+
+    /**
+     * Group by Document.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DocumentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DocumentGroupByArgs['orderBy'] }
+        : { orderBy?: DocumentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DocumentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDocumentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Document model
+   */
+  readonly fields: DocumentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Document.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DocumentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    canvas<T extends CanvasDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CanvasDefaultArgs<ExtArgs>>): Prisma__CanvasClient<$Result.GetResult<Prisma.$CanvasPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Document model
+   */
+  interface DocumentFieldRefs {
+    readonly id: FieldRef<"Document", 'String'>
+    readonly canvasId: FieldRef<"Document", 'String'>
+    readonly projectId: FieldRef<"Document", 'String'>
+    readonly name: FieldRef<"Document", 'String'>
+    readonly order: FieldRef<"Document", 'Int'>
+    readonly content: FieldRef<"Document", 'Json'>
+    readonly createdAt: FieldRef<"Document", 'DateTime'>
+    readonly updatedAt: FieldRef<"Document", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Document findUnique
+   */
+  export type DocumentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
+     * Filter, which Document to fetch.
+     */
+    where: DocumentWhereUniqueInput
+  }
+
+  /**
+   * Document findUniqueOrThrow
+   */
+  export type DocumentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
+     * Filter, which Document to fetch.
+     */
+    where: DocumentWhereUniqueInput
+  }
+
+  /**
+   * Document findFirst
+   */
+  export type DocumentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
+     * Filter, which Document to fetch.
+     */
+    where?: DocumentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Documents to fetch.
+     */
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Documents.
+     */
+    cursor?: DocumentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Documents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Documents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Documents.
+     */
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
+   * Document findFirstOrThrow
+   */
+  export type DocumentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
+     * Filter, which Document to fetch.
+     */
+    where?: DocumentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Documents to fetch.
+     */
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Documents.
+     */
+    cursor?: DocumentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Documents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Documents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Documents.
+     */
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
+   * Document findMany
+   */
+  export type DocumentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
+     * Filter, which Documents to fetch.
+     */
+    where?: DocumentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Documents to fetch.
+     */
+    orderBy?: DocumentOrderByWithRelationInput | DocumentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Documents.
+     */
+    cursor?: DocumentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Documents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Documents.
+     */
+    skip?: number
+    distinct?: DocumentScalarFieldEnum | DocumentScalarFieldEnum[]
+  }
+
+  /**
+   * Document create
+   */
+  export type DocumentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Document.
+     */
+    data: XOR<DocumentCreateInput, DocumentUncheckedCreateInput>
+  }
+
+  /**
+   * Document createMany
+   */
+  export type DocumentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Documents.
+     */
+    data: DocumentCreateManyInput | DocumentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Document createManyAndReturn
+   */
+  export type DocumentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * The data used to create many Documents.
+     */
+    data: DocumentCreateManyInput | DocumentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Document update
+   */
+  export type DocumentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Document.
+     */
+    data: XOR<DocumentUpdateInput, DocumentUncheckedUpdateInput>
+    /**
+     * Choose, which Document to update.
+     */
+    where: DocumentWhereUniqueInput
+  }
+
+  /**
+   * Document updateMany
+   */
+  export type DocumentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Documents.
+     */
+    data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyInput>
+    /**
+     * Filter which Documents to update
+     */
+    where?: DocumentWhereInput
+    /**
+     * Limit how many Documents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Document updateManyAndReturn
+   */
+  export type DocumentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * The data used to update Documents.
+     */
+    data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyInput>
+    /**
+     * Filter which Documents to update
+     */
+    where?: DocumentWhereInput
+    /**
+     * Limit how many Documents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Document upsert
+   */
+  export type DocumentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Document to update in case it exists.
+     */
+    where: DocumentWhereUniqueInput
+    /**
+     * In case the Document found by the `where` argument doesn't exist, create a new Document with this data.
+     */
+    create: XOR<DocumentCreateInput, DocumentUncheckedCreateInput>
+    /**
+     * In case the Document was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DocumentUpdateInput, DocumentUncheckedUpdateInput>
+  }
+
+  /**
+   * Document delete
+   */
+  export type DocumentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
+    /**
+     * Filter which Document to delete.
+     */
+    where: DocumentWhereUniqueInput
+  }
+
+  /**
+   * Document deleteMany
+   */
+  export type DocumentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Documents to delete
+     */
+    where?: DocumentWhereInput
+    /**
+     * Limit how many Documents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Document without action
+   */
+  export type DocumentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Document
+     */
+    select?: DocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Document
+     */
+    omit?: DocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentInclude<ExtArgs> | null
   }
 
 
@@ -5783,11 +7092,26 @@ export namespace Prisma {
     projectId: 'projectId',
     name: 'name',
     order: 'order',
+    documentContent: 'documentContent',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type CanvasScalarFieldEnum = (typeof CanvasScalarFieldEnum)[keyof typeof CanvasScalarFieldEnum]
+
+
+  export const DocumentScalarFieldEnum: {
+    id: 'id',
+    canvasId: 'canvasId',
+    projectId: 'projectId',
+    name: 'name',
+    order: 'order',
+    content: 'content',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DocumentScalarFieldEnum = (typeof DocumentScalarFieldEnum)[keyof typeof DocumentScalarFieldEnum]
 
 
   export const CanvasShareTokenScalarFieldEnum: {
@@ -5826,6 +7150,14 @@ export namespace Prisma {
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const JsonNullValueInput: {
@@ -5908,20 +7240,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Float'
-   */
-  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-  /**
-   * Reference to a field of type 'Float[]'
-   */
-  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -5932,6 +7250,20 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float'
+   */
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float[]'
+   */
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
   /**
    * Deep Input Types
@@ -5951,6 +7283,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
     canvases?: CanvasListRelationFilter
+    documents?: DocumentListRelationFilter
   }
 
   export type ProjectOrderByWithRelationInput = {
@@ -5963,6 +7296,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     canvases?: CanvasOrderByRelationAggregateInput
+    documents?: DocumentOrderByRelationAggregateInput
   }
 
   export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -5978,6 +7312,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
     canvases?: CanvasListRelationFilter
+    documents?: DocumentListRelationFilter
   }, "id">
 
   export type ProjectOrderByWithAggregationInput = {
@@ -6016,10 +7351,12 @@ export namespace Prisma {
     projectId?: StringFilter<"Canvas"> | string
     name?: StringFilter<"Canvas"> | string
     order?: IntFilter<"Canvas"> | number
+    documentContent?: JsonNullableFilter<"Canvas">
     createdAt?: DateTimeFilter<"Canvas"> | Date | string
     updatedAt?: DateTimeFilter<"Canvas"> | Date | string
     project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
     canvasBlocks?: CanvasBlockListRelationFilter
+    documents?: DocumentListRelationFilter
     shareTokens?: CanvasShareTokenListRelationFilter
   }
 
@@ -6028,10 +7365,12 @@ export namespace Prisma {
     projectId?: SortOrder
     name?: SortOrder
     order?: SortOrder
+    documentContent?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     project?: ProjectOrderByWithRelationInput
     canvasBlocks?: CanvasBlockOrderByRelationAggregateInput
+    documents?: DocumentOrderByRelationAggregateInput
     shareTokens?: CanvasShareTokenOrderByRelationAggregateInput
   }
 
@@ -6043,10 +7382,12 @@ export namespace Prisma {
     projectId?: StringFilter<"Canvas"> | string
     name?: StringFilter<"Canvas"> | string
     order?: IntFilter<"Canvas"> | number
+    documentContent?: JsonNullableFilter<"Canvas">
     createdAt?: DateTimeFilter<"Canvas"> | Date | string
     updatedAt?: DateTimeFilter<"Canvas"> | Date | string
     project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
     canvasBlocks?: CanvasBlockListRelationFilter
+    documents?: DocumentListRelationFilter
     shareTokens?: CanvasShareTokenListRelationFilter
   }, "id">
 
@@ -6055,6 +7396,7 @@ export namespace Prisma {
     projectId?: SortOrder
     name?: SortOrder
     order?: SortOrder
+    documentContent?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: CanvasCountOrderByAggregateInput
@@ -6072,8 +7414,84 @@ export namespace Prisma {
     projectId?: StringWithAggregatesFilter<"Canvas"> | string
     name?: StringWithAggregatesFilter<"Canvas"> | string
     order?: IntWithAggregatesFilter<"Canvas"> | number
+    documentContent?: JsonNullableWithAggregatesFilter<"Canvas">
     createdAt?: DateTimeWithAggregatesFilter<"Canvas"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Canvas"> | Date | string
+  }
+
+  export type DocumentWhereInput = {
+    AND?: DocumentWhereInput | DocumentWhereInput[]
+    OR?: DocumentWhereInput[]
+    NOT?: DocumentWhereInput | DocumentWhereInput[]
+    id?: StringFilter<"Document"> | string
+    canvasId?: StringFilter<"Document"> | string
+    projectId?: StringFilter<"Document"> | string
+    name?: StringFilter<"Document"> | string
+    order?: IntFilter<"Document"> | number
+    content?: JsonNullableFilter<"Document">
+    createdAt?: DateTimeFilter<"Document"> | Date | string
+    updatedAt?: DateTimeFilter<"Document"> | Date | string
+    canvas?: XOR<CanvasScalarRelationFilter, CanvasWhereInput>
+    project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
+  }
+
+  export type DocumentOrderByWithRelationInput = {
+    id?: SortOrder
+    canvasId?: SortOrder
+    projectId?: SortOrder
+    name?: SortOrder
+    order?: SortOrder
+    content?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    canvas?: CanvasOrderByWithRelationInput
+    project?: ProjectOrderByWithRelationInput
+  }
+
+  export type DocumentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: DocumentWhereInput | DocumentWhereInput[]
+    OR?: DocumentWhereInput[]
+    NOT?: DocumentWhereInput | DocumentWhereInput[]
+    canvasId?: StringFilter<"Document"> | string
+    projectId?: StringFilter<"Document"> | string
+    name?: StringFilter<"Document"> | string
+    order?: IntFilter<"Document"> | number
+    content?: JsonNullableFilter<"Document">
+    createdAt?: DateTimeFilter<"Document"> | Date | string
+    updatedAt?: DateTimeFilter<"Document"> | Date | string
+    canvas?: XOR<CanvasScalarRelationFilter, CanvasWhereInput>
+    project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
+  }, "id">
+
+  export type DocumentOrderByWithAggregationInput = {
+    id?: SortOrder
+    canvasId?: SortOrder
+    projectId?: SortOrder
+    name?: SortOrder
+    order?: SortOrder
+    content?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DocumentCountOrderByAggregateInput
+    _avg?: DocumentAvgOrderByAggregateInput
+    _max?: DocumentMaxOrderByAggregateInput
+    _min?: DocumentMinOrderByAggregateInput
+    _sum?: DocumentSumOrderByAggregateInput
+  }
+
+  export type DocumentScalarWhereWithAggregatesInput = {
+    AND?: DocumentScalarWhereWithAggregatesInput | DocumentScalarWhereWithAggregatesInput[]
+    OR?: DocumentScalarWhereWithAggregatesInput[]
+    NOT?: DocumentScalarWhereWithAggregatesInput | DocumentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Document"> | string
+    canvasId?: StringWithAggregatesFilter<"Document"> | string
+    projectId?: StringWithAggregatesFilter<"Document"> | string
+    name?: StringWithAggregatesFilter<"Document"> | string
+    order?: IntWithAggregatesFilter<"Document"> | number
+    content?: JsonNullableWithAggregatesFilter<"Document">
+    createdAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Document"> | Date | string
   }
 
   export type CanvasShareTokenWhereInput = {
@@ -6238,6 +7656,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     canvases?: CanvasCreateNestedManyWithoutProjectInput
+    documents?: DocumentCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateInput = {
@@ -6250,6 +7669,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     canvases?: CanvasUncheckedCreateNestedManyWithoutProjectInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUpdateInput = {
@@ -6262,6 +7682,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvases?: CanvasUpdateManyWithoutProjectNestedInput
+    documents?: DocumentUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateInput = {
@@ -6274,6 +7695,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvases?: CanvasUncheckedUpdateManyWithoutProjectNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateManyInput = {
@@ -6313,10 +7735,12 @@ export namespace Prisma {
     id?: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     project: ProjectCreateNestedOneWithoutCanvasesInput
     canvasBlocks?: CanvasBlockCreateNestedManyWithoutCanvasInput
+    documents?: DocumentCreateNestedManyWithoutCanvasInput
     shareTokens?: CanvasShareTokenCreateNestedManyWithoutCanvasInput
   }
 
@@ -6325,9 +7749,11 @@ export namespace Prisma {
     projectId: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutCanvasInput
     shareTokens?: CanvasShareTokenUncheckedCreateNestedManyWithoutCanvasInput
   }
 
@@ -6335,10 +7761,12 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutCanvasesNestedInput
     canvasBlocks?: CanvasBlockUpdateManyWithoutCanvasNestedInput
+    documents?: DocumentUpdateManyWithoutCanvasNestedInput
     shareTokens?: CanvasShareTokenUpdateManyWithoutCanvasNestedInput
   }
 
@@ -6347,9 +7775,11 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutCanvasNestedInput
     shareTokens?: CanvasShareTokenUncheckedUpdateManyWithoutCanvasNestedInput
   }
 
@@ -6358,6 +7788,7 @@ export namespace Prisma {
     projectId: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -6366,6 +7797,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -6375,6 +7807,82 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentCreateInput = {
+    id?: string
+    name?: string
+    order?: number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    canvas: CanvasCreateNestedOneWithoutDocumentsInput
+    project: ProjectCreateNestedOneWithoutDocumentsInput
+  }
+
+  export type DocumentUncheckedCreateInput = {
+    id?: string
+    canvasId: string
+    projectId: string
+    name?: string
+    order?: number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    canvas?: CanvasUpdateOneRequiredWithoutDocumentsNestedInput
+    project?: ProjectUpdateOneRequiredWithoutDocumentsNestedInput
+  }
+
+  export type DocumentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    canvasId?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentCreateManyInput = {
+    id?: string
+    canvasId: string
+    projectId: string
+    name?: string
+    order?: number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    canvasId?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    content?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -6592,12 +8100,22 @@ export namespace Prisma {
     none?: CanvasWhereInput
   }
 
+  export type DocumentListRelationFilter = {
+    every?: DocumentWhereInput
+    some?: DocumentWhereInput
+    none?: DocumentWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
   }
 
   export type CanvasOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DocumentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -6694,6 +8212,29 @@ export namespace Prisma {
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntFilter<$PrismaModel> | number
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type ProjectScalarRelationFilter = {
     is?: ProjectWhereInput
@@ -6725,6 +8266,7 @@ export namespace Prisma {
     projectId?: SortOrder
     name?: SortOrder
     order?: SortOrder
+    documentContent?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -6770,6 +8312,76 @@ export namespace Prisma {
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
   }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type CanvasScalarRelationFilter = {
+    is?: CanvasWhereInput
+    isNot?: CanvasWhereInput
+  }
+
+  export type DocumentCountOrderByAggregateInput = {
+    id?: SortOrder
+    canvasId?: SortOrder
+    projectId?: SortOrder
+    name?: SortOrder
+    order?: SortOrder
+    content?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DocumentAvgOrderByAggregateInput = {
+    order?: SortOrder
+  }
+
+  export type DocumentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    canvasId?: SortOrder
+    projectId?: SortOrder
+    name?: SortOrder
+    order?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DocumentMinOrderByAggregateInput = {
+    id?: SortOrder
+    canvasId?: SortOrder
+    projectId?: SortOrder
+    name?: SortOrder
+    order?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DocumentSumOrderByAggregateInput = {
+    order?: SortOrder
+  }
 
   export type DateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
@@ -6780,11 +8392,6 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
-  export type CanvasScalarRelationFilter = {
-    is?: CanvasWhereInput
-    isNot?: CanvasWhereInput
   }
 
   export type CanvasShareTokenCountOrderByAggregateInput = {
@@ -6970,11 +8577,25 @@ export namespace Prisma {
     connect?: CanvasWhereUniqueInput | CanvasWhereUniqueInput[]
   }
 
+  export type DocumentCreateNestedManyWithoutProjectInput = {
+    create?: XOR<DocumentCreateWithoutProjectInput, DocumentUncheckedCreateWithoutProjectInput> | DocumentCreateWithoutProjectInput[] | DocumentUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutProjectInput | DocumentCreateOrConnectWithoutProjectInput[]
+    createMany?: DocumentCreateManyProjectInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
   export type CanvasUncheckedCreateNestedManyWithoutProjectInput = {
     create?: XOR<CanvasCreateWithoutProjectInput, CanvasUncheckedCreateWithoutProjectInput> | CanvasCreateWithoutProjectInput[] | CanvasUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: CanvasCreateOrConnectWithoutProjectInput | CanvasCreateOrConnectWithoutProjectInput[]
     createMany?: CanvasCreateManyProjectInputEnvelope
     connect?: CanvasWhereUniqueInput | CanvasWhereUniqueInput[]
+  }
+
+  export type DocumentUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<DocumentCreateWithoutProjectInput, DocumentUncheckedCreateWithoutProjectInput> | DocumentCreateWithoutProjectInput[] | DocumentUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutProjectInput | DocumentCreateOrConnectWithoutProjectInput[]
+    createMany?: DocumentCreateManyProjectInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -7003,6 +8624,20 @@ export namespace Prisma {
     deleteMany?: CanvasScalarWhereInput | CanvasScalarWhereInput[]
   }
 
+  export type DocumentUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<DocumentCreateWithoutProjectInput, DocumentUncheckedCreateWithoutProjectInput> | DocumentCreateWithoutProjectInput[] | DocumentUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutProjectInput | DocumentCreateOrConnectWithoutProjectInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutProjectInput | DocumentUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: DocumentCreateManyProjectInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutProjectInput | DocumentUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutProjectInput | DocumentUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
   export type CanvasUncheckedUpdateManyWithoutProjectNestedInput = {
     create?: XOR<CanvasCreateWithoutProjectInput, CanvasUncheckedCreateWithoutProjectInput> | CanvasCreateWithoutProjectInput[] | CanvasUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: CanvasCreateOrConnectWithoutProjectInput | CanvasCreateOrConnectWithoutProjectInput[]
@@ -7015,6 +8650,20 @@ export namespace Prisma {
     update?: CanvasUpdateWithWhereUniqueWithoutProjectInput | CanvasUpdateWithWhereUniqueWithoutProjectInput[]
     updateMany?: CanvasUpdateManyWithWhereWithoutProjectInput | CanvasUpdateManyWithWhereWithoutProjectInput[]
     deleteMany?: CanvasScalarWhereInput | CanvasScalarWhereInput[]
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<DocumentCreateWithoutProjectInput, DocumentUncheckedCreateWithoutProjectInput> | DocumentCreateWithoutProjectInput[] | DocumentUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutProjectInput | DocumentCreateOrConnectWithoutProjectInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutProjectInput | DocumentUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: DocumentCreateManyProjectInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutProjectInput | DocumentUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutProjectInput | DocumentUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
   }
 
   export type ProjectCreateNestedOneWithoutCanvasesInput = {
@@ -7030,6 +8679,13 @@ export namespace Prisma {
     connect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
   }
 
+  export type DocumentCreateNestedManyWithoutCanvasInput = {
+    create?: XOR<DocumentCreateWithoutCanvasInput, DocumentUncheckedCreateWithoutCanvasInput> | DocumentCreateWithoutCanvasInput[] | DocumentUncheckedCreateWithoutCanvasInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutCanvasInput | DocumentCreateOrConnectWithoutCanvasInput[]
+    createMany?: DocumentCreateManyCanvasInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+  }
+
   export type CanvasShareTokenCreateNestedManyWithoutCanvasInput = {
     create?: XOR<CanvasShareTokenCreateWithoutCanvasInput, CanvasShareTokenUncheckedCreateWithoutCanvasInput> | CanvasShareTokenCreateWithoutCanvasInput[] | CanvasShareTokenUncheckedCreateWithoutCanvasInput[]
     connectOrCreate?: CanvasShareTokenCreateOrConnectWithoutCanvasInput | CanvasShareTokenCreateOrConnectWithoutCanvasInput[]
@@ -7042,6 +8698,13 @@ export namespace Prisma {
     connectOrCreate?: CanvasBlockCreateOrConnectWithoutCanvasInput | CanvasBlockCreateOrConnectWithoutCanvasInput[]
     createMany?: CanvasBlockCreateManyCanvasInputEnvelope
     connect?: CanvasBlockWhereUniqueInput | CanvasBlockWhereUniqueInput[]
+  }
+
+  export type DocumentUncheckedCreateNestedManyWithoutCanvasInput = {
+    create?: XOR<DocumentCreateWithoutCanvasInput, DocumentUncheckedCreateWithoutCanvasInput> | DocumentCreateWithoutCanvasInput[] | DocumentUncheckedCreateWithoutCanvasInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutCanvasInput | DocumentCreateOrConnectWithoutCanvasInput[]
+    createMany?: DocumentCreateManyCanvasInputEnvelope
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
   }
 
   export type CanvasShareTokenUncheckedCreateNestedManyWithoutCanvasInput = {
@@ -7081,6 +8744,20 @@ export namespace Prisma {
     deleteMany?: CanvasBlockScalarWhereInput | CanvasBlockScalarWhereInput[]
   }
 
+  export type DocumentUpdateManyWithoutCanvasNestedInput = {
+    create?: XOR<DocumentCreateWithoutCanvasInput, DocumentUncheckedCreateWithoutCanvasInput> | DocumentCreateWithoutCanvasInput[] | DocumentUncheckedCreateWithoutCanvasInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutCanvasInput | DocumentCreateOrConnectWithoutCanvasInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutCanvasInput | DocumentUpsertWithWhereUniqueWithoutCanvasInput[]
+    createMany?: DocumentCreateManyCanvasInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutCanvasInput | DocumentUpdateWithWhereUniqueWithoutCanvasInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutCanvasInput | DocumentUpdateManyWithWhereWithoutCanvasInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
   export type CanvasShareTokenUpdateManyWithoutCanvasNestedInput = {
     create?: XOR<CanvasShareTokenCreateWithoutCanvasInput, CanvasShareTokenUncheckedCreateWithoutCanvasInput> | CanvasShareTokenCreateWithoutCanvasInput[] | CanvasShareTokenUncheckedCreateWithoutCanvasInput[]
     connectOrCreate?: CanvasShareTokenCreateOrConnectWithoutCanvasInput | CanvasShareTokenCreateOrConnectWithoutCanvasInput[]
@@ -7109,6 +8786,20 @@ export namespace Prisma {
     deleteMany?: CanvasBlockScalarWhereInput | CanvasBlockScalarWhereInput[]
   }
 
+  export type DocumentUncheckedUpdateManyWithoutCanvasNestedInput = {
+    create?: XOR<DocumentCreateWithoutCanvasInput, DocumentUncheckedCreateWithoutCanvasInput> | DocumentCreateWithoutCanvasInput[] | DocumentUncheckedCreateWithoutCanvasInput[]
+    connectOrCreate?: DocumentCreateOrConnectWithoutCanvasInput | DocumentCreateOrConnectWithoutCanvasInput[]
+    upsert?: DocumentUpsertWithWhereUniqueWithoutCanvasInput | DocumentUpsertWithWhereUniqueWithoutCanvasInput[]
+    createMany?: DocumentCreateManyCanvasInputEnvelope
+    set?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    disconnect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    delete?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    connect?: DocumentWhereUniqueInput | DocumentWhereUniqueInput[]
+    update?: DocumentUpdateWithWhereUniqueWithoutCanvasInput | DocumentUpdateWithWhereUniqueWithoutCanvasInput[]
+    updateMany?: DocumentUpdateManyWithWhereWithoutCanvasInput | DocumentUpdateManyWithWhereWithoutCanvasInput[]
+    deleteMany?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+  }
+
   export type CanvasShareTokenUncheckedUpdateManyWithoutCanvasNestedInput = {
     create?: XOR<CanvasShareTokenCreateWithoutCanvasInput, CanvasShareTokenUncheckedCreateWithoutCanvasInput> | CanvasShareTokenCreateWithoutCanvasInput[] | CanvasShareTokenUncheckedCreateWithoutCanvasInput[]
     connectOrCreate?: CanvasShareTokenCreateOrConnectWithoutCanvasInput | CanvasShareTokenCreateOrConnectWithoutCanvasInput[]
@@ -7121,6 +8812,34 @@ export namespace Prisma {
     update?: CanvasShareTokenUpdateWithWhereUniqueWithoutCanvasInput | CanvasShareTokenUpdateWithWhereUniqueWithoutCanvasInput[]
     updateMany?: CanvasShareTokenUpdateManyWithWhereWithoutCanvasInput | CanvasShareTokenUpdateManyWithWhereWithoutCanvasInput[]
     deleteMany?: CanvasShareTokenScalarWhereInput | CanvasShareTokenScalarWhereInput[]
+  }
+
+  export type CanvasCreateNestedOneWithoutDocumentsInput = {
+    create?: XOR<CanvasCreateWithoutDocumentsInput, CanvasUncheckedCreateWithoutDocumentsInput>
+    connectOrCreate?: CanvasCreateOrConnectWithoutDocumentsInput
+    connect?: CanvasWhereUniqueInput
+  }
+
+  export type ProjectCreateNestedOneWithoutDocumentsInput = {
+    create?: XOR<ProjectCreateWithoutDocumentsInput, ProjectUncheckedCreateWithoutDocumentsInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutDocumentsInput
+    connect?: ProjectWhereUniqueInput
+  }
+
+  export type CanvasUpdateOneRequiredWithoutDocumentsNestedInput = {
+    create?: XOR<CanvasCreateWithoutDocumentsInput, CanvasUncheckedCreateWithoutDocumentsInput>
+    connectOrCreate?: CanvasCreateOrConnectWithoutDocumentsInput
+    upsert?: CanvasUpsertWithoutDocumentsInput
+    connect?: CanvasWhereUniqueInput
+    update?: XOR<XOR<CanvasUpdateToOneWithWhereWithoutDocumentsInput, CanvasUpdateWithoutDocumentsInput>, CanvasUncheckedUpdateWithoutDocumentsInput>
+  }
+
+  export type ProjectUpdateOneRequiredWithoutDocumentsNestedInput = {
+    create?: XOR<ProjectCreateWithoutDocumentsInput, ProjectUncheckedCreateWithoutDocumentsInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutDocumentsInput
+    upsert?: ProjectUpsertWithoutDocumentsInput
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutDocumentsInput, ProjectUpdateWithoutDocumentsInput>, ProjectUncheckedUpdateWithoutDocumentsInput>
   }
 
   export type CanvasCreateNestedOneWithoutShareTokensInput = {
@@ -7298,6 +9017,29 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
@@ -7367,9 +9109,11 @@ export namespace Prisma {
     id?: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     canvasBlocks?: CanvasBlockCreateNestedManyWithoutCanvasInput
+    documents?: DocumentCreateNestedManyWithoutCanvasInput
     shareTokens?: CanvasShareTokenCreateNestedManyWithoutCanvasInput
   }
 
@@ -7377,9 +9121,11 @@ export namespace Prisma {
     id?: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutCanvasInput
     shareTokens?: CanvasShareTokenUncheckedCreateNestedManyWithoutCanvasInput
   }
 
@@ -7390,6 +9136,36 @@ export namespace Prisma {
 
   export type CanvasCreateManyProjectInputEnvelope = {
     data: CanvasCreateManyProjectInput | CanvasCreateManyProjectInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DocumentCreateWithoutProjectInput = {
+    id?: string
+    name?: string
+    order?: number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    canvas: CanvasCreateNestedOneWithoutDocumentsInput
+  }
+
+  export type DocumentUncheckedCreateWithoutProjectInput = {
+    id?: string
+    canvasId: string
+    name?: string
+    order?: number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateOrConnectWithoutProjectInput = {
+    where: DocumentWhereUniqueInput
+    create: XOR<DocumentCreateWithoutProjectInput, DocumentUncheckedCreateWithoutProjectInput>
+  }
+
+  export type DocumentCreateManyProjectInputEnvelope = {
+    data: DocumentCreateManyProjectInput | DocumentCreateManyProjectInput[]
     skipDuplicates?: boolean
   }
 
@@ -7417,8 +9193,39 @@ export namespace Prisma {
     projectId?: StringFilter<"Canvas"> | string
     name?: StringFilter<"Canvas"> | string
     order?: IntFilter<"Canvas"> | number
+    documentContent?: JsonNullableFilter<"Canvas">
     createdAt?: DateTimeFilter<"Canvas"> | Date | string
     updatedAt?: DateTimeFilter<"Canvas"> | Date | string
+  }
+
+  export type DocumentUpsertWithWhereUniqueWithoutProjectInput = {
+    where: DocumentWhereUniqueInput
+    update: XOR<DocumentUpdateWithoutProjectInput, DocumentUncheckedUpdateWithoutProjectInput>
+    create: XOR<DocumentCreateWithoutProjectInput, DocumentUncheckedCreateWithoutProjectInput>
+  }
+
+  export type DocumentUpdateWithWhereUniqueWithoutProjectInput = {
+    where: DocumentWhereUniqueInput
+    data: XOR<DocumentUpdateWithoutProjectInput, DocumentUncheckedUpdateWithoutProjectInput>
+  }
+
+  export type DocumentUpdateManyWithWhereWithoutProjectInput = {
+    where: DocumentScalarWhereInput
+    data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyWithoutProjectInput>
+  }
+
+  export type DocumentScalarWhereInput = {
+    AND?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+    OR?: DocumentScalarWhereInput[]
+    NOT?: DocumentScalarWhereInput | DocumentScalarWhereInput[]
+    id?: StringFilter<"Document"> | string
+    canvasId?: StringFilter<"Document"> | string
+    projectId?: StringFilter<"Document"> | string
+    name?: StringFilter<"Document"> | string
+    order?: IntFilter<"Document"> | number
+    content?: JsonNullableFilter<"Document">
+    createdAt?: DateTimeFilter<"Document"> | Date | string
+    updatedAt?: DateTimeFilter<"Document"> | Date | string
   }
 
   export type ProjectCreateWithoutCanvasesInput = {
@@ -7430,6 +9237,7 @@ export namespace Prisma {
     status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    documents?: DocumentCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutCanvasesInput = {
@@ -7441,6 +9249,7 @@ export namespace Prisma {
     status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    documents?: DocumentUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutCanvasesInput = {
@@ -7488,6 +9297,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DocumentCreateWithoutCanvasInput = {
+    id?: string
+    name?: string
+    order?: number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutDocumentsInput
+  }
+
+  export type DocumentUncheckedCreateWithoutCanvasInput = {
+    id?: string
+    projectId: string
+    name?: string
+    order?: number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateOrConnectWithoutCanvasInput = {
+    where: DocumentWhereUniqueInput
+    create: XOR<DocumentCreateWithoutCanvasInput, DocumentUncheckedCreateWithoutCanvasInput>
+  }
+
+  export type DocumentCreateManyCanvasInputEnvelope = {
+    data: DocumentCreateManyCanvasInput | DocumentCreateManyCanvasInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CanvasShareTokenCreateWithoutCanvasInput = {
     id?: string
     token: string
@@ -7532,6 +9371,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    documents?: DocumentUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutCanvasesInput = {
@@ -7543,6 +9383,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    documents?: DocumentUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type CanvasBlockUpsertWithWhereUniqueWithoutCanvasInput = {
@@ -7580,6 +9421,22 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"CanvasBlock"> | Date | string
   }
 
+  export type DocumentUpsertWithWhereUniqueWithoutCanvasInput = {
+    where: DocumentWhereUniqueInput
+    update: XOR<DocumentUpdateWithoutCanvasInput, DocumentUncheckedUpdateWithoutCanvasInput>
+    create: XOR<DocumentCreateWithoutCanvasInput, DocumentUncheckedCreateWithoutCanvasInput>
+  }
+
+  export type DocumentUpdateWithWhereUniqueWithoutCanvasInput = {
+    where: DocumentWhereUniqueInput
+    data: XOR<DocumentUpdateWithoutCanvasInput, DocumentUncheckedUpdateWithoutCanvasInput>
+  }
+
+  export type DocumentUpdateManyWithWhereWithoutCanvasInput = {
+    where: DocumentScalarWhereInput
+    data: XOR<DocumentUpdateManyMutationInput, DocumentUncheckedUpdateManyWithoutCanvasInput>
+  }
+
   export type CanvasShareTokenUpsertWithWhereUniqueWithoutCanvasInput = {
     where: CanvasShareTokenWhereUniqueInput
     update: XOR<CanvasShareTokenUpdateWithoutCanvasInput, CanvasShareTokenUncheckedUpdateWithoutCanvasInput>
@@ -7607,14 +9464,144 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"CanvasShareToken"> | Date | string
   }
 
-  export type CanvasCreateWithoutShareTokensInput = {
+  export type CanvasCreateWithoutDocumentsInput = {
     id?: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     project: ProjectCreateNestedOneWithoutCanvasesInput
     canvasBlocks?: CanvasBlockCreateNestedManyWithoutCanvasInput
+    shareTokens?: CanvasShareTokenCreateNestedManyWithoutCanvasInput
+  }
+
+  export type CanvasUncheckedCreateWithoutDocumentsInput = {
+    id?: string
+    projectId: string
+    name?: string
+    order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput
+    shareTokens?: CanvasShareTokenUncheckedCreateNestedManyWithoutCanvasInput
+  }
+
+  export type CanvasCreateOrConnectWithoutDocumentsInput = {
+    where: CanvasWhereUniqueInput
+    create: XOR<CanvasCreateWithoutDocumentsInput, CanvasUncheckedCreateWithoutDocumentsInput>
+  }
+
+  export type ProjectCreateWithoutDocumentsInput = {
+    id?: string
+    userId: string
+    name: string
+    description?: string | null
+    icon?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    canvases?: CanvasCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutDocumentsInput = {
+    id?: string
+    userId: string
+    name: string
+    description?: string | null
+    icon?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    canvases?: CanvasUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutDocumentsInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutDocumentsInput, ProjectUncheckedCreateWithoutDocumentsInput>
+  }
+
+  export type CanvasUpsertWithoutDocumentsInput = {
+    update: XOR<CanvasUpdateWithoutDocumentsInput, CanvasUncheckedUpdateWithoutDocumentsInput>
+    create: XOR<CanvasCreateWithoutDocumentsInput, CanvasUncheckedCreateWithoutDocumentsInput>
+    where?: CanvasWhereInput
+  }
+
+  export type CanvasUpdateToOneWithWhereWithoutDocumentsInput = {
+    where?: CanvasWhereInput
+    data: XOR<CanvasUpdateWithoutDocumentsInput, CanvasUncheckedUpdateWithoutDocumentsInput>
+  }
+
+  export type CanvasUpdateWithoutDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutCanvasesNestedInput
+    canvasBlocks?: CanvasBlockUpdateManyWithoutCanvasNestedInput
+    shareTokens?: CanvasShareTokenUpdateManyWithoutCanvasNestedInput
+  }
+
+  export type CanvasUncheckedUpdateWithoutDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput
+    shareTokens?: CanvasShareTokenUncheckedUpdateManyWithoutCanvasNestedInput
+  }
+
+  export type ProjectUpsertWithoutDocumentsInput = {
+    update: XOR<ProjectUpdateWithoutDocumentsInput, ProjectUncheckedUpdateWithoutDocumentsInput>
+    create: XOR<ProjectCreateWithoutDocumentsInput, ProjectUncheckedCreateWithoutDocumentsInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutDocumentsInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutDocumentsInput, ProjectUncheckedUpdateWithoutDocumentsInput>
+  }
+
+  export type ProjectUpdateWithoutDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    canvases?: CanvasUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    canvases?: CanvasUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
+  export type CanvasCreateWithoutShareTokensInput = {
+    id?: string
+    name?: string
+    order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutCanvasesInput
+    canvasBlocks?: CanvasBlockCreateNestedManyWithoutCanvasInput
+    documents?: DocumentCreateNestedManyWithoutCanvasInput
   }
 
   export type CanvasUncheckedCreateWithoutShareTokensInput = {
@@ -7622,9 +9609,11 @@ export namespace Prisma {
     projectId: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput
+    documents?: DocumentUncheckedCreateNestedManyWithoutCanvasInput
   }
 
   export type CanvasCreateOrConnectWithoutShareTokensInput = {
@@ -7647,10 +9636,12 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutCanvasesNestedInput
     canvasBlocks?: CanvasBlockUpdateManyWithoutCanvasNestedInput
+    documents?: DocumentUpdateManyWithoutCanvasNestedInput
   }
 
   export type CanvasUncheckedUpdateWithoutShareTokensInput = {
@@ -7658,18 +9649,22 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutCanvasNestedInput
   }
 
   export type CanvasCreateWithoutCanvasBlocksInput = {
     id?: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     project: ProjectCreateNestedOneWithoutCanvasesInput
+    documents?: DocumentCreateNestedManyWithoutCanvasInput
     shareTokens?: CanvasShareTokenCreateNestedManyWithoutCanvasInput
   }
 
@@ -7678,8 +9673,10 @@ export namespace Prisma {
     projectId: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    documents?: DocumentUncheckedCreateNestedManyWithoutCanvasInput
     shareTokens?: CanvasShareTokenUncheckedCreateNestedManyWithoutCanvasInput
   }
 
@@ -7703,9 +9700,11 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutCanvasesNestedInput
+    documents?: DocumentUpdateManyWithoutCanvasNestedInput
     shareTokens?: CanvasShareTokenUpdateManyWithoutCanvasNestedInput
   }
 
@@ -7714,8 +9713,10 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    documents?: DocumentUncheckedUpdateManyWithoutCanvasNestedInput
     shareTokens?: CanvasShareTokenUncheckedUpdateManyWithoutCanvasNestedInput
   }
 
@@ -7723,6 +9724,17 @@ export namespace Prisma {
     id?: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateManyProjectInput = {
+    id?: string
+    canvasId: string
+    name?: string
+    order?: number
+    content?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -7731,9 +9743,11 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvasBlocks?: CanvasBlockUpdateManyWithoutCanvasNestedInput
+    documents?: DocumentUpdateManyWithoutCanvasNestedInput
     shareTokens?: CanvasShareTokenUpdateManyWithoutCanvasNestedInput
   }
 
@@ -7741,9 +9755,11 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput
+    documents?: DocumentUncheckedUpdateManyWithoutCanvasNestedInput
     shareTokens?: CanvasShareTokenUncheckedUpdateManyWithoutCanvasNestedInput
   }
 
@@ -7751,6 +9767,37 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    canvas?: CanvasUpdateOneRequiredWithoutDocumentsNestedInput
+  }
+
+  export type DocumentUncheckedUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    canvasId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    canvasId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    content?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -7766,6 +9813,16 @@ export namespace Prisma {
     content: JsonNullValueInput | InputJsonValue
     color?: string | null
     title?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DocumentCreateManyCanvasInput = {
+    id?: string
+    projectId: string
+    name?: string
+    order?: number
+    content?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -7818,6 +9875,36 @@ export namespace Prisma {
     content?: JsonNullValueInput | InputJsonValue
     color?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUpdateWithoutCanvasInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutDocumentsNestedInput
+  }
+
+  export type DocumentUncheckedUpdateWithoutCanvasInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    content?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentUncheckedUpdateManyWithoutCanvasInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    content?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

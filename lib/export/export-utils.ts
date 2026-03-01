@@ -25,6 +25,13 @@ export interface ExportCanvas {
   updatedAt?: string;
 }
 
+export interface ExportDocument {
+  id: string;
+  name: string;
+  order: number;
+  content: unknown;
+}
+
 export interface ExportCanvasWithBlocks {
   id: string;
   name: string;
@@ -46,6 +53,7 @@ export interface ExportCanvasWithBlocks {
     createdAt: string;
     updatedAt: string;
   }>;
+  documents?: ExportDocument[];
 }
 
 export interface ExportProjectData {

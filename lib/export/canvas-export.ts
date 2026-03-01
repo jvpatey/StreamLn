@@ -39,3 +39,8 @@ export {
   buildProjectPNGZip,
   type ExportProgressCallback,
 } from "./export-project";
+
+export {
+  exportDocumentAsMarkdown,
+  exportDocumentAsPDF,
+} from "./document-export";

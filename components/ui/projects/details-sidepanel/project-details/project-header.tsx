@@ -78,7 +78,9 @@ export function ProjectHeader({
             const created = formatDistanceToNow(new Date(project.createdAt), {
               addSuffix: true,
             });
-            const updated = formatDistanceToNow(new Date(project.updatedAt), {
+            const updatedAt =
+              project.lastUpdatedAt ?? project.updatedAt;
+            const updated = formatDistanceToNow(new Date(updatedAt), {
               addSuffix: true,
             });
             return `Created ${created} · Updated ${updated}`;

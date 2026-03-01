@@ -176,7 +176,7 @@ export default function HeroSection() {
 
           {/* Feature preview dots with hover animations */}
           <motion.div
-            className="mt-10 sm:mt-16 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-12 text-base text-slate-600 dark:text-slate-300"
+            className="mt-10 sm:mt-16 flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-4 sm:gap-12 text-base text-slate-600 dark:text-slate-300"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={
@@ -186,7 +186,7 @@ export default function HeroSection() {
             }
           >
             <motion.span
-              className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-slate-900 dark:hover:text-slate-100 hover:scale-105"
+              className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-slate-900 dark:hover:text-slate-100 hover:scale-105 whitespace-nowrap"
               initial={
                 shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }
               }
@@ -197,13 +197,13 @@ export default function HeroSection() {
                   : { duration: 0.5, ease: "easeOut", delay: 0.7 }
               }
             >
-              <div className="relative h-3 w-3 rounded-full bg-primary-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:shadow-primary-500/50">
+              <div className="relative h-3 w-3 rounded-full bg-primary-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(59,130,246,0.6)]">
                 <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               Infinite Canvas
             </motion.span>
             <motion.span
-              className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-slate-900 dark:hover:text-slate-100 hover:scale-105"
+              className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-slate-900 dark:hover:text-slate-100 hover:scale-105 whitespace-nowrap"
               initial={
                 shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }
               }
@@ -214,13 +214,13 @@ export default function HeroSection() {
                   : { duration: 0.5, ease: "easeOut", delay: 0.8 }
               }
             >
-              <div className="relative h-3 w-3 rounded-full bg-accent-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(168,85,247,0.6)] group-hover:shadow-accent-500/50">
+              <div className="relative h-3 w-3 rounded-full bg-nebula-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(99,102,241,0.6)]">
                 <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               Drag & Drop
             </motion.span>
             <motion.span
-              className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-slate-900 dark:hover:text-slate-100 hover:scale-105"
+              className="group flex items-center gap-3 cursor-pointer transition-all duration-200 hover:text-slate-900 dark:hover:text-slate-100 hover:scale-105 whitespace-nowrap"
               initial={
                 shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }
               }
@@ -228,13 +228,13 @@ export default function HeroSection() {
               transition={
                 shouldReduceMotion
                   ? { duration: 0.01 }
-                  : { duration: 0.5, ease: "easeOut", delay: 0.9 }
+                  : { duration: 0.5, ease: "easeOut", delay: 1.0 }
               }
             >
-              <div className="relative h-3 w-3 rounded-full bg-primary-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(59,130,246,0.6)] group-hover:shadow-primary-500/50">
+              <div className="relative h-3 w-3 rounded-full bg-accent-500 transition-all duration-300 group-hover:scale-125 group-hover:brightness-125 group-hover:shadow-[0_0_8px_rgba(245,158,11,0.6)]">
                 <div className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
-              Visual Organization
+              Document Editing
             </motion.span>
           </motion.div>
         </div>

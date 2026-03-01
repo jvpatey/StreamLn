@@ -109,20 +109,28 @@ export function ShareCanvasModal({
   const handleCopy = async (shareToken: ShareToken) => {
     const url = getShareUrl(shareToken.token);
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title: `${canvasName} - ${projectName}`,
-          text: `View ${canvasName} on StreamLn`,
-          url,
-        });
-      } else {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(url);
+      } else {
+        throw new Error("Clipboard not available");
       }
-      setCopiedId(shareToken.id);
-      setTimeout(() => setCopiedId(null), 2000);
     } catch {
-      setError("Failed to copy link");
+      try {
+        const textarea = document.createElement("textarea");
+        textarea.value = url;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      } catch {
+        setError("Failed to copy link");
+        return;
+      }
     }
+    setCopiedId(shareToken.id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const handleRevoke = async (tokenId: string) => {
@@ -175,10 +183,10 @@ export function ShareCanvasModal({
               </div>
               <div>
                 <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-                  Share Canvas
+                  Share Canvas & Documents
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Copy a link to share
+                  Copy a link to share canvas and documents
                 </p>
               </div>
             </div>

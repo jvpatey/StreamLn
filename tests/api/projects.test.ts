@@ -55,7 +55,9 @@ describe("GET /api/projects", () => {
             order: 0,
             createdAt: new Date(),
             updatedAt: new Date(),
-            _count: { canvasBlocks: 5 },
+            _count: { canvasBlocks: 5, documents: 2 },
+            documents: [{ updatedAt: new Date() }],
+            canvasBlocks: [{ updatedAt: new Date() }],
           },
         ],
       },
@@ -68,13 +70,27 @@ describe("GET /api/projects", () => {
     const json = await res.json();
     expect(json).toHaveLength(1);
     expect(json[0].blocks).toBe(5);
+    expect(json[0].documents).toBe(2);
     expect(json[0].canvasCount).toBe(1);
     expect(json[0].name).toBe("Test");
+    expect(json[0].lastUpdatedAt).toBeDefined();
     expect(prisma.project.findMany).toHaveBeenCalledWith({
       where: { userId: "user-123" },
       include: {
         canvases: {
-          include: { _count: { select: { canvasBlocks: true } } },
+          include: {
+            _count: { select: { canvasBlocks: true, documents: true } },
+            documents: {
+              orderBy: { updatedAt: "desc" },
+              take: 1,
+              select: { updatedAt: true },
+            },
+            canvasBlocks: {
+              orderBy: { updatedAt: "desc" },
+              take: 1,
+              select: { updatedAt: true },
+            },
+          },
         },
       },
     });

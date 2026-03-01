@@ -38,8 +38,10 @@ interface Project {
   description?: string;
   status?: string;
   updatedAt?: string;
+  lastUpdatedAt?: string;
   createdAt?: string;
   blocks?: number;
+  documents?: number;
   canvasCount?: number;
   userId?: string;
   icon?: string;
@@ -379,6 +381,7 @@ export function ProjectsContent({
                     <div className="space-y-2 text-xs text-slate-500 dark:text-slate-500">
                       <p>• Create Project — sidebar or card above</p>
                       <p>• Import from JSON — sidebar</p>
+                      <p>• Create documents in any canvas — sidebar</p>
                       <p>
                         • Press {getKeyboardShortcut("⌘K")} to search and create
                       </p>
@@ -412,10 +415,17 @@ export function ProjectsContent({
                         id={project.id}
                         name={project.name}
                         type={project.description || "Project Workspace"}
-                        lastModified={formatTimeAgo(project.updatedAt)}
+                        lastModified={formatTimeAgo(
+                          project.lastUpdatedAt ?? project.updatedAt
+                        )}
                         blocks={
                           typeof project.blocks === "number"
                             ? project.blocks
+                            : 0
+                        }
+                        documents={
+                          typeof project.documents === "number"
+                            ? project.documents
                             : 0
                         }
                         canvasCount={
@@ -516,6 +526,7 @@ export function ProjectsContent({
                     <div className="space-y-2 text-xs text-slate-500 dark:text-slate-500">
                       <p>• Create Project — button above or sidebar</p>
                       <p>• Import from JSON — sidebar</p>
+                      <p>• Create documents in any canvas — sidebar</p>
                       <p>
                         • Press {getKeyboardShortcut("⌘K")} to search and create
                       </p>
@@ -546,7 +557,8 @@ export function ProjectsContent({
                         delay: shouldReduceMotion ? 0 : index * 0.04,
                         ease: [0.25, 0.46, 0.45, 0.94],
                       }}
-                      className="flex items-center px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                      className="flex items-center px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                      onClick={() => onProjectClick?.(project)}
                     >
                       {/* Icon */}
                       <div className="w-8 flex-shrink-0">

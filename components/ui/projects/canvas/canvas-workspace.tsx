@@ -446,6 +446,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
                 <div className="space-y-2 text-xs text-slate-500 dark:text-slate-500">
                   <p>• Double-click to add a note</p>
                   <p>• Use the sidebar to add different block types</p>
+                  <p>• Create documents in the sidebar for long-form writing</p>
                   <p>• Drag blocks to rearrange them</p>
                   <p>• Scroll to zoom in and out</p>
                   <p>

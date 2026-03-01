@@ -1,4 +1,9 @@
-import type { Canvas, CanvasBlock, CanvasBlockType } from "@/lib/types/canvas";
+import type {
+  Canvas,
+  CanvasBlock,
+  CanvasBlockType,
+  Document,
+} from "@/lib/types/canvas";
 
 interface RawBlock {
   id: string;
@@ -148,6 +153,175 @@ export async function saveCanvasBlocks(
 
   if (!res.ok) {
     return { ok: false, conflict: false, error: "Failed to save canvas blocks" };
+  }
+
+  const data = await res.json();
+  return { ok: true, updatedAt: data.updatedAt ?? new Date().toISOString() };
+}
+
+export type SaveCanvasDocumentResult =
+  | { ok: true; updatedAt: string }
+  | { ok: false; conflict: true }
+  | { ok: false; conflict: false; error: string };
+
+export async function saveCanvasDocument(
+  projectId: string,
+  canvasId: string,
+  documentContent: unknown,
+  lastSavedAt?: string
+): Promise<SaveCanvasDocumentResult> {
+  const res = await fetch(
+    `/api/projects/${projectId}/canvases/${canvasId}/document`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ documentContent, lastSavedAt }),
+    }
+  );
+
+  if (res.status === 409) {
+    return { ok: false, conflict: true };
+  }
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      conflict: false,
+      error: "Failed to save document",
+    };
+  }
+
+  const data = await res.json();
+  return { ok: true, updatedAt: data.updatedAt ?? new Date().toISOString() };
+}
+
+export interface ProjectDocumentTree {
+  canvases: Array<{
+    id: string;
+    name: string;
+    order: number;
+    documents: Array<{ id: string; name: string; order: number }>;
+  }>;
+}
+
+export async function fetchProjectDocuments(
+  projectId: string
+): Promise<ProjectDocumentTree> {
+  const res = await fetch(`/api/projects/${projectId}/project-documents`);
+  if (!res.ok) throw new Error("Failed to fetch project documents");
+  const data = await res.json();
+  return { canvases: data.canvases ?? [] };
+}
+
+export async function fetchDocuments(
+  projectId: string,
+  canvasId: string
+): Promise<Document[]> {
+  const res = await fetch(
+    `/api/projects/${projectId}/canvases/${canvasId}/documents`
+  );
+  if (!res.ok) throw new Error("Failed to fetch documents");
+  const data = await res.json();
+  return data.documents ?? [];
+}
+
+export async function createDocument(
+  projectId: string,
+  canvasId: string,
+  name?: string,
+  order?: number
+): Promise<Document> {
+  const res = await fetch(
+    `/api/projects/${projectId}/canvases/${canvasId}/documents`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name ?? "Untitled Document", order }),
+    }
+  );
+  if (!res.ok) throw new Error("Failed to create document");
+  return res.json();
+}
+
+export async function updateDocument(
+  projectId: string,
+  canvasId: string,
+  documentId: string,
+  updates: { name?: string; order?: number }
+): Promise<Document> {
+  const res = await fetch(
+    `/api/projects/${projectId}/canvases/${canvasId}/documents/${documentId}`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    }
+  );
+  if (!res.ok) throw new Error("Failed to update document");
+  return res.json();
+}
+
+export async function deleteDocument(
+  projectId: string,
+  canvasId: string,
+  documentId: string
+): Promise<void> {
+  const res = await fetch(
+    `/api/projects/${projectId}/canvases/${canvasId}/documents/${documentId}`,
+    { method: "DELETE" }
+  );
+  if (!res.ok) throw new Error("Failed to delete document");
+}
+
+export async function reorderDocuments(
+  projectId: string,
+  canvasId: string,
+  updates: { id: string; order: number }[]
+): Promise<Document[]> {
+  const res = await fetch(
+    `/api/projects/${projectId}/canvases/${canvasId}/documents`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ updates }),
+    }
+  );
+  if (!res.ok) throw new Error("Failed to reorder documents");
+  const data = await res.json();
+  return data.documents ?? [];
+}
+
+export type SaveDocumentResult =
+  | { ok: true; updatedAt: string }
+  | { ok: false; conflict: true }
+  | { ok: false; conflict: false; error: string };
+
+export async function saveDocument(
+  projectId: string,
+  canvasId: string,
+  documentId: string,
+  content: unknown,
+  lastSavedAt?: string
+): Promise<SaveDocumentResult> {
+  const res = await fetch(
+    `/api/projects/${projectId}/canvases/${canvasId}/documents/${documentId}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content, lastSavedAt }),
+    }
+  );
+
+  if (res.status === 409) {
+    return { ok: false, conflict: true };
+  }
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      conflict: false,
+      error: "Failed to save document",
+    };
   }
 
   const data = await res.json();

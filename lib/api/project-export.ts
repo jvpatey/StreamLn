@@ -33,6 +33,12 @@ export interface ExportProjectData {
       createdAt: string;
       updatedAt: string;
     }>;
+    documents?: Array<{
+      id: string;
+      name: string;
+      order: number;
+      content: unknown;
+    }>;
   }>;
 }
 
