@@ -44,6 +44,18 @@ export const createCanvasSchema = z.object({
 export const updateCanvasSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   order: z.number().int().min(0).optional(),
+  documentContent: z.unknown().optional().nullable(),
+});
+
+export const saveCanvasDocumentSchema = z.object({
+  documentContent: z.unknown(),
+  lastSavedAt: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || Number.isFinite(new Date(val).getTime()),
+      { message: "lastSavedAt must be a valid ISO datetime string" }
+    ),
 });
 
 export const reorderCanvasesSchema = z.object({
@@ -64,6 +76,7 @@ export const createShareTokenSchema = z.object({
 
 export type CanvasBlockInput = z.infer<typeof canvasBlockSchema>;
 export type SaveCanvasBlocksInput = z.infer<typeof saveCanvasBlocksSchema>;
+export type SaveCanvasDocumentInput = z.infer<typeof saveCanvasDocumentSchema>;
 export type CreateCanvasInput = z.infer<typeof createCanvasSchema>;
 export type UpdateCanvasInput = z.infer<typeof updateCanvasSchema>;
 export type ReorderCanvasesInput = z.infer<typeof reorderCanvasesSchema>;

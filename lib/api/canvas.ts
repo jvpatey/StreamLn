@@ -153,3 +153,39 @@ export async function saveCanvasBlocks(
   const data = await res.json();
   return { ok: true, updatedAt: data.updatedAt ?? new Date().toISOString() };
 }
+
+export type SaveCanvasDocumentResult =
+  | { ok: true; updatedAt: string }
+  | { ok: false; conflict: true }
+  | { ok: false; conflict: false; error: string };
+
+export async function saveCanvasDocument(
+  projectId: string,
+  canvasId: string,
+  documentContent: unknown,
+  lastSavedAt?: string
+): Promise<SaveCanvasDocumentResult> {
+  const res = await fetch(
+    `/api/projects/${projectId}/canvases/${canvasId}/document`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ documentContent, lastSavedAt }),
+    }
+  );
+
+  if (res.status === 409) {
+    return { ok: false, conflict: true };
+  }
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      conflict: false,
+      error: "Failed to save document",
+    };
+  }
+
+  const data = await res.json();
+  return { ok: true, updatedAt: data.updatedAt ?? new Date().toISOString() };
+}

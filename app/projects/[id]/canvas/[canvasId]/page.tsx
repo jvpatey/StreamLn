@@ -7,6 +7,7 @@ import {
   type CanvasTool,
 } from "@/components/ui/projects/canvas/canvas-toolbar";
 import { CanvasWorkspace } from "@/components/ui/projects/canvas/canvas-workspace";
+import { CanvasDocumentEditor } from "@/components/ui/projects/canvas/canvas-document-editor";
 import { CanvasSidebar } from "@/components/ui/projects/canvas/canvas-sidebar";
 import { CanvasFloatingToolbar } from "@/components/ui/projects/canvas/canvas-floating-toolbar";
 import { CanvasHeader } from "@/components/ui/projects/canvas/canvas-header";
@@ -109,6 +110,7 @@ export default function ProjectCanvasPage() {
   const [toolbarOpen, setToolbarOpen] = useState(true);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const [isToolbarExiting, setIsToolbarExiting] = useState(false);
+  const [primaryMode, setPrimaryMode] = useState<"canvas" | "document">("canvas");
   const [viewMode, setViewMode] = useState<"edit" | "present">("edit");
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -652,6 +654,8 @@ export default function ProjectCanvasPage() {
         project={displayProject}
         canvas={displayCanvas}
         canvases={displayCanvases}
+        primaryMode={primaryMode}
+        onPrimaryModeChange={setPrimaryMode}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onCanvasCreate={handleCreateCanvas}
@@ -731,110 +735,130 @@ export default function ProjectCanvasPage() {
         </div>
       )}
       <div className="flex h-[calc(100vh-64px)] relative">
-        {!sidebarOpen && (
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(true)}
-            title="Show sidebar"
-            aria-label="Show sidebar"
-            className="absolute left-0 top-4 z-30 flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
-          >
-            <PanelLeftOpen size={18} aria-hidden />
-          </button>
-        )}
-        <CanvasSidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onAddBlock={
-            loading
-              ? () => {}
-              : (type, position) => {
-                  setIsAddingBlock(type);
-                  const canvasCenter = {
-                    x: (window.innerWidth / 2 - panOffset.x) / zoomLevel,
-                    y: (window.innerHeight / 2 - panOffset.y) / zoomLevel,
-                  };
-                  addBlock(type, position || canvasCenter);
-                }
-          }
-          selectedBlocks={selectedBlocks}
-          canvasBlocks={canvasBlocks}
-          onBlockUpdate={updateBlock}
-          onBlockSelect={setSelectedBlocks}
-        />
-        <div className="flex-1 relative overflow-hidden">
-          {!toolbarOpen && !isToolbarExiting && (
-            <CanvasToolbarShowTab onShow={() => setToolbarOpen(true)} />
-          )}
-          {(toolbarOpen || isToolbarExiting) && (
-            <CanvasToolbar
-              tool={activeTool}
-              onToolChange={(newTool) => {
-                setActiveTool(newTool);
-                if (newTool === "text") setIsAddingBlock("text");
-                else if (newTool === "shape") setIsAddingBlock("shape");
-                else setIsAddingBlock(null);
-              }}
-              onAddShape={(shapeKind) => {
-                setAddingShapeKind(shapeKind);
-                setActiveTool("shape");
-                setIsAddingBlock("shape");
-              }}
-              zoomLevel={zoomLevel}
-              onZoomChange={setZoomLevel}
-              showGrid={showGrid}
-              onGridToggle={() => setShowGrid(!showGrid)}
-              onResetView={() => {
-                setZoomLevel(1);
-                setPanOffset({ x: 0, y: 0 });
-              }}
-              onFitToView={handleFitToView}
-              onToolbarToggle={() => setIsToolbarExiting(true)}
-              onToolbarExitComplete={() => {
-                setToolbarOpen(false);
-                setIsToolbarExiting(false);
-              }}
-              isExiting={isToolbarExiting}
+        {primaryMode === "document" ? (
+          <div className="flex-1 relative overflow-hidden">
+            {!loading && project && canvas && (
+              <CanvasDocumentEditor
+                documentContent={canvas.documentContent}
+                projectId={project.id}
+                canvasId={canvas.id}
+                lastSavedAt={lastSavedAt}
+                onDocumentSaved={(updatedAt) => {
+                  lastSavedAtRef.current = updatedAt;
+                  setLastSavedAt(updatedAt);
+                }}
+                onSaveConflict={() => setSaveConflict(true)}
+              />
+            )}
+          </div>
+        ) : (
+          <>
+            {!sidebarOpen && (
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                title="Show sidebar"
+                aria-label="Show sidebar"
+                className="absolute left-0 top-4 z-30 flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                <PanelLeftOpen size={18} aria-hidden />
+              </button>
+            )}
+            <CanvasSidebar
+              isOpen={sidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              onAddBlock={
+                loading
+                  ? () => {}
+                  : (type, position) => {
+                      setIsAddingBlock(type);
+                      const canvasCenter = {
+                        x: (window.innerWidth / 2 - panOffset.x) / zoomLevel,
+                        y: (window.innerHeight / 2 - panOffset.y) / zoomLevel,
+                      };
+                      addBlock(type, position || canvasCenter);
+                    }
+              }
+              selectedBlocks={selectedBlocks}
               canvasBlocks={canvasBlocks}
-              selectedBlocks={selectedBlocks}
-              onDeleteSelected={deleteSelectedBlocks}
-              onDuplicateSelected={duplicateBlocks}
-            />
-          )}
-          {loading ? (
-            <CanvasWorkspaceSkeleton />
-          ) : (
-            <CanvasWorkspace
-              ref={canvasRef}
-              activeTool={activeTool}
-              blocks={canvasBlocks}
-              canvasName={canvas?.name}
-              selectedBlocks={selectedBlocks}
-              onBlockSelect={setSelectedBlocks}
               onBlockUpdate={updateBlock}
-              onBlockDuplicate={duplicateBlock}
-              onBlockDelete={deleteBlock}
-              zoomLevel={zoomLevel}
-              panOffset={panOffset}
-              onZoomChange={setZoomLevel}
-              onPanOffsetChange={setPanOffset}
-              showGrid={showGrid}
-              isDragging={isDragging}
-              onDraggingChange={setIsDragging}
-              isResizing={isResizing}
-              onResizingChange={setIsResizing}
-              isAddingBlock={isAddingBlock}
-              onAddBlock={addBlock}
-              onFloatingToolbarShow={(position) => {
-                setFloatingToolbarPosition(position);
-                setShowFloatingToolbar(true);
-              }}
-              viewMode={viewMode}
+              onBlockSelect={setSelectedBlocks}
             />
-          )}
-        </div>
+            <div className="flex-1 relative overflow-hidden">
+              {!toolbarOpen && !isToolbarExiting && (
+                <CanvasToolbarShowTab onShow={() => setToolbarOpen(true)} />
+              )}
+              {(toolbarOpen || isToolbarExiting) && (
+                <CanvasToolbar
+                  tool={activeTool}
+                  onToolChange={(newTool) => {
+                    setActiveTool(newTool);
+                    if (newTool === "text") setIsAddingBlock("text");
+                    else if (newTool === "shape") setIsAddingBlock("shape");
+                    else setIsAddingBlock(null);
+                  }}
+                  onAddShape={(shapeKind) => {
+                    setAddingShapeKind(shapeKind);
+                    setActiveTool("shape");
+                    setIsAddingBlock("shape");
+                  }}
+                  zoomLevel={zoomLevel}
+                  onZoomChange={setZoomLevel}
+                  showGrid={showGrid}
+                  onGridToggle={() => setShowGrid(!showGrid)}
+                  onResetView={() => {
+                    setZoomLevel(1);
+                    setPanOffset({ x: 0, y: 0 });
+                  }}
+                  onFitToView={handleFitToView}
+                  onToolbarToggle={() => setIsToolbarExiting(true)}
+                  onToolbarExitComplete={() => {
+                    setToolbarOpen(false);
+                    setIsToolbarExiting(false);
+                  }}
+                  isExiting={isToolbarExiting}
+                  canvasBlocks={canvasBlocks}
+                  selectedBlocks={selectedBlocks}
+                  onDeleteSelected={deleteSelectedBlocks}
+                  onDuplicateSelected={duplicateBlocks}
+                />
+              )}
+              {loading ? (
+                <CanvasWorkspaceSkeleton />
+              ) : (
+                <CanvasWorkspace
+                  ref={canvasRef}
+                  activeTool={activeTool}
+                  blocks={canvasBlocks}
+                  canvasName={canvas?.name}
+                  selectedBlocks={selectedBlocks}
+                  onBlockSelect={setSelectedBlocks}
+                  onBlockUpdate={updateBlock}
+                  onBlockDuplicate={duplicateBlock}
+                  onBlockDelete={deleteBlock}
+                  zoomLevel={zoomLevel}
+                  panOffset={panOffset}
+                  onZoomChange={setZoomLevel}
+                  onPanOffsetChange={setPanOffset}
+                  showGrid={showGrid}
+                  isDragging={isDragging}
+                  onDraggingChange={setIsDragging}
+                  isResizing={isResizing}
+                  onResizingChange={setIsResizing}
+                  isAddingBlock={isAddingBlock}
+                  onAddBlock={addBlock}
+                  onFloatingToolbarShow={(position) => {
+                    setFloatingToolbarPosition(position);
+                    setShowFloatingToolbar(true);
+                  }}
+                  viewMode={viewMode}
+                />
+              )}
+            </div>
+          </>
+        )}
       </div>
-      {showFloatingToolbar && selectedBlocks.length > 0 && (
+      {primaryMode === "canvas" && showFloatingToolbar && selectedBlocks.length > 0 && (
         <CanvasFloatingToolbar
           position={floatingToolbarPosition}
           selectedBlocks={selectedBlocks}

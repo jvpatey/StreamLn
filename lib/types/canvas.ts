@@ -3,6 +3,7 @@ export interface Canvas {
   projectId: string;
   name: string;
   order: number;
+  documentContent?: unknown | null;
   createdAt: string;
   updatedAt: string;
   blocksCount?: number;

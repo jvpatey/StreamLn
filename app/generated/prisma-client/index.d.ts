@@ -2364,6 +2364,7 @@ export namespace Prisma {
     projectId: number
     name: number
     order: number
+    documentContent: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2401,6 +2402,7 @@ export namespace Prisma {
     projectId?: true
     name?: true
     order?: true
+    documentContent?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2497,6 +2499,7 @@ export namespace Prisma {
     projectId: string
     name: string
     order: number
+    documentContent: JsonValue | null
     createdAt: Date
     updatedAt: Date
     _count: CanvasCountAggregateOutputType | null
@@ -2525,6 +2528,7 @@ export namespace Prisma {
     projectId?: boolean
     name?: boolean
     order?: boolean
+    documentContent?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     project?: boolean | ProjectDefaultArgs<ExtArgs>
@@ -2538,6 +2542,7 @@ export namespace Prisma {
     projectId?: boolean
     name?: boolean
     order?: boolean
+    documentContent?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     project?: boolean | ProjectDefaultArgs<ExtArgs>
@@ -2548,6 +2553,7 @@ export namespace Prisma {
     projectId?: boolean
     name?: boolean
     order?: boolean
+    documentContent?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     project?: boolean | ProjectDefaultArgs<ExtArgs>
@@ -2558,11 +2564,12 @@ export namespace Prisma {
     projectId?: boolean
     name?: boolean
     order?: boolean
+    documentContent?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type CanvasOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "name" | "order" | "createdAt" | "updatedAt", ExtArgs["result"]["canvas"]>
+  export type CanvasOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "name" | "order" | "documentContent" | "createdAt" | "updatedAt", ExtArgs["result"]["canvas"]>
   export type CanvasInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
     canvasBlocks?: boolean | Canvas$canvasBlocksArgs<ExtArgs>
@@ -2588,6 +2595,7 @@ export namespace Prisma {
       projectId: string
       name: string
       order: number
+      documentContent: Prisma.JsonValue | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["canvas"]>
@@ -3020,6 +3028,7 @@ export namespace Prisma {
     readonly projectId: FieldRef<"Canvas", 'String'>
     readonly name: FieldRef<"Canvas", 'String'>
     readonly order: FieldRef<"Canvas", 'Int'>
+    readonly documentContent: FieldRef<"Canvas", 'Json'>
     readonly createdAt: FieldRef<"Canvas", 'DateTime'>
     readonly updatedAt: FieldRef<"Canvas", 'DateTime'>
   }
@@ -5783,6 +5792,7 @@ export namespace Prisma {
     projectId: 'projectId',
     name: 'name',
     order: 'order',
+    documentContent: 'documentContent',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -5826,6 +5836,14 @@ export namespace Prisma {
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const JsonNullValueInput: {
@@ -5908,20 +5926,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Float'
-   */
-  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-  /**
-   * Reference to a field of type 'Float[]'
-   */
-  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -5932,6 +5936,20 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float'
+   */
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float[]'
+   */
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
   /**
    * Deep Input Types
@@ -6016,6 +6034,7 @@ export namespace Prisma {
     projectId?: StringFilter<"Canvas"> | string
     name?: StringFilter<"Canvas"> | string
     order?: IntFilter<"Canvas"> | number
+    documentContent?: JsonNullableFilter<"Canvas">
     createdAt?: DateTimeFilter<"Canvas"> | Date | string
     updatedAt?: DateTimeFilter<"Canvas"> | Date | string
     project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
@@ -6028,6 +6047,7 @@ export namespace Prisma {
     projectId?: SortOrder
     name?: SortOrder
     order?: SortOrder
+    documentContent?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     project?: ProjectOrderByWithRelationInput
@@ -6043,6 +6063,7 @@ export namespace Prisma {
     projectId?: StringFilter<"Canvas"> | string
     name?: StringFilter<"Canvas"> | string
     order?: IntFilter<"Canvas"> | number
+    documentContent?: JsonNullableFilter<"Canvas">
     createdAt?: DateTimeFilter<"Canvas"> | Date | string
     updatedAt?: DateTimeFilter<"Canvas"> | Date | string
     project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
@@ -6055,6 +6076,7 @@ export namespace Prisma {
     projectId?: SortOrder
     name?: SortOrder
     order?: SortOrder
+    documentContent?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: CanvasCountOrderByAggregateInput
@@ -6072,6 +6094,7 @@ export namespace Prisma {
     projectId?: StringWithAggregatesFilter<"Canvas"> | string
     name?: StringWithAggregatesFilter<"Canvas"> | string
     order?: IntWithAggregatesFilter<"Canvas"> | number
+    documentContent?: JsonNullableWithAggregatesFilter<"Canvas">
     createdAt?: DateTimeWithAggregatesFilter<"Canvas"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Canvas"> | Date | string
   }
@@ -6313,6 +6336,7 @@ export namespace Prisma {
     id?: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     project: ProjectCreateNestedOneWithoutCanvasesInput
@@ -6325,6 +6349,7 @@ export namespace Prisma {
     projectId: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput
@@ -6335,6 +6360,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutCanvasesNestedInput
@@ -6347,6 +6373,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput
@@ -6358,6 +6385,7 @@ export namespace Prisma {
     projectId: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -6366,6 +6394,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -6375,6 +6404,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -6694,6 +6724,29 @@ export namespace Prisma {
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntFilter<$PrismaModel> | number
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type ProjectScalarRelationFilter = {
     is?: ProjectWhereInput
@@ -6725,6 +6778,7 @@ export namespace Prisma {
     projectId?: SortOrder
     name?: SortOrder
     order?: SortOrder
+    documentContent?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -6769,6 +6823,32 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type DateTimeNullableFilter<$PrismaModel = never> = {
@@ -7298,6 +7378,29 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
@@ -7367,6 +7470,7 @@ export namespace Prisma {
     id?: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     canvasBlocks?: CanvasBlockCreateNestedManyWithoutCanvasInput
@@ -7377,6 +7481,7 @@ export namespace Prisma {
     id?: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput
@@ -7417,6 +7522,7 @@ export namespace Prisma {
     projectId?: StringFilter<"Canvas"> | string
     name?: StringFilter<"Canvas"> | string
     order?: IntFilter<"Canvas"> | number
+    documentContent?: JsonNullableFilter<"Canvas">
     createdAt?: DateTimeFilter<"Canvas"> | Date | string
     updatedAt?: DateTimeFilter<"Canvas"> | Date | string
   }
@@ -7611,6 +7717,7 @@ export namespace Prisma {
     id?: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     project: ProjectCreateNestedOneWithoutCanvasesInput
@@ -7622,6 +7729,7 @@ export namespace Prisma {
     projectId: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     canvasBlocks?: CanvasBlockUncheckedCreateNestedManyWithoutCanvasInput
@@ -7647,6 +7755,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutCanvasesNestedInput
@@ -7658,6 +7767,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput
@@ -7667,6 +7777,7 @@ export namespace Prisma {
     id?: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     project: ProjectCreateNestedOneWithoutCanvasesInput
@@ -7678,6 +7789,7 @@ export namespace Prisma {
     projectId: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     shareTokens?: CanvasShareTokenUncheckedCreateNestedManyWithoutCanvasInput
@@ -7703,6 +7815,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutCanvasesNestedInput
@@ -7714,6 +7827,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     shareTokens?: CanvasShareTokenUncheckedUpdateManyWithoutCanvasNestedInput
@@ -7723,6 +7837,7 @@ export namespace Prisma {
     id?: string
     name?: string
     order?: number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -7731,6 +7846,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvasBlocks?: CanvasBlockUpdateManyWithoutCanvasNestedInput
@@ -7741,6 +7857,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     canvasBlocks?: CanvasBlockUncheckedUpdateManyWithoutCanvasNestedInput
@@ -7751,6 +7868,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
+    documentContent?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

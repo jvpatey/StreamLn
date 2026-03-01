@@ -30,6 +30,8 @@ import {
   ChevronDown,
   Pencil,
   Trash2,
+  LayoutGrid,
+  FileText,
 } from "lucide-react";
 import {
   Popover,
@@ -94,6 +96,8 @@ interface CanvasHeaderProps {
   project: Project;
   canvas?: CanvasItem;
   canvases?: CanvasItem[];
+  primaryMode: "canvas" | "document";
+  onPrimaryModeChange: (mode: "canvas" | "document") => void;
   viewMode: "edit" | "present";
   onViewModeChange: (mode: "edit" | "present") => void;
   onCanvasCreate?: (name: string) => void;
@@ -118,6 +122,8 @@ export function CanvasHeader({
   project,
   canvas,
   canvases = [],
+  primaryMode,
+  onPrimaryModeChange,
   viewMode,
   onViewModeChange,
   onCanvasCreate,
@@ -457,12 +463,12 @@ export function CanvasHeader({
               </Popover>
             </div>
 
-            {/* Center section - Edit/View toggle */}
-            <div className="flex items-center gap-4 shrink-0">
-              {/* Edit/View toggle - no border */}
+            {/* Center section - Primary mode (Canvas/Document) + Edit/View when Canvas */}
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Primary mode: Canvas | Document */}
               <div
                 role="radiogroup"
-                aria-label="View mode"
+                aria-label="Primary mode"
                 className={cn(
                   "hidden md:flex items-center p-1 gap-0.5 relative",
                   getLiquidGlassSurfaceClassName({
@@ -473,56 +479,121 @@ export function CanvasHeader({
                   })
                 )}
               >
-              {/* Sliding indicator - spring animation matches sidebar */}
-              <motion.div
-                className={cn(
-                  "absolute left-1 top-1 h-9 w-32 rounded-xl pointer-events-none",
-                  "bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/20 dark:via-primary-400/25 dark:to-accent-500/20",
-                  "backdrop-blur-2xl",
-                  "border border-white/30 dark:border-white/20",
-                  "shadow-[0_8px_32px_rgba(59,130,246,0.2),0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.3)]",
-                  "dark:shadow-[0_8px_32px_rgba(59,130,246,0.15),0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
-                )}
-                animate={{
-                  x: viewMode === "present" ? "calc(100% + 4px)" : 0,
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 400,
-                  damping: 30,
-                }}
-              />
-              <button
-                type="button"
-                role="radio"
-                aria-checked={viewMode === "edit"}
-                onClick={() => onViewModeChange("edit")}
-                className={cn(
-                  "relative z-10 text-xs rounded-xl h-9 w-32 flex items-center justify-center font-medium transition-colors duration-200",
-                  viewMode === "edit"
-                    ? "text-slate-900 dark:text-white"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100"
-                )}
-              >
-                <Edit3 size={16} className="mr-2" />
-                Edit
-              </button>
-              <button
-                type="button"
-                role="radio"
-                aria-checked={viewMode === "present"}
-                onClick={() => onViewModeChange("present")}
-                className={cn(
-                  "relative z-10 text-xs rounded-xl h-9 w-32 flex items-center justify-center font-medium transition-colors duration-200",
-                  viewMode === "present"
-                    ? "text-slate-900 dark:text-white"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100"
-                )}
-              >
-                <Eye size={16} className="mr-2" />
-                View
-              </button>
-            </div>
+                <motion.div
+                  className={cn(
+                    "absolute left-1 top-1 h-9 w-28 rounded-xl pointer-events-none",
+                    "bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/20 dark:via-primary-400/25 dark:to-accent-500/20",
+                    "backdrop-blur-2xl",
+                    "border border-white/30 dark:border-white/20",
+                    "shadow-[0_8px_32px_rgba(59,130,246,0.2),0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.3)]",
+                    "dark:shadow-[0_8px_32px_rgba(59,130,246,0.15),0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                  )}
+                  animate={{
+                    x: primaryMode === "document" ? "calc(100% + 4px)" : 0,
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 30,
+                  }}
+                />
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={primaryMode === "canvas"}
+                  onClick={() => onPrimaryModeChange("canvas")}
+                  className={cn(
+                    "relative z-10 text-xs rounded-xl h-9 w-28 flex items-center justify-center font-medium transition-colors duration-200",
+                    primaryMode === "canvas"
+                      ? "text-slate-900 dark:text-white"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100"
+                  )}
+                >
+                  <LayoutGrid size={16} className="mr-2" />
+                  Canvas
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={primaryMode === "document"}
+                  onClick={() => onPrimaryModeChange("document")}
+                  className={cn(
+                    "relative z-10 text-xs rounded-xl h-9 w-28 flex items-center justify-center font-medium transition-colors duration-200",
+                    primaryMode === "document"
+                      ? "text-slate-900 dark:text-white"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100"
+                  )}
+                >
+                  <FileText size={16} className="mr-2" />
+                  Document
+                </button>
+              </div>
+
+              {/* Edit/View toggle - only when Canvas mode */}
+              {primaryMode === "canvas" && (
+                <div
+                  role="radiogroup"
+                  aria-label="View mode"
+                  className={cn(
+                    "hidden md:flex items-center p-1 gap-0.5 relative",
+                    getLiquidGlassSurfaceClassName({
+                      variant: "toolbar",
+                      intensity: "xl",
+                      rounded: "2xl",
+                      className: "inline-flex",
+                    })
+                  )}
+                >
+                  <motion.div
+                    className={cn(
+                      "absolute left-1 top-1 h-9 w-24 rounded-xl pointer-events-none",
+                      "bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/20 dark:via-primary-400/25 dark:to-accent-500/20",
+                      "backdrop-blur-2xl",
+                      "border border-white/30 dark:border-white/20",
+                      "shadow-[0_8px_32px_rgba(59,130,246,0.2),0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.3)]",
+                      "dark:shadow-[0_8px_32px_rgba(59,130,246,0.15),0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                    )}
+                    animate={{
+                      x: viewMode === "present" ? "calc(100% + 4px)" : 0,
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 30,
+                    }}
+                  />
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={viewMode === "edit"}
+                    onClick={() => onViewModeChange("edit")}
+                    className={cn(
+                      "relative z-10 text-xs rounded-xl h-9 w-24 flex items-center justify-center font-medium transition-colors duration-200",
+                      viewMode === "edit"
+                        ? "text-slate-900 dark:text-white"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100"
+                    )}
+                  >
+                    <Edit3 size={16} className="mr-2" />
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={viewMode === "present"}
+                    onClick={() => onViewModeChange("present")}
+                    className={cn(
+                      "relative z-10 text-xs rounded-xl h-9 w-24 flex items-center justify-center font-medium transition-colors duration-200",
+                      viewMode === "present"
+                        ? "text-slate-900 dark:text-white"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100"
+                    )}
+                  >
+                    <Eye size={16} className="mr-2" />
+                    View
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Right section */}
@@ -641,47 +712,94 @@ export function CanvasHeader({
                   </div>
 
                   <div className="p-2">
-                    {/* Mobile View Mode Toggle */}
+                    {/* Mobile Primary Mode Toggle */}
                     <div
                       role="radiogroup"
-                      aria-label="View mode"
+                      aria-label="Primary mode"
                       className="md:hidden space-y-1 pb-2 mb-2 border-b border-slate-200 dark:border-slate-700"
                     >
                       <button
                         type="button"
                         role="radio"
-                        aria-checked={viewMode === "edit"}
+                        aria-checked={primaryMode === "canvas"}
                         onClick={() => {
-                          onViewModeChange("edit");
+                          onPrimaryModeChange("canvas");
                           setMenuOpen(false);
                         }}
-                        className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
-                          viewMode === "edit"
+                        className={cn(
+                          "w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
+                          primaryMode === "canvas"
                             ? "bg-primary/10 text-primary"
                             : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        }`}
+                        )}
                       >
-                        <Edit3 size={14} className="mr-2" />
-                        Edit Mode
+                        <LayoutGrid size={14} className="mr-2" />
+                        Canvas Mode
                       </button>
                       <button
                         type="button"
                         role="radio"
-                        aria-checked={viewMode === "present"}
+                        aria-checked={primaryMode === "document"}
                         onClick={() => {
-                          onViewModeChange("present");
+                          onPrimaryModeChange("document");
                           setMenuOpen(false);
                         }}
-                        className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
-                          viewMode === "present"
+                        className={cn(
+                          "w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
+                          primaryMode === "document"
                             ? "bg-primary/10 text-primary"
                             : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        }`}
+                        )}
                       >
-                        <Eye size={14} className="mr-2" />
-                        View Mode
+                        <FileText size={14} className="mr-2" />
+                        Document Mode
                       </button>
                     </div>
+                    {/* Mobile Edit/View Toggle - only when Canvas */}
+                    {primaryMode === "canvas" && (
+                      <div
+                        role="radiogroup"
+                        aria-label="View mode"
+                        className="md:hidden space-y-1 pb-2 mb-2 border-b border-slate-200 dark:border-slate-700"
+                      >
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={viewMode === "edit"}
+                          onClick={() => {
+                            onViewModeChange("edit");
+                            setMenuOpen(false);
+                          }}
+                          className={cn(
+                            "w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
+                            viewMode === "edit"
+                              ? "bg-primary/10 text-primary"
+                              : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                          )}
+                        >
+                          <Edit3 size={14} className="mr-2" />
+                          Edit Mode
+                        </button>
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={viewMode === "present"}
+                          onClick={() => {
+                            onViewModeChange("present");
+                            setMenuOpen(false);
+                          }}
+                          className={cn(
+                            "w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
+                            viewMode === "present"
+                              ? "bg-primary/10 text-primary"
+                              : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                          )}
+                        >
+                          <Eye size={14} className="mr-2" />
+                          View Mode
+                        </button>
+                      </div>
+                    )}
 
                     {/* Back to Projects */}
                     <Link
