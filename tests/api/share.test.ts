@@ -565,6 +565,7 @@ describe("GET /api/share/[token] (public canvas access)", () => {
             updatedAt: new Date(),
           },
         ],
+        documents: [],
       },
     } as any);
 
@@ -583,6 +584,7 @@ describe("GET /api/share/[token] (public canvas access)", () => {
     expect(json.blocks).toHaveLength(1);
     expect(json.blocks[0].type).toBe("note");
     expect(json.blocks[0].title).toBe("Note");
+    expect(json.documents).toEqual([]);
     expect(json.expiresAt).toBeDefined();
   });
 
@@ -597,6 +599,7 @@ describe("GET /api/share/[token] (public canvas access)", () => {
         name: "Forever Canvas",
         project: { name: "Project" },
         canvasBlocks: [],
+        documents: [],
       },
     } as any);
 
@@ -613,6 +616,7 @@ describe("GET /api/share/[token] (public canvas access)", () => {
     expect(json.projectName).toBe("Project");
     expect(json.canvasName).toBe("Forever Canvas");
     expect(json.blocks).toEqual([]);
+    expect(json.documents).toEqual([]);
     expect(json.expiresAt).toBeNull();
   });
 });

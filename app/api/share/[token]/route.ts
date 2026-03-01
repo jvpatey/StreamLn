@@ -20,6 +20,7 @@ export async function GET(
           include: {
             project: { select: { name: true } },
             canvasBlocks: { orderBy: { order: "asc" } },
+            documents: { orderBy: { order: "asc" } },
           },
         },
       },
@@ -49,10 +50,18 @@ export async function GET(
       updatedAt: b.updatedAt.toISOString(),
     }));
 
+    const documents = canvas.documents.map((d) => ({
+      id: d.id,
+      name: d.name,
+      order: d.order,
+      content: d.content,
+    }));
+
     return NextResponse.json({
       projectName: canvas.project.name,
       canvasName: canvas.name,
       blocks,
+      documents,
       expiresAt: shareToken.expiresAt?.toISOString() ?? null,
     });
   } catch (error) {

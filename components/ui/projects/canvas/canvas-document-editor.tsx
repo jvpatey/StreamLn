@@ -451,13 +451,14 @@ interface CanvasDocumentEditorProps {
   documentId: string;
   documentContent: unknown;
   documentName?: string;
-  projectId: string;
-  canvasId: string;
-  lastSavedAt: string | null;
-  onDocumentSaved: (updatedAt: string) => void;
+  projectId?: string;
+  canvasId?: string;
+  lastSavedAt?: string | null;
+  onDocumentSaved?: (updatedAt: string) => void;
   onSaveConflict?: () => void;
   sidebarOpen?: boolean;
   onSidebarToggle?: () => void;
+  editable?: boolean;
 }
 
 export const CanvasDocumentEditor = forwardRef<
@@ -474,6 +475,7 @@ export const CanvasDocumentEditor = forwardRef<
   onSaveConflict,
   sidebarOpen,
   onSidebarToggle,
+  editable = true,
 }, ref) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedAtRef = useRef(lastSavedAt);
@@ -501,7 +503,7 @@ export const CanvasDocumentEditor = forwardRef<
     ],
     content: initialContent,
     immediatelyRender: false,
-    editable: true,
+    editable,
     editorProps: {
       attributes: {
         class: cn(
@@ -525,6 +527,7 @@ export const CanvasDocumentEditor = forwardRef<
   });
 
   const saveDocument = useCallback(() => {
+    if (!editable || !projectId || !canvasId || !onDocumentSaved) return;
     if (!editor?.isDestroyed) {
       const json = editor.getJSON();
       saveDocumentApi(
@@ -542,10 +545,10 @@ export const CanvasDocumentEditor = forwardRef<
         }
       });
     }
-  }, [editor, projectId, canvasId, documentId, onDocumentSaved, onSaveConflict]);
+  }, [editable, editor, projectId, canvasId, documentId, onDocumentSaved, onSaveConflict]);
 
   useEffect(() => {
-    if (!editor) return;
+    if (!editor || !editable) return;
 
     const handleUpdate = () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -563,7 +566,7 @@ export const CanvasDocumentEditor = forwardRef<
         debounceRef.current = null;
       }
     };
-  }, [editor, saveDocument]);
+  }, [editor, editable, saveDocument]);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -608,12 +611,14 @@ export const CanvasDocumentEditor = forwardRef<
         })
       )}
     >
-      <DocumentFormattingToolbar
-        editor={editor}
-        documentName={documentName}
-        sidebarOpen={sidebarOpen}
-        onSidebarToggle={onSidebarToggle}
-      />
+      {editable && (
+        <DocumentFormattingToolbar
+          editor={editor}
+          documentName={documentName}
+          sidebarOpen={sidebarOpen}
+          onSidebarToggle={onSidebarToggle}
+        />
+      )}
       <EditorContent editor={editor} />
     </div>
   );
