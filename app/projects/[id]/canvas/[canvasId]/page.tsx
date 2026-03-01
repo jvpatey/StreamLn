@@ -342,18 +342,22 @@ export default function ProjectCanvasPage() {
     );
   }, [primaryMode, docParam, documents, projectId, canvasId, router]);
 
-  // Sync lastSavedAt from current document when in document mode (avoids 409 on save)
+  // Sync lastSavedAt based on mode (avoids 409 on save)
   useEffect(() => {
-    if (primaryMode !== "document") return;
-    const current =
-      docParam && documents.length > 0
-        ? documents.find((d) => d.id === docParam) ?? documents[0]
-        : null;
-    if (current?.updatedAt) {
-      lastSavedAtRef.current = current.updatedAt;
-      setLastSavedAt(current.updatedAt);
+    if (primaryMode === "document") {
+      const current =
+        docParam && documents.length > 0
+          ? documents.find((d) => d.id === docParam) ?? documents[0]
+          : null;
+      if (current?.updatedAt) {
+        lastSavedAtRef.current = current.updatedAt;
+        setLastSavedAt(current.updatedAt);
+      }
+    } else if (primaryMode === "canvas" && canvas?.updatedAt) {
+      lastSavedAtRef.current = canvas.updatedAt;
+      setLastSavedAt(canvas.updatedAt);
     }
-  }, [primaryMode, docParam, documents]);
+  }, [primaryMode, docParam, documents, canvas?.updatedAt]);
 
   // Initialize view state from preferences (client-only)
   useEffect(() => {
