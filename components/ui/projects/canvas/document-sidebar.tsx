@@ -434,8 +434,7 @@ export function DocumentSidebar({
                                                   <Pencil size={12} />
                                                 </button>
                                               )}
-                                              {onDocumentDelete &&
-                                                canvas.documents.length > 1 && (
+                                              {onDocumentDelete && (
                                                   <button
                                                     type="button"
                                                     onClick={(e) => {
@@ -560,8 +559,7 @@ export function DocumentSidebar({
                                                 <Pencil size={12} />
                                               </button>
                                             )}
-                                            {onDocumentDelete &&
-                                              canvas.documents.length > 1 && (
+                                            {onDocumentDelete && (
                                                 <button
                                                   type="button"
                                                   onClick={(e) => {
@@ -740,8 +738,7 @@ export function DocumentSidebar({
                                           <Pencil size={12} />
                                         </button>
                                       )}
-                                      {onDocumentDelete &&
-                                        canvas.documents.length > 1 && (
+                                      {onDocumentDelete && (
                                           <button
                                             type="button"
                                             onClick={(e) => {
