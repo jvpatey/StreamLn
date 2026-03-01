@@ -38,6 +38,7 @@ interface Project {
   description?: string;
   status?: string;
   updatedAt?: string;
+  lastUpdatedAt?: string;
   createdAt?: string;
   blocks?: number;
   documents?: number;
