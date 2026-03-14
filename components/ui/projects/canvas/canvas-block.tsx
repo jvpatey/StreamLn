@@ -277,7 +277,34 @@ export function CanvasBlock({
   );
 
   const handlePointerUp = useCallback(() => {
-    if (pendingDrag) setPendingDrag(null);
+    if (pendingDrag) {
+      const pd = pendingDrag;
+      setPendingDrag(null);
+      // Click without drag on text block: focus contentEditable and place cursor
+      if (block.type === "text" && blockRef.current) {
+        const editEl = blockRef.current.querySelector(
+          '[contenteditable="true"]'
+        );
+        if (editEl && editEl instanceof HTMLElement) {
+          editEl.focus();
+          const doc = editEl.ownerDocument;
+          const range =
+            "caretRangeFromPoint" in doc
+              ? (doc as Document & { caretRangeFromPoint(x: number, y: number): Range | null }).caretRangeFromPoint(
+                  pd.startClientX,
+                  pd.startClientY
+                )
+              : null;
+          if (range) {
+            const sel = doc.defaultView?.getSelection();
+            if (sel) {
+              sel.removeAllRanges();
+              sel.addRange(range);
+            }
+          }
+        }
+      }
+    }
     if (isDragging) {
       setIsDragging(false);
       onDragEnd();
@@ -286,7 +313,7 @@ export function CanvasBlock({
       setIsResizing(false);
       onResizeEnd();
     }
-  }, [pendingDrag, isDragging, isResizing, onDragEnd, onResizeEnd]);
+  }, [pendingDrag, isDragging, isResizing, onDragEnd, onResizeEnd, block.type]);
 
   const handlePointerCancel = useCallback(() => {
     if (pendingDrag) setPendingDrag(null);
@@ -766,6 +793,7 @@ export function CanvasBlock({
         {block.type === "text" && (
           <div
             className="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            data-no-block-drag
             onMouseDown={(e) => e.stopPropagation()}
           >
             {block.locked && (
