@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LiquidGlassButton } from "@/components/ui/shared/liquid-glass-button";
 import { getKeyboardShortcut } from "@/lib/utils";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 import {
   BookOpen,
   Plus,
@@ -11,6 +12,9 @@ import {
   Filter,
   Grid3x3,
   List,
+  FolderOpen,
+  Download,
+  ArrowUpDown,
 } from "lucide-react";
 
 interface ProjectsGuideModalProps {
@@ -36,6 +40,8 @@ function Kbd({ children }: { children: React.ReactNode }) {
 }
 
 export function ProjectsGuideModal({ open, onOpenChange }: ProjectsGuideModalProps) {
+  const isMobile = useIsMobile();
+
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -68,12 +74,12 @@ export function ProjectsGuideModal({ open, onOpenChange }: ProjectsGuideModalPro
               duration: 0.25,
               ease: [0.25, 0.46, 0.45, 0.94],
             }}
-            className="w-full max-w-xl"
+            className="w-full max-w-xl max-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-2rem)] flex flex-col min-h-0"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl">
+            <div className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl min-h-0 flex-1">
           {/* Header */}
-          <div className="flex items-center border-b border-slate-200 dark:border-slate-700 p-4">
+          <div className="flex items-center border-b border-slate-200 dark:border-slate-700 p-4 shrink-0">
             <div className="flex items-center space-x-3 flex-1">
               <div className="p-2 rounded-lg bg-gradient-to-br from-primary-500/10 to-accent-500/10">
                 <BookOpen
@@ -93,7 +99,7 @@ export function ProjectsGuideModal({ open, onOpenChange }: ProjectsGuideModalPro
           </div>
 
           {/* Body */}
-          <div className="max-h-[min(70vh,calc(100dvh-12rem))] overflow-y-auto p-4 sm:p-6 space-y-6">
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-6">
             {/* Getting Started */}
             <section>
               <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-2">
@@ -141,35 +147,82 @@ export function ProjectsGuideModal({ open, onOpenChange }: ProjectsGuideModalPro
               </div>
             </section>
 
-            {/* Command Palette */}
-            <section>
-              <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-2">
-                Command Palette
-              </h4>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
-                Press <Kbd>{getKeyboardShortcut("⌘K")}</Kbd> to open the command palette. Search projects, create new ones, filter by status, or browse all—without leaving the keyboard.
-              </p>
-            </section>
-
-            {/* Keyboard Shortcuts */}
+            {/* Project Details Sidepanel */}
             <section>
               <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-3">
-                Keyboard Shortcuts
+                Project Details
               </h4>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {SHORTCUTS.map(({ keys, action }) => (
-                  <div
-                    key={keys}
-                    className="flex items-center justify-between gap-4 px-3 py-2 min-h-[44px] rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700"
-                  >
-                    <span className="text-sm text-slate-600 dark:text-slate-400">
-                      {action}
-                    </span>
-                    <Kbd>{getKeyboardShortcut(keys)}</Kbd>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                Tap or click a project to open the sidepanel. From there you can:
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
+                    <FolderOpen size={16} className="text-slate-600 dark:text-slate-400" />
                   </div>
-                ))}
+                  <div>
+                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                      Canvases
+                    </span>
+                    <span className="text-slate-500 dark:text-slate-500"> — </span>
+                    <span className="text-slate-600 dark:text-slate-400">
+                      Create, reorder, open, or delete canvases
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
+                    <Download size={16} className="text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                      Export
+                    </span>
+                    <span className="text-slate-500 dark:text-slate-500"> — </span>
+                    <span className="text-slate-600 dark:text-slate-400">
+                      Export project as JSON, Markdown, PNG, PDF, or CSV
+                    </span>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 pl-11">
+                  Edit project name/icon, change status (Active/Archived), or delete from the sidepanel.
+                </p>
               </div>
             </section>
+
+            {!isMobile && (
+              <>
+                {/* Command Palette - desktop only */}
+                <section>
+                  <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-2">
+                    Command Palette
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                    Press <Kbd>{getKeyboardShortcut("⌘K")}</Kbd> to open the command palette. Search projects, create new ones, filter by status, or browse all—without leaving the keyboard.
+                  </p>
+                </section>
+
+                {/* Keyboard Shortcuts - desktop only */}
+                <section>
+                  <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-3">
+                    Keyboard Shortcuts
+                  </h4>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {SHORTCUTS.map(({ keys, action }) => (
+                      <div
+                        key={keys}
+                        className="flex items-center justify-between gap-4 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700"
+                      >
+                        <span className="text-sm text-slate-600 dark:text-slate-400">
+                          {action}
+                        </span>
+                        <Kbd>{getKeyboardShortcut(keys)}</Kbd>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </>
+            )}
 
             {/* Filter & View */}
             <section>
@@ -192,6 +245,20 @@ export function ProjectsGuideModal({ open, onOpenChange }: ProjectsGuideModalPro
                   </div>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
+                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
+                    <ArrowUpDown size={16} className="text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div>
+                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                      Sort by
+                    </span>
+                    <span className="text-slate-500 dark:text-slate-500"> — </span>
+                    <span className="text-slate-600 dark:text-slate-400">
+                      Last Updated or Alphabetically
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
                   <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0 flex gap-0.5">
                     <Grid3x3 size={14} className="text-slate-600 dark:text-slate-400" />
                     <List size={14} className="text-slate-600 dark:text-slate-400" />
@@ -210,7 +277,7 @@ export function ProjectsGuideModal({ open, onOpenChange }: ProjectsGuideModalPro
             </section>
           </div>
 
-          <div className="flex items-center justify-end p-4 pt-2 pb-[env(safe-area-inset-bottom)] sm:pb-4 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex items-center justify-end p-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-4 border-t border-slate-200 dark:border-slate-700 shrink-0">
             <LiquidGlassButton
               gradient="primary"
               onClick={() => onOpenChange(false)}
