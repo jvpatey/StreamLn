@@ -37,14 +37,11 @@ export function ProjectsSidebar({
     .slice(0, 5);
   return (
     <>
-      {/* Collapsible Sidebar - Hidden on mobile. CSS animation runs immediately (before hydration). */}
+      {/* Sidebar - hidden on mobile, inline on desktop */}
       <div
-        className={`${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed lg:relative lg:translate-x-0 z-40 w-72 
+        className="hidden lg:block lg:relative lg:translate-x-0 w-72
         lg:rounded-[24px] lg:mt-2 lg:mb-2 lg:ml-2 lg:h-[calc(100vh-4.5rem)] lg:min-h-[calc(100vh-4.5rem)]
-        transition-transform duration-300 ease-in-out overflow-hidden hidden lg:block
-        animate-sidebar-enter`}
+        overflow-hidden animate-sidebar-enter"
       >
         <LiquidGlassSurface
           variant="panel"

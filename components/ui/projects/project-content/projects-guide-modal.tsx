@@ -55,7 +55,7 @@ export function ProjectsGuideModal({ open, onOpenChange }: ProjectsGuideModalPro
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center py-8 px-4 sm:py-20 sm:px-8"
+          className="fixed inset-0 z-[100] bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center py-8 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] sm:py-20 sm:px-8"
           onClick={() => onOpenChange(false)}
           aria-modal="true"
           role="dialog"
@@ -93,7 +93,7 @@ export function ProjectsGuideModal({ open, onOpenChange }: ProjectsGuideModalPro
           </div>
 
           {/* Body */}
-          <div className="max-h-[70vh] overflow-y-auto p-4 space-y-6">
+          <div className="max-h-[min(70vh,calc(100dvh-12rem))] overflow-y-auto p-4 sm:p-6 space-y-6">
             {/* Getting Started */}
             <section>
               <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-2">
@@ -160,7 +160,7 @@ export function ProjectsGuideModal({ open, onOpenChange }: ProjectsGuideModalPro
                 {SHORTCUTS.map(({ keys, action }) => (
                   <div
                     key={keys}
-                    className="flex items-center justify-between gap-4 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700"
+                    className="flex items-center justify-between gap-4 px-3 py-2 min-h-[44px] rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700"
                   >
                     <span className="text-sm text-slate-600 dark:text-slate-400">
                       {action}
@@ -210,8 +210,12 @@ export function ProjectsGuideModal({ open, onOpenChange }: ProjectsGuideModalPro
             </section>
           </div>
 
-          <div className="flex items-center justify-end p-4 pt-2 border-t border-slate-200 dark:border-slate-700">
-            <LiquidGlassButton gradient="primary" onClick={() => onOpenChange(false)} className="rounded-xl">
+          <div className="flex items-center justify-end p-4 pt-2 pb-[env(safe-area-inset-bottom)] sm:pb-4 border-t border-slate-200 dark:border-slate-700">
+            <LiquidGlassButton
+              gradient="primary"
+              onClick={() => onOpenChange(false)}
+              className="rounded-xl min-h-[44px] px-6"
+            >
               Got it
             </LiquidGlassButton>
           </div>

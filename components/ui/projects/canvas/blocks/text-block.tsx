@@ -166,13 +166,11 @@ export function TextBlock({ block, onUpdate, isEditable }: TextBlockProps) {
             suppressContentEditableWarning
             className="min-w-0 w-full break-words outline-none focus:outline-none"
             style={textStyle}
+            data-no-block-drag
             onBlur={handleBlur}
             onFocus={() => setIsFocused(true)}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
-            onClick={(e) => e.stopPropagation()}
-            onMouseDown={(e) => e.stopPropagation()}
-            data-no-block-drag
           />
           {!localText.trim() && !isFocused && (
             <div

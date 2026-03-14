@@ -239,9 +239,11 @@ export function CanvasFloatingToolbar({
 
   // Position is in viewport (client) coordinates; use directly for fixed positioning
   const toolbarTop = Math.max(64, position.y - 60);
+  const toolbarWidth = 320;
+  const padding = 16;
   const toolbarLeft = Math.min(
-    Math.max(8, position.x - 120),
-    window.innerWidth - 400,
+    Math.max(padding, position.x - 120),
+    Math.max(padding, window.innerWidth - toolbarWidth - padding),
   );
 
   return (
@@ -249,7 +251,7 @@ export function CanvasFloatingToolbar({
       variant="toolbar"
       intensity="xl"
       rounded="xl"
-      className="fixed z-50 p-2 flex items-center space-x-1"
+      className="fixed z-50 p-2 flex items-center space-x-1 max-w-[calc(100vw-2rem)] overflow-x-auto overflow-y-hidden"
       style={{
         left: toolbarLeft,
         top: toolbarTop,

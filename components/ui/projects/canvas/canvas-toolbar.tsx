@@ -157,7 +157,8 @@ export function CanvasToolbar({
             variant: "toolbar",
             intensity: "xl",
             rounded: "xl",
-            className: "flex items-center flex-nowrap gap-2 px-3 py-2 min-w-0 overflow-hidden",
+            className:
+              "flex items-center flex-nowrap gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 min-w-0 overflow-x-auto overflow-y-hidden md:overflow-hidden",
           })}
         >
         {/* Edit/View toggle */}

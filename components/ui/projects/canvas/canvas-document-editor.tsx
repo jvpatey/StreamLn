@@ -150,7 +150,7 @@ function FormattingControls({
 
   return (
     <div
-      className="flex items-center gap-1.5 flex-wrap"
+      className="flex items-center gap-1.5 flex-nowrap md:flex-wrap"
       onMouseDown={(e) => e.preventDefault()}
     >
       {onSidebarToggle != null && !sidebarInParent && (
@@ -400,36 +400,38 @@ function DocumentFormattingToolbar({
         })
       )}
     >
-      <div className="w-full max-w-5xl mx-auto flex items-center gap-3">
-        {onSidebarToggle != null && (
-          <>
-            <button
-              type="button"
-              onClick={onSidebarToggle}
-              title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-              aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-              className={buttonClass}
-            >
-              {sidebarOpen ? (
-                <PanelLeftClose size={iconSize} aria-hidden />
-              ) : (
-                <PanelLeftOpen size={iconSize} aria-hidden />
-              )}
-            </button>
-            <div className="w-px h-4 bg-slate-200 dark:bg-slate-600 shrink-0" />
-          </>
-        )}
-        {documentName != null && (
-          <div className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0 min-w-0">
-            <div className="p-1 rounded-md bg-primary/20 dark:bg-primary/30 shrink-0">
-              <FileText size={iconSize} className="text-primary" />
+      <div className="w-full flex items-center gap-2 sm:gap-3 min-w-0 overflow-x-auto overflow-y-hidden">
+        <div className="flex items-center gap-2 shrink-0">
+          {onSidebarToggle != null && (
+            <>
+              <button
+                type="button"
+                onClick={onSidebarToggle}
+                title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+                aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+                className={cn(buttonClass, "min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 shrink-0 hidden md:flex")}
+              >
+                {sidebarOpen ? (
+                  <PanelLeftClose size={iconSize} aria-hidden />
+                ) : (
+                  <PanelLeftOpen size={iconSize} aria-hidden />
+                )}
+              </button>
+              <div className="hidden md:block w-px h-4 bg-slate-200 dark:bg-slate-600 shrink-0" />
+            </>
+          )}
+          {documentName != null && (
+            <div className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0 min-w-0">
+              <div className="p-1 rounded-md bg-primary/20 dark:bg-primary/30 shrink-0">
+                <FileText size={iconSize} className="text-primary" />
+              </div>
+              <span className="text-sm font-medium text-primary truncate max-w-[160px]">
+                {documentName}
+              </span>
             </div>
-            <span className="text-sm font-medium text-primary truncate max-w-[160px]">
-              {documentName}
-            </span>
-          </div>
-        )}
-        <div className="flex-1 flex justify-center min-w-0">
+          )}
+        </div>
+        <div className="flex-1 flex justify-center min-w-0 overflow-x-auto overflow-y-hidden">
           <FormattingControls
             editor={editor}
             sidebarOpen={sidebarOpen}
@@ -488,7 +490,7 @@ export const CanvasDocumentEditor = forwardRef<
       StarterKit.configure({ paragraph: false }),
       ParagraphWithIndent,
       Placeholder.configure({
-        placeholder: "Start writing…",
+        placeholder: "Click here to start typing",
       }),
       TextStyle,
       FontFamily,
@@ -507,7 +509,7 @@ export const CanvasDocumentEditor = forwardRef<
     editorProps: {
       attributes: {
         class: cn(
-          "canvas-document-editor min-h-full w-full max-w-[720px] mx-auto px-8 py-12",
+          "canvas-document-editor min-h-[60vh] w-full",
           "text-base text-slate-700 dark:text-slate-300 focus:outline-none",
           "[&_h1]:text-2xl [&_h1]:font-semibold [&_h1]:text-slate-900 dark:[&_h1]:text-slate-100 [&_h1]:mt-8 [&_h1]:mb-4 [&_h1]:first:mt-0",
           "[&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-slate-900 dark:[&_h2]:text-slate-100 [&_h2]:mt-6 [&_h2]:mb-3",
@@ -601,15 +603,7 @@ export const CanvasDocumentEditor = forwardRef<
   return (
     <div
       ref={containerRef}
-      className={cn(
-        "h-full overflow-auto",
-        getLiquidGlassSurfaceClassName({
-          variant: "panel",
-          intensity: "xl",
-          rounded: "none",
-          className: "bg-white/95 dark:bg-slate-900/95",
-        })
-      )}
+      className="h-full overflow-auto bg-slate-100 dark:bg-slate-800/50"
     >
       {editable && (
         <DocumentFormattingToolbar
@@ -619,7 +613,11 @@ export const CanvasDocumentEditor = forwardRef<
           onSidebarToggle={onSidebarToggle}
         />
       )}
-      <EditorContent editor={editor} />
+      <div className="flex justify-center py-8 px-4">
+        <div className="w-full max-w-[720px] min-h-[70vh] bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 px-8 py-12 sm:px-12 sm:py-16">
+          <EditorContent editor={editor} />
+        </div>
+      </div>
     </div>
   );
 });

@@ -55,6 +55,8 @@ interface CanvasBlock {
 interface CanvasBlockProps {
   block: CanvasBlock;
   entranceIndex?: number;
+  /** When set, exit animation uses this index for staggered delay (e.g. Start blank) */
+  exitStaggerIndex?: number;
   isSelected: boolean;
   isEditable: boolean;
   isSelectionDragging?: boolean;
@@ -76,12 +78,14 @@ interface CanvasBlockProps {
 const dropdownItemClass =
   "flex items-center gap-2 px-2 py-1.5 text-sm rounded-md cursor-pointer outline-none focus:bg-slate-100 dark:focus:bg-slate-700 text-slate-700 dark:text-slate-300 data-[highlighted]:bg-slate-100 dark:data-[highlighted]:bg-slate-700";
 
-const STAGGER_DELAY = 0.045;
+const STAGGER_DELAY = 0.03;
+const EXIT_STAGGER_DELAY = 0.03;
 const ENTRANCE_EASE = [0.25, 0.46, 0.45, 0.94] as const;
 
 export function CanvasBlock({
   block,
   entranceIndex,
+  exitStaggerIndex,
   isSelected,
   isEditable,
   isSelectionDragging = false,
@@ -190,22 +194,19 @@ export function CanvasBlock({
     return block.color || "#3b82f6";
   };
 
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
       e.stopPropagation();
       onSelect();
 
       if (!isEditable || block.locked) return;
 
-      // Don't start block drag when interacting with task board (cards, columns, etc.)
       if ((e.target as HTMLElement).closest("[data-no-block-drag]")) return;
 
-      // Convert screen coordinates to world coordinates (canvasOrigin = container rect + pan)
       const origin = canvasOriginRef.current;
       const worldX = (e.clientX - origin.x) / zoomLevel;
       const worldY = (e.clientY - origin.y) / zoomLevel;
 
-      // Record pending drag; start real drag only after pointer moves past threshold
       const offsetX = worldX - block.x;
       const offsetY = worldY - block.y;
       setPendingDrag({
@@ -214,12 +215,13 @@ export function CanvasBlock({
         offsetX,
         offsetY,
       });
+      e.currentTarget.setPointerCapture(e.pointerId);
     },
     [onSelect, isEditable, block.locked, canvasOriginRef, zoomLevel, block.x, block.y]
   );
 
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
+  const handlePointerMove = useCallback(
+    (e: PointerEvent) => {
       if (pendingDrag) {
         const dx = e.clientX - pendingDrag.startClientX;
         const dy = e.clientY - pendingDrag.startClientY;
@@ -278,7 +280,46 @@ export function CanvasBlock({
     ]
   );
 
-  const handleMouseUp = useCallback(() => {
+  const handlePointerUp = useCallback(() => {
+    if (pendingDrag) {
+      const pd = pendingDrag;
+      setPendingDrag(null);
+      // Click without drag on text/note block: focus contentEditable and place cursor
+      if ((block.type === "text" || block.type === "note") && blockRef.current) {
+        const editEl = blockRef.current.querySelector(
+          '[contenteditable="true"]'
+        );
+        if (editEl && editEl instanceof HTMLElement) {
+          editEl.focus();
+          const doc = editEl.ownerDocument;
+          const range =
+            "caretRangeFromPoint" in doc
+              ? (doc as Document & { caretRangeFromPoint(x: number, y: number): Range | null }).caretRangeFromPoint(
+                  pd.startClientX,
+                  pd.startClientY
+                )
+              : null;
+          if (range) {
+            const sel = doc.defaultView?.getSelection();
+            if (sel) {
+              sel.removeAllRanges();
+              sel.addRange(range);
+            }
+          }
+        }
+      }
+    }
+    if (isDragging) {
+      setIsDragging(false);
+      onDragEnd();
+    }
+    if (isResizing) {
+      setIsResizing(false);
+      onResizeEnd();
+    }
+  }, [pendingDrag, isDragging, isResizing, onDragEnd, onResizeEnd, block.type]);
+
+  const handlePointerCancel = useCallback(() => {
     if (pendingDrag) setPendingDrag(null);
     if (isDragging) {
       setIsDragging(false);
@@ -291,7 +332,7 @@ export function CanvasBlock({
   }, [pendingDrag, isDragging, isResizing, onDragEnd, onResizeEnd]);
 
   const handleResizeStart = useCallback(
-    (e: React.MouseEvent) => {
+    (e: React.PointerEvent) => {
       e.stopPropagation();
       if (!isEditable || block.locked) return;
 
@@ -303,6 +344,7 @@ export function CanvasBlock({
         height: block.height,
       });
       onResizeStart();
+      e.currentTarget.setPointerCapture(e.pointerId);
     },
     [isEditable, block.locked, block.width, block.height, onResizeStart]
   );
@@ -315,17 +357,19 @@ export function CanvasBlock({
     [onContextMenu]
   );
 
-  // Add global mouse event listeners when dragging, resizing, or pending drag
+  // Add global pointer event listeners when dragging, resizing, or pending drag
   useEffect(() => {
     if (isDragging || isResizing || pendingDrag !== null) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("pointermove", handlePointerMove);
+      document.addEventListener("pointerup", handlePointerUp);
+      document.addEventListener("pointercancel", handlePointerCancel);
       return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
+        document.removeEventListener("pointermove", handlePointerMove);
+        document.removeEventListener("pointerup", handlePointerUp);
+        document.removeEventListener("pointercancel", handlePointerCancel);
       };
     }
-  }, [isDragging, isResizing, pendingDrag, handleMouseMove, handleMouseUp]);
+  }, [isDragging, isResizing, pendingDrag, handlePointerMove, handlePointerUp, handlePointerCancel]);
 
   const renderBlockContent = () => {
     const commonProps = {
@@ -497,33 +541,41 @@ export function CanvasBlock({
       width: block.width,
       height: block.height,
     },
-    onMouseDown: handleMouseDown,
+    onPointerDown: handlePointerDown,
     onContextMenu: handleContextMenu,
   };
 
   const isActivelyDragging = isDragging || (isSelected && isSelectionDragging);
+  const exitDelay =
+    exitStaggerIndex !== undefined ? exitStaggerIndex * EXIT_STAGGER_DELAY : 0;
+  const baseTransition = {
+    layout: isActivelyDragging
+      ? { duration: 0 }
+      : { duration: 0.28, ease: [0.32, 0.72, 0, 1] as const },
+    ...(exitStaggerIndex !== undefined && {
+      exit: {
+        duration: 0.25,
+        delay: exitDelay,
+        ease: [0.32, 0.72, 0, 1] as const,
+      },
+    }),
+  };
   const animationProps =
     entranceIndex !== undefined
       ? {
-          initial: { opacity: 0, y: 12 },
-          animate: { opacity: 1, y: 0 },
-          exit: { opacity: 0, scale: 0.98 },
+          initial: { opacity: 0, y: 8, scale: 0.98 },
+          animate: { opacity: 1, y: 0, scale: 1 },
+          exit: { opacity: 0, scale: 0.96, y: -8 },
           transition: {
-            duration: 0.3,
+            duration: 0.22,
             delay: entranceIndex * STAGGER_DELAY,
             ease: ENTRANCE_EASE,
-            layout: isActivelyDragging
-              ? { duration: 0 }
-              : { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
+            ...baseTransition,
           },
         }
       : {
-          exit: { opacity: 0, scale: 0.98 },
-          transition: {
-            layout: isActivelyDragging
-              ? { duration: 0 }
-              : { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
-          },
+          exit: { opacity: 0, scale: 0.96, y: -8 },
+          transition: baseTransition,
         };
 
   return (
@@ -753,6 +805,7 @@ export function CanvasBlock({
         {block.type === "text" && (
           <div
             className="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            data-no-block-drag
             onMouseDown={(e) => e.stopPropagation()}
           >
             {block.locked && (
@@ -1005,7 +1058,7 @@ export function CanvasBlock({
                   clipPath: "polygon(100% 0%, 0% 100%, 100% 100%)",
                   backgroundColor: getBlockColor(),
                 }}
-                onMouseDown={handleResizeStart}
+                onPointerDown={handleResizeStart}
               />
             )}
 

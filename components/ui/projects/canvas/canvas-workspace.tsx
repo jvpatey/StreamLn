@@ -10,7 +10,11 @@ import {
 import { AnimatePresence } from "framer-motion";
 import { CanvasBlock } from "./canvas-block";
 import { getKeyboardShortcut } from "@/lib/utils";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 import type { CanvasTool } from "./canvas-toolbar";
+
+const MIN_ZOOM = 0.1;
+const MAX_ZOOM = 3;
 
 interface CanvasBlock {
   id: string;
@@ -58,6 +62,8 @@ interface CanvasWorkspaceProps {
   viewMode: "edit" | "present";
   /** When false, hides the "Press E to edit" badge (e.g. for shared read-only links) */
   showPresentModeBadge?: boolean;
+  /** When true, blocks use staggered exit animation (e.g. for "Start blank") */
+  startBlankExiting?: boolean;
 }
 
 export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
@@ -85,10 +91,12 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
       onFloatingToolbarShow,
       viewMode,
       showPresentModeBadge = true,
+      startBlankExiting = false,
     },
     ref,
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const isMobile = useIsMobile();
     const [isPanning, setIsPanning] = useState(false);
     const canvasOriginRef = useRef({ x: 0, y: 0 });
     const [panStart, setPanStart] = useState({ x: 0, y: 0 });
@@ -97,6 +105,18 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
       end: { x: number; y: number };
       additive: boolean;
       initialSelection: string[];
+    } | null>(null);
+    // Pinch zoom: track active pointers
+    const pointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
+    const pinchStartRef = useRef<{
+      distance: number;
+      centerX: number;
+      centerY: number;
+      zoom: number;
+      panX: number;
+      panY: number;
+      canvasX: number;
+      canvasY: number;
     } | null>(null);
 
     // Keep canvas origin in sync for accurate block drag coordinates (container rect + pan)
@@ -118,11 +138,14 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
       };
     }, [panOffset.x, panOffset.y]);
 
-    // Handle mouse events for panning and selection
-    const handleMouseDown = useCallback(
-      (e: React.MouseEvent) => {
+    // Handle pointer events for panning and selection (unified mouse/touch)
+    const handlePointerDown = useCallback(
+      (e: React.PointerEvent) => {
         const rect = containerRef.current?.getBoundingClientRect();
         if (!rect) return;
+
+        // Track pointer for pinch zoom
+        pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
         const x = (e.clientX - rect.left - panOffset.x) / zoomLevel;
         const y = (e.clientY - rect.top - panOffset.y) / zoomLevel;
@@ -137,15 +160,12 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         );
 
         if (isAddingBlock) {
-          // Add new block at clicked position
           onAddBlock(isAddingBlock, { x, y });
           return;
         }
 
         if (clickedBlock) {
-          // Handle block selection
           if (e.metaKey || e.ctrlKey) {
-            // Multi-select
             if (selectedBlocks.includes(clickedBlock.id)) {
               onBlockSelect(
                 selectedBlocks.filter((id) => id !== clickedBlock.id),
@@ -157,18 +177,21 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
             onBlockSelect([clickedBlock.id]);
           }
         } else {
-          // Start panning or selection box
-          // Pan: hand tool active, or modifier key, or middle mouse
+          // Pan: hand tool, modifier, middle mouse, or (mobile) single-finger drag on empty space
           const shouldPan =
-            activeTool === "pan" || e.metaKey || e.ctrlKey || e.button === 1;
+            activeTool === "pan" ||
+            e.metaKey ||
+            e.ctrlKey ||
+            e.button === 1 ||
+            isMobile;
           if (shouldPan) {
             setIsPanning(true);
             setPanStart({
               x: e.clientX - panOffset.x,
               y: e.clientY - panOffset.y,
             });
+            e.currentTarget.setPointerCapture(e.pointerId);
           } else {
-            // Selection box mode (Shift = additive)
             const additive = e.shiftKey;
             setSelectionBox({
               start: { x, y },
@@ -179,6 +202,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
             if (!additive) {
               onBlockSelect([]);
             }
+            e.currentTarget.setPointerCapture(e.pointerId);
           }
         }
       },
@@ -191,11 +215,56 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         zoomLevel,
         isAddingBlock,
         onAddBlock,
+        isMobile,
       ],
     );
 
-    const handleMouseMove = useCallback(
-      (e: React.MouseEvent) => {
+    const handlePointerMove = useCallback(
+      (e: React.PointerEvent) => {
+        pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        // Pinch zoom: 2+ pointers
+        const pointers = Array.from(pointersRef.current.values());
+        if (pointers.length >= 2) {
+          const [p1, p2] = pointers;
+          const distance = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+          const centerX = (p1.x + p2.x) / 2;
+          const centerY = (p1.y + p2.y) / 2;
+
+          if (!pinchStartRef.current) {
+            const rect = containerRef.current?.getBoundingClientRect();
+            if (!rect) return;
+            const canvasX = (centerX - rect.left - panOffset.x) / zoomLevel;
+            const canvasY = (centerY - rect.top - panOffset.y) / zoomLevel;
+            pinchStartRef.current = {
+              distance,
+              centerX,
+              centerY,
+              zoom: zoomLevel,
+              panX: panOffset.x,
+              panY: panOffset.y,
+              canvasX,
+              canvasY,
+            };
+            setIsPanning(false);
+            setSelectionBox(null);
+          } else {
+            const start = pinchStartRef.current;
+            const scale = distance / start.distance;
+            const newZoom = Math.min(
+              MAX_ZOOM,
+              Math.max(MIN_ZOOM, start.zoom * scale),
+            );
+            const rect = containerRef.current?.getBoundingClientRect();
+            if (!rect) return;
+            const newPanX = centerX - rect.left - start.canvasX * newZoom;
+            const newPanY = centerY - rect.top - start.canvasY * newZoom;
+            onZoomChange(newZoom);
+            onPanOffsetChange({ x: newPanX, y: newPanY });
+          }
+          return;
+        }
+
         if (isPanning) {
           onPanOffsetChange({
             x: e.clientX - panStart.x,
@@ -213,7 +282,6 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
             end: { x, y },
           });
 
-          // Find blocks within selection box
           const minX = Math.min(selectionBox.start.x, x);
           const maxX = Math.max(selectionBox.start.x, x);
           const minY = Math.min(selectionBox.start.y, y);
@@ -255,13 +323,45 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         onBlockSelect,
         panOffset,
         zoomLevel,
+        onZoomChange,
       ],
     );
 
-    const handleMouseUp = useCallback(() => {
-      setIsPanning(false);
-      setSelectionBox(null);
-    }, []);
+    const handlePointerUp = useCallback(
+      (e: React.PointerEvent) => {
+        pointersRef.current.delete(e.pointerId);
+        if (pointersRef.current.size < 2) {
+          pinchStartRef.current = null;
+        }
+        setIsPanning(false);
+        setSelectionBox(null);
+      },
+      [],
+    );
+
+    const handlePointerCancel = useCallback(
+      (e: React.PointerEvent) => {
+        pointersRef.current.delete(e.pointerId);
+        if (pointersRef.current.size < 2) {
+          pinchStartRef.current = null;
+        }
+        setIsPanning(false);
+        setSelectionBox(null);
+      },
+      [],
+    );
+
+    const handlePointerLeave = useCallback(
+      (e: React.PointerEvent) => {
+        pointersRef.current.delete(e.pointerId);
+        if (pointersRef.current.size < 2) {
+          pinchStartRef.current = null;
+        }
+        setIsPanning(false);
+        setSelectionBox(null);
+      },
+      [],
+    );
 
     // Handle wheel zoom (scroll = zoom toward cursor; Cmd/Ctrl+scroll also zooms)
     const handleWheel = useCallback(
@@ -275,8 +375,6 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         const canvasY = (my - panOffset.y) / zoomLevel;
 
         const ZOOM_SENSITIVITY = 0.002;
-        const MIN_ZOOM = 0.1;
-        const MAX_ZOOM = 3;
         const newZoom = Math.min(
           MAX_ZOOM,
           Math.max(MIN_ZOOM, zoomLevel * (1 - e.deltaY * ZOOM_SENSITIVITY)),
@@ -343,13 +441,15 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
           }
         }}
         className={`relative w-full h-full overflow-hidden select-none ${cursorClass}`}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onPointerDownCapture={handlePointerDown}
+        onPointerMoveCapture={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerLeave}
+        onPointerCancel={handlePointerCancel}
         onWheel={handleWheel}
         onDoubleClick={handleDoubleClick}
         style={{
+          touchAction: "none",
           background: showGrid
             ? `
               radial-gradient(circle, rgba(148, 163, 184, 0.4) 1px, transparent 1px)
@@ -375,6 +475,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
                 key={block.id}
                 block={block}
                 entranceIndex={index}
+                exitStaggerIndex={startBlankExiting ? index : undefined}
                 isSelected={selectedBlocks.includes(block.id)}
                 isEditable={viewMode === "edit"}
                 isSelectionDragging={isDragging}
@@ -433,7 +534,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         )}
 
         {/* Instructions for empty canvas */}
-        {blocks.length === 0 && !isAddingBlock && viewMode === "edit" && (
+        {blocks.length === 0 && !isAddingBlock && viewMode === "edit" && !startBlankExiting && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="text-center">
               <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl px-8 py-6 shadow-lg max-w-md">
@@ -444,15 +545,27 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
                   Start building your project workspace by adding blocks
                 </p>
                 <div className="space-y-2 text-xs text-slate-500 dark:text-slate-500">
-                  <p>• Double-click to add a note</p>
-                  <p>• Use the sidebar to add different block types</p>
-                  <p>• Create documents in the sidebar for long-form writing</p>
-                  <p>• Drag blocks to rearrange them</p>
-                  <p>• Scroll to zoom in and out</p>
-                  <p>
-                    • Hand tool ({getKeyboardShortcut("H")}) or hold{" "}
-                    {getKeyboardShortcut("⌘")} to pan
-                  </p>
+                  {isMobile ? (
+                    <>
+                      <p>• Double-tap to add a note</p>
+                      <p>• Use the Add blocks button to add different block types</p>
+                      <p>• Create documents for long-form writing</p>
+                      <p>• Tap and drag blocks to rearrange them</p>
+                      <p>• Pinch to zoom, two-finger drag to pan</p>
+                    </>
+                  ) : (
+                    <>
+                      <p>• Double-click to add a note</p>
+                      <p>• Use the sidebar to add different block types</p>
+                      <p>• Create documents in the sidebar for long-form writing</p>
+                      <p>• Drag blocks to rearrange them</p>
+                      <p>• Scroll to zoom in and out</p>
+                      <p>
+                        • Hand tool ({getKeyboardShortcut("H")}) or hold{" "}
+                        {getKeyboardShortcut("⌘")} to pan
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

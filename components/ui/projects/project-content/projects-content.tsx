@@ -628,8 +628,8 @@ export function ProjectsContent({
                     </motion.div>
                   ))}
                 </AnimatePresence>
-                {/* Create Project row - dotted outline, matches grid card */}
-                <div className="px-4 pt-4 pb-2">
+                {/* Create Project row - dotted outline, matches grid card. Hidden on mobile. */}
+                <div className="hidden lg:block px-4 pt-4 pb-2">
                   <CreateProjectListRow onClick={onCreateProject} />
                 </div>
               </>

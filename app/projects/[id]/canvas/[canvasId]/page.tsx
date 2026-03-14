@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   CanvasToolbar,
@@ -21,6 +21,7 @@ import {
   exportCanvasAsPNG,
   exportCanvasAsPDF,
 } from "@/lib/export/canvas-export";
+import { isDefaultTemplate } from "@/lib/canvas/default-blocks";
 import { DEFAULT_NOTE_CONTENT } from "@/components/ui/projects/canvas/blocks/note-defaults";
 import { DEFAULT_LINK_CONTENT } from "@/components/ui/projects/canvas/blocks/link-defaults";
 import { DEFAULT_TAG_CONTENT } from "@/components/ui/projects/canvas/blocks/tag-defaults";
@@ -59,8 +60,18 @@ import {
   getDefaultSidebarOpen,
   getDefaultToolbarOpen,
 } from "@/lib/canvas-preferences";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 import type { CanvasBlock, Canvas, Document } from "@/lib/types/canvas";
-import { PanelLeftOpen, PanelTopOpen, Edit3, Eye } from "lucide-react";
+import {
+  PanelLeftOpen,
+  PanelTopOpen,
+  Edit3,
+  Eye,
+  Blocks,
+  FileText,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -151,6 +162,7 @@ export default function ProjectCanvasPage() {
   const [canvas, setCanvas] = useState<Canvas | null>(null);
   const [canvases, setCanvases] = useState<Canvas[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [documentsLoading, setDocumentsLoading] = useState(true);
   const [projectDocuments, setProjectDocuments] = useState<
     Array<{
       id: string;
@@ -184,9 +196,12 @@ export default function ProjectCanvasPage() {
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
   const documentEditorRef = useRef<CanvasDocumentEditorHandle | null>(null);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [startBlankConfirmOpen, setStartBlankConfirmOpen] = useState(false);
+  const [startBlankExiting, setStartBlankExiting] = useState(false);
 
   // Canvas tool state (select vs pan)
   const [activeTool, setActiveTool] = useState<CanvasTool>("select");
+  const isMobile = useIsMobile();
 
   // Canvas interaction state
   const [isAddingBlock, setIsAddingBlock] = useState<string | null>(null);
@@ -202,39 +217,117 @@ export default function ProjectCanvasPage() {
   const skipNextSaveRef = useRef(true);
   const lastSavedAtRef = useRef<string | null>(null);
   const [saveConflict, setSaveConflict] = useState(false);
+  const hasFittedToViewRef = useRef<string | null>(null);
+  const zoomPanRef = useRef({ zoom: 1, pan: { x: 0, y: 0 } });
+  zoomPanRef.current = { zoom: zoomLevel, pan: panOffset };
 
-  const handleFitToView = useCallback(() => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect || canvasBlocks.length === 0) {
-      setZoomLevel(1);
-      setPanOffset({ x: 0, y: 0 });
-      return;
+  const handleFitToView = useCallback(
+    (animate = false) => {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect || canvasBlocks.length === 0) {
+        setZoomLevel(1);
+        setPanOffset({ x: 0, y: 0 });
+        return;
+      }
+      const viewportWidth = rect.width;
+      const viewportHeight = rect.height;
+      const bounds = canvasBlocks.reduce(
+        (acc, block) => ({
+          left: Math.min(acc.left, block.x),
+          top: Math.min(acc.top, block.y),
+          right: Math.max(acc.right, block.x + block.width),
+          bottom: Math.max(acc.bottom, block.y + block.height),
+        }),
+        { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity },
+      );
+      const padding = 100;
+      const contentWidth = bounds.right - bounds.left + padding * 2;
+      const contentHeight = bounds.bottom - bounds.top + padding * 2;
+      const scaleX = viewportWidth / contentWidth;
+      const scaleY = viewportHeight / contentHeight;
+      const targetZoom = Math.min(scaleX, scaleY, 1);
+      const centerX = (bounds.left + bounds.right) / 2;
+      const centerY = (bounds.top + bounds.bottom) / 2;
+      const targetPan = {
+        x: viewportWidth / 2 - centerX * targetZoom,
+        y: viewportHeight / 2 - centerY * targetZoom,
+      };
+
+      if (animate) {
+        const { zoom: startZoom, pan: startPan } = zoomPanRef.current;
+        const duration = 280;
+        const startTime = performance.now();
+
+        const tick = (now: number) => {
+          const elapsed = now - startTime;
+          const t = Math.min(elapsed / duration, 1);
+          const eased = 1 - (1 - t) ** 3;
+
+          setZoomLevel(startZoom + (targetZoom - startZoom) * eased);
+          setPanOffset({
+            x: startPan.x + (targetPan.x - startPan.x) * eased,
+            y: startPan.y + (targetPan.y - startPan.y) * eased,
+          });
+
+          if (t < 1) requestAnimationFrame(tick);
+        };
+
+        requestAnimationFrame(tick);
+      } else {
+        setZoomLevel(targetZoom);
+        setPanOffset(targetPan);
+      }
+    },
+    [canvasBlocks],
+  );
+
+  // Fit to view when blocks load (e.g. new canvas with default blocks)
+  useLayoutEffect(() => {
+    const canvasIdStr =
+      typeof canvasId === "string" ? canvasId : canvasId?.[0];
+    if (
+      !loading &&
+      canvasBlocks.length > 0 &&
+      primaryMode === "canvas" &&
+      canvasIdStr &&
+      hasFittedToViewRef.current !== canvasIdStr
+    ) {
+      const el = canvasRef.current;
+      if (!el) return;
+
+      let cancelled = false;
+      const runFit = () => {
+        if (cancelled) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          hasFittedToViewRef.current = canvasIdStr ?? "";
+          handleFitToView(true);
+        }
+      };
+
+      // Run after layout: rAF ensures we're past the current frame's layout
+      const rafId = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          runFit();
+        });
+      });
+
+      // ResizeObserver for when container gets dimensions (e.g. sidebar animates)
+      const ro = new ResizeObserver(() => {
+        if (!cancelled) runFit();
+      });
+      ro.observe(el);
+
+      // Fallback: run again after layout fully settles
+      const t = setTimeout(runFit, 400);
+      return () => {
+        cancelled = true;
+        cancelAnimationFrame(rafId);
+        ro.disconnect();
+        clearTimeout(t);
+      };
     }
-    const viewportWidth = rect.width;
-    const viewportHeight = rect.height;
-    const bounds = canvasBlocks.reduce(
-      (acc, block) => ({
-        left: Math.min(acc.left, block.x),
-        top: Math.min(acc.top, block.y),
-        right: Math.max(acc.right, block.x + block.width),
-        bottom: Math.max(acc.bottom, block.y + block.height),
-      }),
-      { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity },
-    );
-    const padding = 100;
-    const contentWidth = bounds.right - bounds.left + padding * 2;
-    const contentHeight = bounds.bottom - bounds.top + padding * 2;
-    const scaleX = viewportWidth / contentWidth;
-    const scaleY = viewportHeight / contentHeight;
-    const newZoom = Math.min(scaleX, scaleY, 1);
-    const centerX = (bounds.left + bounds.right) / 2;
-    const centerY = (bounds.top + bounds.bottom) / 2;
-    setZoomLevel(newZoom);
-    setPanOffset({
-      x: viewportWidth / 2 - centerX * newZoom,
-      y: viewportHeight / 2 - centerY * newZoom,
-    });
-  }, [canvasBlocks]);
+  }, [loading, canvasBlocks.length, primaryMode, canvasId, handleFitToView]);
 
   // Load project, canvas, and blocks
   useEffect(() => {
@@ -295,6 +388,11 @@ export default function ProjectCanvasPage() {
     }
   }, [docParam, projectId, canvasId]);
 
+  // Reset documents loading when leaving document mode
+  useEffect(() => {
+    if (primaryMode !== "document") setDocumentsLoading(false);
+  }, [primaryMode]);
+
   // Fetch documents when in document mode (for current canvas)
   useEffect(() => {
     if (
@@ -306,16 +404,24 @@ export default function ProjectCanvasPage() {
     )
       return;
 
+    let cancelled = false;
+    setDocumentsLoading(true);
+
     const loadDocuments = async () => {
       try {
         const docs = await fetchDocuments(projectId, canvasId);
-        setDocuments(docs);
+        if (!cancelled) setDocuments(docs);
       } catch {
-        setDocuments([]);
+        if (!cancelled) setDocuments([]);
+      } finally {
+        if (!cancelled) setDocumentsLoading(false);
       }
     };
 
     loadDocuments();
+    return () => {
+      cancelled = true;
+    };
   }, [projectId, canvasId, primaryMode]);
 
   // Fetch project documents tree when in document mode (for sidebar)
@@ -398,10 +504,20 @@ export default function ProjectCanvasPage() {
   // Initialize view state from preferences (client-only)
   useEffect(() => {
     setShowGrid(getDefaultShowGrid());
-    setZoomLevel(getDefaultZoom());
-    setSidebarOpen(getDefaultSidebarOpen());
+    const defaultSidebar = getDefaultSidebarOpen();
+    const isMobile =
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 767px)").matches;
+    setSidebarOpen(isMobile ? false : defaultSidebar);
     setToolbarOpen(getDefaultToolbarOpen());
   }, []);
+
+  // Apply zoom from preferences only when canvas is empty - fit-to-view handles zoom when we have blocks
+  useEffect(() => {
+    if (loading || canvasBlocks.length === 0) {
+      setZoomLevel(getDefaultZoom());
+    }
+  }, [loading, canvasBlocks.length]);
 
   // Track project as recently opened
   useEffect(() => {
@@ -522,12 +638,17 @@ export default function ProjectCanvasPage() {
       }
 
       const target = e.target as HTMLElement;
-      if (
-        !target.closest("input") &&
-        !target.closest("textarea") &&
-        !target.closest("[contenteditable]")
-      ) {
-        if (e.key === "v" && !e.metaKey && !e.ctrlKey) {
+      const isTyping =
+        target.closest("input") ||
+        target.closest("textarea") ||
+        target.closest("[contenteditable]");
+      if (!isTyping) {
+        if (e.key === "Backspace" || e.key === "Delete") {
+          e.preventDefault();
+          if (selectedBlocks.length > 0) {
+            deleteSelectedBlocks();
+          }
+        } else if (e.key === "v" && !e.metaKey && !e.ctrlKey) {
           e.preventDefault();
           setActiveTool("select");
         } else if (e.key === "h" && !e.metaKey && !e.ctrlKey) {
@@ -691,6 +812,47 @@ export default function ProjectCanvasPage() {
     setCanvasBlocks((prev) => prev.filter((block) => block.id !== id));
     setSelectedBlocks((prev) => prev.filter((blockId) => blockId !== id));
   };
+
+  const handleConfirmStartBlank = useCallback(() => {
+    setStartBlankConfirmOpen(false);
+    setStartBlankExiting(true);
+    // Clear blocks after zoom/pan anim; blocks run staggered exit via AnimatePresence
+    setTimeout(() => {
+      setCanvasBlocks([]);
+      setSelectedBlocks([]);
+      setZoomLevel(1);
+      setPanOffset({ x: 0, y: 0 });
+    }, 400);
+    // Keep startBlankExiting true until block exit animations finish (last block: 5*30ms + 250ms ≈ 400ms after clear)
+    setTimeout(() => setStartBlankExiting(false), 400 + 450);
+  }, []);
+
+  // Animate zoom/pan toward center when starting blank (runs in parallel with block exit)
+  useEffect(() => {
+    if (!startBlankExiting) return;
+    const startZoom = zoomLevel;
+    const startPan = { x: panOffset.x, y: panOffset.y };
+    const duration = 350;
+    const startTime = performance.now();
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const t = Math.min(elapsed / duration, 1);
+      const eased = 1 - (1 - t) ** 3; // ease-out cubic
+
+      setZoomLevel(startZoom + (1 - startZoom) * eased);
+      setPanOffset({
+        x: startPan.x + (0 - startPan.x) * eased,
+        y: startPan.y + (0 - startPan.y) * eased,
+      });
+
+      if (t < 1) requestAnimationFrame(tick);
+    };
+
+    const id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally capture zoom/pan only when startBlankExiting becomes true
+  }, [startBlankExiting]);
 
   const duplicateBlock = (id: string) => {
     const block = canvasBlocks.find((b) => b.id === id);
@@ -1220,6 +1382,66 @@ export default function ProjectCanvasPage() {
       />
       {!loading && project && canvas && (
         <>
+          <AnimatePresence>
+            {startBlankConfirmOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm"
+                style={{ pointerEvents: "auto" }}
+                onClick={() => setStartBlankConfirmOpen(false)}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="start-blank-dialog-title"
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                  transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4 border border-slate-200 dark:border-slate-700 pointer-events-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3
+                        id="start-blank-dialog-title"
+                        className="text-lg font-bold text-slate-900 dark:text-slate-100"
+                      >
+                        Start blank?
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        This will remove the sample blocks and give you an empty
+                        canvas.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => setStartBlankConfirmOpen(false)}
+                      className="min-h-[44px] min-w-[44px] px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors touch-manipulation"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleConfirmStartBlank}
+                      className="min-h-[44px] min-w-[44px] px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary/90 transition-colors inline-flex items-center gap-2 touch-manipulation"
+                    >
+                      <Sparkles size={16} />
+                      Start blank
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <ShareCanvasModal
             open={shareModalOpen}
             onOpenChange={setShareModalOpen}
@@ -1244,7 +1466,7 @@ export default function ProjectCanvasPage() {
           </button>
         </div>
       )}
-      <div className="flex h-[calc(100vh-64px)] relative overflow-hidden">
+      <div className="flex h-[calc(100dvh-64px)] min-h-[calc(100vh-64px)] relative overflow-hidden">
         <AnimatePresence mode="wait">
           {primaryMode === "document" ? (
             <motion.div
@@ -1346,6 +1568,24 @@ export default function ProjectCanvasPage() {
                 canvas &&
                 primaryMode === "document" &&
                 !currentDocument &&
+                documentsLoading && (
+                  <div className="flex flex-col items-center justify-center h-full p-8">
+                    <div className="flex flex-col items-center gap-3 text-slate-500 dark:text-slate-400">
+                      <Loader2
+                        size={32}
+                        className="animate-spin"
+                        aria-hidden
+                      />
+                      <p className="text-sm">Loading documents...</p>
+                    </div>
+                  </div>
+                )}
+              {!loading &&
+                project &&
+                canvas &&
+                primaryMode === "document" &&
+                !currentDocument &&
+                !documentsLoading &&
                 documents.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-full p-8">
                     <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl px-8 py-6 shadow-lg max-w-md w-full text-center">
@@ -1383,13 +1623,13 @@ export default function ProjectCanvasPage() {
                 ease: [0.25, 0.46, 0.45, 0.94],
               }}
             >
-            {!sidebarOpen && (
+            {!sidebarOpen && !isMobile && (
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
                 title="Show sidebar"
                 aria-label="Show sidebar"
-                className="absolute left-0 top-4 z-30 flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+                className="absolute left-0 top-4 z-30 flex items-center justify-center p-2.5 sm:p-2 min-h-[44px] sm:min-h-0 min-w-[44px] sm:min-w-0 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
               >
                 <PanelLeftOpen size={18} aria-hidden />
               </button>
@@ -1407,6 +1647,7 @@ export default function ProjectCanvasPage() {
                         y: (window.innerHeight / 2 - panOffset.y) / zoomLevel,
                       };
                       addBlock(type, position || canvasCenter);
+                      if (isMobile) setSidebarOpen(false);
                     }
               }
               selectedBlocks={selectedBlocks}
@@ -1459,9 +1700,39 @@ export default function ProjectCanvasPage() {
                   onViewModeChange={setViewMode}
                 />
               )}
+              {!loading &&
+                primaryMode === "canvas" &&
+                canvasBlocks.length > 0 &&
+                isDefaultTemplate(canvasBlocks) && (
+                  <div
+                    className={cn(
+                      "absolute z-20",
+                      isMobile
+                        ? "left-1/2 -translate-x-1/2 bottom-20"
+                        : "left-4 bottom-4"
+                    )}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setStartBlankConfirmOpen(true)}
+                      className="flex items-center gap-2 min-h-[44px] px-4 py-2.5 rounded-xl border-2 border-primary/40 bg-primary/10 dark:bg-primary/20 backdrop-blur-sm shadow-lg shadow-primary/10 hover:bg-primary/20 dark:hover:bg-primary/30 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/15 transition-all text-primary dark:text-primary font-semibold text-sm touch-manipulation"
+                      aria-label="Start with blank canvas"
+                    >
+                      <Sparkles size={18} className="text-primary" />
+                      Start blank
+                    </button>
+                  </div>
+                )}
               {loading ? (
                 <CanvasWorkspaceSkeleton />
               ) : (
+                <motion.div
+                  key="canvas-workspace"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="h-full w-full"
+                >
                 <CanvasWorkspace
                   ref={canvasRef}
                   activeTool={activeTool}
@@ -1488,14 +1759,16 @@ export default function ProjectCanvasPage() {
                     setShowFloatingToolbar(true);
                   }}
                   viewMode={viewMode}
+                  startBlankExiting={startBlankExiting}
                 />
+                </motion.div>
               )}
             </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-      {primaryMode === "canvas" &&
+        {primaryMode === "canvas" &&
         showFloatingToolbar &&
         selectedBlocks.length > 0 && (
           <CanvasFloatingToolbar
@@ -1516,6 +1789,41 @@ export default function ProjectCanvasPage() {
             zoomLevel={zoomLevel}
             panOffset={panOffset}
           />
+        )}
+      {/* Mobile: bottom FAB to open blocks sheet when sidebar is closed */}
+      {isMobile &&
+        primaryMode === "canvas" &&
+        !sidebarOpen &&
+        !loading &&
+        project &&
+        canvas && (
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            title="Add blocks"
+            aria-label="Add blocks"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-6 py-3.5 rounded-full shadow-lg border border-slate-200/80 dark:border-slate-600/80 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl hover:bg-slate-50 dark:hover:bg-slate-700/95 hover:shadow-xl transition-all text-slate-700 dark:text-slate-200 font-medium text-sm"
+          >
+            <Blocks size={20} className="shrink-0" />
+            Add blocks
+          </button>
+        )}
+      {/* Mobile: bottom FAB to open documents sheet when sidebar is closed */}
+      {isMobile &&
+        primaryMode === "document" &&
+        !sidebarOpen &&
+        !loading &&
+        project && (
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            title="Documents"
+            aria-label="Documents"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-6 py-3.5 rounded-full shadow-lg border border-slate-200/80 dark:border-slate-600/80 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl hover:bg-slate-50 dark:hover:bg-slate-700/95 hover:shadow-xl transition-all text-slate-700 dark:text-slate-200 font-medium text-sm"
+          >
+            <FileText size={20} className="shrink-0" />
+            Documents
+          </button>
         )}
     </div>
   );

@@ -19,22 +19,20 @@ import Link from "next/link";
 
 interface ProjectsHeaderProps {
   onCommandPaletteOpen: () => void;
-  onSidebarToggle: () => void;
   onGuideOpen?: () => void;
 }
 
 export function ProjectsHeader({
   onCommandPaletteOpen,
-  onSidebarToggle,
   onGuideOpen,
 }: ProjectsHeaderProps) {
   return (
     <LiquidGlassSurface asChild variant="header" intensity="2xl">
       <header className="animate-navbar-enter">
         <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-14">
+          <div className="flex items-center h-14">
             {/* Left section */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 flex-1 min-w-0">
               <Link href="/projects" aria-label="Go to Projects Dashboard">
                 <span className="inline-flex items-center space-x-2 cursor-pointer transition-transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary-400 rounded-md group">
                   <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-lg">
@@ -48,10 +46,10 @@ export function ProjectsHeader({
             </div>
 
             {/* Center - Command Palette Trigger */}
-            <div className="hidden md:flex flex-1 max-w-lg mx-8">
+            <div className="hidden md:flex flex-1 justify-center min-w-0 px-4">
               <LiquidGlassButton
                 gradient="primary"
-                className="w-full justify-start text-slate-600 dark:text-slate-300 rounded-full"
+                className="w-full max-w-lg justify-start text-slate-600 dark:text-slate-300 rounded-full"
                 onClick={onCommandPaletteOpen}
               >
                 <Search size={16} className="mr-3" />
@@ -66,7 +64,7 @@ export function ProjectsHeader({
             </div>
 
             {/* Right section */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-end space-x-3 flex-1 min-w-0">
               <Button
                 variant="glass"
                 size="sm"

@@ -219,9 +219,9 @@ export function CanvasHeader({
       <LiquidGlassSurface asChild variant="header" intensity="2xl">
         <header className="animate-navbar-enter">
           <div className="px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 gap-4 min-w-0">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 gap-2 sm:gap-4 min-w-0">
               {/* Left section - Back | Project (prominent) | Canvas | Active */}
-              <div className="flex items-center gap-4 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-4 min-w-0 overflow-hidden">
                 <Tooltip content="Back to Projects">
                   <Link href="/projects">
                     <Button
@@ -236,7 +236,7 @@ export function CanvasHeader({
                     </Button>
                   </Link>
                 </Tooltip>
-                <div className="h-11 w-px bg-slate-200 dark:bg-slate-700 shrink-0" />
+                <div className="h-11 w-px bg-slate-200 dark:bg-slate-700 shrink-0 hidden sm:block" />
 
                 {/* Document mode: simplified (Back + project name only) */}
                 <AnimatePresence mode="wait">
@@ -841,6 +841,23 @@ export function CanvasHeader({
                           Document Mode
                         </button>
                       </div>
+
+                      {/* Mobile: Switch canvas - opens canvas list when header breadcrumb is truncated */}
+                      {canvases.length > 0 && (
+                        <div className="md:hidden pb-2 mb-2 border-b border-slate-200 dark:border-slate-700">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCanvasSwitcherOpen(true);
+                              setMenuOpen(false);
+                            }}
+                            className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                          >
+                            <LayoutGrid size={14} className="mr-2 shrink-0" />
+                            Switch canvas
+                          </button>
+                        </div>
+                      )}
 
                       {/* Back to Projects */}
                       <Link
