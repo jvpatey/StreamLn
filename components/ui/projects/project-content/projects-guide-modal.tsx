@@ -55,7 +55,7 @@ export function ProjectsGuideModal({ open, onOpenChange }: ProjectsGuideModalPro
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center py-8 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] sm:py-20 sm:px-8"
+          className="fixed inset-0 z-[100] bg-slate-900/50 dark:bg-slate-900/80 backdrop-blur-sm flex items-center justify-center py-8 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] sm:py-20 sm:px-8"
           onClick={() => onOpenChange(false)}
           aria-modal="true"
           role="dialog"
