@@ -1575,6 +1575,7 @@ export default function ProjectCanvasPage() {
                   lastSavedAt={lastSavedAt}
                   sidebarOpen={sidebarOpen}
                   onSidebarToggle={() => setSidebarOpen((prev) => !prev)}
+                  onDocumentRename={handleDocumentRename}
                   onDocumentSaved={(updatedAt) => {
                     lastSavedAtRef.current = updatedAt;
                     setLastSavedAt(updatedAt);

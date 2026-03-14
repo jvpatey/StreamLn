@@ -383,16 +383,62 @@ function FormattingControls({
 function DocumentFormattingToolbar({
   editor,
   documentName,
+  documentId,
+  canvasId,
+  onDocumentRename,
   sidebarOpen,
   onSidebarToggle,
 }: {
   editor: Editor;
   documentName?: string;
+  documentId?: string;
+  canvasId?: string;
+  onDocumentRename?: (canvasId: string, documentId: string, name: string) => void;
   sidebarOpen?: boolean;
   onSidebarToggle?: () => void;
 }) {
   const isMobile = useIsMobile();
   const [formatSheetOpen, setFormatSheetOpen] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editNameValue, setEditNameValue] = useState(documentName ?? "");
+  const editInputRef = useRef<HTMLInputElement>(null);
+
+  const canEditName =
+    documentId &&
+    canvasId &&
+    onDocumentRename &&
+    documentName != null;
+
+  const handleStartEditName = useCallback(() => {
+    if (!canEditName) return;
+    setEditNameValue(documentName ?? "");
+    setIsEditingName(true);
+  }, [canEditName, documentName]);
+
+  const handleSaveName = useCallback(() => {
+    if (!canEditName) return;
+    const trimmed = editNameValue.trim();
+    if (trimmed && trimmed !== documentName) {
+      onDocumentRename?.(canvasId, documentId, trimmed);
+    }
+    setIsEditingName(false);
+  }, [canEditName, editNameValue, documentName, onDocumentRename, canvasId, documentId]);
+
+  const handleCancelEditName = useCallback(() => {
+    setEditNameValue(documentName ?? "");
+    setIsEditingName(false);
+  }, [documentName]);
+
+  useEffect(() => {
+    if (!isEditingName) setEditNameValue(documentName ?? "");
+  }, [documentName, isEditingName]);
+
+  useEffect(() => {
+    if (isEditingName) {
+      editInputRef.current?.focus();
+      editInputRef.current?.select();
+    }
+  }, [isEditingName]);
 
   return (
     <>
@@ -431,33 +477,52 @@ function DocumentFormattingToolbar({
               </>
             )}
             {documentName != null && (
-              isMobile && onSidebarToggle != null ? (
-                <button
-                  type="button"
-                  onClick={onSidebarToggle}
-                  title="Documents"
-                  aria-label="Open documents"
-                  className={cn(
-                    "flex items-center justify-center min-h-[44px] min-w-[44px] shrink-0",
-                    "rounded-lg bg-primary/10 dark:bg-primary/20",
-                    "hover:bg-primary/15 dark:hover:bg-primary/25",
-                    "transition-colors touch-manipulation"
-                  )}
-                >
-                  <div className="p-1.5 rounded-md bg-primary/20 dark:bg-primary/30">
+              <div className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0 min-w-0 min-h-[36px] md:min-h-0">
+                {isMobile && onSidebarToggle != null ? (
+                  <button
+                    type="button"
+                    onClick={onSidebarToggle}
+                    title="Documents"
+                    aria-label="Open documents"
+                    className="p-1.5 rounded-md bg-primary/20 dark:bg-primary/30 shrink-0 -ml-0.5"
+                  >
                     <FileText size={iconSize} className="text-primary" />
-                  </div>
-                </button>
-              ) : (
-                <div className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0 min-w-0">
+                  </button>
+                ) : (
                   <div className="p-1 rounded-md bg-primary/20 dark:bg-primary/30 shrink-0">
                     <FileText size={iconSize} className="text-primary" />
                   </div>
-                  <span className="text-sm font-medium text-primary truncate max-w-[160px]">
-                    {documentName}
-                  </span>
-                </div>
-              )
+                )}
+                {isEditingName ? (
+                  <input
+                    ref={editInputRef}
+                    type="text"
+                    value={editNameValue}
+                    onChange={(e) => setEditNameValue(e.target.value)}
+                    onBlur={handleSaveName}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSaveName();
+                      if (e.key === "Escape") handleCancelEditName();
+                    }}
+                    className="flex-1 min-w-0 text-sm font-medium text-primary bg-transparent border-none outline-none focus:ring-0 max-w-[140px] md:max-w-[160px]"
+                    autoFocus
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={canEditName ? handleStartEditName : undefined}
+                    className={cn(
+                      "flex-1 min-w-0 text-left text-sm font-medium text-primary truncate max-w-[140px] md:max-w-[160px]",
+                      canEditName &&
+                      "hover:underline cursor-text focus:outline-none focus:ring-0"
+                    )}
+                    disabled={!canEditName}
+                    title={canEditName ? "Click to rename" : undefined}
+                  >
+                    {documentName || "Untitled Document"}
+                  </button>
+                )}
+              </div>
             )}
           </div>
           {isMobile ? (
@@ -538,6 +603,7 @@ interface CanvasDocumentEditorProps {
   lastSavedAt?: string | null;
   onDocumentSaved?: (updatedAt: string) => void;
   onSaveConflict?: () => void;
+  onDocumentRename?: (canvasId: string, documentId: string, name: string) => void;
   sidebarOpen?: boolean;
   onSidebarToggle?: () => void;
   editable?: boolean;
@@ -555,6 +621,7 @@ export const CanvasDocumentEditor = forwardRef<
   lastSavedAt,
   onDocumentSaved,
   onSaveConflict,
+  onDocumentRename,
   sidebarOpen,
   onSidebarToggle,
   editable = true,
@@ -689,6 +756,9 @@ export const CanvasDocumentEditor = forwardRef<
         <DocumentFormattingToolbar
           editor={editor}
           documentName={documentName}
+          documentId={documentId}
+          canvasId={canvasId}
+          onDocumentRename={onDocumentRename}
           sidebarOpen={sidebarOpen}
           onSidebarToggle={onSidebarToggle}
         />

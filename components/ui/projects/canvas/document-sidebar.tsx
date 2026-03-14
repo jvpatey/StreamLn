@@ -7,6 +7,7 @@ import {
   LiquidGlassSurface,
   getLiquidGlassSurfaceClassName,
 } from "@/components/ui/shared/liquid-glass-surface";
+import { Button } from "@/components/ui/shared/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/shared/sheet";
 import { SortableCanvasList, SortableCanvasItem } from "./sortable-canvas-list";
 import { useIsMobile } from "@/lib/hooks/use-is-mobile";
@@ -297,17 +298,81 @@ export function DocumentSidebar({
                             <ChevronRight size={14} />
                           )}
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => handleCanvasClickWithClose(canvas.id)}
-                          className="flex-1 text-left text-sm truncate min-w-0 flex items-center gap-1.5"
-                        >
-                          <LayoutGrid
-                            size={14}
-                            className="shrink-0 text-slate-500"
+                        {renameCanvasId === canvas.id ? (
+                          <input
+                            type="text"
+                            value={renameCanvasValue}
+                            onChange={(e) =>
+                              setRenameCanvasValue(e.target.value)
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                onCanvasRename?.(
+                                  canvas.id,
+                                  renameCanvasValue.trim() || canvas.name,
+                                );
+                                setRenameCanvasId(null);
+                              }
+                              if (e.key === "Escape") {
+                                setRenameCanvasId(null);
+                                setRenameCanvasValue(canvas.name);
+                              }
+                            }}
+                            onBlur={() => {
+                              if (renameCanvasValue.trim())
+                                onCanvasRename?.(
+                                  canvas.id,
+                                  renameCanvasValue.trim(),
+                                );
+                              setRenameCanvasId(null);
+                            }}
+                            className="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0"
+                            autoFocus
                           />
-                          {canvas.name}
-                        </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleCanvasClickWithClose(canvas.id)}
+                            className="flex-1 text-left text-sm truncate min-w-0 flex items-center gap-1.5"
+                          >
+                            <LayoutGrid
+                              size={14}
+                              className="shrink-0 text-slate-500"
+                            />
+                            {canvas.name}
+                          </button>
+                        )}
+                        {renameCanvasId !== canvas.id && onCanvasRename && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 rounded-lg shrink-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 sm:h-6 sm:w-6 hover:bg-slate-200/50 dark:hover:bg-slate-600/50 active:bg-slate-200/50 dark:active:bg-slate-600/50 text-slate-500 dark:text-slate-400"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setRenameCanvasId(canvas.id);
+                              setRenameCanvasValue(canvas.name);
+                            }}
+                            aria-label="Rename canvas"
+                          >
+                            <Pencil size={12} />
+                          </Button>
+                        )}
+                        {renameCanvasId !== canvas.id &&
+                          onCanvasDelete &&
+                          canvases.length > 1 && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 rounded-lg shrink-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 sm:h-6 sm:w-6 hover:bg-red-500/10 dark:hover:bg-red-500/20 active:bg-red-500/10 dark:active:bg-red-500/20 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 active:text-red-600 dark:active:text-red-400"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onCanvasDelete(canvas.id);
+                              }}
+                              aria-label="Delete canvas"
+                            >
+                              <Trash2 size={12} />
+                            </Button>
+                          )}
                       </div>
                       <AnimatePresence initial={false}>
                         {isExpanded && (
@@ -318,31 +383,107 @@ export function DocumentSidebar({
                             transition={treeTransition}
                           >
                             <div className="ml-6 mt-1 space-y-1 border-l border-slate-200/50 dark:border-slate-600/50 pl-2">
-                              {canvas.documents.map((doc) => (
-                                <button
-                                  key={doc.id}
-                                  type="button"
-                                  onClick={() =>
-                                    handleDocumentClickWithClose(
-                                      canvas.id,
-                                      doc.id,
-                                    )
-                                  }
-                                  className={cn(
-                                    "w-full flex items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm",
-                                    isCurrentCanvas &&
-                                      doc.id === currentDocumentId
-                                      ? "bg-primary/10 text-primary"
-                                      : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
-                                  )}
-                                >
-                                  <FileText
-                                    size={14}
-                                    className="shrink-0 text-slate-500"
-                                  />
-                                  <span className="truncate">{doc.name}</span>
-                                </button>
-                              ))}
+                              {canvas.documents.map((doc) => {
+                                const isRenaming =
+                                  renameDocId === doc.id &&
+                                  renameDocCanvasId === canvas.id;
+                                return (
+                                  <div
+                                    key={doc.id}
+                                    className={cn(
+                                      "flex items-center gap-2 rounded-lg px-2.5 py-2 group",
+                                      isCurrentCanvas &&
+                                        doc.id === currentDocumentId
+                                        ? "bg-primary/10 text-primary"
+                                        : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
+                                    )}
+                                  >
+                                    <FileText
+                                      size={14}
+                                      className="shrink-0 text-slate-500"
+                                    />
+                                    {isRenaming ? (
+                                      <input
+                                        type="text"
+                                        value={renameDocValue}
+                                        onChange={(e) =>
+                                          setRenameDocValue(e.target.value)
+                                        }
+                                        onKeyDown={(e) => {
+                                          if (e.key === "Enter") {
+                                            onDocumentRename(
+                                              canvas.id,
+                                              doc.id,
+                                              renameDocValue.trim() || doc.name,
+                                            );
+                                            setRenameDocId(null);
+                                            setRenameDocCanvasId(null);
+                                          }
+                                          if (e.key === "Escape") {
+                                            setRenameDocId(null);
+                                            setRenameDocCanvasId(null);
+                                            setRenameDocValue(doc.name);
+                                          }
+                                        }}
+                                        onBlur={() => {
+                                          onDocumentRename(
+                                            canvas.id,
+                                            doc.id,
+                                            renameDocValue.trim() || doc.name,
+                                          );
+                                          setRenameDocId(null);
+                                          setRenameDocCanvasId(null);
+                                        }}
+                                        className="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0"
+                                        autoFocus
+                                      />
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          handleDocumentClickWithClose(
+                                            canvas.id,
+                                            doc.id,
+                                          )
+                                        }
+                                        className="flex-1 min-w-0 text-left text-sm truncate"
+                                      >
+                                        {doc.name}
+                                      </button>
+                                    )}
+                                    {!isRenaming && onDocumentRename && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 rounded-lg shrink-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 sm:h-6 sm:w-6 hover:bg-slate-200/50 dark:hover:bg-slate-600/50 active:bg-slate-200/50 dark:active:bg-slate-600/50 text-slate-500 dark:text-slate-400"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setRenameDocId(doc.id);
+                                          setRenameDocCanvasId(canvas.id);
+                                          setRenameDocValue(doc.name);
+                                        }}
+                                        aria-label="Rename document"
+                                      >
+                                        <Pencil size={12} />
+                                      </Button>
+                                    )}
+                                    {!isRenaming && onDocumentDelete && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 rounded-lg shrink-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 sm:h-6 sm:w-6 hover:bg-red-500/10 dark:hover:bg-red-500/20 active:bg-red-500/10 dark:active:bg-red-500/20 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 active:text-red-600 dark:active:text-red-400"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          onDocumentDelete(canvas.id, doc.id);
+                                        }}
+                                        aria-label="Delete document"
+                                      >
+                                        <Trash2 size={12} />
+                                      </Button>
+                                    )}
+                                  </div>
+                                );
+                              })}
                               <button
                                 type="button"
                                 onClick={() => onDocumentCreate(canvas.id)}
@@ -553,26 +694,30 @@ export function DocumentSidebar({
                                   {canvas.name}
                                 </button>
                                 {onCanvasRename && (
-                                  <button
-                                    type="button"
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 rounded-lg shrink-0 hover:bg-slate-200/50 dark:hover:bg-slate-600/50 active:bg-slate-200/50 dark:active:bg-slate-600/50 text-slate-500 dark:text-slate-400"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setRenameCanvasId(canvas.id);
                                       setRenameCanvasValue(canvas.name);
                                     }}
-                                    className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
+                                    aria-label="Rename canvas"
                                   >
                                     <Pencil size={12} />
-                                  </button>
+                                  </Button>
                                 )}
                                 {onCanvasDelete && canvases.length > 1 && (
-                                  <button
-                                    type="button"
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 rounded-lg shrink-0 hover:bg-red-500/10 dark:hover:bg-red-500/20 active:bg-red-500/10 dark:active:bg-red-500/20 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 active:text-red-600 dark:active:text-red-400"
                                     onClick={() => onCanvasDelete(canvas.id)}
-                                    className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
+                                    aria-label="Delete canvas"
                                   >
                                     <Trash2 size={12} />
-                                  </button>
+                                  </Button>
                                 )}
                               </>
                             )}
@@ -699,8 +844,10 @@ export function DocumentSidebar({
                                                         {doc.name}
                                                       </button>
                                                       {onDocumentRename && (
-                                                        <button
-                                                          type="button"
+                                                        <Button
+                                                          variant="ghost"
+                                                          size="sm"
+                                                          className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 rounded-lg shrink-0 hover:bg-slate-200/50 dark:hover:bg-slate-600/50 active:bg-slate-200/50 dark:active:bg-slate-600/50 text-slate-500 dark:text-slate-400"
                                                           onClick={(e) => {
                                                             e.stopPropagation();
                                                             setRenameDocId(
@@ -713,14 +860,16 @@ export function DocumentSidebar({
                                                               doc.name,
                                                             );
                                                           }}
-                                                          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
+                                                          aria-label="Rename document"
                                                         >
                                                           <Pencil size={12} />
-                                                        </button>
+                                                        </Button>
                                                       )}
                                                       {onDocumentDelete && (
-                                                        <button
-                                                          type="button"
+                                                        <Button
+                                                          variant="ghost"
+                                                          size="sm"
+                                                          className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 rounded-lg shrink-0 hover:bg-red-500/10 dark:hover:bg-red-500/20 active:bg-red-500/10 dark:active:bg-red-500/20 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 active:text-red-600 dark:active:text-red-400"
                                                           onClick={(e) => {
                                                             e.stopPropagation();
                                                             onDocumentDelete(
@@ -728,10 +877,10 @@ export function DocumentSidebar({
                                                               doc.id,
                                                             );
                                                           }}
-                                                          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
+                                                          aria-label="Delete document"
                                                         >
                                                           <Trash2 size={12} />
-                                                        </button>
+                                                        </Button>
                                                       )}
                                                     </>
                                                   )}
@@ -834,8 +983,10 @@ export function DocumentSidebar({
                                                     {doc.name}
                                                   </button>
                                                   {onDocumentRename && (
-                                                    <button
-                                                      type="button"
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 rounded-lg shrink-0 hover:bg-slate-200/50 dark:hover:bg-slate-600/50 active:bg-slate-200/50 dark:active:bg-slate-600/50 text-slate-500 dark:text-slate-400"
                                                       onClick={(e) => {
                                                         e.stopPropagation();
                                                         setRenameDocId(doc.id);
@@ -846,14 +997,16 @@ export function DocumentSidebar({
                                                           doc.name,
                                                         );
                                                       }}
-                                                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
+                                                      aria-label="Rename document"
                                                     >
                                                       <Pencil size={12} />
-                                                    </button>
+                                                    </Button>
                                                   )}
                                                   {onDocumentDelete && (
-                                                    <button
-                                                      type="button"
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 rounded-lg shrink-0 hover:bg-red-500/10 dark:hover:bg-red-500/20 active:bg-red-500/10 dark:active:bg-red-500/20 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 active:text-red-600 dark:active:text-red-400"
                                                       onClick={(e) => {
                                                         e.stopPropagation();
                                                         onDocumentDelete(
@@ -861,10 +1014,10 @@ export function DocumentSidebar({
                                                           doc.id,
                                                         );
                                                       }}
-                                                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
+                                                      aria-label="Delete document"
                                                     >
                                                       <Trash2 size={12} />
-                                                    </button>
+                                                    </Button>
                                                   )}
                                                 </>
                                               )}
@@ -1024,8 +1177,10 @@ export function DocumentSidebar({
                                               {doc.name}
                                             </button>
                                             {onDocumentRename && (
-                                              <button
-                                                type="button"
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 rounded-lg shrink-0 hover:bg-slate-200/50 dark:hover:bg-slate-600/50 active:bg-slate-200/50 dark:active:bg-slate-600/50 text-slate-500 dark:text-slate-400"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
                                                   setRenameDocId(doc.id);
@@ -1034,14 +1189,16 @@ export function DocumentSidebar({
                                                   );
                                                   setRenameDocValue(doc.name);
                                                 }}
-                                                className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
+                                                aria-label="Rename document"
                                               >
                                                 <Pencil size={12} />
-                                              </button>
+                                              </Button>
                                             )}
                                             {onDocumentDelete && (
-                                              <button
-                                                type="button"
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 rounded-lg shrink-0 hover:bg-red-500/10 dark:hover:bg-red-500/20 active:bg-red-500/10 dark:active:bg-red-500/20 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 active:text-red-600 dark:active:text-red-400"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
                                                   onDocumentDelete(
@@ -1049,10 +1206,10 @@ export function DocumentSidebar({
                                                     doc.id,
                                                   );
                                                 }}
-                                                className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
+                                                aria-label="Delete document"
                                               >
                                                 <Trash2 size={12} />
-                                              </button>
+                                              </Button>
                                             )}
                                           </>
                                         )}
