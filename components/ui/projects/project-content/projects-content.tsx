@@ -498,7 +498,7 @@ export function ProjectsContent({
                   <button
                     type="button"
                     onClick={onCreateProject}
-                    className="flex items-center gap-4 w-full max-w-md px-6 py-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-primary-400 dark:hover:border-primary-500 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-all duration-200 cursor-pointer group"
+                    className="hidden lg:flex items-center gap-4 w-full max-w-md px-6 py-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-primary-400 dark:hover:border-primary-500 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-all duration-200 cursor-pointer group"
                   >
                     <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                       <Plus
@@ -524,7 +524,11 @@ export function ProjectsContent({
                       from a backup.
                     </p>
                     <div className="space-y-2 text-xs text-slate-500 dark:text-slate-500">
-                      <p>• Create Project — button above or sidebar</p>
+                      <p>
+                        • Create Project —{" "}
+                        <span className="hidden lg:inline">button above or </span>
+                        sidebar
+                      </p>
                       <p>• Import from JSON — sidebar</p>
                       <p>• Create documents in any canvas — sidebar</p>
                       <p>
