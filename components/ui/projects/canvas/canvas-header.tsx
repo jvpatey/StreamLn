@@ -140,6 +140,7 @@ interface CanvasHeaderProps {
   onZoomChange?: (zoom: number) => void;
   sidebarOpen?: boolean;
   onSidebarOpenChange?: (open: boolean) => void;
+  onSidebarHighlight?: () => void;
   toolbarOpen?: boolean;
   onToolbarOpenChange?: (open: boolean) => void;
   lastSavedAt?: string | null;
@@ -177,6 +178,7 @@ export function CanvasHeader({
   onZoomChange,
   sidebarOpen = true,
   onSidebarOpenChange,
+  onSidebarHighlight,
   toolbarOpen = true,
   onToolbarOpenChange,
   lastSavedAt = null,
@@ -260,7 +262,10 @@ export function CanvasHeader({
                     <Tooltip content="Documents">
                       <button
                         type="button"
-                        onClick={() => onSidebarOpenChange(true)}
+                        onClick={(e) => {
+                          onSidebarOpenChange(true);
+                          (e.currentTarget as HTMLButtonElement).blur();
+                        }}
                         className={cn(
                           "flex items-center gap-2 h-10 rounded-xl px-3 min-w-0",
                           "border border-white/10 dark:border-white/10",
@@ -284,6 +289,42 @@ export function CanvasHeader({
                           size={14}
                           className="text-slate-500 dark:text-slate-400 shrink-0"
                         />
+                      </button>
+                    </Tooltip>
+                  ) : onSidebarOpenChange ? (
+                    <Tooltip content="Documents">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          sidebarOpen
+                            ? onSidebarHighlight?.()
+                            : onSidebarOpenChange(true);
+                          (e.currentTarget as HTMLButtonElement).blur();
+                        }}
+                        className={cn(
+                          "flex items-center gap-3 rounded-xl min-w-0",
+                          "border border-white/10 dark:border-white/10",
+                          "bg-white/5 dark:bg-white/5 backdrop-blur-md",
+                          "hover:bg-white/10 dark:hover:bg-slate-800/50 hover:border-white/20 dark:hover:border-white/20",
+                          "focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-inset",
+                          "transition-colors cursor-pointer",
+                          "h-11 px-4"
+                        )}
+                        aria-label="Open documents"
+                      >
+                        <div className="p-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0">
+                          {React.createElement(
+                            getIconComponent(project.icon || "Folder"),
+                            {
+                              className:
+                                "h-4 w-4 text-primary-600 dark:text-primary-400",
+                            },
+                          )}
+                        </div>
+                        <span className="font-bold text-slate-900 dark:text-slate-100 truncate text-lg">
+                          {project.name}
+                        </span>
+                        <ProjectStatusBadge status={project.status} size="sm" />
                       </button>
                     </Tooltip>
                   ) : (

@@ -39,6 +39,8 @@ interface CanvasWithDocs {
 interface DocumentSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  isHighlighted?: boolean;
+  onHighlightClear?: () => void;
   projectId: string;
   projectName: string;
   projectIcon?: string;
@@ -77,6 +79,8 @@ function formatDate(dateString: string) {
 export function DocumentSidebar({
   isOpen,
   onClose,
+  isHighlighted,
+  onHighlightClear,
   projectId,
   projectName,
   projectIcon,
@@ -194,7 +198,6 @@ export function DocumentSidebar({
     if (isMobile) onClose();
   };
 
-
   // Mobile: bottom sheet
   if (isMobile) {
     return (
@@ -227,7 +230,7 @@ export function DocumentSidebar({
                       {
                         className:
                           "h-5 w-5 text-primary-600 dark:text-primary-400",
-                      }
+                      },
                     )}
                   </div>
                   <div className="min-w-0">
@@ -299,7 +302,10 @@ export function DocumentSidebar({
                           onClick={() => handleCanvasClickWithClose(canvas.id)}
                           className="flex-1 text-left text-sm truncate min-w-0 flex items-center gap-1.5"
                         >
-                          <LayoutGrid size={14} className="shrink-0 text-slate-500" />
+                          <LayoutGrid
+                            size={14}
+                            className="shrink-0 text-slate-500"
+                          />
                           {canvas.name}
                         </button>
                       </div>
@@ -316,15 +322,24 @@ export function DocumentSidebar({
                                 <button
                                   key={doc.id}
                                   type="button"
-                                  onClick={() => handleDocumentClickWithClose(canvas.id, doc.id)}
+                                  onClick={() =>
+                                    handleDocumentClickWithClose(
+                                      canvas.id,
+                                      doc.id,
+                                    )
+                                  }
                                   className={cn(
                                     "w-full flex items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm",
-                                    isCurrentCanvas && doc.id === currentDocumentId
+                                    isCurrentCanvas &&
+                                      doc.id === currentDocumentId
                                       ? "bg-primary/10 text-primary"
                                       : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
                                   )}
                                 >
-                                  <FileText size={14} className="shrink-0 text-slate-500" />
+                                  <FileText
+                                    size={14}
+                                    className="shrink-0 text-slate-500"
+                                  />
                                   <span className="truncate">{doc.name}</span>
                                 </button>
                               ))}
@@ -357,10 +372,15 @@ export function DocumentSidebar({
                         onClick={() => handleRecentClickWithClose(doc)}
                         className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-sm hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
                       >
-                        <FileText size={14} className="shrink-0 text-slate-500" />
+                        <FileText
+                          size={14}
+                          className="shrink-0 text-slate-500"
+                        />
                         <span className="truncate">
                           {doc.documentName}
-                          <span className="text-slate-400 text-xs ml-1">({doc.canvasName})</span>
+                          <span className="text-slate-400 text-xs ml-1">
+                            ({doc.canvasName})
+                          </span>
                         </span>
                       </button>
                     ))}
@@ -396,11 +416,18 @@ export function DocumentSidebar({
           className="md:hidden absolute inset-0 bg-black/40 backdrop-blur-[2px] z-0"
         />
       )}
-      <div className="w-80 max-w-[min(320px,85vw)] md:max-w-none h-full animate-sidebar-enter md:relative absolute left-0 top-0 bottom-0 md:left-auto md:top-auto md:bottom-auto z-10 md:z-auto max-h-[calc(100dvh-4rem)] md:max-h-none">
+      <div
+        className="w-80 max-w-[min(320px,85vw)] md:max-w-none h-full animate-sidebar-enter md:relative absolute left-0 top-0 bottom-0 md:left-auto md:top-auto md:bottom-auto z-10 md:z-auto max-h-[calc(100dvh-4rem)] md:max-h-none transition-shadow duration-300"
+        onClick={() => onHighlightClear?.()}
+      >
         <LiquidGlassSurface
           variant="panel"
           intensity="xl"
-          className="relative w-full min-w-0 max-w-80 h-full flex flex-col border-r border-white/30 dark:border-white/15"
+          className={cn(
+            "relative w-full min-w-0 max-w-80 h-full flex flex-col border-r border-white/30 dark:border-white/15 transition-shadow duration-300",
+            isHighlighted &&
+              "shadow-[0_0_24px_rgba(59,130,246,0.35)] dark:shadow-[0_0_24px_rgba(59,130,246,0.25)] ring-2 ring-primary/30 ring-inset",
+          )}
         >
           {/* Mobile close button */}
           <button
@@ -514,7 +541,9 @@ export function DocumentSidebar({
                               <>
                                 <button
                                   type="button"
-                                  onClick={() => handleCanvasClickWithClose(canvas.id)}
+                                  onClick={() =>
+                                    handleCanvasClickWithClose(canvas.id)
+                                  }
                                   className="flex-1 text-left text-sm truncate min-w-0 flex items-center gap-1.5"
                                 >
                                   <LayoutGrid
@@ -556,150 +585,362 @@ export function DocumentSidebar({
                                 exit={{ opacity: 0 }}
                                 transition={treeTransition}
                               >
-                            <div className="ml-6 mt-1 space-y-1 border-l border-slate-200/50 dark:border-slate-600/50 pl-2 overflow-hidden">
-                              {onDocumentReorder &&
-                              canvas.documents.length > 1 ? (
-                                <SortableCanvasList
-                                  canvases={canvas.documents}
-                                  onReorder={(reordered) =>
-                                    onDocumentReorder(canvas.id, reordered)
-                                  }
-                                >
-                                  <div className="space-y-1">
-                                    <AnimatePresence>
-                                    {canvas.documents.map((doc) => {
-                                      const isCurrent =
-                                        isCurrentCanvas &&
-                                        doc.id === currentDocumentId;
-                                      const isRenaming =
-                                        renameDocId === doc.id &&
-                                        renameDocCanvasId === canvas.id;
-                                      return (
-                                        <motion.div
-                                          key={doc.id}
-                                          layout
-                                          initial={{ opacity: 1 }}
-                                          exit={{ opacity: 0, x: -12 }}
-                                          transition={treeTransition}
-                                          className="rounded-lg"
-                                        >
-                                        <SortableCanvasItem
-                                          key={doc.id}
-                                          id={doc.id}
-                                          className={cn(
-                                            "relative rounded-lg px-2.5 py-2 group",
-                                            isCurrent
-                                              ? "text-primary"
-                                              : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
-                                          )}
-                                          dragHandleClassName="shrink-0 cursor-grab active:cursor-grabbing p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 opacity-60 hover:opacity-100"
-                                        >
-                                          {isCurrent && (
-                                            <motion.div
-                                              layoutId={`doc-selection-${canvas.id}`}
-                                              className="absolute inset-0 rounded-lg bg-primary/10 -z-10"
-                                              transition={treeTransition}
-                                            />
-                                          )}
-                                          <FileText
-                                            size={14}
-                                            className="shrink-0 text-slate-500"
-                                          />
-                                          {isRenaming ? (
-                                            <input
-                                              type="text"
-                                              value={renameDocValue}
-                                              onChange={(e) =>
-                                                setRenameDocValue(
-                                                  e.target.value,
-                                                )
-                                              }
-                                              onKeyDown={(e) => {
-                                                if (e.key === "Enter") {
-                                                  onDocumentRename(
-                                                    canvas.id,
-                                                    doc.id,
-                                                    renameDocValue.trim() ||
-                                                      doc.name,
-                                                  );
-                                                  setRenameDocId(null);
-                                                  setRenameDocCanvasId(null);
-                                                }
-                                                if (e.key === "Escape") {
-                                                  setRenameDocId(null);
-                                                  setRenameDocCanvasId(null);
-                                                }
-                                              }}
-                                              onBlur={() => {
-                                                if (renameDocValue.trim())
-                                                  onDocumentRename(
-                                                    canvas.id,
-                                                    doc.id,
-                                                    renameDocValue.trim(),
-                                                  );
-                                                setRenameDocId(null);
-                                                setRenameDocCanvasId(null);
-                                              }}
-                                              autoFocus
-                                              className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm"
-                                            />
-                                          ) : (
-                                            <>
-                                              <button
-                                                type="button"
-                                                onClick={() =>
-                                                  handleDocumentClickWithClose(
-                                                    canvas.id,
-                                                    doc.id,
-                                                  )
-                                                }
-                                                className="flex-1 text-left text-sm truncate min-w-0"
+                                <div className="ml-6 mt-1 space-y-1 border-l border-slate-200/50 dark:border-slate-600/50 pl-2 overflow-hidden">
+                                  {onDocumentReorder &&
+                                  canvas.documents.length > 1 ? (
+                                    <SortableCanvasList
+                                      canvases={canvas.documents}
+                                      onReorder={(reordered) =>
+                                        onDocumentReorder(canvas.id, reordered)
+                                      }
+                                    >
+                                      <div className="space-y-1">
+                                        <AnimatePresence>
+                                          {canvas.documents.map((doc) => {
+                                            const isCurrent =
+                                              isCurrentCanvas &&
+                                              doc.id === currentDocumentId;
+                                            const isRenaming =
+                                              renameDocId === doc.id &&
+                                              renameDocCanvasId === canvas.id;
+                                            return (
+                                              <motion.div
+                                                key={doc.id}
+                                                layout
+                                                initial={{ opacity: 1 }}
+                                                exit={{ opacity: 0, x: -12 }}
+                                                transition={treeTransition}
+                                                className="rounded-lg"
                                               >
-                                                {doc.name}
-                                              </button>
-                                              {onDocumentRename && (
-                                                <button
-                                                  type="button"
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setRenameDocId(doc.id);
-                                                    setRenameDocCanvasId(
-                                                      canvas.id,
-                                                    );
-                                                    setRenameDocValue(doc.name);
-                                                  }}
-                                                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
+                                                <SortableCanvasItem
+                                                  key={doc.id}
+                                                  id={doc.id}
+                                                  className={cn(
+                                                    "relative rounded-lg px-2.5 py-2 group",
+                                                    isCurrent
+                                                      ? "text-primary"
+                                                      : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
+                                                  )}
+                                                  dragHandleClassName="shrink-0 cursor-grab active:cursor-grabbing p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 opacity-60 hover:opacity-100"
                                                 >
-                                                  <Pencil size={12} />
-                                                </button>
+                                                  {isCurrent && (
+                                                    <motion.div
+                                                      layoutId={`doc-selection-${canvas.id}`}
+                                                      className="absolute inset-0 rounded-lg bg-primary/10 -z-10"
+                                                      transition={
+                                                        treeTransition
+                                                      }
+                                                    />
+                                                  )}
+                                                  <FileText
+                                                    size={14}
+                                                    className="shrink-0 text-slate-500"
+                                                  />
+                                                  {isRenaming ? (
+                                                    <input
+                                                      type="text"
+                                                      value={renameDocValue}
+                                                      onChange={(e) =>
+                                                        setRenameDocValue(
+                                                          e.target.value,
+                                                        )
+                                                      }
+                                                      onKeyDown={(e) => {
+                                                        if (e.key === "Enter") {
+                                                          onDocumentRename(
+                                                            canvas.id,
+                                                            doc.id,
+                                                            renameDocValue.trim() ||
+                                                              doc.name,
+                                                          );
+                                                          setRenameDocId(null);
+                                                          setRenameDocCanvasId(
+                                                            null,
+                                                          );
+                                                        }
+                                                        if (
+                                                          e.key === "Escape"
+                                                        ) {
+                                                          setRenameDocId(null);
+                                                          setRenameDocCanvasId(
+                                                            null,
+                                                          );
+                                                        }
+                                                      }}
+                                                      onBlur={() => {
+                                                        if (
+                                                          renameDocValue.trim()
+                                                        )
+                                                          onDocumentRename(
+                                                            canvas.id,
+                                                            doc.id,
+                                                            renameDocValue.trim(),
+                                                          );
+                                                        setRenameDocId(null);
+                                                        setRenameDocCanvasId(
+                                                          null,
+                                                        );
+                                                      }}
+                                                      autoFocus
+                                                      className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm"
+                                                    />
+                                                  ) : (
+                                                    <>
+                                                      <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                          handleDocumentClickWithClose(
+                                                            canvas.id,
+                                                            doc.id,
+                                                          )
+                                                        }
+                                                        className="flex-1 text-left text-sm truncate min-w-0"
+                                                      >
+                                                        {doc.name}
+                                                      </button>
+                                                      {onDocumentRename && (
+                                                        <button
+                                                          type="button"
+                                                          onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setRenameDocId(
+                                                              doc.id,
+                                                            );
+                                                            setRenameDocCanvasId(
+                                                              canvas.id,
+                                                            );
+                                                            setRenameDocValue(
+                                                              doc.name,
+                                                            );
+                                                          }}
+                                                          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
+                                                        >
+                                                          <Pencil size={12} />
+                                                        </button>
+                                                      )}
+                                                      {onDocumentDelete && (
+                                                        <button
+                                                          type="button"
+                                                          onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            onDocumentDelete(
+                                                              canvas.id,
+                                                              doc.id,
+                                                            );
+                                                          }}
+                                                          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
+                                                        >
+                                                          <Trash2 size={12} />
+                                                        </button>
+                                                      )}
+                                                    </>
+                                                  )}
+                                                </SortableCanvasItem>
+                                              </motion.div>
+                                            );
+                                          })}
+                                        </AnimatePresence>
+                                      </div>
+                                    </SortableCanvasList>
+                                  ) : (
+                                    <>
+                                      <AnimatePresence>
+                                        {canvas.documents.map((doc) => {
+                                          const isCurrent =
+                                            isCurrentCanvas &&
+                                            doc.id === currentDocumentId;
+                                          const isRenaming =
+                                            renameDocId === doc.id &&
+                                            renameDocCanvasId === canvas.id;
+                                          return (
+                                            <motion.div
+                                              key={doc.id}
+                                              layout
+                                              initial={{ opacity: 1 }}
+                                              exit={{ opacity: 0, x: -12 }}
+                                              transition={treeTransition}
+                                              className={cn(
+                                                "relative flex items-center gap-2 rounded-lg px-2.5 py-2 group",
+                                                isCurrent
+                                                  ? "text-primary"
+                                                  : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
                                               )}
-                                              {onDocumentDelete && (
-                                                  <button
-                                                    type="button"
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                      onDocumentDelete(
+                                            >
+                                              {isCurrent && (
+                                                <motion.div
+                                                  layoutId={`doc-selection-${canvas.id}`}
+                                                  className="absolute inset-0 rounded-lg bg-primary/10 -z-10"
+                                                  transition={treeTransition}
+                                                />
+                                              )}
+                                              <FileText
+                                                size={14}
+                                                className="shrink-0 text-slate-500"
+                                              />
+                                              {isRenaming ? (
+                                                <input
+                                                  type="text"
+                                                  value={renameDocValue}
+                                                  onChange={(e) =>
+                                                    setRenameDocValue(
+                                                      e.target.value,
+                                                    )
+                                                  }
+                                                  onKeyDown={(e) => {
+                                                    if (e.key === "Enter") {
+                                                      onDocumentRename(
                                                         canvas.id,
                                                         doc.id,
+                                                        renameDocValue.trim() ||
+                                                          doc.name,
                                                       );
-                                                    }}
-                                                    className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
+                                                      setRenameDocId(null);
+                                                      setRenameDocCanvasId(
+                                                        null,
+                                                      );
+                                                    }
+                                                    if (e.key === "Escape") {
+                                                      setRenameDocId(null);
+                                                      setRenameDocCanvasId(
+                                                        null,
+                                                      );
+                                                    }
+                                                  }}
+                                                  onBlur={() => {
+                                                    if (renameDocValue.trim())
+                                                      onDocumentRename(
+                                                        canvas.id,
+                                                        doc.id,
+                                                        renameDocValue.trim(),
+                                                      );
+                                                    setRenameDocId(null);
+                                                    setRenameDocCanvasId(null);
+                                                  }}
+                                                  autoFocus
+                                                  className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm"
+                                                />
+                                              ) : (
+                                                <>
+                                                  <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                      handleDocumentClickWithClose(
+                                                        canvas.id,
+                                                        doc.id,
+                                                      )
+                                                    }
+                                                    className="flex-1 text-left text-sm truncate min-w-0"
                                                   >
-                                                    <Trash2 size={12} />
+                                                    {doc.name}
                                                   </button>
-                                                )}
-                                            </>
-                                          )}
-                                        </SortableCanvasItem>
-                                        </motion.div>
-                                      );
-                                    })}
-                                    </AnimatePresence>
-                                  </div>
-                                </SortableCanvasList>
-                              ) : (
-                                <>
-                                  <AnimatePresence>
+                                                  {onDocumentRename && (
+                                                    <button
+                                                      type="button"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setRenameDocId(doc.id);
+                                                        setRenameDocCanvasId(
+                                                          canvas.id,
+                                                        );
+                                                        setRenameDocValue(
+                                                          doc.name,
+                                                        );
+                                                      }}
+                                                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
+                                                    >
+                                                      <Pencil size={12} />
+                                                    </button>
+                                                  )}
+                                                  {onDocumentDelete && (
+                                                    <button
+                                                      type="button"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onDocumentDelete(
+                                                          canvas.id,
+                                                          doc.id,
+                                                        );
+                                                      }}
+                                                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
+                                                    >
+                                                      <Trash2 size={12} />
+                                                    </button>
+                                                  )}
+                                                </>
+                                              )}
+                                            </motion.div>
+                                          );
+                                        })}
+                                      </AnimatePresence>
+                                    </>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => onDocumentCreate(canvas.id)}
+                                    className="w-full flex items-center gap-2 px-2.5 py-2 mt-2 text-xs text-primary hover:bg-primary/10 rounded-lg"
+                                  >
+                                    <Plus size={12} />
+                                    New document
+                                  </button>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </SortableCanvasList>
+              ) : (
+                <div className="space-y-1">
+                  {filteredCanvases.map((canvas) => {
+                    const isExpanded = expandedCanvases.has(canvas.id);
+                    const isCurrentCanvas = canvas.id === currentCanvasId;
+                    return (
+                      <div key={canvas.id}>
+                        <div
+                          className={cn(
+                            "flex items-center gap-2 rounded-lg px-2.5 py-2 group transition-colors duration-200",
+                            isCurrentCanvas
+                              ? "bg-primary/10"
+                              : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
+                          )}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => toggleCanvas(canvas.id)}
+                            className="p-0.5 shrink-0 -ml-0.5"
+                          >
+                            {isExpanded ? (
+                              <ChevronDown size={14} />
+                            ) : (
+                              <ChevronRight size={14} />
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleCanvasClickWithClose(canvas.id)
+                            }
+                            className="flex-1 text-left text-sm truncate min-w-0 flex items-center gap-1.5"
+                          >
+                            <LayoutGrid
+                              size={14}
+                              className="shrink-0 text-slate-500"
+                            />
+                            {canvas.name}
+                          </button>
+                        </div>
+                        <AnimatePresence initial={false}>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={treeTransition}
+                            >
+                              <div className="ml-6 mt-1 space-y-1 border-l border-slate-200/50 dark:border-slate-600/50 pl-2 overflow-hidden">
+                                <AnimatePresence>
                                   {canvas.documents.map((doc) => {
                                     const isCurrent =
                                       isCurrentCanvas &&
@@ -799,214 +1040,35 @@ export function DocumentSidebar({
                                               </button>
                                             )}
                                             {onDocumentDelete && (
-                                                <button
-                                                  type="button"
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    onDocumentDelete(
-                                                      canvas.id,
-                                                      doc.id,
-                                                    );
-                                                  }}
-                                                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
-                                                >
-                                                  <Trash2 size={12} />
-                                                </button>
-                                              )}
+                                              <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  onDocumentDelete(
+                                                    canvas.id,
+                                                    doc.id,
+                                                  );
+                                                }}
+                                                className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
+                                              >
+                                                <Trash2 size={12} />
+                                              </button>
+                                            )}
                                           </>
                                         )}
                                       </motion.div>
                                     );
                                   })}
-                            </AnimatePresence>
-                                </>
-                              )}
-                              <button
-                                type="button"
-                                onClick={() => onDocumentCreate(canvas.id)}
-                                className="w-full flex items-center gap-2 px-2.5 py-2 mt-2 text-xs text-primary hover:bg-primary/10 rounded-lg"
-                              >
-                                <Plus size={12} />
-                                New document
-                              </button>
-                            </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </SortableCanvasList>
-              ) : (
-                <div className="space-y-1">
-                  {filteredCanvases.map((canvas) => {
-                    const isExpanded = expandedCanvases.has(canvas.id);
-                    const isCurrentCanvas = canvas.id === currentCanvasId;
-                    return (
-                      <div key={canvas.id}>
-                        <div
-                          className={cn(
-                            "flex items-center gap-2 rounded-lg px-2.5 py-2 group transition-colors duration-200",
-                            isCurrentCanvas
-                              ? "bg-primary/10"
-                              : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
-                          )}
-                        >
-                          <button
-                            type="button"
-                            onClick={() => toggleCanvas(canvas.id)}
-                            className="p-0.5 shrink-0 -ml-0.5"
-                          >
-                            {isExpanded ? (
-                              <ChevronDown size={14} />
-                            ) : (
-                              <ChevronRight size={14} />
-                            )}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleCanvasClickWithClose(canvas.id)}
-                            className="flex-1 text-left text-sm truncate min-w-0 flex items-center gap-1.5"
-                          >
-                            <LayoutGrid
-                              size={14}
-                              className="shrink-0 text-slate-500"
-                            />
-                            {canvas.name}
-                          </button>
-                        </div>
-                        <AnimatePresence initial={false}>
-                          {isExpanded && (
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              transition={treeTransition}
-                            >
-                          <div className="ml-6 mt-1 space-y-1 border-l border-slate-200/50 dark:border-slate-600/50 pl-2 overflow-hidden">
-                            <AnimatePresence>
-                            {canvas.documents.map((doc) => {
-                              const isCurrent =
-                                isCurrentCanvas && doc.id === currentDocumentId;
-                              const isRenaming =
-                                renameDocId === doc.id &&
-                                renameDocCanvasId === canvas.id;
-                              return (
-                                <motion.div
-                                  key={doc.id}
-                                  layout
-                                  initial={{ opacity: 1 }}
-                                  exit={{ opacity: 0, x: -12 }}
-                                  transition={treeTransition}
-                                  className={cn(
-                                    "relative flex items-center gap-2 rounded-lg px-2.5 py-2 group",
-                                    isCurrent
-                                      ? "text-primary"
-                                      : "hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
-                                  )}
+                                </AnimatePresence>
+                                <button
+                                  type="button"
+                                  onClick={() => onDocumentCreate(canvas.id)}
+                                  className="w-full flex items-center gap-2 px-2.5 py-2 mt-2 text-xs text-primary hover:bg-primary/10 rounded-lg"
                                 >
-                                  {isCurrent && (
-                                    <motion.div
-                                      layoutId={`doc-selection-${canvas.id}`}
-                                      className="absolute inset-0 rounded-lg bg-primary/10 -z-10"
-                                      transition={treeTransition}
-                                    />
-                                  )}
-                                  <FileText
-                                    size={14}
-                                    className="shrink-0 text-slate-500"
-                                  />
-                                  {isRenaming ? (
-                                    <input
-                                      type="text"
-                                      value={renameDocValue}
-                                      onChange={(e) =>
-                                        setRenameDocValue(e.target.value)
-                                      }
-                                      onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                          onDocumentRename(
-                                            canvas.id,
-                                            doc.id,
-                                            renameDocValue.trim() || doc.name,
-                                          );
-                                          setRenameDocId(null);
-                                          setRenameDocCanvasId(null);
-                                        }
-                                        if (e.key === "Escape") {
-                                          setRenameDocId(null);
-                                          setRenameDocCanvasId(null);
-                                        }
-                                      }}
-                                      onBlur={() => {
-                                        if (renameDocValue.trim())
-                                          onDocumentRename(
-                                            canvas.id,
-                                            doc.id,
-                                            renameDocValue.trim(),
-                                          );
-                                        setRenameDocId(null);
-                                        setRenameDocCanvasId(null);
-                                      }}
-                                      autoFocus
-                                      className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm"
-                                    />
-                                  ) : (
-                                    <>
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          handleDocumentClickWithClose(canvas.id, doc.id)
-                                        }
-                                        className="flex-1 text-left text-sm truncate min-w-0"
-                                      >
-                                        {doc.name}
-                                      </button>
-                                      {onDocumentRename && (
-                                        <button
-                                          type="button"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setRenameDocId(doc.id);
-                                            setRenameDocCanvasId(canvas.id);
-                                            setRenameDocValue(doc.name);
-                                          }}
-                                          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0"
-                                        >
-                                          <Pencil size={12} />
-                                        </button>
-                                      )}
-                                      {onDocumentDelete && (
-                                          <button
-                                            type="button"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              onDocumentDelete(
-                                                canvas.id,
-                                                doc.id,
-                                              );
-                                            }}
-                                            className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-red-600 shrink-0"
-                                          >
-                                            <Trash2 size={12} />
-                                          </button>
-                                        )}
-                                    </>
-                                  )}
-                                </motion.div>
-                              );
-                            })}
-                            </AnimatePresence>
-                            <button
-                              type="button"
-                              onClick={() => onDocumentCreate(canvas.id)}
-                              className="w-full flex items-center gap-2 px-2.5 py-2 mt-2 text-xs text-primary hover:bg-primary/10 rounded-lg"
-                            >
-                              <Plus size={12} />
-                              New document
-                            </button>
-                          </div>
+                                  <Plus size={12} />
+                                  New document
+                                </button>
+                              </div>
                             </motion.div>
                           )}
                         </AnimatePresence>

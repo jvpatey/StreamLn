@@ -190,6 +190,7 @@ export default function ProjectCanvasPage() {
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [showGrid, setShowGrid] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarHighlighted, setSidebarHighlighted] = useState(false);
   const [toolbarOpen, setToolbarOpen] = useState(true);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const docParam = searchParams.get("doc");
@@ -1387,6 +1388,7 @@ export default function ProjectCanvasPage() {
         onZoomChange={setZoomLevel}
         sidebarOpen={sidebarOpen}
         onSidebarOpenChange={setSidebarOpen}
+        onSidebarHighlight={() => setSidebarHighlighted(true)}
         toolbarOpen={toolbarOpen}
         onToolbarOpenChange={setToolbarOpen}
         lastSavedAt={lastSavedAt}
@@ -1500,6 +1502,8 @@ export default function ProjectCanvasPage() {
               <DocumentSidebar
               isOpen={sidebarOpen}
               onClose={() => setSidebarOpen(false)}
+              isHighlighted={sidebarHighlighted}
+              onHighlightClear={() => setSidebarHighlighted(false)}
               projectId={project?.id ?? ""}
               projectName={project?.name ?? ""}
               projectIcon={project?.icon}
@@ -1543,7 +1547,10 @@ export default function ProjectCanvasPage() {
                   : []
               }
             />
-            <div className="flex-1 relative overflow-hidden">
+            <div
+              className="flex-1 relative overflow-hidden"
+              onClick={() => setSidebarHighlighted(false)}
+            >
               {!loading && project && canvas && currentDocument && (
                 <AnimatePresence mode="wait">
                   <motion.div
