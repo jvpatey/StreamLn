@@ -190,22 +190,19 @@ export function CanvasBlock({
     return block.color || "#3b82f6";
   };
 
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
       e.stopPropagation();
       onSelect();
 
       if (!isEditable || block.locked) return;
 
-      // Don't start block drag when interacting with task board (cards, columns, etc.)
       if ((e.target as HTMLElement).closest("[data-no-block-drag]")) return;
 
-      // Convert screen coordinates to world coordinates (canvasOrigin = container rect + pan)
       const origin = canvasOriginRef.current;
       const worldX = (e.clientX - origin.x) / zoomLevel;
       const worldY = (e.clientY - origin.y) / zoomLevel;
 
-      // Record pending drag; start real drag only after pointer moves past threshold
       const offsetX = worldX - block.x;
       const offsetY = worldY - block.y;
       setPendingDrag({
@@ -214,12 +211,13 @@ export function CanvasBlock({
         offsetX,
         offsetY,
       });
+      e.currentTarget.setPointerCapture(e.pointerId);
     },
     [onSelect, isEditable, block.locked, canvasOriginRef, zoomLevel, block.x, block.y]
   );
 
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
+  const handlePointerMove = useCallback(
+    (e: PointerEvent) => {
       if (pendingDrag) {
         const dx = e.clientX - pendingDrag.startClientX;
         const dy = e.clientY - pendingDrag.startClientY;
@@ -278,7 +276,19 @@ export function CanvasBlock({
     ]
   );
 
-  const handleMouseUp = useCallback(() => {
+  const handlePointerUp = useCallback(() => {
+    if (pendingDrag) setPendingDrag(null);
+    if (isDragging) {
+      setIsDragging(false);
+      onDragEnd();
+    }
+    if (isResizing) {
+      setIsResizing(false);
+      onResizeEnd();
+    }
+  }, [pendingDrag, isDragging, isResizing, onDragEnd, onResizeEnd]);
+
+  const handlePointerCancel = useCallback(() => {
     if (pendingDrag) setPendingDrag(null);
     if (isDragging) {
       setIsDragging(false);
@@ -291,7 +301,7 @@ export function CanvasBlock({
   }, [pendingDrag, isDragging, isResizing, onDragEnd, onResizeEnd]);
 
   const handleResizeStart = useCallback(
-    (e: React.MouseEvent) => {
+    (e: React.PointerEvent) => {
       e.stopPropagation();
       if (!isEditable || block.locked) return;
 
@@ -303,6 +313,7 @@ export function CanvasBlock({
         height: block.height,
       });
       onResizeStart();
+      e.currentTarget.setPointerCapture(e.pointerId);
     },
     [isEditable, block.locked, block.width, block.height, onResizeStart]
   );
@@ -315,17 +326,19 @@ export function CanvasBlock({
     [onContextMenu]
   );
 
-  // Add global mouse event listeners when dragging, resizing, or pending drag
+  // Add global pointer event listeners when dragging, resizing, or pending drag
   useEffect(() => {
     if (isDragging || isResizing || pendingDrag !== null) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("pointermove", handlePointerMove);
+      document.addEventListener("pointerup", handlePointerUp);
+      document.addEventListener("pointercancel", handlePointerCancel);
       return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
+        document.removeEventListener("pointermove", handlePointerMove);
+        document.removeEventListener("pointerup", handlePointerUp);
+        document.removeEventListener("pointercancel", handlePointerCancel);
       };
     }
-  }, [isDragging, isResizing, pendingDrag, handleMouseMove, handleMouseUp]);
+  }, [isDragging, isResizing, pendingDrag, handlePointerMove, handlePointerUp, handlePointerCancel]);
 
   const renderBlockContent = () => {
     const commonProps = {
@@ -497,7 +510,7 @@ export function CanvasBlock({
       width: block.width,
       height: block.height,
     },
-    onMouseDown: handleMouseDown,
+    onPointerDown: handlePointerDown,
     onContextMenu: handleContextMenu,
   };
 
@@ -1005,7 +1018,7 @@ export function CanvasBlock({
                   clipPath: "polygon(100% 0%, 0% 100%, 100% 100%)",
                   backgroundColor: getBlockColor(),
                 }}
-                onMouseDown={handleResizeStart}
+                onPointerDown={handleResizeStart}
               />
             )}
 
