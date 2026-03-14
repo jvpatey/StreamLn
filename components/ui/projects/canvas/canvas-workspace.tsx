@@ -545,15 +545,27 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
                   Start building your project workspace by adding blocks
                 </p>
                 <div className="space-y-2 text-xs text-slate-500 dark:text-slate-500">
-                  <p>• Double-click to add a note</p>
-                  <p>• Use the sidebar to add different block types</p>
-                  <p>• Create documents in the sidebar for long-form writing</p>
-                  <p>• Drag blocks to rearrange them</p>
-                  <p>• Scroll to zoom in and out</p>
-                  <p>
-                    • Hand tool ({getKeyboardShortcut("H")}) or hold{" "}
-                    {getKeyboardShortcut("⌘")} to pan
-                  </p>
+                  {isMobile ? (
+                    <>
+                      <p>• Double-tap to add a note</p>
+                      <p>• Use the Add blocks button to add different block types</p>
+                      <p>• Create documents for long-form writing</p>
+                      <p>• Tap and drag blocks to rearrange them</p>
+                      <p>• Pinch to zoom, two-finger drag to pan</p>
+                    </>
+                  ) : (
+                    <>
+                      <p>• Double-click to add a note</p>
+                      <p>• Use the sidebar to add different block types</p>
+                      <p>• Create documents in the sidebar for long-form writing</p>
+                      <p>• Drag blocks to rearrange them</p>
+                      <p>• Scroll to zoom in and out</p>
+                      <p>
+                        • Hand tool ({getKeyboardShortcut("H")}) or hold{" "}
+                        {getKeyboardShortcut("⌘")} to pan
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

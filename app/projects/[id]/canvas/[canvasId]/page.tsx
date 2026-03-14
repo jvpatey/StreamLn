@@ -1425,14 +1425,14 @@ export default function ProjectCanvasPage() {
                     <button
                       type="button"
                       onClick={() => setStartBlankConfirmOpen(false)}
-                      className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                      className="min-h-[44px] min-w-[44px] px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors touch-manipulation"
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
                       onClick={handleConfirmStartBlank}
-                      className="px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
+                      className="min-h-[44px] min-w-[44px] px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary/90 transition-colors inline-flex items-center gap-2 touch-manipulation"
                     >
                       <Sparkles size={16} />
                       Start blank
@@ -1704,11 +1704,18 @@ export default function ProjectCanvasPage() {
                 primaryMode === "canvas" &&
                 canvasBlocks.length > 0 &&
                 isDefaultTemplate(canvasBlocks) && (
-                  <div className="absolute bottom-4 left-4 z-20">
+                  <div
+                    className={cn(
+                      "absolute z-20",
+                      isMobile
+                        ? "left-1/2 -translate-x-1/2 bottom-20"
+                        : "left-4 bottom-4"
+                    )}
+                  >
                     <button
                       type="button"
                       onClick={() => setStartBlankConfirmOpen(true)}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-primary/40 bg-primary/10 dark:bg-primary/20 backdrop-blur-sm shadow-lg shadow-primary/10 hover:bg-primary/20 dark:hover:bg-primary/30 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/15 transition-all text-primary dark:text-primary font-semibold text-sm"
+                      className="flex items-center gap-2 min-h-[44px] px-4 py-2.5 rounded-xl border-2 border-primary/40 bg-primary/10 dark:bg-primary/20 backdrop-blur-sm shadow-lg shadow-primary/10 hover:bg-primary/20 dark:hover:bg-primary/30 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/15 transition-all text-primary dark:text-primary font-semibold text-sm touch-manipulation"
                       aria-label="Start with blank canvas"
                     >
                       <Sparkles size={18} className="text-primary" />
