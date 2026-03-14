@@ -19,9 +19,9 @@ export function ActionButtons({
 }: ActionButtonsProps) {
   if (isEditMode) {
     return (
-      <div className="flex space-x-2">
+      <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2 sm:gap-0">
         <Button
-          className="flex-1 rounded-full
+          className="flex-1 rounded-full min-h-[44px]
             backdrop-blur-2xl 
             bg-gradient-to-r from-primary-500/20 via-primary-400/25 to-accent-500/20
             dark:from-primary-500/15 dark:via-primary-400/20 dark:to-accent-500/15
@@ -37,7 +37,7 @@ export function ActionButtons({
         </Button>
         <Button
           variant="outline"
-          className="flex-1 rounded-full
+          className="flex-1 rounded-full min-h-[44px]
             backdrop-blur-2xl bg-white/40 dark:bg-slate-800/40
             border border-white/30 dark:border-slate-700/30
             hover:bg-white/60 dark:hover:bg-slate-800/60
@@ -55,7 +55,7 @@ export function ActionButtons({
 
   return (
     <Button
-      className="w-full rounded-full font-semibold
+      className="w-full rounded-full font-semibold min-h-[44px]
         backdrop-blur-2xl 
         bg-gradient-to-r from-primary-500/20 via-primary-400/25 to-accent-500/20
         dark:from-primary-500/15 dark:via-primary-400/20 dark:to-accent-500/15

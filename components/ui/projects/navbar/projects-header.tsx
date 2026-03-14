@@ -19,13 +19,11 @@ import Link from "next/link";
 
 interface ProjectsHeaderProps {
   onCommandPaletteOpen: () => void;
-  onSidebarToggle: () => void;
   onGuideOpen?: () => void;
 }
 
 export function ProjectsHeader({
   onCommandPaletteOpen,
-  onSidebarToggle,
   onGuideOpen,
 }: ProjectsHeaderProps) {
   return (

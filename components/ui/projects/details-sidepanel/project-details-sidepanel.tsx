@@ -120,7 +120,9 @@ export function ProjectDetailsSidepanel({
             bg-[linear-gradient(to_bottom,rgba(251,191,36,0.1)_0%,rgba(251,191,36,0.05)_25%,rgba(59,130,246,0.08)_55%,rgba(255,255,255,0.4)_100%)]
             dark:bg-[linear-gradient(to_bottom,rgba(245,158,11,0.12)_0%,rgba(245,158,11,0.06)_25%,rgba(59,130,246,0.1)_55%,rgba(15,23,42,0.3)_100%)]
             border border-white/30 dark:border-white/20
-            rounded-[24px] !top-16 !bottom-8 !right-4 !h-[calc(100vh-6rem)]"
+            !top-14 !bottom-0 !right-0 !left-0 !h-[calc(100vh-3.5rem)]
+            sm:!top-16 sm:!bottom-8 sm:!right-4 sm:!left-auto sm:!h-[calc(100vh-6rem)]
+            rounded-t-2xl sm:rounded-[24px]"
         >
           <SheetHeader className="shrink-0 space-y-3 pb-4 border-b border-white/20 dark:border-slate-700/20">
             <ProjectHeader
@@ -135,7 +137,7 @@ export function ProjectDetailsSidepanel({
                     <PopoverTrigger asChild>
                       <button
                         type="button"
-                        className="h-9 w-9 rounded-full flex items-center justify-center
+                        className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 h-9 w-9 rounded-full flex items-center justify-center
                           bg-white/20 dark:bg-slate-700/50
                           hover:bg-white/30 dark:hover:bg-slate-600/50
                           transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -185,7 +187,7 @@ export function ProjectDetailsSidepanel({
                     </PopoverContent>
                   </Popover>
                   <SheetClose
-                    className="h-9 w-9 rounded-full flex items-center justify-center
+                    className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 h-9 w-9 rounded-full flex items-center justify-center
                       bg-white/20 dark:bg-slate-700/50
                       hover:bg-white/30 dark:hover:bg-slate-600/50
                       transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
@@ -228,7 +230,7 @@ export function ProjectDetailsSidepanel({
           </div>
 
           {/* Action Buttons */}
-          <div className="shrink-0 flex flex-col space-y-2 pt-4 border-t border-white/20 dark:border-slate-700/20">
+          <div className="shrink-0 flex flex-col space-y-2 pt-4 pb-[env(safe-area-inset-bottom)] sm:pb-0 border-t border-white/20 dark:border-slate-700/20">
             <ActionButtons
               isEditMode={isEditMode}
               project={project}

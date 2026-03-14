@@ -29,7 +29,6 @@ export default function DashboardPage() {
     useState(false);
   const [commandPaletteBrowseMode, setCommandPaletteBrowseMode] =
     useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -184,7 +183,7 @@ export default function DashboardPage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [sidebarOpen, commandPaletteOpen, handleCreateProject, handleImportProject]);
+  }, [commandPaletteOpen, handleCreateProject, handleImportProject]);
 
   // API integration for creating a project
   const handleCreateProjectApi = async ({
@@ -396,7 +395,6 @@ export default function DashboardPage() {
       <div className="shrink-0 relative z-[60]">
         <ProjectsHeader
           onCommandPaletteOpen={() => setCommandPaletteOpen(true)}
-          onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
           onGuideOpen={() => setGuideOpen(true)}
         />
       </div>
@@ -405,8 +403,8 @@ export default function DashboardPage() {
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Sidebar */}
         <ProjectsSidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
+          isOpen={true}
+          onClose={() => {}}
           onCreateProject={handleCreateProject}
           onImportProject={handleImportProject}
           projects={projects}

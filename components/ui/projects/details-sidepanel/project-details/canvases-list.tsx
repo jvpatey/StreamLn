@@ -267,18 +267,18 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
     return (
       <div key={canvas.id} className="flex-1 min-w-0 space-y-1">
         <div
-          className={cn(
-            "flex items-center justify-between gap-2 rounded-lg px-3 py-2",
-            "backdrop-blur-sm bg-white/30 dark:bg-slate-800/30",
+            className={cn(
+              "flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2 rounded-lg px-3 py-2 min-h-[44px]",
+              "backdrop-blur-sm bg-white/30 dark:bg-slate-800/30",
             "border border-white/20 dark:border-slate-700/20",
             "hover:border-white/30 dark:hover:border-slate-600/30 transition-colors"
           )}
         >
-          <div className="flex-1 min-w-0 flex items-center gap-2">
+          <div className="flex-1 min-w-0 flex items-center gap-2 order-1">
             <button
               type="button"
               onClick={() => toggleCanvas(canvas.id)}
-              className="shrink-0 p-0.5 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-white/30 dark:hover:bg-slate-700/50"
+              className="shrink-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 p-2 -m-1 flex items-center justify-center rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-white/30 dark:hover:bg-slate-700/50"
               aria-label={isExpanded ? "Collapse" : "Expand"}
             >
               {hasDocuments ? (
@@ -344,16 +344,24 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.97 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="flex-1 min-w-0 flex items-center justify-between gap-2"
+                  className="flex-1 min-w-0 flex items-center gap-2"
                 >
-                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate flex-1">
+                  <span
+                    className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate block min-w-0"
+                    title={canvas.name}
+                  >
                     {canvas.name}
                   </span>
-                  <div className="flex items-center gap-1 shrink-0">
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          {editingCanvasId !== canvas.id && (
+          <div className="flex items-center gap-1 shrink-0 order-2 self-end sm:self-auto">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 w-7 p-0 rounded-lg
+                      className="min-h-[44px] min-w-[44px] h-9 w-9 sm:h-7 sm:w-7 sm:min-h-0 sm:min-w-0 p-0 rounded-lg
                         hover:bg-slate-200/50 dark:hover:bg-slate-600/50
                         text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                       onClick={() => handleStartEditCanvas(canvas)}
@@ -364,7 +372,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 w-7 p-0 rounded-lg
+                      className="min-h-[44px] min-w-[44px] h-9 w-9 sm:h-7 sm:w-7 sm:min-h-0 sm:min-w-0 p-0 rounded-lg
                         hover:bg-slate-200/50 dark:hover:bg-slate-600/50
                         text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                       onClick={() => setExportCanvasId(canvas.id)}
@@ -375,7 +383,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 w-7 p-0 rounded-lg
+                      className="min-h-[44px] min-w-[44px] h-9 w-9 sm:h-7 sm:w-7 sm:min-h-0 sm:min-w-0 p-0 rounded-lg
                         hover:bg-slate-200/50 dark:hover:bg-slate-600/50
                         text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                       onClick={() => setShareCanvasId(canvas.id)}
@@ -386,7 +394,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 px-2 rounded-lg
+                      className="min-h-[44px] sm:min-h-0 h-9 sm:h-7 px-3 sm:px-2 rounded-lg
                         backdrop-blur-sm bg-primary/10 dark:bg-primary/20
                         hover:bg-primary/20 dark:hover:bg-primary/30
                         text-primary text-xs font-medium"
@@ -396,10 +404,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                       Open
                     </Button>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          )}
         </div>
 
         {isExpanded && hasDocuments && (
@@ -414,7 +419,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
               <div
                 key={doc.id}
                 className={cn(
-                  "flex items-center justify-between gap-2 rounded-lg px-3 py-1.5 ml-2",
+                  "flex items-center justify-between gap-2 rounded-lg px-3 py-1.5 ml-2 min-h-[44px]",
                   "backdrop-blur-sm bg-white/20 dark:bg-slate-800/20",
                   "border border-white/15 dark:border-slate-700/30",
                   "hover:border-white/25 dark:hover:border-slate-600/40 transition-colors"
