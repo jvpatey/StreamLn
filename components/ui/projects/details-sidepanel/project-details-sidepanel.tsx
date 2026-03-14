@@ -229,16 +229,16 @@ export function ProjectDetailsSidepanel({
             />
           </div>
 
-          {/* Action Buttons */}
-          <div className="shrink-0 flex flex-col space-y-2 pt-4 pb-[env(safe-area-inset-bottom)] sm:pb-0 border-t border-white/20 dark:border-slate-700/20">
-            <ActionButtons
-              isEditMode={isEditMode}
-              project={project}
-              onSaveEdit={handleSaveEdit}
-              onCancelEdit={handleCancelEdit}
-              onOpenCanvas={onOpenCanvas}
-            />
-          </div>
+          {/* Action Buttons - only shown when editing */}
+          {isEditMode && (
+            <div className="shrink-0 flex flex-col space-y-2 pt-4 pb-[env(safe-area-inset-bottom)] sm:pb-0 border-t border-white/20 dark:border-slate-700/20">
+              <ActionButtons
+                isEditMode={isEditMode}
+                onSaveEdit={handleSaveEdit}
+                onCancelEdit={handleCancelEdit}
+              />
+            </div>
+          )}
         </SheetContent>
       </Sheet>
     </>

@@ -346,12 +346,14 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                   transition={{ duration: 0.2, ease: "easeOut" }}
                   className="flex-1 min-w-0 flex items-center gap-2"
                 >
-                  <span
-                    className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate block min-w-0"
-                    title={canvas.name}
+                  <button
+                    type="button"
+                    onClick={() => onOpenCanvas(project, canvas.id)}
+                    className="text-left text-sm font-medium text-slate-900 dark:text-slate-100 truncate block min-w-0 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-1 rounded"
+                    title={`Open ${canvas.name}`}
                   >
                     {canvas.name}
-                  </span>
+                  </button>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -392,12 +394,13 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                       <Share2 size={12} />
                     </Button>
                     <Button
-                      variant="ghost"
                       size="sm"
-                      className="min-h-[44px] sm:min-h-0 h-9 sm:h-7 px-3 sm:px-2 rounded-lg
-                        backdrop-blur-sm bg-primary/10 dark:bg-primary/20
-                        hover:bg-primary/20 dark:hover:bg-primary/30
-                        text-primary text-xs font-medium"
+                      className="min-h-[44px] sm:min-h-0 h-9 sm:h-7 px-3 sm:px-2.5 rounded-lg
+                        bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/30 dark:via-primary-400/35 dark:to-accent-500/30
+                        hover:from-primary-500/35 hover:via-primary-400/40 hover:to-accent-500/35 dark:hover:from-primary-500/40 dark:hover:via-primary-400/45 dark:hover:to-accent-500/40
+                        border border-primary-400/40 dark:border-primary-400/50
+                        text-slate-900 dark:text-white text-xs font-semibold
+                        shadow-sm hover:shadow-md transition-all duration-200"
                       onClick={() => onOpenCanvas(project, canvas.id)}
                     >
                       <ExternalLink size={12} className="mr-1" />
@@ -483,9 +486,16 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                         exit={{ opacity: 0, scale: 0.97 }}
                         className="flex-1 min-w-0 flex items-center justify-between gap-2"
                       >
-                        <span className="text-sm text-slate-700 dark:text-slate-300 truncate flex-1">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onOpenCanvas(project, canvas.id, doc.id)
+                          }
+                          className="text-left text-sm text-slate-700 dark:text-slate-300 truncate flex-1 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-1 rounded"
+                          title={`Open ${doc.name}`}
+                        >
                           {doc.name}
-                        </span>
+                        </button>
                         <div className="flex items-center gap-1 shrink-0">
                           <Button
                             variant="ghost"
@@ -516,12 +526,13 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                             <Trash2 size={11} />
                           </Button>
                           <Button
-                            variant="ghost"
                             size="sm"
-                            className="h-6 px-1.5 rounded
-                              backdrop-blur-sm bg-primary/10 dark:bg-primary/20
-                              hover:bg-primary/20 dark:hover:bg-primary/30
-                              text-primary text-xs"
+                            className="h-6 px-2 rounded
+                              bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/30 dark:via-primary-400/35 dark:to-accent-500/30
+                              hover:from-primary-500/35 hover:via-primary-400/40 hover:to-accent-500/35 dark:hover:from-primary-500/40 dark:hover:via-primary-400/45 dark:hover:to-accent-500/40
+                              border border-primary-400/40 dark:border-primary-400/50
+                              text-slate-900 dark:text-white text-xs font-semibold
+                              shadow-sm hover:shadow-md transition-all duration-200"
                             onClick={() =>
                               onOpenCanvas(project, canvas.id, doc.id)
                             }
