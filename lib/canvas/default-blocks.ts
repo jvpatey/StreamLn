@@ -123,6 +123,30 @@ function createTaskBoardContent() {
   };
 }
 
+/** Default block types we use in the starter template */
+const DEFAULT_TEMPLATE_TYPES = new Set([
+  "text",
+  "tag",
+  "note",
+  "task-board",
+  "code",
+  "link",
+]);
+
+/**
+ * Returns true if the blocks match the default starter template (6 blocks with expected types).
+ */
+export function isDefaultTemplate(
+  blocks: Array<{ type: string }>
+): boolean {
+  if (blocks.length !== 6) return false;
+  const types = new Set(blocks.map((b) => b.type));
+  return (
+    types.size === 6 &&
+    [...types].every((t) => DEFAULT_TEMPLATE_TYPES.has(t))
+  );
+}
+
 export interface DefaultBlockInput {
   id: string;
   type: string;

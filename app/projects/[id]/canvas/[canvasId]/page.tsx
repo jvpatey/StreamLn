@@ -21,6 +21,7 @@ import {
   exportCanvasAsPNG,
   exportCanvasAsPDF,
 } from "@/lib/export/canvas-export";
+import { isDefaultTemplate } from "@/lib/canvas/default-blocks";
 import { DEFAULT_NOTE_CONTENT } from "@/components/ui/projects/canvas/blocks/note-defaults";
 import { DEFAULT_LINK_CONTENT } from "@/components/ui/projects/canvas/blocks/link-defaults";
 import { DEFAULT_TAG_CONTENT } from "@/components/ui/projects/canvas/blocks/tag-defaults";
@@ -69,6 +70,7 @@ import {
   Blocks,
   FileText,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -194,6 +196,8 @@ export default function ProjectCanvasPage() {
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
   const documentEditorRef = useRef<CanvasDocumentEditorHandle | null>(null);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [startBlankConfirmOpen, setStartBlankConfirmOpen] = useState(false);
+  const [startBlankExiting, setStartBlankExiting] = useState(false);
 
   // Canvas tool state (select vs pan)
   const [activeTool, setActiveTool] = useState<CanvasTool>("select");
@@ -778,6 +782,47 @@ export default function ProjectCanvasPage() {
     setSelectedBlocks((prev) => prev.filter((blockId) => blockId !== id));
   };
 
+  const handleConfirmStartBlank = useCallback(() => {
+    setStartBlankConfirmOpen(false);
+    setStartBlankExiting(true);
+    // Clear blocks after zoom/pan anim; blocks run staggered exit via AnimatePresence
+    setTimeout(() => {
+      setCanvasBlocks([]);
+      setSelectedBlocks([]);
+      setZoomLevel(1);
+      setPanOffset({ x: 0, y: 0 });
+    }, 400);
+    // Keep startBlankExiting true until block exit animations finish (last block: 5*30ms + 250ms ≈ 400ms after clear)
+    setTimeout(() => setStartBlankExiting(false), 400 + 450);
+  }, []);
+
+  // Animate zoom/pan toward center when starting blank (runs in parallel with block exit)
+  useEffect(() => {
+    if (!startBlankExiting) return;
+    const startZoom = zoomLevel;
+    const startPan = { x: panOffset.x, y: panOffset.y };
+    const duration = 350;
+    const startTime = performance.now();
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const t = Math.min(elapsed / duration, 1);
+      const eased = 1 - (1 - t) ** 3; // ease-out cubic
+
+      setZoomLevel(startZoom + (1 - startZoom) * eased);
+      setPanOffset({
+        x: startPan.x + (0 - startPan.x) * eased,
+        y: startPan.y + (0 - startPan.y) * eased,
+      });
+
+      if (t < 1) requestAnimationFrame(tick);
+    };
+
+    const id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally capture zoom/pan only when startBlankExiting becomes true
+  }, [startBlankExiting]);
+
   const duplicateBlock = (id: string) => {
     const block = canvasBlocks.find((b) => b.id === id);
     if (!block) return;
@@ -1306,6 +1351,66 @@ export default function ProjectCanvasPage() {
       />
       {!loading && project && canvas && (
         <>
+          <AnimatePresence>
+            {startBlankConfirmOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm"
+                style={{ pointerEvents: "auto" }}
+                onClick={() => setStartBlankConfirmOpen(false)}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="start-blank-dialog-title"
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                  transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4 border border-slate-200 dark:border-slate-700 pointer-events-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3
+                        id="start-blank-dialog-title"
+                        className="text-lg font-bold text-slate-900 dark:text-slate-100"
+                      >
+                        Start blank?
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        This will remove the sample blocks and give you an empty
+                        canvas.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => setStartBlankConfirmOpen(false)}
+                      className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleConfirmStartBlank}
+                      className="px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
+                    >
+                      <Sparkles size={16} />
+                      Start blank
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <ShareCanvasModal
             open={shareModalOpen}
             onOpenChange={setShareModalOpen}
@@ -1564,6 +1669,22 @@ export default function ProjectCanvasPage() {
                   onViewModeChange={setViewMode}
                 />
               )}
+              {!loading &&
+                primaryMode === "canvas" &&
+                canvasBlocks.length > 0 &&
+                isDefaultTemplate(canvasBlocks) && (
+                  <div className="absolute bottom-4 left-4 z-20">
+                    <button
+                      type="button"
+                      onClick={() => setStartBlankConfirmOpen(true)}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-primary/40 bg-primary/10 dark:bg-primary/20 backdrop-blur-sm shadow-lg shadow-primary/10 hover:bg-primary/20 dark:hover:bg-primary/30 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/15 transition-all text-primary dark:text-primary font-semibold text-sm"
+                      aria-label="Start with blank canvas"
+                    >
+                      <Sparkles size={18} className="text-primary" />
+                      Start blank
+                    </button>
+                  </div>
+                )}
               {loading ? (
                 <CanvasWorkspaceSkeleton />
               ) : (
@@ -1593,6 +1714,7 @@ export default function ProjectCanvasPage() {
                     setShowFloatingToolbar(true);
                   }}
                   viewMode={viewMode}
+                  startBlankExiting={startBlankExiting}
                 />
               )}
             </div>

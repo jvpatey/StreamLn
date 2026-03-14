@@ -62,6 +62,8 @@ interface CanvasWorkspaceProps {
   viewMode: "edit" | "present";
   /** When false, hides the "Press E to edit" badge (e.g. for shared read-only links) */
   showPresentModeBadge?: boolean;
+  /** When true, blocks use staggered exit animation (e.g. for "Start blank") */
+  startBlankExiting?: boolean;
 }
 
 export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
@@ -89,6 +91,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
       onFloatingToolbarShow,
       viewMode,
       showPresentModeBadge = true,
+      startBlankExiting = false,
     },
     ref,
   ) => {
@@ -472,6 +475,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
                 key={block.id}
                 block={block}
                 entranceIndex={index}
+                exitStaggerIndex={startBlankExiting ? index : undefined}
                 isSelected={selectedBlocks.includes(block.id)}
                 isEditable={viewMode === "edit"}
                 isSelectionDragging={isDragging}
@@ -530,7 +534,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         )}
 
         {/* Instructions for empty canvas */}
-        {blocks.length === 0 && !isAddingBlock && viewMode === "edit" && (
+        {blocks.length === 0 && !isAddingBlock && viewMode === "edit" && !startBlankExiting && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="text-center">
               <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl px-8 py-6 shadow-lg max-w-md">
