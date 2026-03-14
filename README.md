@@ -17,7 +17,7 @@
 
 ## About
 
-StreamLn combines smart technical notes, visual task boards, and lightweight AI assistance into one interface. Built for solo devs and small teams who need structure and clarity—map out your projects, notes, and task boards on a limitless 2D canvas. Your workflow, your way.
+StreamLn combines smart technical notes, visual task boards, and document editing into one interface. Built for users who need structure and clarity—map out your projects, notes, and task boards on a limitless 2D canvas. Your workflow, your way.
 
 ### Key Features
 
