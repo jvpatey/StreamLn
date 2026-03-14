@@ -227,27 +227,30 @@ export function CanvasHeader({
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 gap-2 sm:gap-4 min-w-0">
               {/* Left section - Back | Project (prominent) | Canvas | Active */}
-              <div className="flex items-center gap-2 sm:gap-4 min-w-0 overflow-hidden">
-                <Tooltip content="Back to Projects">
-                  <Link href="/projects">
-                    <Button
-                      variant="glass"
-                      size="sm"
-                      className={cn(
-                        "rounded-xl p-0 flex items-center justify-center shrink-0 text-xs",
-                        isMobile ? "h-10 w-10" : "h-11 w-11"
-                      )}
-                    >
-                      <ArrowLeft
-                        size={18}
-                        className="text-slate-600 dark:text-slate-300"
-                      />
-                    </Button>
-                  </Link>
-                </Tooltip>
+              <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                <div className="shrink-0 overflow-visible">
+                  <Tooltip content="Back to Projects">
+                    <Link href="/projects">
+                      <Button
+                        variant="glass"
+                        size="sm"
+                        className={cn(
+                          "rounded-xl p-0 flex items-center justify-center shrink-0 text-xs",
+                          isMobile ? "h-10 w-10" : "h-11 w-11"
+                        )}
+                      >
+                        <ArrowLeft
+                          size={18}
+                          className="text-slate-600 dark:text-slate-300"
+                        />
+                      </Button>
+                    </Link>
+                  </Tooltip>
+                </div>
                 <div className="h-11 w-px bg-slate-200 dark:bg-slate-700 shrink-0 hidden sm:block" />
 
                 {/* Document mode: simplified (Back + project name only) */}
+                <div className="flex items-center min-w-0 overflow-hidden flex-1">
                 <AnimatePresence mode="wait">
                 {primaryMode === "document" ? (
                   <motion.div
@@ -881,6 +884,7 @@ export function CanvasHeader({
                   </motion.div>
                 )}
                 </AnimatePresence>
+                </div>
               </div>
 
               {/* Center section - Primary mode (Canvas/Document) - fixed center position */}
