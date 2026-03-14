@@ -30,12 +30,15 @@ import {
   Trash2,
   LayoutGrid,
   FileText,
+  X,
 } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/shared/popover";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/shared/sheet";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 import React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { cn } from "@/lib/utils";
@@ -178,6 +181,7 @@ export function CanvasHeader({
   onToolbarOpenChange,
   lastSavedAt = null,
 }: CanvasHeaderProps) {
+  const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
   const [canvasSwitcherOpen, setCanvasSwitcherOpen] = useState(false);
   const [createCanvasModalOpen, setCreateCanvasModalOpen] = useState(false);
@@ -227,7 +231,10 @@ export function CanvasHeader({
                     <Button
                       variant="glass"
                       size="sm"
-                      className="rounded-xl p-0 h-11 w-11 flex items-center justify-center shrink-0 text-xs"
+                      className={cn(
+                        "rounded-xl p-0 flex items-center justify-center shrink-0 text-xs",
+                        isMobile ? "h-10 w-10" : "h-11 w-11"
+                      )}
                     >
                       <ArrowLeft
                         size={18}
@@ -249,13 +256,47 @@ export function CanvasHeader({
                     transition={{ duration: 0.2, ease: "easeOut" }}
                     className="flex items-center min-w-0"
                   >
+                  {isMobile && onSidebarOpenChange ? (
+                    <Tooltip content="Documents">
+                      <button
+                        type="button"
+                        onClick={() => onSidebarOpenChange(true)}
+                        className={cn(
+                          "flex items-center gap-2 h-10 rounded-xl px-3 min-w-0",
+                          "border border-white/10 dark:border-white/10",
+                          "bg-white/5 dark:bg-white/5 backdrop-blur-md",
+                          "hover:bg-white/10 dark:hover:bg-slate-800/50 hover:border-white/20 dark:hover:border-white/20",
+                          "focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-inset",
+                          "transition-colors cursor-pointer"
+                        )}
+                        aria-label="Open documents"
+                      >
+                        <div className="p-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0">
+                          {React.createElement(
+                            getIconComponent(project.icon || "Folder"),
+                            {
+                              className:
+                                "h-4 w-4 text-primary-600 dark:text-primary-400",
+                            },
+                          )}
+                        </div>
+                        <ChevronDown
+                          size={14}
+                          className="text-slate-500 dark:text-slate-400 shrink-0"
+                        />
+                      </button>
+                    </Tooltip>
+                  ) : (
                   <Link
                     href={`/projects/${project.id}`}
-                    className="flex items-center gap-3 h-11 rounded-xl px-4 min-w-0
-                    border border-white/10 dark:border-white/10
-                    bg-white/5 dark:bg-white/5 backdrop-blur-md
-                    hover:bg-white/10 dark:hover:bg-slate-800/50 hover:border-white/20 dark:hover:border-white/20
-                    transition-colors group"
+                    className={cn(
+                      "flex items-center gap-3 rounded-xl min-w-0",
+                      "border border-white/10 dark:border-white/10",
+                      "bg-white/5 dark:bg-white/5 backdrop-blur-md",
+                      "hover:bg-white/10 dark:hover:bg-slate-800/50 hover:border-white/20 dark:hover:border-white/20",
+                      "transition-colors group",
+                      "h-11 px-4"
+                    )}
                   >
                     <div className="p-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0">
                       {React.createElement(
@@ -266,14 +307,15 @@ export function CanvasHeader({
                         },
                       )}
                     </div>
-                    <span className="text-lg font-bold text-slate-900 dark:text-slate-100 truncate">
+                    <span className="font-bold text-slate-900 dark:text-slate-100 truncate text-lg">
                       {project.name}
                     </span>
                     <ProjectStatusBadge status={project.status} size="sm" />
                   </Link>
+                  )}
                   </motion.div>
                 ) : (
-                  /* Canvas mode: full breadcrumb dropdown */
+                  /* Canvas mode: full breadcrumb dropdown (desktop) or bottom drawer (mobile) */
                   <motion.div
                     key="canvas"
                     initial={{ opacity: 0, x: 8 }}
@@ -282,6 +324,221 @@ export function CanvasHeader({
                     transition={{ duration: 0.2, ease: "easeOut" }}
                     className="flex items-center min-w-0"
                   >
+                  {isMobile ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setCanvasSwitcherOpen(true)}
+                        className={cn(
+                          "flex items-center gap-2 h-10 rounded-xl px-3 min-w-0",
+                          "border border-white/10 dark:border-white/10",
+                          "bg-white/5 dark:bg-white/5 backdrop-blur-md",
+                          "hover:bg-white/10 dark:hover:bg-slate-800/50 hover:border-white/20 dark:hover:border-white/20",
+                          "focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-inset",
+                          "transition-colors cursor-pointer"
+                        )}
+                      >
+                        <div className="p-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0">
+                          {React.createElement(
+                            getIconComponent(project.icon || "Folder"),
+                            {
+                              className:
+                                "h-4 w-4 text-primary-600 dark:text-primary-400",
+                            },
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                            {project.name}
+                          </span>
+                          <span className="text-slate-400 dark:text-slate-500 text-xs shrink-0">
+                            /
+                          </span>
+                          <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">
+                            {canvas?.name ?? "Canvas"}
+                          </span>
+                        </div>
+                        <ChevronDown
+                          size={14}
+                          className="text-slate-500 dark:text-slate-400 shrink-0"
+                        />
+                      </button>
+                      <Sheet
+                        open={canvasSwitcherOpen}
+                        onOpenChange={(open) => {
+                          setCanvasSwitcherOpen(open);
+                          if (!open) {
+                            setRenameCanvasId(null);
+                            setRenameDocumentId(null);
+                          }
+                        }}
+                      >
+                        <SheetContent
+                          side="bottom"
+                          hideClose
+                          className="h-[70vh] max-h-[70vh] rounded-t-2xl border-0 p-0 gap-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50"
+                        >
+                          <SheetTitle className="sr-only">
+                            Project and canvas list
+                          </SheetTitle>
+                          <div className="flex flex-col h-full min-h-0">
+                            <div className="flex items-center justify-between pt-3 pb-2 px-4 shrink-0">
+                              <div className="w-10" />
+                              <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                              <button
+                                type="button"
+                                onClick={() => setCanvasSwitcherOpen(false)}
+                                aria-label="Close"
+                                className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+                              >
+                                <X size={20} />
+                              </button>
+                            </div>
+                            <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4">
+                              <div className="p-3 border-b border-slate-200/50 dark:border-slate-700/50">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 rounded-md bg-primary/10 dark:bg-primary/20">
+                                    {React.createElement(
+                                      getIconComponent(project.icon || "Folder"),
+                                      {
+                                        className:
+                                          "h-5 w-5 text-primary-600 dark:text-primary-400",
+                                      },
+                                    )}
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="font-semibold text-slate-900 dark:text-slate-100 truncate">
+                                      {project.name}
+                                    </p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                      Updated{" "}
+                                      {formatDate(
+                                        canvas?.updatedAt ?? project.updatedAt,
+                                      )}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="p-2 space-y-1 max-h-[50vh] overflow-y-auto">
+                                {canvases.map((c) => (
+                                  <div
+                                    key={c.id}
+                                    className={cn(
+                                      "flex items-center gap-2 rounded-lg px-3 py-2.5 min-h-[44px]",
+                                      c.id === canvas?.id
+                                        ? "bg-primary/10 text-primary"
+                                        : "hover:bg-slate-100 dark:hover:bg-slate-800",
+                                    )}
+                                  >
+                                    {renameCanvasId === c.id ? (
+                                      <input
+                                        type="text"
+                                        value={renameValue}
+                                        onChange={(e) =>
+                                          setRenameValue(e.target.value)
+                                        }
+                                        onKeyDown={(e) => {
+                                          if (e.key === "Enter") {
+                                            onCanvasRename?.(
+                                              c.id,
+                                              renameValue.trim() || c.name,
+                                            );
+                                            setRenameCanvasId(null);
+                                          }
+                                          if (e.key === "Escape") {
+                                            setRenameCanvasId(null);
+                                            setRenameValue(c.name);
+                                          }
+                                        }}
+                                        onBlur={() => {
+                                          if (renameValue.trim()) {
+                                            onCanvasRename?.(
+                                              c.id,
+                                              renameValue.trim(),
+                                            );
+                                          }
+                                          setRenameCanvasId(null);
+                                        }}
+                                        autoFocus
+                                        className="flex-1 bg-transparent border border-slate-300 dark:border-slate-600 rounded px-2 py-1 text-sm min-w-0"
+                                      />
+                                    ) : (
+                                      <>
+                                        <button
+                                          type="button"
+                                          className="flex-1 text-left text-sm truncate min-w-0"
+                                          onClick={() => {
+                                            if (c.id !== canvas?.id) {
+                                              router.push(
+                                                `/projects/${project.id}/canvas/${c.id}`,
+                                              );
+                                              setCanvasSwitcherOpen(false);
+                                            }
+                                          }}
+                                        >
+                                          {c.name}
+                                        </button>
+                                        {onCanvasRename && (
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              setRenameCanvasId(c.id);
+                                              setRenameValue(c.name);
+                                            }}
+                                            className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                            aria-label="Rename canvas"
+                                          >
+                                            <Pencil size={14} />
+                                          </button>
+                                        )}
+                                        {onCanvasDelete && canvases.length > 1 && (
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              if (c.id === canvas?.id) {
+                                                const next = canvases.find(
+                                                  (x) => x.id !== c.id,
+                                                );
+                                                if (next)
+                                                  router.push(
+                                                    `/projects/${project.id}/canvas/${next.id}`,
+                                                  );
+                                              }
+                                              onCanvasDelete(c.id);
+                                              setCanvasSwitcherOpen(false);
+                                            }}
+                                            className="p-2 rounded-lg hover:bg-red-500/20 text-red-600 dark:text-red-400 shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                            aria-label="Delete canvas"
+                                          >
+                                            <Trash2 size={14} />
+                                          </button>
+                                        )}
+                                      </>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                              {onCanvasCreate && (
+                                <div className="pt-2 mt-2 border-t border-slate-200/50 dark:border-slate-700/50">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setCanvasSwitcherOpen(false);
+                                      setCreateCanvasModalOpen(true);
+                                    }}
+                                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary hover:bg-primary/10 rounded-xl transition-colors min-h-[44px]"
+                                  >
+                                    <Plus size={14} />
+                                    Add canvas
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </SheetContent>
+                      </Sheet>
+                    </>
+                  ) : (
                   <Popover
                     open={canvasSwitcherOpen}
                     onOpenChange={(open) => {
@@ -590,6 +847,7 @@ export function CanvasHeader({
                       )}
                     </PopoverContent>
                   </Popover>
+                  )}
                   </motion.div>
                 )}
                 </AnimatePresence>
@@ -601,7 +859,7 @@ export function CanvasHeader({
                   role="radiogroup"
                   aria-label="Primary mode"
                   className={cn(
-                    "hidden md:flex items-center p-1 gap-0.5 relative",
+                    "flex items-center p-1 gap-0.5 relative",
                     getLiquidGlassSurfaceClassName({
                       variant: "toolbar",
                       intensity: "xl",
@@ -610,55 +868,113 @@ export function CanvasHeader({
                     }),
                   )}
                 >
-                  <motion.div
-                    className={cn(
-                      "absolute left-1 top-1 h-9 w-28 rounded-xl pointer-events-none",
-                      "bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/20 dark:via-primary-400/25 dark:to-accent-500/20",
-                      "backdrop-blur-2xl",
-                      "border border-white/30 dark:border-white/20",
-                      "shadow-[0_8px_32px_rgba(59,130,246,0.2),0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.3)]",
-                      "dark:shadow-[0_8px_32px_rgba(59,130,246,0.15),0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]",
-                    )}
-                    animate={{
-                      x: primaryMode === "document" ? "calc(100% + 2px)" : 0,
-                    }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 500,
-                      damping: 35,
-                      mass: 0.8,
-                    }}
-                  />
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={primaryMode === "canvas"}
-                    onClick={() => onPrimaryModeChange("canvas")}
-                    className={cn(
-                      "relative z-10 text-xs rounded-xl h-9 w-28 flex items-center justify-center gap-2 font-medium transition-colors duration-200 px-4",
-                      primaryMode === "canvas"
-                        ? "text-slate-900 dark:text-white"
-                        : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100",
-                    )}
-                  >
-                    <LayoutGrid size={16} className="shrink-0" />
-                    Canvas
-                  </button>
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={primaryMode === "document"}
-                    onClick={() => onPrimaryModeChange("document")}
-                    className={cn(
-                      "relative z-10 text-xs rounded-xl h-9 w-28 flex items-center justify-center gap-2 font-medium transition-colors duration-200 px-4",
-                      primaryMode === "document"
-                        ? "text-slate-900 dark:text-white"
-                        : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100",
-                    )}
-                  >
-                    <FileText size={16} className="shrink-0" />
-                    Document
-                  </button>
+                  {isMobile ? (
+                    <>
+                      <motion.div
+                        className={cn(
+                          "absolute left-1 top-1 h-9 w-10 rounded-xl pointer-events-none",
+                          "bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/20 dark:via-primary-400/25 dark:to-accent-500/20",
+                          "backdrop-blur-2xl",
+                          "border border-white/30 dark:border-white/20",
+                          "shadow-[0_8px_32px_rgba(59,130,246,0.2),0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.3)]",
+                          "dark:shadow-[0_8px_32px_rgba(59,130,246,0.15),0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]",
+                        )}
+                        animate={{
+                          x: primaryMode === "document" ? "calc(100% + 2px)" : 0,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 35,
+                          mass: 0.8,
+                        }}
+                      />
+                      <Tooltip content="Canvas mode">
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={primaryMode === "canvas"}
+                          onClick={() => onPrimaryModeChange("canvas")}
+                          className={cn(
+                            "relative z-10 rounded-xl h-9 w-10 flex items-center justify-center transition-colors duration-200",
+                            primaryMode === "canvas"
+                              ? "text-slate-900 dark:text-white"
+                              : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100",
+                          )}
+                        >
+                          <LayoutGrid size={18} />
+                        </button>
+                      </Tooltip>
+                      <Tooltip content="Document mode">
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={primaryMode === "document"}
+                          onClick={() => onPrimaryModeChange("document")}
+                          className={cn(
+                            "relative z-10 rounded-xl h-9 w-10 flex items-center justify-center transition-colors duration-200",
+                            primaryMode === "document"
+                              ? "text-slate-900 dark:text-white"
+                              : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100",
+                          )}
+                        >
+                          <FileText size={18} />
+                        </button>
+                      </Tooltip>
+                    </>
+                  ) : (
+                    <>
+                      <motion.div
+                        className={cn(
+                          "absolute left-1 top-1 h-9 w-28 rounded-xl pointer-events-none",
+                          "bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/20 dark:via-primary-400/25 dark:to-accent-500/20",
+                          "backdrop-blur-2xl",
+                          "border border-white/30 dark:border-white/20",
+                          "shadow-[0_8px_32px_rgba(59,130,246,0.2),0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.3)]",
+                          "dark:shadow-[0_8px_32px_rgba(59,130,246,0.15),0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]",
+                        )}
+                        animate={{
+                          x: primaryMode === "document" ? "calc(100% + 2px)" : 0,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 35,
+                          mass: 0.8,
+                        }}
+                      />
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={primaryMode === "canvas"}
+                        onClick={() => onPrimaryModeChange("canvas")}
+                        className={cn(
+                          "relative z-10 text-xs rounded-xl h-9 w-28 flex items-center justify-center gap-2 font-medium transition-colors duration-200 px-4",
+                          primaryMode === "canvas"
+                            ? "text-slate-900 dark:text-white"
+                            : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100",
+                        )}
+                      >
+                        <LayoutGrid size={16} className="shrink-0" />
+                        Canvas
+                      </button>
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={primaryMode === "document"}
+                        onClick={() => onPrimaryModeChange("document")}
+                        className={cn(
+                          "relative z-10 text-xs rounded-xl h-9 w-28 flex items-center justify-center gap-2 font-medium transition-colors duration-200 px-4",
+                          primaryMode === "document"
+                            ? "text-slate-900 dark:text-white"
+                            : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10 hover:text-slate-900 dark:hover:text-slate-100",
+                        )}
+                      >
+                        <FileText size={16} className="shrink-0" />
+                        Document
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -738,7 +1054,152 @@ export function CanvasHeader({
                   )}
                 </Button>
 
-                {/* User Menu (avatar trigger) */}
+                {/* User Menu (avatar trigger) - Popover on desktop, bottom Sheet on mobile */}
+                {isMobile ? (
+                  <>
+                    <Button
+                      variant="glass"
+                      size="sm"
+                      onClick={() => setMenuOpen(true)}
+                      className="rounded-full p-0 h-11 w-11 flex items-center justify-center overflow-hidden"
+                      title="Account & canvas options"
+                      aria-label="Account & canvas options"
+                    >
+                      {themeMounted && userImage ? (
+                        <img
+                          src={userImage}
+                          alt={userName}
+                          className="h-11 w-11 object-cover pointer-events-none"
+                        />
+                      ) : (
+                        <span className="h-11 w-11 flex items-center justify-center rounded-full bg-primary/20 text-primary text-sm font-medium pointer-events-none">
+                          {themeMounted ? userInitials : "?"}
+                        </span>
+                      )}
+                    </Button>
+                    <Sheet
+                      open={menuOpen}
+                      onOpenChange={setMenuOpen}
+                    >
+                      <SheetContent
+                        side="bottom"
+                        hideClose
+                        className="rounded-t-2xl border-0 p-0 gap-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50 pb-[env(safe-area-inset-bottom)]"
+                      >
+                        <SheetTitle className="sr-only">
+                          Account & canvas options
+                        </SheetTitle>
+                        <div className="flex flex-col">
+                          <div className="flex items-center justify-between pt-3 pb-2 px-4 shrink-0">
+                            <div className="w-10" />
+                            <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                            <button
+                              type="button"
+                              onClick={() => setMenuOpen(false)}
+                              aria-label="Close"
+                              className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            >
+                              <X size={20} />
+                            </button>
+                          </div>
+                          <div className="px-4 pb-6 overflow-y-auto max-h-[70vh]">
+                            <div className="p-3 border-b border-slate-200 dark:border-slate-700">
+                              <div className="flex items-center gap-3">
+                                {themeMounted && userImage ? (
+                                  <img
+                                    src={userImage}
+                                    alt={userName}
+                                    className="h-12 w-12 rounded-full object-cover shrink-0"
+                                  />
+                                ) : (
+                                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-primary/20 text-primary text-base font-medium shrink-0">
+                                    {themeMounted ? userInitials : "?"}
+                                  </span>
+                                )}
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-base font-medium text-slate-900 dark:text-slate-100 truncate">
+                                    {themeMounted ? userName : "User"}
+                                  </p>
+                                  {themeMounted && userEmail && (
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 truncate">
+                                      {userEmail}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="py-2 space-y-0.5">
+                              <Link
+                                href="/projects"
+                                onClick={() => setMenuOpen(false)}
+                                className="flex items-center px-4 py-3 text-base text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors min-h-[48px]"
+                              >
+                                <ArrowLeft size={18} className="mr-3 shrink-0" />
+                                Back to Projects
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  onShareClick?.();
+                                  setMenuOpen(false);
+                                }}
+                                className="w-full flex items-center px-4 py-3 text-base text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors min-h-[48px]"
+                              >
+                                <Share2 size={18} className="mr-3 shrink-0" />
+                                Share Canvas
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  onExportClick?.();
+                                  setMenuOpen(false);
+                                }}
+                                className="w-full flex items-center px-4 py-3 text-base text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors min-h-[48px]"
+                              >
+                                <Download size={18} className="mr-3 shrink-0" />
+                                Export
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setGuideOpen(true);
+                                  setMenuOpen(false);
+                                }}
+                                className="w-full flex items-center px-4 py-3 text-base text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors min-h-[48px]"
+                              >
+                                <BookOpen size={18} className="mr-3 shrink-0" />
+                                Canvas Guide
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSettingsOpen(true);
+                                  setMenuOpen(false);
+                                }}
+                                className="w-full flex items-center px-4 py-3 text-base text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors min-h-[48px]"
+                              >
+                                <Settings size={18} className="mr-3 shrink-0" />
+                                Canvas Settings
+                              </button>
+                              <div className="h-px bg-slate-200 dark:bg-slate-700 my-2" />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  signOut();
+                                  setMenuOpen(false);
+                                }}
+                                className="w-full flex items-center px-4 py-3 text-base text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors min-h-[48px]"
+                              >
+                                <LogOut size={18} className="mr-3 shrink-0" />
+                                Sign out
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </SheetContent>
+                    </Sheet>
+                  </>
+                ) : (
                 <Popover open={menuOpen} onOpenChange={setMenuOpen}>
                   <PopoverTrigger asChild>
                     <Button
@@ -798,67 +1259,6 @@ export function CanvasHeader({
                     </div>
 
                     <div className="p-2">
-                      {/* Mobile Primary Mode Toggle */}
-                      <div
-                        role="radiogroup"
-                        aria-label="Primary mode"
-                        className="md:hidden space-y-1 pb-2 mb-2 border-b border-slate-200 dark:border-slate-700"
-                      >
-                        <button
-                          type="button"
-                          role="radio"
-                          aria-checked={primaryMode === "canvas"}
-                          onClick={() => {
-                            onPrimaryModeChange("canvas");
-                            setMenuOpen(false);
-                          }}
-                          className={cn(
-                            "w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
-                            primaryMode === "canvas"
-                              ? "bg-primary/10 text-primary"
-                              : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800",
-                          )}
-                        >
-                          <LayoutGrid size={14} className="mr-2" />
-                          Canvas Mode
-                        </button>
-                        <button
-                          type="button"
-                          role="radio"
-                          aria-checked={primaryMode === "document"}
-                          onClick={() => {
-                            onPrimaryModeChange("document");
-                            setMenuOpen(false);
-                          }}
-                          className={cn(
-                            "w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
-                            primaryMode === "document"
-                              ? "bg-primary/10 text-primary"
-                              : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800",
-                          )}
-                        >
-                          <FileText size={14} className="mr-2" />
-                          Document Mode
-                        </button>
-                      </div>
-
-                      {/* Mobile: Switch canvas - opens canvas list when header breadcrumb is truncated */}
-                      {canvases.length > 0 && (
-                        <div className="md:hidden pb-2 mb-2 border-b border-slate-200 dark:border-slate-700">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setCanvasSwitcherOpen(true);
-                              setMenuOpen(false);
-                            }}
-                            className="w-full flex items-center px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                          >
-                            <LayoutGrid size={14} className="mr-2 shrink-0" />
-                            Switch canvas
-                          </button>
-                        </div>
-                      )}
-
                       {/* Back to Projects */}
                       <Link
                         href="/projects"
@@ -934,6 +1334,7 @@ export function CanvasHeader({
                     </div>
                   </PopoverContent>
                 </Popover>
+                )}
               </div>
             </div>
           </div>

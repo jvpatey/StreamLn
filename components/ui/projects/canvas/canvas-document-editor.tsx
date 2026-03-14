@@ -38,12 +38,16 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   FileText,
+  SlidersHorizontal,
+  X,
 } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/shared/popover";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/shared/sheet";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 import {
   exportDocumentAsMarkdown,
   exportDocumentAsPDF,
@@ -105,6 +109,7 @@ function FormattingControls({
   sidebarOpen,
   onSidebarToggle,
   sidebarInParent = false,
+  className,
 }: {
   editor: Editor;
   compact?: boolean;
@@ -112,6 +117,7 @@ function FormattingControls({
   onSidebarToggle?: () => void;
   /** When true, parent renders sidebar toggle; these controls are centered */
   sidebarInParent?: boolean;
+  className?: string;
 }) {
   const {
     isBold,
@@ -150,7 +156,7 @@ function FormattingControls({
 
   return (
     <div
-      className="flex items-center gap-1.5 flex-nowrap md:flex-wrap"
+      className={cn("flex items-center gap-1.5 flex-nowrap md:flex-wrap", className)}
       onMouseDown={(e) => e.preventDefault()}
     >
       {onSidebarToggle != null && !sidebarInParent && (
@@ -385,62 +391,136 @@ function DocumentFormattingToolbar({
   sidebarOpen?: boolean;
   onSidebarToggle?: () => void;
 }) {
+  const isMobile = useIsMobile();
+  const [formatSheetOpen, setFormatSheetOpen] = useState(false);
+
   return (
-    <div
-      className={cn(
-        "sticky top-0 z-10 flex items-center gap-2 px-4 py-2 min-h-[40px]",
-        "border-b border-slate-200 dark:border-slate-700",
-        getLiquidGlassSurfaceClassName({
-          variant: "toolbar",
-          intensity: "xl",
-          rounded: "none",
-          border: false,
-          shadow: false,
-          className: "bg-white/95 dark:bg-slate-900/95",
-        })
-      )}
-    >
-      <div className="w-full flex items-center gap-2 sm:gap-3 min-w-0 overflow-x-auto overflow-y-hidden">
-        <div className="flex items-center gap-2 shrink-0">
-          {onSidebarToggle != null && (
-            <>
-              <button
-                type="button"
-                onClick={onSidebarToggle}
-                title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-                aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-                className={cn(buttonClass, "min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 shrink-0 hidden md:flex")}
-              >
-                {sidebarOpen ? (
-                  <PanelLeftClose size={iconSize} aria-hidden />
-                ) : (
-                  <PanelLeftOpen size={iconSize} aria-hidden />
-                )}
-              </button>
-              <div className="hidden md:block w-px h-4 bg-slate-200 dark:bg-slate-600 shrink-0" />
-            </>
-          )}
-          {documentName != null && (
-            <div className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0 min-w-0">
-              <div className="p-1 rounded-md bg-primary/20 dark:bg-primary/30 shrink-0">
-                <FileText size={iconSize} className="text-primary" />
-              </div>
-              <span className="text-sm font-medium text-primary truncate max-w-[160px]">
-                {documentName}
-              </span>
+    <>
+      <div
+        className={cn(
+          "sticky top-0 z-10 flex items-center gap-2 px-4 py-2 min-h-[40px]",
+          "border-b border-slate-200 dark:border-slate-700",
+          getLiquidGlassSurfaceClassName({
+            variant: "toolbar",
+            intensity: "xl",
+            rounded: "none",
+            border: false,
+            shadow: false,
+            className: "bg-white/95 dark:bg-slate-900/95",
+          })
+        )}
+      >
+        <div className="w-full flex items-center gap-2 sm:gap-3 min-w-0 overflow-x-auto overflow-y-hidden">
+          <div className="flex items-center gap-2 shrink-0">
+            {onSidebarToggle != null && (
+              <>
+                <button
+                  type="button"
+                  onClick={onSidebarToggle}
+                  title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+                  aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+                  className={cn(buttonClass, "min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 shrink-0 hidden md:flex")}
+                >
+                  {sidebarOpen ? (
+                    <PanelLeftClose size={iconSize} aria-hidden />
+                  ) : (
+                    <PanelLeftOpen size={iconSize} aria-hidden />
+                  )}
+                </button>
+                <div className="hidden md:block w-px h-4 bg-slate-200 dark:bg-slate-600 shrink-0" />
+              </>
+            )}
+            {documentName != null && (
+              isMobile && onSidebarToggle != null ? (
+                <button
+                  type="button"
+                  onClick={onSidebarToggle}
+                  title="Documents"
+                  aria-label="Open documents"
+                  className={cn(
+                    "flex items-center justify-center min-h-[44px] min-w-[44px] shrink-0",
+                    "rounded-lg bg-primary/10 dark:bg-primary/20",
+                    "hover:bg-primary/15 dark:hover:bg-primary/25",
+                    "transition-colors touch-manipulation"
+                  )}
+                >
+                  <div className="p-1.5 rounded-md bg-primary/20 dark:bg-primary/30">
+                    <FileText size={iconSize} className="text-primary" />
+                  </div>
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0 min-w-0">
+                  <div className="p-1 rounded-md bg-primary/20 dark:bg-primary/30 shrink-0">
+                    <FileText size={iconSize} className="text-primary" />
+                  </div>
+                  <span className="text-sm font-medium text-primary truncate max-w-[160px]">
+                    {documentName}
+                  </span>
+                </div>
+              )
+            )}
+          </div>
+          {isMobile ? (
+            <button
+              type="button"
+              onClick={() => setFormatSheetOpen(true)}
+              className={cn(
+                buttonClass,
+                "ml-auto shrink-0 min-h-[44px] px-3 flex items-center gap-2"
+              )}
+              aria-label="Formatting options"
+            >
+              <SlidersHorizontal size={iconSize} aria-hidden />
+              <span className="text-sm font-medium">Format</span>
+            </button>
+          ) : (
+            <div className="flex-1 flex justify-center min-w-0 overflow-x-auto overflow-y-hidden">
+              <FormattingControls
+                editor={editor}
+                sidebarOpen={sidebarOpen}
+                onSidebarToggle={onSidebarToggle}
+                sidebarInParent
+              />
             </div>
           )}
         </div>
-        <div className="flex-1 flex justify-center min-w-0 overflow-x-auto overflow-y-hidden">
-          <FormattingControls
-            editor={editor}
-            sidebarOpen={sidebarOpen}
-            onSidebarToggle={onSidebarToggle}
-            sidebarInParent
-          />
-        </div>
       </div>
-    </div>
+      {isMobile && (
+        <Sheet open={formatSheetOpen} onOpenChange={setFormatSheetOpen}>
+          <SheetContent
+            side="bottom"
+            hideClose
+            className="rounded-t-2xl border-0 p-0 gap-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50"
+          >
+            <SheetTitle className="sr-only">Formatting</SheetTitle>
+            <div className="flex flex-col max-h-[60vh]">
+              {/* Drag handle + close */}
+              <div className="flex items-center justify-between pt-3 pb-2 px-4 shrink-0">
+                <div className="w-10" />
+                <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                <button
+                  type="button"
+                  onClick={() => setFormatSheetOpen(false)}
+                  aria-label="Close"
+                  className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                  <X size={20} aria-hidden />
+                </button>
+              </div>
+              <div className="px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] overflow-y-auto">
+                <FormattingControls
+                  editor={editor}
+                  sidebarOpen={sidebarOpen}
+                  onSidebarToggle={onSidebarToggle}
+                  sidebarInParent
+                  className="flex flex-wrap gap-2 justify-center"
+                />
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
+    </>
   );
 }
 
