@@ -222,6 +222,19 @@
   }
 }
 
+/* Document editor (full-page) - placeholder and base */
+.canvas-document-editor.ProseMirror {
+  outline: none;
+  cursor: text;
+}
+.canvas-document-editor.ProseMirror p.is-editor-empty:first-child::before {
+  color: hsl(var(--muted-foreground));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
 /* Note block Tiptap editor (canvas) */
 .note-block-editor.ProseMirror {
   outline: none;
