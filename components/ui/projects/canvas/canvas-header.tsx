@@ -347,17 +347,6 @@ export function CanvasHeader({
                             },
                           )}
                         </div>
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
-                            {project.name}
-                          </span>
-                          <span className="text-slate-400 dark:text-slate-500 text-xs shrink-0">
-                            /
-                          </span>
-                          <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">
-                            {canvas?.name ?? "Canvas"}
-                          </span>
-                        </div>
                         <ChevronDown
                           size={14}
                           className="text-slate-500 dark:text-slate-400 shrink-0"
