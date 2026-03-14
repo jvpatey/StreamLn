@@ -4,7 +4,9 @@ import {
   SheetContent,
   SheetHeader,
   SheetClose,
+  SheetTitle,
 } from "@/components/ui/shared/sheet";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 import {
   Popover,
   PopoverContent,
@@ -33,6 +35,8 @@ interface ProjectDetailsSidepanelProps {
     documentId?: string
   ) => void;
   onExportProject?: (project: Project) => void;
+  onCanvasCreate?: (project: Project, name: string) => Promise<void> | void;
+  canvasesRefreshKey?: number;
 }
 
 export function ProjectDetailsSidepanel({
@@ -44,7 +48,10 @@ export function ProjectDetailsSidepanel({
   onStatusChange,
   onOpenCanvas,
   onExportProject,
+  onCanvasCreate,
+  canvasesRefreshKey = 0,
 }: ProjectDetailsSidepanelProps) {
+  const isMobile = useIsMobile();
   const [projectMenuOpen, setProjectMenuOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -109,13 +116,165 @@ export function ProjectDetailsSidepanel({
     }));
   };
 
-  return (
+  const projectMenuActions = (
     <>
-      <Sheet open={isOpen} onOpenChange={onClose}>
+      <Popover open={projectMenuOpen} onOpenChange={setProjectMenuOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 h-9 w-9 rounded-full flex items-center justify-center
+              bg-white/20 dark:bg-slate-700/50
+              hover:bg-white/30 dark:hover:bg-slate-600/50
+              transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
+            aria-label="Project menu"
+          >
+            <MoreHorizontal size={16} className="text-slate-700 dark:text-slate-200" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent align="end" side="bottom" className="w-48 p-1 backdrop-blur-xl bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700">
+          {onExportProject && (
+            <button
+              type="button"
+              onClick={() => {
+                onExportProject(project);
+                setProjectMenuOpen(false);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              <Download size={16} className="text-slate-600 dark:text-slate-400" />
+              Export
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              handleEditClick();
+              setProjectMenuOpen(false);
+            }}
+            disabled={isEditMode}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Pencil size={16} className="text-slate-600 dark:text-slate-400" />
+            Edit
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              handleDelete();
+              setProjectMenuOpen(false);
+            }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+            disabled={!onRequestDelete}
+          >
+            <Trash2 size={16} />
+            Delete
+          </button>
+        </PopoverContent>
+      </Popover>
+      {!isMobile && (
+        <SheetClose
+          className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 h-9 w-9 rounded-full flex items-center justify-center
+            bg-white/20 dark:bg-slate-700/50
+            hover:bg-white/30 dark:hover:bg-slate-600/50
+            transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+          aria-label="Close"
+        >
+          <X size={16} className="text-slate-700 dark:text-slate-200" />
+        </SheetClose>
+      )}
+    </>
+  );
+
+  // Mobile: bottom sheet (matches CanvasSidebar, DocumentSidebar pattern)
+  if (isMobile) {
+    return (
+      <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <SheetContent
-          side="right"
+          side="bottom"
           hideClose
-          className="w-full sm:max-w-lg flex flex-col overflow-hidden
+          className="h-[70vh] max-h-[70vh] rounded-t-2xl border-0 p-0 gap-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50"
+        >
+          <SheetTitle className="sr-only">Project details</SheetTitle>
+          <div className="flex flex-col h-full min-h-0">
+            {/* Drag handle + close */}
+            <div className="flex items-center justify-between pt-3 pb-2 px-4 shrink-0">
+              <div className="w-10" />
+              <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            {/* Content */}
+            <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3 pb-[env(safe-area-inset-bottom)] space-y-3">
+              <SheetHeader className="space-y-3 pb-4 border-b border-slate-200 dark:border-slate-700">
+                <ProjectHeader
+                  project={project}
+                  isEditMode={isEditMode}
+                  editForm={editForm}
+                  onInputChange={handleInputChange}
+                  onStatusChange={onStatusChange}
+                  renderActions={projectMenuActions}
+                />
+                {isEditMode && (
+                  <div className="space-y-2">
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium text-foreground">
+                        Project Icon
+                      </label>
+                      <IconPicker
+                        selectedIcon={editForm.icon}
+                        onIconSelect={(icon) => handleInputChange("icon", icon)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </SheetHeader>
+              <ProjectStats
+                project={project}
+                isEditMode={isEditMode}
+                editForm={editForm}
+                onInputChange={handleInputChange}
+              />
+              <CanvasesList
+                project={project}
+                onOpenCanvas={(p, canvasId, documentId) =>
+                  onOpenCanvas?.(p, canvasId, documentId)
+                }
+                onCanvasCreate={
+                  onCanvasCreate
+                    ? (name) => onCanvasCreate(project, name)
+                    : undefined
+                }
+                refreshKey={canvasesRefreshKey}
+              />
+            </div>
+            {isEditMode && (
+              <div className="shrink-0 flex flex-col space-y-2 pt-4 pb-[env(safe-area-inset-bottom)] border-t border-slate-200 dark:border-slate-700 px-4">
+                <ActionButtons
+                  isEditMode={isEditMode}
+                  onSaveEdit={handleSaveEdit}
+                  onCancelEdit={handleCancelEdit}
+                />
+              </div>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  // Desktop: right-side panel (unchanged)
+  return (
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent
+        side="right"
+        hideClose
+        className="w-full sm:max-w-lg flex flex-col overflow-hidden
             backdrop-blur-2xl
             bg-[linear-gradient(to_bottom,rgba(251,191,36,0.1)_0%,rgba(251,191,36,0.05)_25%,rgba(59,130,246,0.08)_55%,rgba(255,255,255,0.4)_100%)]
             dark:bg-[linear-gradient(to_bottom,rgba(245,158,11,0.12)_0%,rgba(245,158,11,0.06)_25%,rgba(59,130,246,0.1)_55%,rgba(15,23,42,0.3)_100%)]
@@ -131,72 +290,7 @@ export function ProjectDetailsSidepanel({
               editForm={editForm}
               onInputChange={handleInputChange}
               onStatusChange={onStatusChange}
-              renderActions={
-                <>
-                  <Popover open={projectMenuOpen} onOpenChange={setProjectMenuOpen}>
-                    <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 h-9 w-9 rounded-full flex items-center justify-center
-                          bg-white/20 dark:bg-slate-700/50
-                          hover:bg-white/30 dark:hover:bg-slate-600/50
-                          transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        aria-label="Project menu"
-                      >
-                        <MoreHorizontal size={16} className="text-slate-700 dark:text-slate-200" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent align="end" side="bottom" className="w-48 p-1 backdrop-blur-xl bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700">
-                      {onExportProject && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            onExportProject(project);
-                            setProjectMenuOpen(false);
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-                        >
-                          <Download size={16} className="text-slate-600 dark:text-slate-400" />
-                          Export
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleEditClick();
-                          setProjectMenuOpen(false);
-                        }}
-                        disabled={isEditMode}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Pencil size={16} className="text-slate-600 dark:text-slate-400" />
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleDelete();
-                          setProjectMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
-                        disabled={!onRequestDelete}
-                      >
-                        <Trash2 size={16} />
-                        Delete
-                      </button>
-                    </PopoverContent>
-                  </Popover>
-                  <SheetClose
-                    className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 h-9 w-9 rounded-full flex items-center justify-center
-                      bg-white/20 dark:bg-slate-700/50
-                      hover:bg-white/30 dark:hover:bg-slate-600/50
-                      transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-                    aria-label="Close"
-                  >
-                    <X size={16} className="text-slate-700 dark:text-slate-200" />
-                  </SheetClose>
-                </>
-              }
+              renderActions={projectMenuActions}
             />
 
             {isEditMode && (
@@ -226,6 +320,12 @@ export function ProjectDetailsSidepanel({
               onOpenCanvas={(p, canvasId, documentId) =>
                 onOpenCanvas?.(p, canvasId, documentId)
               }
+              onCanvasCreate={
+                onCanvasCreate
+                  ? (name) => onCanvasCreate(project, name)
+                  : undefined
+              }
+              refreshKey={canvasesRefreshKey}
             />
           </div>
 
@@ -241,6 +341,5 @@ export function ProjectDetailsSidepanel({
           )}
         </SheetContent>
       </Sheet>
-    </>
   );
 }

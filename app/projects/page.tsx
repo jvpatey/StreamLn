@@ -21,6 +21,7 @@ import {
   updateProjectStatus,
   updateProject,
 } from "@/lib/api/projects";
+import { createCanvas } from "@/lib/api/canvas";
 import { addProjectToRecent } from "@/lib/recent-projects";
 
 export default function DashboardPage() {
@@ -50,6 +51,7 @@ export default function DashboardPage() {
   const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [canvasesRefreshKey, setCanvasesRefreshKey] = useState(0);
   const { user } = useUser();
   const router = useRouter();
 
@@ -238,6 +240,11 @@ export default function DashboardPage() {
     }
   };
 
+  const handleCanvasCreate = async (project: any, name: string) => {
+    await createCanvas(project.id, name.trim() || "Untitled Canvas");
+    setCanvasesRefreshKey((k) => k + 1);
+  };
+
   const handleProjectDelete = async (projectId: string) => {
     const projectToRestore = projects.find((p) => p.id === projectId);
     setProjects((prev) => prev.filter((p) => p.id !== projectId));
@@ -362,6 +369,8 @@ export default function DashboardPage() {
         onStatusChange={handleProjectStatusChange}
         onOpenCanvas={handleOpenCanvas}
         onExportProject={(p) => setExportModalProject({ id: p.id, name: p.name })}
+        onCanvasCreate={handleCanvasCreate}
+        canvasesRefreshKey={canvasesRefreshKey}
       />
 
       {projectToDelete && (

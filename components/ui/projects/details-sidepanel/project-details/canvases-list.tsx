@@ -10,7 +10,9 @@ import {
   ExternalLink,
   FileText,
   Layout,
+  MoreHorizontal,
   Pencil,
+  Plus,
   Share2,
   Trash2,
   X,
@@ -40,6 +42,13 @@ import { CanvasExportFromListModal } from "@/components/ui/projects/canvas/canva
 import { ShareCanvasModal } from "@/components/ui/projects/canvas/share-canvas-modal";
 import { DocumentDeleteConfirmDialog } from "./document-delete-confirm-dialog";
 import { CanvasDeleteConfirmDialog } from "./canvas-delete-confirm-dialog";
+import { CreateCanvasModal } from "@/components/ui/projects/canvas/create-canvas-modal";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/shared/popover";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 import { cn } from "@/lib/utils";
 
 type CanvasWithDocs = ProjectDocumentTree["canvases"][number];
@@ -47,11 +56,23 @@ type CanvasWithDocs = ProjectDocumentTree["canvases"][number];
 interface CanvasesListProps {
   project: Project;
   onOpenCanvas: (project: Project, canvasId: string, documentId?: string) => void;
+  onCanvasCreate?: (name: string) => Promise<void> | void;
+  refreshKey?: number;
 }
 
-export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
+export function CanvasesList({
+  project,
+  onOpenCanvas,
+  onCanvasCreate,
+  refreshKey = 0,
+}: CanvasesListProps) {
+  const isMobile = useIsMobile();
   const [canvases, setCanvases] = useState<CanvasWithDocs[]>([]);
   const [loading, setLoading] = useState(true);
+  const [createCanvasModalOpen, setCreateCanvasModalOpen] = useState(false);
+  const [actionsMenuOpenCanvasId, setActionsMenuOpenCanvasId] = useState<
+    string | null
+  >(null);
   const [expandedCanvasIds, setExpandedCanvasIds] = useState<Set<string>>(
     () => new Set()
   );
@@ -93,7 +114,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
     return () => {
       cancelled = true;
     };
-  }, [project.id]);
+  }, [project.id, refreshKey]);
 
   useEffect(() => {
     if (editingCanvasId) {
@@ -276,7 +297,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
     );
   }
 
-  if (canvases.length === 0) return null;
+  if (canvases.length === 0 && !onCanvasCreate) return null;
 
   const exportCanvas = exportCanvasId
     ? canvases.find((c) => c.id === exportCanvasId)
@@ -289,21 +310,80 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
     const isExpanded = expandedCanvasIds.has(canvas.id);
     const hasDocuments = canvas.documents.length > 0;
 
+    const closeActionsMenu = () => setActionsMenuOpenCanvasId(null);
+
+    const canvasActionsMenu = (
+      <>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 h-9 text-slate-700 dark:text-slate-300"
+          onClick={() => {
+            closeActionsMenu();
+            handleStartEditCanvas(canvas);
+          }}
+        >
+          <Pencil size={14} />
+          Edit
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 h-9 text-slate-700 dark:text-slate-300"
+          onClick={() => {
+            closeActionsMenu();
+            setExportCanvasId(canvas.id);
+          }}
+        >
+          <Download size={14} />
+          Export
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 h-9 text-slate-700 dark:text-slate-300"
+          onClick={() => {
+            closeActionsMenu();
+            setShareCanvasId(canvas.id);
+          }}
+        >
+          <Share2 size={14} />
+          Share
+        </Button>
+        {canvases.length > 1 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 h-9 text-red-600 dark:text-red-400"
+            onClick={() => {
+              closeActionsMenu();
+              setCanvasToDelete({ id: canvas.id, name: canvas.name });
+            }}
+          >
+            <Trash2 size={14} />
+            Delete
+          </Button>
+        )}
+      </>
+    );
+
     return (
       <div key={canvas.id} className="flex-1 min-w-0 space-y-1">
         <div
             className={cn(
-              "flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2 rounded-lg px-3 py-2 min-h-[44px]",
-              "backdrop-blur-sm bg-white/30 dark:bg-slate-800/30",
-            "border border-white/20 dark:border-slate-700/20",
-            "hover:border-white/30 dark:hover:border-slate-600/30 transition-colors"
-          )}
+              "flex rounded-xl backdrop-blur-sm bg-white/30 dark:bg-slate-800/30",
+              "border border-white/20 dark:border-slate-700/20",
+              "hover:border-white/30 dark:hover:border-slate-600/30 transition-colors",
+              isMobile
+                ? "items-center gap-2 px-3 py-2.5 min-h-[52px]"
+                : "flex-col sm:flex-row sm:items-center gap-2 sm:gap-2 px-3 py-2 min-h-[44px] sm:min-h-0 rounded-lg"
+            )}
         >
-          <div className="flex-1 min-w-0 flex items-center gap-2 order-1">
+          <div className="flex-1 min-w-0 flex items-center gap-2">
             <button
               type="button"
               onClick={() => toggleCanvas(canvas.id)}
-              className="shrink-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 p-2 -m-1 flex items-center justify-center rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-white/30 dark:hover:bg-slate-700/50"
+              className="shrink-0 w-11 h-11 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-white/30 dark:hover:bg-slate-700/50 touch-manipulation"
               aria-label={isExpanded ? "Collapse" : "Expand"}
             >
               {hasDocuments ? (
@@ -384,69 +464,108 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
             </AnimatePresence>
           </div>
           {editingCanvasId !== canvas.id && (
-          <div className="flex items-center gap-1.5 shrink-0 order-2 self-end sm:self-auto touch-manipulation">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="min-h-[44px] min-w-[44px] h-9 w-9 sm:h-7 sm:w-7 sm:min-h-0 sm:min-w-0 p-0 rounded-lg
-                        hover:bg-slate-200/50 dark:hover:bg-slate-600/50
-                        text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                      onClick={() => handleStartEditCanvas(canvas)}
-                      aria-label="Edit canvas name"
-                    >
-                      <Pencil size={12} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="min-h-[44px] min-w-[44px] h-9 w-9 sm:h-7 sm:w-7 sm:min-h-0 sm:min-w-0 p-0 rounded-lg
-                        hover:bg-slate-200/50 dark:hover:bg-slate-600/50
-                        text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                      onClick={() => setExportCanvasId(canvas.id)}
-                      aria-label="Export canvas"
-                    >
-                      <Download size={12} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="min-h-[44px] min-w-[44px] h-9 w-9 sm:h-7 sm:w-7 sm:min-h-0 sm:min-w-0 p-0 rounded-lg
-                        hover:bg-slate-200/50 dark:hover:bg-slate-600/50
-                        text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                      onClick={() => setShareCanvasId(canvas.id)}
-                      aria-label="Share canvas"
-                    >
-                      <Share2 size={12} />
-                    </Button>
-                    {canvases.length > 1 && (
+            <div
+              className={cn(
+                "flex items-center gap-1.5 shrink-0 touch-manipulation",
+                !isMobile && "order-2 self-end sm:self-auto"
+              )}
+            >
+              {isMobile ? (
+                <>
+                  <Popover
+                    open={actionsMenuOpenCanvasId === canvas.id}
+                    onOpenChange={(open) =>
+                      open
+                        ? setActionsMenuOpenCanvasId(canvas.id)
+                        : setActionsMenuOpenCanvasId(null)
+                    }
+                  >
+                    <PopoverTrigger asChild>
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="min-h-[44px] min-w-[44px] h-9 w-9 sm:h-7 sm:w-7 sm:min-h-0 sm:min-w-0 p-0 rounded-lg
-                          hover:bg-red-500/10 dark:hover:bg-red-500/20
-                          text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400"
-                        onClick={() =>
-                          setCanvasToDelete({ id: canvas.id, name: canvas.name })
-                        }
-                        aria-label="Delete canvas"
+                        className="w-9 h-9 p-0 rounded-lg text-slate-500 hover:text-slate-700 dark:hover:text-slate-200"
+                        aria-label="Canvas actions"
                       >
-                        <Trash2 size={12} />
+                        <MoreHorizontal size={18} />
                       </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      className="min-h-[44px] sm:min-h-0 h-9 sm:h-7 px-3 sm:px-2.5 rounded-lg
-                        bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/30 dark:via-primary-400/35 dark:to-accent-500/30
-                        hover:from-primary-500/35 hover:via-primary-400/40 hover:to-accent-500/35 dark:hover:from-primary-500/40 dark:hover:via-primary-400/45 dark:hover:to-accent-500/40
-                        border border-primary-400/40 dark:border-primary-400/50
-                        text-slate-900 dark:text-white text-xs font-semibold
-                        shadow-sm hover:shadow-md transition-all duration-200 touch-manipulation"
-                      onClick={() => onOpenCanvas(project, canvas.id)}
+                    </PopoverTrigger>
+                    <PopoverContent
+                      align="end"
+                      side="top"
+                      className="w-48 p-1.5 flex flex-col gap-0.5"
                     >
-                      <ExternalLink size={12} className="mr-1" />
-                      Open
+                      {canvasActionsMenu}
+                    </PopoverContent>
+                  </Popover>
+                  <Button
+                    size="sm"
+                    className="h-9 px-3 rounded-lg text-xs font-semibold
+                      bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/30 dark:via-primary-400/35 dark:to-accent-500/30
+                      border border-primary-400/40 dark:border-primary-400/50
+                      text-slate-900 dark:text-white
+                      shadow-sm hover:shadow-md transition-all duration-200"
+                    onClick={() => onOpenCanvas(project, canvas.id)}
+                  >
+                    Open
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-600/50 text-slate-500 dark:text-slate-400"
+                    onClick={() => handleStartEditCanvas(canvas)}
+                    aria-label="Edit canvas name"
+                  >
+                    <Pencil size={12} />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-600/50 text-slate-500 dark:text-slate-400"
+                    onClick={() => setExportCanvasId(canvas.id)}
+                    aria-label="Export canvas"
+                  >
+                    <Download size={12} />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-600/50 text-slate-500 dark:text-slate-400"
+                    onClick={() => setShareCanvasId(canvas.id)}
+                    aria-label="Share canvas"
+                  >
+                    <Share2 size={12} />
+                  </Button>
+                  {canvases.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 rounded-lg hover:bg-red-500/10 dark:hover:bg-red-500/20 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400"
+                      onClick={() =>
+                        setCanvasToDelete({ id: canvas.id, name: canvas.name })
+                      }
+                      aria-label="Delete canvas"
+                    >
+                      <Trash2 size={12} />
                     </Button>
-                  </div>
+                  )}
+                  <Button
+                    size="sm"
+                    className="h-7 px-2.5 rounded-lg text-xs font-semibold
+                      bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/30 dark:via-primary-400/35 dark:to-accent-500/30
+                      border border-primary-400/40 dark:border-primary-400/50
+                      text-slate-900 dark:text-white shadow-sm hover:shadow-md transition-all"
+                    onClick={() => onOpenCanvas(project, canvas.id)}
+                  >
+                    <ExternalLink size={12} className="mr-1" />
+                    Open
+                  </Button>
+                </>
+              )}
+            </div>
           )}
         </div>
 
@@ -610,7 +729,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-1.5 max-h-64 sm:max-h-48 min-h-0 overflow-y-auto overscroll-contain touch-manipulation">
+          <div className="space-y-2 sm:space-y-1.5 max-h-64 sm:max-h-48 min-h-0 overflow-y-auto overscroll-contain touch-manipulation">
             {canvases.length > 1 ? (
               <SortableCanvasList canvases={canvases} onReorder={handleReorder}>
                 <div className="space-y-1.5">
@@ -630,8 +749,29 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
               canvases.map((canvas) => renderCanvasRow(canvas))
             )}
           </div>
+          {onCanvasCreate && (
+            <div className="pt-3 mt-3 border-t border-white/20 dark:border-slate-700/30">
+              <button
+                type="button"
+                onClick={() => setCreateCanvasModalOpen(true)}
+                className="w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-xl transition-colors min-h-[44px] sm:min-h-0"
+              >
+                <Plus size={14} />
+                Add canvas
+              </button>
+            </div>
+          )}
         </CardContent>
       </Card>
+      {onCanvasCreate && (
+        <CreateCanvasModal
+          open={createCanvasModalOpen}
+          onOpenChange={setCreateCanvasModalOpen}
+          onCreate={async (name) => {
+            await onCanvasCreate(name);
+          }}
+        />
+      )}
 
       {exportCanvas && (
         <CanvasExportFromListModal
