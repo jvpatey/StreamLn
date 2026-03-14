@@ -8,6 +8,8 @@ import {
   LiquidGlassSurface,
   getLiquidGlassSurfaceClassName,
 } from "@/components/ui/shared/liquid-glass-surface";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/shared/sheet";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 import { cn } from "@/lib/utils";
 import {
   FileText,
@@ -21,6 +23,7 @@ import {
   Blocks,
   Plus,
   PanelLeftClose,
+  X,
   Eye,
   EyeOff,
   Lock,
@@ -150,6 +153,7 @@ export function CanvasSidebar({
   onBlockSelect,
 }: CanvasSidebarProps) {
   const [activeTab, setActiveTab] = useState<"blocks" | "layers">("blocks");
+  const isMobile = useIsMobile();
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -173,6 +177,102 @@ export function CanvasSidebar({
       onBlockUpdate(blockId, { locked: !block.locked });
     }
   };
+
+  const renderBlocksTab = () => (
+    <motion.div
+      key="blocks"
+      initial={{ opacity: 0, x: 16 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -16 }}
+      transition={{ duration: 0.2, ease: "easeInOut" }}
+      className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 space-y-3"
+    >
+      <div className="flex items-center justify-between w-full gap-3 text-xs text-slate-500 dark:text-slate-400">
+        <span>
+          <span className="font-semibold text-slate-700 dark:text-slate-300">
+            {canvasBlocks.length}
+          </span>{" "}
+          blocks
+        </span>
+        <span className="text-slate-400 dark:text-slate-500">·</span>
+        <span>
+          <span className="font-semibold text-slate-700 dark:text-slate-300">
+            {selectedBlocks.length}
+          </span>{" "}
+          selected
+        </span>
+      </div>
+      <div className="space-y-1">
+        <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+          Add Blocks
+        </h3>
+        <div className="space-y-2">
+          {BLOCK_CATEGORIES.map((category) => (
+            <div key={category.label} className="space-y-1">
+              <h4 className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">
+                {category.label}
+              </h4>
+              <div className="grid grid-cols-1 gap-2">
+                {category.blocks.map((blockType) => {
+                  const IconComponent = blockType.icon;
+                  return (
+                    <div
+                      key={blockType.type}
+                      className={getLiquidGlassSurfaceClassName({
+                        variant: "panel",
+                        intensity: "md",
+                        rounded: "2xl",
+                        className:
+                          "p-3 cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:border-white/40 dark:hover:border-white/30",
+                      })}
+                      style={{
+                        backgroundImage: `linear-gradient(to right, ${blockType.color}35, transparent)`,
+                      }}
+                      onClick={() => onAddBlock(blockType.type)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onAddBlock(blockType.type);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div
+                          className="p-2 rounded-xl flex-shrink-0"
+                          style={{
+                            backgroundColor: `${blockType.color}22`,
+                          }}
+                        >
+                          <IconComponent
+                            size={18}
+                            style={{ color: blockType.color }}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                          <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+                            {blockType.label}
+                          </h4>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                            {blockType.description}
+                          </p>
+                        </div>
+                        <Plus
+                          size={16}
+                          className="text-slate-400 flex-shrink-0"
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
 
   const renderLayersTab = () => (
     <div className="space-y-4">
@@ -305,17 +405,138 @@ export function CanvasSidebar({
     </div>
   );
 
+  // Mobile: bottom sheet (thumb-friendly, less coverage)
+  if (isMobile) {
+    return (
+      <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <SheetContent
+          side="bottom"
+          hideClose
+          className="h-[60vh] max-h-[60vh] rounded-t-2xl border-0 p-0 gap-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50"
+        >
+          <SheetTitle className="sr-only">Add blocks and manage layers</SheetTitle>
+          <div className="flex flex-col h-full min-h-0">
+            {/* Drag handle + close */}
+            <div className="flex items-center justify-between pt-3 pb-2 px-4 shrink-0">
+              <div className="w-10" />
+              <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            {/* Tabs */}
+            <div className="px-4 pb-2 shrink-0">
+              <div
+                role="radiogroup"
+                aria-label="Sidebar panel"
+                className={cn(
+                  "flex items-center p-1 gap-0.5 relative w-full min-w-0",
+                  getLiquidGlassSurfaceClassName({
+                    variant: "toolbar",
+                    intensity: "xl",
+                    rounded: "2xl",
+                    className: "flex w-full min-w-0",
+                  }),
+                )}
+              >
+                <motion.div
+                  className={cn(
+                    "absolute left-1 top-1 h-9 rounded-xl pointer-events-none w-[calc(50%-6px)]",
+                    "bg-gradient-to-r from-primary-500/25 via-primary-400/30 to-accent-500/25 dark:from-primary-500/20 dark:via-primary-400/25 dark:to-accent-500/20",
+                    "backdrop-blur-2xl border border-white/30 dark:border-white/20",
+                  )}
+                  animate={{
+                    x: activeTab === "layers" ? "calc(100% + 4px)" : 0,
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={activeTab === "blocks"}
+                  onClick={() => setActiveTab("blocks")}
+                  className={cn(
+                    "relative z-10 flex-1 min-w-0 text-sm rounded-xl h-9 flex items-center justify-center gap-2 font-medium transition-colors duration-200",
+                    activeTab === "blocks"
+                      ? "text-slate-900 dark:text-white"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10",
+                  )}
+                >
+                  <Blocks size={14} />
+                  Blocks
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={activeTab === "layers"}
+                  onClick={() => setActiveTab("layers")}
+                  className={cn(
+                    "relative z-10 flex-1 min-w-0 text-sm rounded-xl h-9 flex items-center justify-center gap-2 font-medium transition-colors duration-200",
+                    activeTab === "layers"
+                      ? "text-slate-900 dark:text-white"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-white/10 dark:hover:bg-slate-500/10",
+                  )}
+                >
+                  <Layers size={14} />
+                  Layers
+                </button>
+              </div>
+            </div>
+            {/* Content */}
+            <div className="flex-1 min-h-0 relative overflow-y-auto overflow-x-hidden">
+              <AnimatePresence initial={false} mode="wait">
+                {activeTab === "blocks" && renderBlocksTab()}
+                {activeTab === "layers" && (
+                  <motion.div
+                    key="layers"
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 16 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4"
+                  >
+                    {renderLayersTab()}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  // Desktop: left sidebar
   return (
     <div
-      className={`flex-shrink-0 transition-[width] duration-300 ease-in-out relative ${
-        isOpen ? "w-80 overflow-visible z-20" : "w-0 overflow-hidden"
-      }`}
+      className={`flex-shrink-0 transition-[width] duration-300 ease-in-out relative
+        md:relative
+        ${isOpen ? "w-80 overflow-visible z-20" : "w-0 overflow-hidden"}
+        ${isOpen ? "fixed inset-x-0 top-16 bottom-0 z-50 md:!static md:!inset-auto md:!top-auto md:!bottom-auto" : "md:block"}
+        ${!isOpen ? "hidden md:block" : ""}
+      `}
     >
-      <div className="w-80 h-full animate-sidebar-enter">
+      {/* Mobile backdrop - tap to close */}
+      {isOpen && (
+        <div
+          role="button"
+          tabIndex={-1}
+          onClick={onClose}
+          onKeyDown={(e) => e.key === "Escape" && onClose()}
+          aria-label="Close sidebar"
+          className="md:hidden absolute inset-0 bg-black/40 backdrop-blur-[2px] z-0"
+        />
+      )}
+      <div className="w-80 max-w-[min(320px,85vw)] md:max-w-none h-full animate-sidebar-enter md:relative absolute left-0 top-0 bottom-0 md:left-auto md:top-auto md:bottom-auto z-10 md:z-auto max-h-[calc(100dvh-4rem)] md:max-h-none">
         <LiquidGlassSurface
           variant="panel"
           intensity="xl"
-          className="relative w-80 h-full flex flex-col border-r border-white/30 dark:border-white/15"
+          className="relative w-full min-w-0 max-w-80 h-full flex flex-col border-r border-white/30 dark:border-white/15"
         >
           {/* Hide sidebar tab - on sidebar margin, extends out into canvas */}
           <button
@@ -399,106 +620,7 @@ export function CanvasSidebar({
           {/* Content - AnimatePresence for tab transitions */}
           <div className="flex-1 min-w-0 relative overflow-hidden">
             <AnimatePresence initial={false} mode="wait">
-              {activeTab === "blocks" && (
-                <motion.div
-                  key="blocks"
-                  initial={{ opacity: 0, x: 16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -16 }}
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
-                  className="absolute inset-0 overflow-y-auto overflow-x-hidden p-4 space-y-3"
-                >
-                  {/* Compact stats at top - full width */}
-                  <div className="flex items-center justify-between w-full gap-3 text-xs text-slate-500 dark:text-slate-400">
-                    <span>
-                      <span className="font-semibold text-slate-700 dark:text-slate-300">
-                        {canvasBlocks.length}
-                      </span>{" "}
-                      blocks
-                    </span>
-                    <span className="text-slate-400 dark:text-slate-500">
-                      ·
-                    </span>
-                    <span>
-                      <span className="font-semibold text-slate-700 dark:text-slate-300">
-                        {selectedBlocks.length}
-                      </span>{" "}
-                      selected
-                    </span>
-                  </div>
-
-                  {/* Block Types - grouped by category */}
-                  <div className="space-y-1">
-                    <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                      Add Blocks
-                    </h3>
-                    <div className="space-y-2">
-                      {BLOCK_CATEGORIES.map((category) => (
-                        <div key={category.label} className="space-y-1">
-                          <h4 className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wide">
-                            {category.label}
-                          </h4>
-                          <div className="grid grid-cols-1 gap-2">
-                            {category.blocks.map((blockType) => {
-                              const IconComponent = blockType.icon;
-                              return (
-                                <div
-                                  key={blockType.type}
-                                  className={getLiquidGlassSurfaceClassName({
-                                    variant: "panel",
-                                    intensity: "md",
-                                    rounded: "2xl",
-                                    className:
-                                      "p-3 cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:border-white/40 dark:hover:border-white/30",
-                                  })}
-                                  style={{
-                                    backgroundImage: `linear-gradient(to right, ${blockType.color}35, transparent)`,
-                                  }}
-                                  onClick={() => onAddBlock(blockType.type)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter" || e.key === " ") {
-                                      e.preventDefault();
-                                      onAddBlock(blockType.type);
-                                    }
-                                  }}
-                                  role="button"
-                                  tabIndex={0}
-                                >
-                                  <div className="flex items-center gap-3 min-w-0">
-                                    <div
-                                      className="p-2 rounded-xl flex-shrink-0"
-                                      style={{
-                                        backgroundColor: `${blockType.color}22`,
-                                      }}
-                                    >
-                                      <IconComponent
-                                        size={18}
-                                        style={{ color: blockType.color }}
-                                      />
-                                    </div>
-                                    <div className="flex-1 min-w-0 overflow-hidden">
-                                      <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
-                                        {blockType.label}
-                                      </h4>
-                                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                                        {blockType.description}
-                                      </p>
-                                    </div>
-                                    <Plus
-                                      size={16}
-                                      className="text-slate-400 flex-shrink-0"
-                                    />
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
+              {activeTab === "blocks" && renderBlocksTab()}
               {activeTab === "layers" && (
                 <motion.div
                   key="layers"

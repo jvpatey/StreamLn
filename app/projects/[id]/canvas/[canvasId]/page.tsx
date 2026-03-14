@@ -59,8 +59,15 @@ import {
   getDefaultSidebarOpen,
   getDefaultToolbarOpen,
 } from "@/lib/canvas-preferences";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 import type { CanvasBlock, Canvas, Document } from "@/lib/types/canvas";
-import { PanelLeftOpen, PanelTopOpen, Edit3, Eye } from "lucide-react";
+import {
+  PanelLeftOpen,
+  PanelTopOpen,
+  Edit3,
+  Eye,
+  Blocks,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -187,6 +194,7 @@ export default function ProjectCanvasPage() {
 
   // Canvas tool state (select vs pan)
   const [activeTool, setActiveTool] = useState<CanvasTool>("select");
+  const isMobile = useIsMobile();
 
   // Canvas interaction state
   const [isAddingBlock, setIsAddingBlock] = useState<string | null>(null);
@@ -399,7 +407,11 @@ export default function ProjectCanvasPage() {
   useEffect(() => {
     setShowGrid(getDefaultShowGrid());
     setZoomLevel(getDefaultZoom());
-    setSidebarOpen(getDefaultSidebarOpen());
+    const defaultSidebar = getDefaultSidebarOpen();
+    const isMobile =
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 767px)").matches;
+    setSidebarOpen(isMobile ? false : defaultSidebar);
     setToolbarOpen(getDefaultToolbarOpen());
   }, []);
 
@@ -1244,7 +1256,7 @@ export default function ProjectCanvasPage() {
           </button>
         </div>
       )}
-      <div className="flex h-[calc(100vh-64px)] relative overflow-hidden">
+      <div className="flex h-[calc(100dvh-64px)] min-h-[calc(100vh-64px)] relative overflow-hidden">
         <AnimatePresence mode="wait">
           {primaryMode === "document" ? (
             <motion.div
@@ -1383,13 +1395,13 @@ export default function ProjectCanvasPage() {
                 ease: [0.25, 0.46, 0.45, 0.94],
               }}
             >
-            {!sidebarOpen && (
+            {!sidebarOpen && !isMobile && (
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
                 title="Show sidebar"
                 aria-label="Show sidebar"
-                className="absolute left-0 top-4 z-30 flex items-center justify-center p-2 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+                className="absolute left-0 top-4 z-30 flex items-center justify-center p-2.5 sm:p-2 min-h-[44px] sm:min-h-0 min-w-[44px] sm:min-w-0 rounded-r-xl border border-l-0 border-slate-200/80 dark:border-slate-600/80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/90 hover:shadow-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
               >
                 <PanelLeftOpen size={18} aria-hidden />
               </button>
@@ -1407,6 +1419,7 @@ export default function ProjectCanvasPage() {
                         y: (window.innerHeight / 2 - panOffset.y) / zoomLevel,
                       };
                       addBlock(type, position || canvasCenter);
+                      if (isMobile) setSidebarOpen(false);
                     }
               }
               selectedBlocks={selectedBlocks}
@@ -1495,7 +1508,7 @@ export default function ProjectCanvasPage() {
           )}
         </AnimatePresence>
       </div>
-      {primaryMode === "canvas" &&
+        {primaryMode === "canvas" &&
         showFloatingToolbar &&
         selectedBlocks.length > 0 && (
           <CanvasFloatingToolbar
@@ -1516,6 +1529,24 @@ export default function ProjectCanvasPage() {
             zoomLevel={zoomLevel}
             panOffset={panOffset}
           />
+        )}
+      {/* Mobile: bottom FAB to open blocks sheet when sidebar is closed */}
+      {isMobile &&
+        primaryMode === "canvas" &&
+        !sidebarOpen &&
+        !loading &&
+        project &&
+        canvas && (
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            title="Add blocks"
+            aria-label="Add blocks"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-6 py-3.5 rounded-full shadow-lg border border-slate-200/80 dark:border-slate-600/80 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl hover:bg-slate-50 dark:hover:bg-slate-700/95 hover:shadow-xl transition-all text-slate-700 dark:text-slate-200 font-medium text-sm"
+          >
+            <Blocks size={20} className="shrink-0" />
+            Add blocks
+          </button>
         )}
     </div>
   );

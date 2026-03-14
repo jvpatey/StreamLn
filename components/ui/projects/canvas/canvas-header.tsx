@@ -219,9 +219,9 @@ export function CanvasHeader({
       <LiquidGlassSurface asChild variant="header" intensity="2xl">
         <header className="animate-navbar-enter">
           <div className="px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 gap-4 min-w-0">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 gap-2 sm:gap-4 min-w-0">
               {/* Left section - Back | Project (prominent) | Canvas | Active */}
-              <div className="flex items-center gap-4 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-4 min-w-0 overflow-hidden">
                 <Tooltip content="Back to Projects">
                   <Link href="/projects">
                     <Button
@@ -236,7 +236,7 @@ export function CanvasHeader({
                     </Button>
                   </Link>
                 </Tooltip>
-                <div className="h-11 w-px bg-slate-200 dark:bg-slate-700 shrink-0" />
+                <div className="h-11 w-px bg-slate-200 dark:bg-slate-700 shrink-0 hidden sm:block" />
 
                 {/* Document mode: simplified (Back + project name only) */}
                 <AnimatePresence mode="wait">
