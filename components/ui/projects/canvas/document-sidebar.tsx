@@ -307,11 +307,8 @@ export function DocumentSidebar({
                             }
                             onKeyDown={(e) => {
                               if (e.key === "Enter") {
-                                onCanvasRename?.(
-                                  canvas.id,
-                                  renameCanvasValue.trim() || canvas.name,
-                                );
-                                setRenameCanvasId(null);
+                                e.preventDefault();
+                                e.currentTarget.blur();
                               }
                               if (e.key === "Escape") {
                                 setRenameCanvasId(null);
@@ -319,11 +316,9 @@ export function DocumentSidebar({
                               }
                             }}
                             onBlur={() => {
-                              if (renameCanvasValue.trim())
-                                onCanvasRename?.(
-                                  canvas.id,
-                                  renameCanvasValue.trim(),
-                                );
+                              const newName = renameCanvasValue.trim();
+                              if (newName && newName !== canvas.name)
+                                onCanvasRename?.(canvas.id, newName);
                               setRenameCanvasId(null);
                             }}
                             className="flex-1 min-w-0 text-sm bg-transparent border-none outline-none focus:ring-0"
@@ -411,13 +406,8 @@ export function DocumentSidebar({
                                         }
                                         onKeyDown={(e) => {
                                           if (e.key === "Enter") {
-                                            onDocumentRename(
-                                              canvas.id,
-                                              doc.id,
-                                              renameDocValue.trim() || doc.name,
-                                            );
-                                            setRenameDocId(null);
-                                            setRenameDocCanvasId(null);
+                                            e.preventDefault();
+                                            e.currentTarget.blur();
                                           }
                                           if (e.key === "Escape") {
                                             setRenameDocId(null);
@@ -426,11 +416,13 @@ export function DocumentSidebar({
                                           }
                                         }}
                                         onBlur={() => {
-                                          onDocumentRename(
-                                            canvas.id,
-                                            doc.id,
-                                            renameDocValue.trim() || doc.name,
-                                          );
+                                          const newName = renameDocValue.trim();
+                                          if (newName && newName !== doc.name)
+                                            onDocumentRename(
+                                              canvas.id,
+                                              doc.id,
+                                              newName,
+                                            );
                                           setRenameDocId(null);
                                           setRenameDocCanvasId(null);
                                         }}
@@ -792,16 +784,8 @@ export function DocumentSidebar({
                                                       }
                                                       onKeyDown={(e) => {
                                                         if (e.key === "Enter") {
-                                                          onDocumentRename(
-                                                            canvas.id,
-                                                            doc.id,
-                                                            renameDocValue.trim() ||
-                                                              doc.name,
-                                                          );
-                                                          setRenameDocId(null);
-                                                          setRenameDocCanvasId(
-                                                            null,
-                                                          );
+                                                          e.preventDefault();
+                                                          e.currentTarget.blur();
                                                         }
                                                         if (
                                                           e.key === "Escape"
@@ -810,16 +794,22 @@ export function DocumentSidebar({
                                                           setRenameDocCanvasId(
                                                             null,
                                                           );
+                                                          setRenameDocValue(
+                                                            doc.name,
+                                                          );
                                                         }
                                                       }}
                                                       onBlur={() => {
+                                                        const newName =
+                                                          renameDocValue.trim();
                                                         if (
-                                                          renameDocValue.trim()
+                                                          newName &&
+                                                          newName !== doc.name
                                                         )
                                                           onDocumentRename(
                                                             canvas.id,
                                                             doc.id,
-                                                            renameDocValue.trim(),
+                                                            newName,
                                                           );
                                                         setRenameDocId(null);
                                                         setRenameDocCanvasId(
@@ -937,30 +927,30 @@ export function DocumentSidebar({
                                                   }
                                                   onKeyDown={(e) => {
                                                     if (e.key === "Enter") {
-                                                      onDocumentRename(
-                                                        canvas.id,
-                                                        doc.id,
-                                                        renameDocValue.trim() ||
-                                                          doc.name,
-                                                      );
-                                                      setRenameDocId(null);
-                                                      setRenameDocCanvasId(
-                                                        null,
-                                                      );
+                                                      e.preventDefault();
+                                                      e.currentTarget.blur();
                                                     }
                                                     if (e.key === "Escape") {
                                                       setRenameDocId(null);
                                                       setRenameDocCanvasId(
                                                         null,
                                                       );
+                                                      setRenameDocValue(
+                                                        doc.name,
+                                                      );
                                                     }
                                                   }}
                                                   onBlur={() => {
-                                                    if (renameDocValue.trim())
+                                                    const newName =
+                                                      renameDocValue.trim();
+                                                    if (
+                                                      newName &&
+                                                      newName !== doc.name
+                                                    )
                                                       onDocumentRename(
                                                         canvas.id,
                                                         doc.id,
-                                                        renameDocValue.trim(),
+                                                        newName,
                                                       );
                                                     setRenameDocId(null);
                                                     setRenameDocCanvasId(null);
@@ -1135,26 +1125,26 @@ export function DocumentSidebar({
                                             }
                                             onKeyDown={(e) => {
                                               if (e.key === "Enter") {
-                                                onDocumentRename(
-                                                  canvas.id,
-                                                  doc.id,
-                                                  renameDocValue.trim() ||
-                                                    doc.name,
-                                                );
-                                                setRenameDocId(null);
-                                                setRenameDocCanvasId(null);
+                                                e.preventDefault();
+                                                e.currentTarget.blur();
                                               }
                                               if (e.key === "Escape") {
                                                 setRenameDocId(null);
                                                 setRenameDocCanvasId(null);
+                                                setRenameDocValue(doc.name);
                                               }
                                             }}
                                             onBlur={() => {
-                                              if (renameDocValue.trim())
+                                              const newName =
+                                                renameDocValue.trim();
+                                              if (
+                                                newName &&
+                                                newName !== doc.name
+                                              )
                                                 onDocumentRename(
                                                   canvas.id,
                                                   doc.id,
-                                                  renameDocValue.trim(),
+                                                  newName,
                                                 );
                                               setRenameDocId(null);
                                               setRenameDocCanvasId(null);

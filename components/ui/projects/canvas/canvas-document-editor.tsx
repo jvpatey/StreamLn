@@ -501,7 +501,10 @@ function DocumentFormattingToolbar({
                     onChange={(e) => setEditNameValue(e.target.value)}
                     onBlur={handleSaveName}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") handleSaveName();
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        e.currentTarget.blur();
+                      }
                       if (e.key === "Escape") handleCancelEditName();
                     }}
                     className="flex-1 min-w-0 text-sm font-medium text-primary bg-transparent border-none outline-none focus:ring-0 max-w-[140px] md:max-w-[160px]"

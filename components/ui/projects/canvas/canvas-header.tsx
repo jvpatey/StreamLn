@@ -472,11 +472,8 @@ export function CanvasHeader({
                                         }
                                         onKeyDown={(e) => {
                                           if (e.key === "Enter") {
-                                            onCanvasRename?.(
-                                              c.id,
-                                              renameValue.trim() || c.name,
-                                            );
-                                            setRenameCanvasId(null);
+                                            e.preventDefault();
+                                            e.currentTarget.blur();
                                           }
                                           if (e.key === "Escape") {
                                             setRenameCanvasId(null);
@@ -484,12 +481,9 @@ export function CanvasHeader({
                                           }
                                         }}
                                         onBlur={() => {
-                                          if (renameValue.trim()) {
-                                            onCanvasRename?.(
-                                              c.id,
-                                              renameValue.trim(),
-                                            );
-                                          }
+                                          const newName = renameValue.trim();
+                                          if (newName && newName !== c.name)
+                                            onCanvasRename?.(c.id, newName);
                                           setRenameCanvasId(null);
                                         }}
                                         autoFocus
@@ -682,11 +676,8 @@ export function CanvasHeader({
                                       }
                                       onKeyDown={(e) => {
                                         if (e.key === "Enter") {
-                                          onCanvasRename?.(
-                                            c.id,
-                                            renameValue.trim() || c.name,
-                                          );
-                                          setRenameCanvasId(null);
+                                          e.preventDefault();
+                                          e.currentTarget.blur();
                                         }
                                         if (e.key === "Escape") {
                                           setRenameCanvasId(null);
@@ -694,12 +685,9 @@ export function CanvasHeader({
                                         }
                                       }}
                                       onBlur={() => {
-                                        if (renameValue.trim()) {
-                                          onCanvasRename?.(
-                                            c.id,
-                                            renameValue.trim(),
-                                          );
-                                        }
+                                        const newName = renameValue.trim();
+                                        if (newName && newName !== c.name)
+                                          onCanvasRename?.(c.id, newName);
                                         setRenameCanvasId(null);
                                       }}
                                       autoFocus
@@ -783,11 +771,8 @@ export function CanvasHeader({
                                   }
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") {
-                                      onCanvasRename?.(
-                                        c.id,
-                                        renameValue.trim() || c.name,
-                                      );
-                                      setRenameCanvasId(null);
+                                      e.preventDefault();
+                                      e.currentTarget.blur();
                                     }
                                     if (e.key === "Escape") {
                                       setRenameCanvasId(null);
@@ -795,12 +780,9 @@ export function CanvasHeader({
                                     }
                                   }}
                                   onBlur={() => {
-                                    if (renameValue.trim()) {
-                                      onCanvasRename?.(
-                                        c.id,
-                                        renameValue.trim(),
-                                      );
-                                    }
+                                    const newName = renameValue.trim();
+                                    if (newName && newName !== c.name)
+                                      onCanvasRename?.(c.id, newName);
                                     setRenameCanvasId(null);
                                   }}
                                   autoFocus

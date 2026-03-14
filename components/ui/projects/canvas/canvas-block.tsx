@@ -1011,7 +1011,7 @@ export function CanvasBlock({
                         {block.locked ? (
                           <>
                             <Unlock size={14} />
-                            Lock
+                            Unlock
                           </>
                         ) : (
                           <>
