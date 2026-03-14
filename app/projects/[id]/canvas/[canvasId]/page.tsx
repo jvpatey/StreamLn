@@ -254,12 +254,14 @@ export default function ProjectCanvasPage() {
 
   // Fit to view when blocks load (e.g. new canvas with default blocks)
   useLayoutEffect(() => {
+    const canvasIdStr =
+      typeof canvasId === "string" ? canvasId : canvasId?.[0];
     if (
       !loading &&
       canvasBlocks.length > 0 &&
       primaryMode === "canvas" &&
-      canvasId &&
-      hasFittedToViewRef.current !== canvasId
+      canvasIdStr &&
+      hasFittedToViewRef.current !== canvasIdStr
     ) {
       const el = canvasRef.current;
       if (!el) return;
@@ -269,7 +271,7 @@ export default function ProjectCanvasPage() {
         if (cancelled) return;
         const rect = el.getBoundingClientRect();
         if (rect.width > 0 && rect.height > 0) {
-          hasFittedToViewRef.current = canvasId;
+          hasFittedToViewRef.current = canvasIdStr ?? "";
           handleFitToView();
         }
       };
