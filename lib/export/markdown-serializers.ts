@@ -4,6 +4,7 @@
 
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
+import Underline from "@tiptap/extension-underline";
 import { TaskList, TaskItem } from "@tiptap/extension-list";
 import { renderToMarkdown } from "@tiptap/static-renderer/pm/markdown";
 import type { CanvasBlock } from "@/lib/types/canvas";
@@ -19,6 +20,7 @@ const TIPTAP_EXTENSIONS = [StarterKit, Placeholder];
 const DOCUMENT_EXTENSIONS = [
   StarterKit,
   Placeholder,
+  Underline,
   TaskList,
   TaskItem.configure({ nested: true }),
 ];

@@ -16,12 +16,14 @@ import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-text-style";
 import { FontSize } from "@tiptap/extension-text-style";
 import TextAlign from "@tiptap/extension-text-align";
+import UnderlineExtension from "@tiptap/extension-underline";
 import { TaskList } from "@tiptap/extension-list";
 import { TaskItem } from "@tiptap/extension-list";
 import type { Editor } from "@tiptap/core";
 import {
   Bold,
   Italic,
+  Underline,
   Strikethrough,
   Code,
   List,
@@ -122,6 +124,7 @@ function FormattingControls({
   const {
     isBold,
     isItalic,
+    isUnderline,
     isStrike,
     isCode,
     isBulletList,
@@ -139,6 +142,7 @@ function FormattingControls({
     selector: ({ editor: ed }) => ({
       isBold: ed.isActive("bold"),
       isItalic: ed.isActive("italic"),
+      isUnderline: ed.isActive("underline"),
       isStrike: ed.isActive("strike"),
       isCode: ed.isActive("code"),
       isBulletList: ed.isActive("bulletList"),
@@ -329,6 +333,15 @@ function FormattingControls({
         aria-pressed={isItalic}
       >
         <Italic size={iconSize} />
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        className={cn(buttonClass, isUnderline && activeClass)}
+        title="Underline"
+        aria-pressed={isUnderline}
+      >
+        <Underline size={iconSize} />
       </button>
       <button
         type="button"
@@ -648,6 +661,7 @@ export const CanvasDocumentEditor = forwardRef<
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
+      UnderlineExtension,
       TaskList,
       TaskItem.configure({
         nested: true,
@@ -672,6 +686,7 @@ export const CanvasDocumentEditor = forwardRef<
           "[&_ul[data-type=taskList]_input[type=checkbox]]:rounded [&_ul[data-type=taskList]_input[type=checkbox]]:border-slate-300 [&_ul[data-type=taskList]_input[type=checkbox]]:dark:border-slate-600 [&_ul[data-type=taskList]_input[type=checkbox]]:mt-0.5 [&_ul[data-type=taskList]_input[type=checkbox]]:cursor-pointer",
           "[&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-600 dark:[&_blockquote]:text-slate-400 [&_blockquote]:my-4",
           "[&_code]:bg-slate-100 dark:[&_code]:bg-slate-800 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono",
+          "[&_u]:underline",
           "[&_pre]:bg-slate-100 dark:[&_pre]:bg-slate-800 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-4 [&_pre_code]:bg-transparent [&_pre_code]:p-0"
         ),
       },

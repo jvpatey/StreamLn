@@ -166,24 +166,30 @@ export function getDefaultCanvasBlocks(): DefaultBlockInput[] {
   const taskBoardContent = createTaskBoardContent();
 
   const GAP = 24;
-  const HEADER_H = 52;
+  const HEADER_H = 68;
+  const ROW1_W = 320 + GAP + 480; // Note + gap + Task-board
+  const TAG_GAP = 12;
 
   return [
     {
       id: generateBlockId("text"),
       type: "text",
-      x: 0,
+      x: (ROW1_W - 280) / 2,
       y: 0,
-      width: 140,
-      height: 44,
-      content: { text: "Canvas overview" },
+      width: 280,
+      height: 52,
+      content: {
+        text: "Welcome to your canvas",
+        fontSize: 22,
+        textAlign: "center",
+      },
       color: "#64748b",
     },
     {
       id: generateBlockId("tag"),
       type: "tag",
-      x: 148,
-      y: 0,
+      x: (320 - 120) / 2,
+      y: HEADER_H + 340 + TAG_GAP,
       width: 120,
       height: 44,
       content: { label: "canvas" },
@@ -213,7 +219,7 @@ export function getDefaultCanvasBlocks(): DefaultBlockInput[] {
       id: generateBlockId("code"),
       type: "code",
       x: 0,
-      y: HEADER_H + 380 + GAP,
+      y: HEADER_H + 340 + TAG_GAP + 44 + TAG_GAP,
       width: 380,
       height: 320,
       content: {
@@ -234,7 +240,7 @@ export function getDefaultCanvasBlocks(): DefaultBlockInput[] {
       id: generateBlockId("link"),
       type: "link",
       x: 380 + GAP,
-      y: HEADER_H + 380 + GAP,
+      y: HEADER_H + 340 + TAG_GAP + 44 + TAG_GAP,
       width: 420,
       height: 320,
       content: {
