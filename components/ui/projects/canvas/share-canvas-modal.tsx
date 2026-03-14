@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/shared/button";
 import { Tooltip } from "@/components/ui/shared/tooltip";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/shared/sheet";
 import {
   Share2,
   Link2,
@@ -23,6 +24,8 @@ import {
   getDefaultShareExpiry,
   setDefaultShareExpiry,
 } from "@/lib/canvas-preferences";
+import { useIsMobile } from "@/lib/hooks/use-is-mobile";
+import { cn } from "@/lib/utils";
 
 interface ShareCanvasModalProps {
   open: boolean;
@@ -150,6 +153,226 @@ export function ShareCanvasModal({
     (t) => !t.expiresAt || new Date(t.expiresAt) > new Date()
   );
 
+  const isMobile = useIsMobile();
+  const touchTargetClass = isMobile ? "min-h-[44px]" : "";
+
+  const modalContent = (
+    <>
+      {/* Header */}
+      <div className="flex items-center border-b border-slate-200 dark:border-slate-700 p-4">
+        <div className="flex items-center space-x-3 flex-1">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-primary-500/10 to-accent-500/10">
+            <Share2
+              size={20}
+              className="text-primary-600 dark:text-primary-400"
+            />
+          </div>
+          <div>
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+              Share Canvas & Documents
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Copy a link to share canvas and documents
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className={cn("p-4 space-y-6", isMobile && "pb-6")}>
+        {/* Section 1: Anyone with the link */}
+        <div>
+          <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+            View-only link
+          </h4>
+
+          {loading ? (
+            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 py-4">
+              <Loader2 size={16} className="animate-spin" />
+              Loading...
+            </div>
+          ) : (
+            <>
+              {activeTokens.length === 0 ? (
+                <div className="space-y-3">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <select
+                      value={expiresIn ?? ""}
+                      onChange={(e) => {
+                        const val = e.target.value
+                          ? Number(e.target.value)
+                          : undefined;
+                        setExpiresIn(val);
+                        setDefaultShareExpiry(val);
+                      }}
+                      className={cn(
+                        "rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 px-3 py-2",
+                        touchTargetClass
+                      )}
+                    >
+                      {EXPIRY_OPTIONS.map((opt) => (
+                        <option key={opt.label} value={opt.value ?? ""}>
+                          Expires: {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      onClick={handleCreateLink}
+                      disabled={creating}
+                      className={cn("shrink-0", touchTargetClass)}
+                    >
+                      {creating ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <>
+                          <Link2 size={16} className="mr-2" />
+                          Create link
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {activeTokens.map((t) => (
+                    <div
+                      key={t.id}
+                      className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate font-mono">
+                          {getShareUrl(t.token)}
+                        </p>
+                        {t.expiresAt && (
+                          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                            Expires {new Date(t.expiresAt).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Tooltip
+                          content={copiedId === t.id ? "Copied!" : "Copy link"}
+                          side="top"
+                        >
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCopy(t)}
+                            className={cn("h-8 w-8 p-0 sm:h-8 sm:w-8", isMobile && "min-h-[44px] min-w-[44px]")}
+                          >
+                            {copiedId === t.id ? (
+                              <Check size={16} className="text-green-600" />
+                            ) : (
+                              <Copy size={16} />
+                            )}
+                          </Button>
+                        </Tooltip>
+                        <Tooltip content="Revoke link" side="top">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRevoke(t.id)}
+                            disabled={revoking === t.id}
+                            className={cn(
+                              "h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20",
+                              isMobile && "min-h-[44px] min-w-[44px]"
+                            )}
+                          >
+                            {revoking === t.id ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <Trash2 size={16} />
+                            )}
+                          </Button>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCreateLink}
+                    disabled={creating}
+                    className={cn("w-full", touchTargetClass)}
+                  >
+                    {creating ? (
+                      <Loader2 size={16} className="animate-spin mr-2" />
+                    ) : (
+                      <Link2 size={16} className="mr-2" />
+                    )}
+                    Add another link
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Section 2: Invite to collaborate - placeholder */}
+        <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+          <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            Collaborate
+          </h4>
+          <Tooltip
+            content="Coming soon — invite others to edit this canvas with you"
+            side="top"
+          >
+            <button
+              type="button"
+              disabled
+              className={cn(
+                "flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-75",
+                touchTargetClass
+              )}
+            >
+              <div className="p-2 rounded-lg bg-slate-200 dark:bg-slate-700 shrink-0">
+                <Users size={18} />
+              </div>
+              <div className="text-left flex-1">
+                <p className="font-medium">Invite others to edit</p>
+                <p className="text-xs">Real-time collaboration</p>
+              </div>
+              <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 shrink-0">
+                Coming soon
+              </span>
+            </button>
+          </Tooltip>
+        </div>
+
+        {error && (
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        )}
+      </div>
+
+      <div className="flex items-center justify-end p-4 pt-2 border-t border-slate-200 dark:border-slate-700">
+        <Button
+          variant="ghost"
+          onClick={() => onOpenChange(false)}
+          className={touchTargetClass}
+        >
+          Done
+        </Button>
+      </div>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent
+          side="bottom"
+          className={cn(
+            "rounded-t-2xl border-t border-slate-200 dark:border-slate-700",
+            "bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl",
+            "max-h-[85vh] overflow-y-auto"
+          )}
+        >
+          <SheetTitle className="sr-only">Share Canvas & Documents</SheetTitle>
+          <div className="pt-2">{modalContent}</div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
   return (
     <AnimatePresence>
       {open && (
@@ -172,191 +395,8 @@ export function ShareCanvasModal({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl">
-          {/* Header */}
-          <div className="flex items-center border-b border-slate-200 dark:border-slate-700 p-4">
-            <div className="flex items-center space-x-3 flex-1">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-primary-500/10 to-accent-500/10">
-                <Share2
-                  size={20}
-                  className="text-primary-600 dark:text-primary-400"
-                />
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-                  Share Canvas & Documents
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Copy a link to share canvas and documents
-                </p>
-              </div>
+              {modalContent}
             </div>
-          </div>
-
-          <div className="p-4 space-y-6">
-            {/* Section 1: Anyone with the link */}
-            <div>
-              <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-                View-only link
-              </h4>
-
-              {loading ? (
-                <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 py-4">
-                  <Loader2 size={16} className="animate-spin" />
-                  Loading...
-                </div>
-              ) : (
-                <>
-                  {activeTokens.length === 0 ? (
-                    <div className="space-y-3">
-                      <div className="flex gap-2">
-                        <select
-                          value={expiresIn ?? ""}
-                          onChange={(e) => {
-                            const val = e.target.value
-                              ? Number(e.target.value)
-                              : undefined;
-                            setExpiresIn(val);
-                            setDefaultShareExpiry(val);
-                          }}
-                          className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 px-3 py-2"
-                        >
-                          {EXPIRY_OPTIONS.map((opt) => (
-                            <option
-                              key={opt.label}
-                              value={opt.value ?? ""}
-                            >
-                              Expires: {opt.label}
-                            </option>
-                          ))}
-                        </select>
-                        <Button
-                          onClick={handleCreateLink}
-                          disabled={creating}
-                          className="shrink-0"
-                        >
-                          {creating ? (
-                            <Loader2 size={16} className="animate-spin" />
-                          ) : (
-                            <>
-                              <Link2 size={16} className="mr-2" />
-                              Create link
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {activeTokens.map((t) => (
-                        <div
-                          key={t.id}
-                          className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700"
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate font-mono">
-                              {getShareUrl(t.token)}
-                            </p>
-                            {t.expiresAt && (
-                              <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-                                Expires {new Date(t.expiresAt).toLocaleDateString()}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1 shrink-0">
-                            <Tooltip
-                              content={copiedId === t.id ? "Copied!" : "Copy link"}
-                              side="top"
-                            >
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleCopy(t)}
-                                className="h-8 w-8 p-0"
-                              >
-                                {copiedId === t.id ? (
-                                  <Check size={16} className="text-green-600" />
-                                ) : (
-                                  <Copy size={16} />
-                                )}
-                              </Button>
-                            </Tooltip>
-                            <Tooltip content="Revoke link" side="top">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleRevoke(t.id)}
-                                disabled={revoking === t.id}
-                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                              >
-                                {revoking === t.id ? (
-                                  <Loader2 size={16} className="animate-spin" />
-                                ) : (
-                                  <Trash2 size={16} />
-                                )}
-                              </Button>
-                            </Tooltip>
-                          </div>
-                        </div>
-                      ))}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleCreateLink}
-                        disabled={creating}
-                        className="w-full"
-                      >
-                        {creating ? (
-                          <Loader2 size={16} className="animate-spin mr-2" />
-                        ) : (
-                          <Link2 size={16} className="mr-2" />
-                        )}
-                        Add another link
-                      </Button>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Section 2: Invite to collaborate - placeholder */}
-            <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-              <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Collaborate
-              </h4>
-              <Tooltip
-                content="Coming soon — invite others to edit this canvas with you"
-                side="top"
-              >
-                <button
-                  type="button"
-                  disabled
-                  className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-75"
-                >
-                  <div className="p-2 rounded-lg bg-slate-200 dark:bg-slate-700 shrink-0">
-                    <Users size={18} />
-                  </div>
-                  <div className="text-left flex-1">
-                    <p className="font-medium">Invite others to edit</p>
-                    <p className="text-xs">Real-time collaboration</p>
-                  </div>
-                  <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 shrink-0">
-                    Coming soon
-                  </span>
-                </button>
-              </Tooltip>
-            </div>
-
-            {error && (
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-            )}
-          </div>
-
-          <div className="flex items-center justify-end p-4 pt-2 border-t border-slate-200 dark:border-slate-700">
-            <Button variant="ghost" onClick={() => onOpenChange(false)}>
-              Done
-            </Button>
-          </div>
-        </div>
           </motion.div>
         </motion.div>
       )}
