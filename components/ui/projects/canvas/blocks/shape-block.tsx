@@ -104,7 +104,7 @@ export function ShapeBlock({ block }: ShapeBlockProps) {
   };
 
   return (
-    <div className="h-full w-full flex items-center justify-center p-0" data-no-block-drag>
+    <div className="h-full w-full flex items-center justify-center p-0">
       <svg
         width={w}
         height={h}

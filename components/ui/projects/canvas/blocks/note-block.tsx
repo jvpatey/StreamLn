@@ -162,7 +162,6 @@ export function NoteBlock({ block, onUpdate, isEditable }: NoteBlockProps) {
   return (
     <div
       className="h-full min-h-0 overflow-auto select-text"
-      data-no-block-drag
       onWheel={(e) => e.stopPropagation()}
     >
       <EditorContent editor={editor} />

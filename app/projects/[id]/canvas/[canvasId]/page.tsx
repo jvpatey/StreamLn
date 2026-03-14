@@ -535,12 +535,17 @@ export default function ProjectCanvasPage() {
       }
 
       const target = e.target as HTMLElement;
-      if (
-        !target.closest("input") &&
-        !target.closest("textarea") &&
-        !target.closest("[contenteditable]")
-      ) {
-        if (e.key === "v" && !e.metaKey && !e.ctrlKey) {
+      const isTyping =
+        target.closest("input") ||
+        target.closest("textarea") ||
+        target.closest("[contenteditable]");
+      if (!isTyping) {
+        if (e.key === "Backspace" || e.key === "Delete") {
+          e.preventDefault();
+          if (selectedBlocks.length > 0) {
+            deleteSelectedBlocks();
+          }
+        } else if (e.key === "v" && !e.metaKey && !e.ctrlKey) {
           e.preventDefault();
           setActiveTool("select");
         } else if (e.key === "h" && !e.metaKey && !e.ctrlKey) {

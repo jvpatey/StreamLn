@@ -280,8 +280,8 @@ export function CanvasBlock({
     if (pendingDrag) {
       const pd = pendingDrag;
       setPendingDrag(null);
-      // Click without drag on text block: focus contentEditable and place cursor
-      if (block.type === "text" && blockRef.current) {
+      // Click without drag on text/note block: focus contentEditable and place cursor
+      if ((block.type === "text" || block.type === "note") && blockRef.current) {
         const editEl = blockRef.current.querySelector(
           '[contenteditable="true"]'
         );

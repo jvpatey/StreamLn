@@ -301,7 +301,6 @@ function Column({
   return (
     <div
       ref={setNodeRef}
-      data-no-block-drag
       onClick={onSelect}
       className={`flex w-56 shrink-0 flex-col overflow-hidden rounded-2xl border bg-slate-50/90 dark:bg-slate-800/95 shadow-sm transition-all duration-200 ${
         isOver
@@ -773,9 +772,6 @@ export function TaskBoardBlock({
   return (
     <div
       className={`h-full min-h-0 p-4 ${needsHorizontalScroll ? "overflow-auto" : "overflow-visible"}`}
-      data-no-block-drag
-      onMouseDown={(e) => e.stopPropagation()}
-      onPointerDown={(e) => e.stopPropagation()}
     >
       <DndContext
         sensors={sensors}
