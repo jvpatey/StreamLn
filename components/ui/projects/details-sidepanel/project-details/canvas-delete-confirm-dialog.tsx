@@ -2,21 +2,21 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Trash2 } from "lucide-react";
+import { Layout, Trash2 } from "lucide-react";
 
-interface DocumentDeleteConfirmDialogProps {
+interface CanvasDeleteConfirmDialogProps {
   open: boolean;
-  documentName: string;
+  canvasName: string;
   onCancel: () => void;
   onConfirm: () => void;
 }
 
-export function DocumentDeleteConfirmDialog({
+export function CanvasDeleteConfirmDialog({
   open,
-  documentName,
+  canvasName,
   onCancel,
   onConfirm,
-}: DocumentDeleteConfirmDialogProps) {
+}: CanvasDeleteConfirmDialogProps) {
   return (
     <AnimatePresence>
       {open && (
@@ -30,7 +30,7 @@ export function DocumentDeleteConfirmDialog({
           onClick={onCancel}
           role="dialog"
           aria-modal="true"
-          aria-labelledby="document-delete-dialog-title"
+          aria-labelledby="canvas-delete-dialog-title"
         >
           <motion.div
             initial={{ opacity: 0, y: 16, scale: 0.98 }}
@@ -46,21 +46,22 @@ export function DocumentDeleteConfirmDialog({
               </div>
               <div>
                 <h3
-                  id="document-delete-dialog-title"
+                  id="canvas-delete-dialog-title"
                   className="text-lg font-bold text-slate-900 dark:text-slate-100"
                 >
-                  Delete Document?
+                  Delete canvas?
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  This action cannot be undone.
+                  This will permanently delete the canvas and all its blocks and
+                  documents.
                 </p>
               </div>
             </div>
 
             <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 mb-6 border border-border/50 flex items-center gap-2">
-              <FileText className="h-4 w-4 text-slate-500" />
+              <Layout className="h-4 w-4 text-slate-500" />
               <span className="font-medium text-slate-900 dark:text-slate-100 truncate">
-                {documentName}
+                {canvasName}
               </span>
             </div>
 
@@ -77,7 +78,7 @@ export function DocumentDeleteConfirmDialog({
                 onClick={onConfirm}
                 className="min-h-[44px] px-4 py-2 rounded-xl bg-destructive text-white hover:bg-destructive/90 transition-colors inline-flex items-center gap-2 touch-manipulation"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 size={16} />
                 Delete
               </button>
             </div>

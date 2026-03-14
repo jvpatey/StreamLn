@@ -27,6 +27,7 @@ import {
   updateCanvas,
   updateDocument,
   deleteDocument,
+  deleteCanvas,
   reorderCanvases,
 } from "@/lib/api/canvas";
 import type { ProjectDocumentTree } from "@/lib/api/canvas";
@@ -38,6 +39,7 @@ import {
 import { CanvasExportFromListModal } from "@/components/ui/projects/canvas/canvas-export-from-list-modal";
 import { ShareCanvasModal } from "@/components/ui/projects/canvas/share-canvas-modal";
 import { DocumentDeleteConfirmDialog } from "./document-delete-confirm-dialog";
+import { CanvasDeleteConfirmDialog } from "./canvas-delete-confirm-dialog";
 import { cn } from "@/lib/utils";
 
 type CanvasWithDocs = ProjectDocumentTree["canvases"][number];
@@ -65,6 +67,10 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
   const [documentToDelete, setDocumentToDelete] = useState<{
     canvasId: string;
     documentId: string;
+    name: string;
+  } | null>(null);
+  const [canvasToDelete, setCanvasToDelete] = useState<{
+    id: string;
     name: string;
   } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -210,6 +216,25 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
     }
   };
 
+  const handleDeleteCanvas = async () => {
+    if (!canvasToDelete) return;
+    try {
+      await deleteCanvas(project.id, canvasToDelete.id);
+      setCanvases((prev) =>
+        prev.filter((c) => c.id !== canvasToDelete.id)
+      );
+      setExpandedCanvasIds((prev) => {
+        const next = new Set(prev);
+        next.delete(canvasToDelete.id);
+        return next;
+      });
+    } catch {
+      // Could show toast
+    } finally {
+      setCanvasToDelete(null);
+    }
+  };
+
   const handleReorder = async (reordered: CanvasWithDocs[]) => {
     setCanvases(reordered);
     try {
@@ -349,7 +374,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                   <button
                     type="button"
                     onClick={() => onOpenCanvas(project, canvas.id)}
-                    className="text-left text-sm font-medium text-slate-900 dark:text-slate-100 truncate block min-w-0 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-1 rounded"
+                    className="text-left text-base font-semibold text-slate-900 dark:text-slate-100 truncate block min-w-0 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-1 rounded"
                     title={`Open ${canvas.name}`}
                   >
                     {canvas.name}
@@ -359,7 +384,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
             </AnimatePresence>
           </div>
           {editingCanvasId !== canvas.id && (
-          <div className="flex items-center gap-1 shrink-0 order-2 self-end sm:self-auto">
+          <div className="flex items-center gap-1.5 shrink-0 order-2 self-end sm:self-auto touch-manipulation">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -393,6 +418,21 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                     >
                       <Share2 size={12} />
                     </Button>
+                    {canvases.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="min-h-[44px] min-w-[44px] h-9 w-9 sm:h-7 sm:w-7 sm:min-h-0 sm:min-w-0 p-0 rounded-lg
+                          hover:bg-red-500/10 dark:hover:bg-red-500/20
+                          text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400"
+                        onClick={() =>
+                          setCanvasToDelete({ id: canvas.id, name: canvas.name })
+                        }
+                        aria-label="Delete canvas"
+                      >
+                        <Trash2 size={12} />
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       className="min-h-[44px] sm:min-h-0 h-9 sm:h-7 px-3 sm:px-2.5 rounded-lg
@@ -400,7 +440,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
                         hover:from-primary-500/35 hover:via-primary-400/40 hover:to-accent-500/35 dark:hover:from-primary-500/40 dark:hover:via-primary-400/45 dark:hover:to-accent-500/40
                         border border-primary-400/40 dark:border-primary-400/50
                         text-slate-900 dark:text-white text-xs font-semibold
-                        shadow-sm hover:shadow-md transition-all duration-200"
+                        shadow-sm hover:shadow-md transition-all duration-200 touch-manipulation"
                       onClick={() => onOpenCanvas(project, canvas.id)}
                     >
                       <ExternalLink size={12} className="mr-1" />
@@ -570,7 +610,7 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-1.5 max-h-48 overflow-y-auto">
+          <div className="space-y-1.5 max-h-64 sm:max-h-48 min-h-0 overflow-y-auto overscroll-contain touch-manipulation">
             {canvases.length > 1 ? (
               <SortableCanvasList canvases={canvases} onReorder={handleReorder}>
                 <div className="space-y-1.5">
@@ -630,6 +670,15 @@ export function CanvasesList({ project, onOpenCanvas }: CanvasesListProps) {
           documentName={documentToDelete.name}
           onCancel={() => setDocumentToDelete(null)}
           onConfirm={handleDeleteDocument}
+        />
+      )}
+
+      {canvasToDelete && (
+        <CanvasDeleteConfirmDialog
+          open={!!canvasToDelete}
+          canvasName={canvasToDelete.name}
+          onCancel={() => setCanvasToDelete(null)}
+          onConfirm={handleDeleteCanvas}
         />
       )}
     </>
