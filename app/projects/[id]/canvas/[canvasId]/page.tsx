@@ -68,6 +68,7 @@ import {
   Eye,
   Blocks,
   FileText,
+  Loader2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -159,6 +160,7 @@ export default function ProjectCanvasPage() {
   const [canvas, setCanvas] = useState<Canvas | null>(null);
   const [canvases, setCanvases] = useState<Canvas[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [documentsLoading, setDocumentsLoading] = useState(true);
   const [projectDocuments, setProjectDocuments] = useState<
     Array<{
       id: string;
@@ -304,6 +306,11 @@ export default function ProjectCanvasPage() {
     }
   }, [docParam, projectId, canvasId]);
 
+  // Reset documents loading when leaving document mode
+  useEffect(() => {
+    if (primaryMode !== "document") setDocumentsLoading(false);
+  }, [primaryMode]);
+
   // Fetch documents when in document mode (for current canvas)
   useEffect(() => {
     if (
@@ -315,16 +322,24 @@ export default function ProjectCanvasPage() {
     )
       return;
 
+    let cancelled = false;
+    setDocumentsLoading(true);
+
     const loadDocuments = async () => {
       try {
         const docs = await fetchDocuments(projectId, canvasId);
-        setDocuments(docs);
+        if (!cancelled) setDocuments(docs);
       } catch {
-        setDocuments([]);
+        if (!cancelled) setDocuments([]);
+      } finally {
+        if (!cancelled) setDocumentsLoading(false);
       }
     };
 
     loadDocuments();
+    return () => {
+      cancelled = true;
+    };
   }, [projectId, canvasId, primaryMode]);
 
   // Fetch project documents tree when in document mode (for sidebar)
@@ -1364,6 +1379,24 @@ export default function ProjectCanvasPage() {
                 canvas &&
                 primaryMode === "document" &&
                 !currentDocument &&
+                documentsLoading && (
+                  <div className="flex flex-col items-center justify-center h-full p-8">
+                    <div className="flex flex-col items-center gap-3 text-slate-500 dark:text-slate-400">
+                      <Loader2
+                        size={32}
+                        className="animate-spin"
+                        aria-hidden
+                      />
+                      <p className="text-sm">Loading documents...</p>
+                    </div>
+                  </div>
+                )}
+              {!loading &&
+                project &&
+                canvas &&
+                primaryMode === "document" &&
+                !currentDocument &&
+                !documentsLoading &&
                 documents.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-full p-8">
                     <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl px-8 py-6 shadow-lg max-w-md w-full text-center">
