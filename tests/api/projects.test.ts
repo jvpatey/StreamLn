@@ -167,18 +167,24 @@ describe("POST /api/projects", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.name).toBe("New Project");
-    expect(prisma.project.create).toHaveBeenCalledWith({
-      data: {
-        userId: "user-123",
-        name: "New Project",
-        description: "Desc",
-        icon: "Folder",
-        canvases: {
-          create: { name: "Main", order: 0 },
+    const createCall = vi.mocked(prisma.project.create).mock.calls[0][0];
+    expect(createCall.data).toMatchObject({
+      userId: "user-123",
+      name: "New Project",
+      description: "Desc",
+      icon: "Folder",
+      canvases: {
+        create: {
+          name: "Main",
+          order: 0,
+          canvasBlocks: {
+            create: expect.any(Array),
+          },
         },
       },
-      include: { canvases: true },
     });
+    expect(createCall.data.canvases.create.canvasBlocks.create).toHaveLength(6);
+    expect(createCall.include).toEqual({ canvases: true });
   });
 
   it("creates project with custom canvas name", async () => {

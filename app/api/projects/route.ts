@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { Prisma } from "@/app/generated/prisma-client";
 import prisma from "@/lib/db";
+import { getDefaultCanvasBlocks } from "@/lib/canvas/default-blocks";
 import { createProjectSchema } from "@/lib/validations/project";
 import { apiError, handleUnexpectedError } from "@/lib/api/errors";
 
@@ -93,6 +95,7 @@ export async function POST(req: NextRequest) {
 
     const { name, description, icon, canvasName } = parsed.data;
 
+    const defaultBlocks = getDefaultCanvasBlocks();
     const project = await prisma.project.create({
       data: {
         userId,
@@ -103,6 +106,19 @@ export async function POST(req: NextRequest) {
           create: {
             name: (canvasName?.trim() || "Main"),
             order: 0,
+            canvasBlocks: {
+              create: defaultBlocks.map((b, i) => ({
+                order: i,
+                type: b.type,
+                x: b.x,
+                y: b.y,
+                width: b.width,
+                height: b.height,
+                content: (b.content ?? {}) as Prisma.InputJsonValue,
+                color: b.color ?? null,
+                title: b.title ?? null,
+              })),
+            },
           },
         },
       },

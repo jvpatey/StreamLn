@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   CanvasToolbar,
@@ -213,6 +213,7 @@ export default function ProjectCanvasPage() {
   const skipNextSaveRef = useRef(true);
   const lastSavedAtRef = useRef<string | null>(null);
   const [saveConflict, setSaveConflict] = useState(false);
+  const hasFittedToViewRef = useRef<string | null>(null);
 
   const handleFitToView = useCallback(() => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -246,6 +247,52 @@ export default function ProjectCanvasPage() {
       y: viewportHeight / 2 - centerY * newZoom,
     });
   }, [canvasBlocks]);
+
+  // Fit to view when blocks load (e.g. new canvas with default blocks)
+  useLayoutEffect(() => {
+    if (
+      !loading &&
+      canvasBlocks.length > 0 &&
+      primaryMode === "canvas" &&
+      canvasId &&
+      hasFittedToViewRef.current !== canvasId
+    ) {
+      const el = canvasRef.current;
+      if (!el) return;
+
+      let cancelled = false;
+      const runFit = () => {
+        if (cancelled) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          hasFittedToViewRef.current = canvasId;
+          handleFitToView();
+        }
+      };
+
+      // Run after layout: rAF ensures we're past the current frame's layout
+      const rafId = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          runFit();
+        });
+      });
+
+      // ResizeObserver for when container gets dimensions (e.g. sidebar animates)
+      const ro = new ResizeObserver(() => {
+        if (!cancelled) runFit();
+      });
+      ro.observe(el);
+
+      // Fallback: run again after layout fully settles
+      const t = setTimeout(runFit, 400);
+      return () => {
+        cancelled = true;
+        cancelAnimationFrame(rafId);
+        ro.disconnect();
+        clearTimeout(t);
+      };
+    }
+  }, [loading, canvasBlocks.length, primaryMode, canvasId, handleFitToView]);
 
   // Load project, canvas, and blocks
   useEffect(() => {
@@ -422,7 +469,6 @@ export default function ProjectCanvasPage() {
   // Initialize view state from preferences (client-only)
   useEffect(() => {
     setShowGrid(getDefaultShowGrid());
-    setZoomLevel(getDefaultZoom());
     const defaultSidebar = getDefaultSidebarOpen();
     const isMobile =
       typeof window !== "undefined" &&
@@ -430,6 +476,13 @@ export default function ProjectCanvasPage() {
     setSidebarOpen(isMobile ? false : defaultSidebar);
     setToolbarOpen(getDefaultToolbarOpen());
   }, []);
+
+  // Apply zoom from preferences only when canvas is empty - fit-to-view handles zoom when we have blocks
+  useEffect(() => {
+    if (loading || canvasBlocks.length === 0) {
+      setZoomLevel(getDefaultZoom());
+    }
+  }, [loading, canvasBlocks.length]);
 
   // Track project as recently opened
   useEffect(() => {
