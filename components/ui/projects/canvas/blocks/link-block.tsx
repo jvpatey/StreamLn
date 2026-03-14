@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ExternalLink, Link2, Loader2, Pencil, Tag } from "lucide-react";
+import { Check, ExternalLink, Link2, Loader2, Pencil, Tag, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/shared/button";
 import {
   getLinkContent,
@@ -73,6 +73,7 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
   const [label, setLabel] = useState(content.label ?? "");
   const [urlError, setUrlError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [previewFailed, setPreviewFailed] = useState(false);
   const urlInputRef = useRef<HTMLInputElement>(null);
   const labelInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -86,6 +87,7 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
     setUrl(c.url);
     setLabel(c.label ?? "");
     setUrlError(null);
+    setPreviewFailed(false);
   }, [block.content]);
 
   // Fetch link preview when we have a valid URL and no preview yet
@@ -98,6 +100,9 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
 
     let cancelled = false;
     const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      if (!cancelled) setPreviewFailed(true);
+    }, 8000);
 
     async function fetchPreview() {
       try {
@@ -105,7 +110,10 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
           `/api/link-preview?url=${encodeURIComponent(normalizedUrl)}`,
           { signal: controller.signal }
         );
-        if (!res.ok || cancelled) return;
+        if (!res.ok || cancelled) {
+          if (!cancelled) setPreviewFailed(true);
+          return;
+        }
         const preview = (await res.json()) as LinkPreviewData;
         if (cancelled) return;
         onUpdateRef.current({
@@ -118,6 +126,7 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
       } catch (err) {
         if (err instanceof Error && err.name !== "AbortError") {
           console.warn("[LinkBlock] Preview fetch failed:", err.message);
+          if (!cancelled) setPreviewFailed(true);
         }
       }
     }
@@ -126,6 +135,7 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
     return () => {
       cancelled = true;
       controller.abort();
+      clearTimeout(timeoutId);
     };
   }, [content.url, content.label, content.preview]);
 
@@ -216,6 +226,14 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
     }
   }, [url, label, persistContent]);
 
+  const handleRemoveLink = useCallback(() => {
+    setUrl("");
+    setLabel("");
+    setUrlError(null);
+    persistContent("", "");
+    setIsEditing(false);
+  }, [persistContent]);
+
   const handleUrlPaste = useCallback(
     (e: React.ClipboardEvent<HTMLInputElement>) => {
       const pasted = e.clipboardData.getData("text").trim();
@@ -254,7 +272,7 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
 
   useEffect(() => {
     resizeBlockToFit();
-  }, [resizeBlockToFit, content.url, content.preview, isEditable, isEditing, urlError]);
+  }, [resizeBlockToFit, content.url, content.preview, isEditable, isEditing, urlError, previewFailed]);
 
   const displayLabel = getLinkDisplayLabel(content);
   const hrefUrl =
@@ -262,7 +280,7 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
       ? normalizeUrl(content.url)
       : null;
   const isFetchingPreview =
-    hrefUrl && !content.preview && !urlError;
+    hrefUrl && !content.preview && !urlError && !previewFailed;
   const showInputs =
     isEditable &&
     (!hrefUrl || isEditing);
@@ -336,25 +354,44 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
                     Open
                   </a>
                 </Button>
-                {content.preview && isEditable && !showInputs && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    type="button"
-                    className="h-7 w-7 p-0 rounded-lg shrink-0
-                      hover:bg-slate-200/50 dark:hover:bg-slate-600/50
-                      text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setIsEditing(true);
-                      requestAnimationFrame(() => urlInputRef.current?.focus());
-                    }}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    aria-label="Edit link"
-                  >
-                    <Pencil size={12} />
-                  </Button>
+                {isEditable && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      className="h-7 w-7 p-0 rounded-lg shrink-0
+                        hover:bg-slate-200/50 dark:hover:bg-slate-600/50
+                        text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsEditing(true);
+                        requestAnimationFrame(() => urlInputRef.current?.focus());
+                      }}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      aria-label="Edit link"
+                    >
+                      <Pencil size={12} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      className="h-7 w-7 p-0 rounded-lg shrink-0
+                        hover:bg-red-500/10 dark:hover:bg-red-500/20
+                        text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleRemoveLink();
+                      }}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      aria-label="Remove link"
+                    >
+                      <Trash2 size={12} />
+                    </Button>
+                  </>
                 )}
               </>
             )}
@@ -376,6 +413,11 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
                 <div className="flex items-center justify-center gap-2 py-8 text-slate-500 dark:text-slate-400">
                   <Loader2 size={18} className="animate-spin" />
                   <span className="text-sm">Loading preview…</span>
+                </div>
+              ) : previewFailed ? (
+                <div className="flex flex-col items-center justify-center gap-2 py-8 text-slate-500 dark:text-slate-400">
+                  <span className="text-sm">Preview unavailable</span>
+                  <span className="text-xs">Use Edit to fix the URL or Remove to clear</span>
                 </div>
               ) : content.preview ? (
                 <>
@@ -494,22 +536,41 @@ export function LinkBlock({ block, onUpdate, isEditable }: LinkBlockProps) {
                 onClick={(e) => e.stopPropagation()}
               />
             </div>
-            <Button
-              variant="subtle"
-              size="sm"
-              type="button"
-              className="h-7 px-2.5 text-xs gap-1.5 w-fit self-end"
-              disabled={!isUrlValidForDone}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleDone();
-              }}
-              onMouseDown={(e) => e.stopPropagation()}
-            >
-              <Check size={12} />
-              {doneButtonLabel}
-            </Button>
+            <div className="flex items-center gap-2 self-end">
+              {(url.trim() || content.url.trim()) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  type="button"
+                  className="h-7 px-2.5 text-xs gap-1.5 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleRemoveLink();
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                >
+                  <Trash2 size={12} />
+                  Remove link
+                </Button>
+              )}
+              <Button
+                variant="subtle"
+                size="sm"
+                type="button"
+                className="h-7 px-2.5 text-xs gap-1.5"
+                disabled={!isUrlValidForDone}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleDone();
+                }}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                <Check size={12} />
+                {doneButtonLabel}
+              </Button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
