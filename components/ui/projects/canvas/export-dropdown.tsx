@@ -14,7 +14,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/shared/popover";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/shared/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/shared/sheet";
 import {
   exportAsJSON,
   exportAsMarkdown,
@@ -202,10 +207,9 @@ export function ExportDropdown({
 
   if (isMobile) {
     return (
-      <>
-        {trigger}
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetContent
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>{trigger}</SheetTrigger>
+        <SheetContent
             side="bottom"
             className={cn(
               "rounded-t-2xl border-t border-slate-200 dark:border-slate-700",
@@ -217,7 +221,6 @@ export function ExportDropdown({
             <div className="pt-2">{exportOptionsContent}</div>
           </SheetContent>
         </Sheet>
-      </>
     );
   }
 

@@ -441,8 +441,8 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
           }
         }}
         className={`relative w-full h-full overflow-hidden select-none ${cursorClass}`}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
+        onPointerDownCapture={handlePointerDown}
+        onPointerMoveCapture={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerLeave}
         onPointerCancel={handlePointerCancel}

@@ -130,6 +130,7 @@ export function TextBlock({ block, onUpdate, isEditable }: TextBlockProps) {
   return (
     <div
       className="h-full min-h-0 overflow-hidden px-4 py-3 flex items-center cursor-text"
+      data-no-block-drag
       style={{
         justifyContent:
           content.textAlign === "center"
@@ -165,6 +166,7 @@ export function TextBlock({ block, onUpdate, isEditable }: TextBlockProps) {
             suppressContentEditableWarning
             className="min-w-0 w-full break-words outline-none focus:outline-none"
             style={textStyle}
+            data-no-block-drag
             onBlur={handleBlur}
             onFocus={() => setIsFocused(true)}
             onInput={handleInput}
