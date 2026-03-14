@@ -78,7 +78,7 @@ interface CanvasBlockProps {
 const dropdownItemClass =
   "flex items-center gap-2 px-2 py-1.5 text-sm rounded-md cursor-pointer outline-none focus:bg-slate-100 dark:focus:bg-slate-700 text-slate-700 dark:text-slate-300 data-[highlighted]:bg-slate-100 dark:data-[highlighted]:bg-slate-700";
 
-const STAGGER_DELAY = 0.045;
+const STAGGER_DELAY = 0.03;
 const EXIT_STAGGER_DELAY = 0.03;
 const ENTRANCE_EASE = [0.25, 0.46, 0.45, 0.94] as const;
 
@@ -563,11 +563,11 @@ export function CanvasBlock({
   const animationProps =
     entranceIndex !== undefined
       ? {
-          initial: { opacity: 0, y: 12 },
-          animate: { opacity: 1, y: 0 },
+          initial: { opacity: 0, y: 8, scale: 0.98 },
+          animate: { opacity: 1, y: 0, scale: 1 },
           exit: { opacity: 0, scale: 0.96, y: -8 },
           transition: {
-            duration: 0.3,
+            duration: 0.22,
             delay: entranceIndex * STAGGER_DELAY,
             ease: ENTRANCE_EASE,
             ...baseTransition,

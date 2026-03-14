@@ -218,39 +218,68 @@ export default function ProjectCanvasPage() {
   const lastSavedAtRef = useRef<string | null>(null);
   const [saveConflict, setSaveConflict] = useState(false);
   const hasFittedToViewRef = useRef<string | null>(null);
+  const zoomPanRef = useRef({ zoom: 1, pan: { x: 0, y: 0 } });
+  zoomPanRef.current = { zoom: zoomLevel, pan: panOffset };
 
-  const handleFitToView = useCallback(() => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect || canvasBlocks.length === 0) {
-      setZoomLevel(1);
-      setPanOffset({ x: 0, y: 0 });
-      return;
-    }
-    const viewportWidth = rect.width;
-    const viewportHeight = rect.height;
-    const bounds = canvasBlocks.reduce(
-      (acc, block) => ({
-        left: Math.min(acc.left, block.x),
-        top: Math.min(acc.top, block.y),
-        right: Math.max(acc.right, block.x + block.width),
-        bottom: Math.max(acc.bottom, block.y + block.height),
-      }),
-      { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity },
-    );
-    const padding = 100;
-    const contentWidth = bounds.right - bounds.left + padding * 2;
-    const contentHeight = bounds.bottom - bounds.top + padding * 2;
-    const scaleX = viewportWidth / contentWidth;
-    const scaleY = viewportHeight / contentHeight;
-    const newZoom = Math.min(scaleX, scaleY, 1);
-    const centerX = (bounds.left + bounds.right) / 2;
-    const centerY = (bounds.top + bounds.bottom) / 2;
-    setZoomLevel(newZoom);
-    setPanOffset({
-      x: viewportWidth / 2 - centerX * newZoom,
-      y: viewportHeight / 2 - centerY * newZoom,
-    });
-  }, [canvasBlocks]);
+  const handleFitToView = useCallback(
+    (animate = false) => {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect || canvasBlocks.length === 0) {
+        setZoomLevel(1);
+        setPanOffset({ x: 0, y: 0 });
+        return;
+      }
+      const viewportWidth = rect.width;
+      const viewportHeight = rect.height;
+      const bounds = canvasBlocks.reduce(
+        (acc, block) => ({
+          left: Math.min(acc.left, block.x),
+          top: Math.min(acc.top, block.y),
+          right: Math.max(acc.right, block.x + block.width),
+          bottom: Math.max(acc.bottom, block.y + block.height),
+        }),
+        { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity },
+      );
+      const padding = 100;
+      const contentWidth = bounds.right - bounds.left + padding * 2;
+      const contentHeight = bounds.bottom - bounds.top + padding * 2;
+      const scaleX = viewportWidth / contentWidth;
+      const scaleY = viewportHeight / contentHeight;
+      const targetZoom = Math.min(scaleX, scaleY, 1);
+      const centerX = (bounds.left + bounds.right) / 2;
+      const centerY = (bounds.top + bounds.bottom) / 2;
+      const targetPan = {
+        x: viewportWidth / 2 - centerX * targetZoom,
+        y: viewportHeight / 2 - centerY * targetZoom,
+      };
+
+      if (animate) {
+        const { zoom: startZoom, pan: startPan } = zoomPanRef.current;
+        const duration = 280;
+        const startTime = performance.now();
+
+        const tick = (now: number) => {
+          const elapsed = now - startTime;
+          const t = Math.min(elapsed / duration, 1);
+          const eased = 1 - (1 - t) ** 3;
+
+          setZoomLevel(startZoom + (targetZoom - startZoom) * eased);
+          setPanOffset({
+            x: startPan.x + (targetPan.x - startPan.x) * eased,
+            y: startPan.y + (targetPan.y - startPan.y) * eased,
+          });
+
+          if (t < 1) requestAnimationFrame(tick);
+        };
+
+        requestAnimationFrame(tick);
+      } else {
+        setZoomLevel(targetZoom);
+        setPanOffset(targetPan);
+      }
+    },
+    [canvasBlocks],
+  );
 
   // Fit to view when blocks load (e.g. new canvas with default blocks)
   useLayoutEffect(() => {
@@ -272,7 +301,7 @@ export default function ProjectCanvasPage() {
         const rect = el.getBoundingClientRect();
         if (rect.width > 0 && rect.height > 0) {
           hasFittedToViewRef.current = canvasIdStr ?? "";
-          handleFitToView();
+          handleFitToView(true);
         }
       };
 
@@ -1690,6 +1719,13 @@ export default function ProjectCanvasPage() {
               {loading ? (
                 <CanvasWorkspaceSkeleton />
               ) : (
+                <motion.div
+                  key="canvas-workspace"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="h-full w-full"
+                >
                 <CanvasWorkspace
                   ref={canvasRef}
                   activeTool={activeTool}
@@ -1718,6 +1754,7 @@ export default function ProjectCanvasPage() {
                   viewMode={viewMode}
                   startBlankExiting={startBlankExiting}
                 />
+                </motion.div>
               )}
             </div>
             </motion.div>
