@@ -150,7 +150,7 @@ function FormattingControls({
 
   return (
     <div
-      className="flex items-center gap-1.5 flex-wrap"
+      className="flex items-center gap-1.5 flex-nowrap md:flex-wrap"
       onMouseDown={(e) => e.preventDefault()}
     >
       {onSidebarToggle != null && !sidebarInParent && (
@@ -400,7 +400,7 @@ function DocumentFormattingToolbar({
         })
       )}
     >
-      <div className="w-full max-w-5xl mx-auto flex items-center gap-3">
+      <div className="w-full max-w-5xl mx-auto flex items-center gap-2 sm:gap-3 min-w-0 overflow-x-auto overflow-y-hidden">
         {onSidebarToggle != null && (
           <>
             <button
@@ -408,7 +408,7 @@ function DocumentFormattingToolbar({
               onClick={onSidebarToggle}
               title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
               aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-              className={buttonClass}
+              className={cn(buttonClass, "min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 shrink-0 hidden md:flex")}
             >
               {sidebarOpen ? (
                 <PanelLeftClose size={iconSize} aria-hidden />
@@ -416,7 +416,7 @@ function DocumentFormattingToolbar({
                 <PanelLeftOpen size={iconSize} aria-hidden />
               )}
             </button>
-            <div className="w-px h-4 bg-slate-200 dark:bg-slate-600 shrink-0" />
+            <div className="hidden md:block w-px h-4 bg-slate-200 dark:bg-slate-600 shrink-0" />
           </>
         )}
         {documentName != null && (
@@ -429,7 +429,7 @@ function DocumentFormattingToolbar({
             </span>
           </div>
         )}
-        <div className="flex-1 flex justify-center min-w-0">
+        <div className="flex-1 flex justify-center min-w-0 overflow-x-auto overflow-y-hidden">
           <FormattingControls
             editor={editor}
             sidebarOpen={sidebarOpen}

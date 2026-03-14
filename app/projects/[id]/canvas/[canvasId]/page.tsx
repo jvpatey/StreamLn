@@ -67,6 +67,7 @@ import {
   Edit3,
   Eye,
   Blocks,
+  FileText,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -1546,6 +1547,23 @@ export default function ProjectCanvasPage() {
           >
             <Blocks size={20} className="shrink-0" />
             Add blocks
+          </button>
+        )}
+      {/* Mobile: bottom FAB to open documents sheet when sidebar is closed */}
+      {isMobile &&
+        primaryMode === "document" &&
+        !sidebarOpen &&
+        !loading &&
+        project && (
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            title="Documents"
+            aria-label="Documents"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-6 py-3.5 rounded-full shadow-lg border border-slate-200/80 dark:border-slate-600/80 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl hover:bg-slate-50 dark:hover:bg-slate-700/95 hover:shadow-xl transition-all text-slate-700 dark:text-slate-200 font-medium text-sm"
+          >
+            <FileText size={20} className="shrink-0" />
+            Documents
           </button>
         )}
     </div>

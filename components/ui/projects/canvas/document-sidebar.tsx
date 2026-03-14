@@ -188,10 +188,10 @@ export function DocumentSidebar({
         <SheetContent
           side="bottom"
           hideClose
-          className="max-h-[60vh] rounded-t-2xl border-0 p-0 gap-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50"
+          className="h-[60vh] max-h-[60vh] rounded-t-2xl border-0 p-0 gap-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50"
         >
           <SheetTitle className="sr-only">Canvases and documents</SheetTitle>
-          <div className="flex flex-col h-full max-h-[60vh]">
+          <div className="flex flex-col h-full min-h-0">
             <div className="flex items-center justify-between pt-3 pb-2 px-4 shrink-0">
               <div className="w-10" />
               <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
