@@ -79,14 +79,19 @@ function CanvasToolbarShowTab({
   onShow,
   viewMode,
   onViewModeChange,
+  isMobile,
 }: {
   onShow: () => void;
   viewMode: "edit" | "present";
   onViewModeChange: (mode: "edit" | "present") => void;
+  isMobile?: boolean;
 }) {
   return (
     <motion.div
-      className="absolute top-0 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1"
+      className={cn(
+        "left-1/2 -translate-x-1/2 z-30 flex items-center gap-1",
+        isMobile ? "fixed top-20" : "absolute top-0"
+      )}
       initial={{ opacity: 0, scale: 0.8, y: -8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
@@ -185,6 +190,7 @@ export default function ProjectCanvasPage() {
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [showGrid, setShowGrid] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarHighlighted, setSidebarHighlighted] = useState(false);
   const [toolbarOpen, setToolbarOpen] = useState(true);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const docParam = searchParams.get("doc");
@@ -1326,8 +1332,14 @@ export default function ProjectCanvasPage() {
       : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden">
-      <CanvasHeader
+    <div
+      className={cn(
+        "min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden",
+        isMobile && "touch-manipulation"
+      )}
+    >
+      <div className={cn(isMobile && "fixed top-0 left-0 right-0 z-50")}>
+        <CanvasHeader
         project={displayProject}
         canvas={displayCanvas}
         canvases={displayCanvases}
@@ -1376,10 +1388,12 @@ export default function ProjectCanvasPage() {
         onZoomChange={setZoomLevel}
         sidebarOpen={sidebarOpen}
         onSidebarOpenChange={setSidebarOpen}
+        onSidebarHighlight={() => setSidebarHighlighted(true)}
         toolbarOpen={toolbarOpen}
         onToolbarOpenChange={setToolbarOpen}
         lastSavedAt={lastSavedAt}
-      />
+        />
+      </div>
       {!loading && project && canvas && (
         <>
           <AnimatePresence>
@@ -1466,7 +1480,12 @@ export default function ProjectCanvasPage() {
           </button>
         </div>
       )}
-      <div className="flex h-[calc(100dvh-64px)] min-h-[calc(100vh-64px)] relative overflow-hidden">
+      <div
+        className={cn(
+          "flex h-[calc(100dvh-64px)] min-h-[calc(100vh-64px)] relative overflow-hidden",
+          isMobile && "mt-16"
+        )}
+      >
         <AnimatePresence mode="wait">
           {primaryMode === "document" ? (
             <motion.div
@@ -1483,8 +1502,12 @@ export default function ProjectCanvasPage() {
               <DocumentSidebar
               isOpen={sidebarOpen}
               onClose={() => setSidebarOpen(false)}
+              isHighlighted={sidebarHighlighted}
+              onHighlightClear={() => setSidebarHighlighted(false)}
               projectId={project?.id ?? ""}
               projectName={project?.name ?? ""}
+              projectIcon={project?.icon}
+              projectUpdatedAt={canvas?.updatedAt ?? project?.updatedAt}
               canvases={projectDocuments}
               currentCanvasId={canvas?.id ?? ""}
               currentDocumentId={docParam}
@@ -1524,7 +1547,10 @@ export default function ProjectCanvasPage() {
                   : []
               }
             />
-            <div className="flex-1 relative overflow-hidden">
+            <div
+              className="flex-1 relative overflow-hidden"
+              onClick={() => setSidebarHighlighted(false)}
+            >
               {!loading && project && canvas && currentDocument && (
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -1549,6 +1575,7 @@ export default function ProjectCanvasPage() {
                   lastSavedAt={lastSavedAt}
                   sidebarOpen={sidebarOpen}
                   onSidebarToggle={() => setSidebarOpen((prev) => !prev)}
+                  onDocumentRename={handleDocumentRename}
                   onDocumentSaved={(updatedAt) => {
                     lastSavedAtRef.current = updatedAt;
                     setLastSavedAt(updatedAt);
@@ -1661,10 +1688,12 @@ export default function ProjectCanvasPage() {
                   onShow={() => setToolbarOpen(true)}
                   viewMode={viewMode}
                   onViewModeChange={setViewMode}
+                  isMobile={isMobile}
                 />
               )}
               {(toolbarOpen || isToolbarExiting) && (
                 <CanvasToolbar
+                  isMobile={isMobile}
                   tool={activeTool}
                   onToolChange={(newTool) => {
                     setActiveTool(newTool);
@@ -1703,15 +1732,9 @@ export default function ProjectCanvasPage() {
               {!loading &&
                 primaryMode === "canvas" &&
                 canvasBlocks.length > 0 &&
-                isDefaultTemplate(canvasBlocks) && (
-                  <div
-                    className={cn(
-                      "absolute z-20",
-                      isMobile
-                        ? "left-1/2 -translate-x-1/2 bottom-20"
-                        : "left-4 bottom-4"
-                    )}
-                  >
+                isDefaultTemplate(canvasBlocks) &&
+                !isMobile && (
+                  <div className="absolute z-20 left-4 bottom-4">
                     <button
                       type="button"
                       onClick={() => setStartBlankConfirmOpen(true)}
@@ -1790,6 +1813,29 @@ export default function ProjectCanvasPage() {
             panOffset={panOffset}
           />
         )}
+      {/* Mobile: Start blank button - fixed; above Add blocks FAB when both show */}
+      {isMobile &&
+        primaryMode === "canvas" &&
+        !loading &&
+        project &&
+        canvas &&
+        canvasBlocks.length > 0 &&
+        isDefaultTemplate(canvasBlocks) && (
+          <button
+            type="button"
+            onClick={() => setStartBlankConfirmOpen(true)}
+            aria-label="Start with blank canvas"
+            className={cn(
+              "fixed left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 min-h-[44px] px-4 py-2.5 rounded-xl border-2 border-primary/40 bg-primary/10 dark:bg-primary/20 backdrop-blur-sm shadow-lg shadow-primary/10 hover:bg-primary/20 dark:hover:bg-primary/30 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/15 transition-all text-primary dark:text-primary font-semibold text-sm touch-manipulation",
+              sidebarOpen
+                ? "bottom-[max(1.5rem,env(safe-area-inset-bottom))]"
+                : "bottom-[calc(max(1.5rem,env(safe-area-inset-bottom))+5rem)]"
+            )}
+          >
+            <Sparkles size={18} className="text-primary" />
+            Start blank
+          </button>
+        )}
       {/* Mobile: bottom FAB to open blocks sheet when sidebar is closed */}
       {isMobile &&
         primaryMode === "canvas" &&
@@ -1802,7 +1848,7 @@ export default function ProjectCanvasPage() {
             onClick={() => setSidebarOpen(true)}
             title="Add blocks"
             aria-label="Add blocks"
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-6 py-3.5 rounded-full shadow-lg border border-slate-200/80 dark:border-slate-600/80 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl hover:bg-slate-50 dark:hover:bg-slate-700/95 hover:shadow-xl transition-all text-slate-700 dark:text-slate-200 font-medium text-sm"
+            className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-6 py-3.5 rounded-full shadow-lg border border-slate-200/80 dark:border-slate-600/80 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl hover:bg-slate-50 dark:hover:bg-slate-700/95 hover:shadow-xl transition-all text-slate-700 dark:text-slate-200 font-medium text-sm"
           >
             <Blocks size={20} className="shrink-0" />
             Add blocks
@@ -1819,7 +1865,7 @@ export default function ProjectCanvasPage() {
             onClick={() => setSidebarOpen(true)}
             title="Documents"
             aria-label="Documents"
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-6 py-3.5 rounded-full shadow-lg border border-slate-200/80 dark:border-slate-600/80 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl hover:bg-slate-50 dark:hover:bg-slate-700/95 hover:shadow-xl transition-all text-slate-700 dark:text-slate-200 font-medium text-sm"
+            className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-6 py-3.5 rounded-full shadow-lg border border-slate-200/80 dark:border-slate-600/80 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl hover:bg-slate-50 dark:hover:bg-slate-700/95 hover:shadow-xl transition-all text-slate-700 dark:text-slate-200 font-medium text-sm"
           >
             <FileText size={20} className="shrink-0" />
             Documents

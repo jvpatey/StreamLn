@@ -9,7 +9,7 @@ import {
 } from "react";
 import { AnimatePresence } from "framer-motion";
 import { CanvasBlock } from "./canvas-block";
-import { getKeyboardShortcut } from "@/lib/utils";
+import { cn, getKeyboardShortcut } from "@/lib/utils";
 import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 import type { CanvasTool } from "./canvas-toolbar";
 
@@ -514,12 +514,6 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
               }}
             />
           )}
-
-          {/* Canvas Origin Indicator */}
-          <div
-            className="absolute w-4 h-4 border-2 border-slate-400 dark:border-slate-600 rounded-full bg-white dark:bg-slate-800 pointer-events-none opacity-30"
-            style={{ left: -8, top: -8 }}
-          />
         </div>
 
         {/* Adding Block Indicator */}
@@ -536,7 +530,7 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
         {/* Instructions for empty canvas */}
         {blocks.length === 0 && !isAddingBlock && viewMode === "edit" && !startBlankExiting && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center">
+            <div className={cn("text-center", isMobile && "px-5")}>
               <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl px-8 py-6 shadow-lg max-w-md">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
                   Welcome to {canvasName ?? "your Canvas"}

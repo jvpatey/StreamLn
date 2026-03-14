@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { Menu } from "lucide-react";
+import { SignInButton, SignedOut } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/shared/button";
 import { SimpleThemeToggle } from "@/components/ui/shared/theme-toggle";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/shared/sheet";
 import { useIsMobile } from "@/lib/hooks/use-is-mobile";
@@ -80,6 +82,17 @@ export function ScrollSpyNav() {
           >
             <SheetTitle className="sr-only">Navigation</SheetTitle>
             <nav className="flex flex-col gap-1 pt-4" aria-label="Page sections">
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <Button
+                    variant="gradient"
+                    size="lg"
+                    className="w-full rounded-full font-semibold mb-2"
+                  >
+                    Launch Your Workspace
+                  </Button>
+                </SignInButton>
+              </SignedOut>
               {SECTIONS.map(({ id, label }) => {
                 const isActive = activeId === id;
                 return (

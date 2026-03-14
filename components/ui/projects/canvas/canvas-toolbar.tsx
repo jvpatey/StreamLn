@@ -76,6 +76,7 @@ interface CanvasToolbarProps {
   onDuplicateSelected: () => void;
   viewMode: "edit" | "present";
   onViewModeChange: (mode: "edit" | "present") => void;
+  isMobile?: boolean;
 }
 
 const SHAPE_OPTIONS: { kind: ShapeKind; label: string; icon: React.ReactNode }[] = [
@@ -104,6 +105,7 @@ export function CanvasToolbar({
   onDuplicateSelected,
   viewMode,
   onViewModeChange,
+  isMobile,
 }: CanvasToolbarProps) {
   const [alignMenuOpen, setAlignMenuOpen] = useState(false);
   const [layerMenuOpen, setLayerMenuOpen] = useState(false);
@@ -138,7 +140,11 @@ export function CanvasToolbar({
 
   return (
     <motion.div
-      className="absolute top-4 left-1/2 z-40"
+      className={
+        isMobile
+          ? "fixed top-20 left-1/2 -translate-x-1/2 z-40"
+          : "absolute top-4 left-1/2 z-40"
+      }
       style={{ transformOrigin: "50% 0%" }}
       initial={{ scale: 0.5, opacity: 0, y: -16 }}
       animate={
