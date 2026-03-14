@@ -514,12 +514,6 @@ export const CanvasWorkspace = forwardRef<HTMLDivElement, CanvasWorkspaceProps>(
               }}
             />
           )}
-
-          {/* Canvas Origin Indicator */}
-          <div
-            className="absolute w-4 h-4 border-2 border-slate-400 dark:border-slate-600 rounded-full bg-white dark:bg-slate-800 pointer-events-none opacity-30"
-            style={{ left: -8, top: -8 }}
-          />
         </div>
 
         {/* Adding Block Indicator */}
