@@ -11,6 +11,8 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/shared/sheet";
 import { SortableCanvasList, SortableCanvasItem } from "./sortable-canvas-list";
 import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 import { cn } from "@/lib/utils";
+import { getIconComponent } from "@/components/ui/projects/project-content/icon-picker";
+import React from "react";
 import {
   ChevronRight,
   ChevronDown,
@@ -39,6 +41,8 @@ interface DocumentSidebarProps {
   onClose: () => void;
   projectId: string;
   projectName: string;
+  projectIcon?: string;
+  projectUpdatedAt?: string;
   canvases: CanvasWithDocs[];
   currentCanvasId: string;
   currentDocumentId: string | null;
@@ -62,11 +66,21 @@ interface DocumentSidebarProps {
   recentDocuments: RecentDocument[];
 }
 
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 export function DocumentSidebar({
   isOpen,
   onClose,
   projectId,
   projectName,
+  projectIcon,
+  projectUpdatedAt,
   canvases,
   currentCanvasId,
   currentDocumentId,
@@ -205,10 +219,28 @@ export function DocumentSidebar({
               </button>
             </div>
             <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4">
-              <div className="mb-2">
-                <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                  {projectName}
-                </h3>
+              <div className="p-3 border-b border-slate-200/50 dark:border-slate-700/50 mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-md bg-primary/10 dark:bg-primary/20 shrink-0">
+                    {React.createElement(
+                      getIconComponent(projectIcon || "Folder"),
+                      {
+                        className:
+                          "h-5 w-5 text-primary-600 dark:text-primary-400",
+                      }
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-slate-900 dark:text-slate-100 truncate">
+                      {projectName}
+                    </p>
+                    {projectUpdatedAt && (
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Updated {formatDate(projectUpdatedAt)}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
               <div className="relative mb-2">
                 <Search

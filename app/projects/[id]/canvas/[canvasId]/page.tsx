@@ -1502,6 +1502,8 @@ export default function ProjectCanvasPage() {
               onClose={() => setSidebarOpen(false)}
               projectId={project?.id ?? ""}
               projectName={project?.name ?? ""}
+              projectIcon={project?.icon}
+              projectUpdatedAt={canvas?.updatedAt ?? project?.updatedAt}
               canvases={projectDocuments}
               currentCanvasId={canvas?.id ?? ""}
               currentDocumentId={docParam}
