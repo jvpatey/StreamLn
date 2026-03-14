@@ -551,7 +551,7 @@ export function CanvasBlock({
   const baseTransition = {
     layout: isActivelyDragging
       ? { duration: 0 }
-      : { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
+      : { duration: 0.28, ease: [0.32, 0.72, 0, 1] as const },
     ...(exitStaggerIndex !== undefined && {
       exit: {
         duration: 0.25,
